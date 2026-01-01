@@ -170,7 +170,7 @@ export type InsertDesdobramentoMeta = typeof desdobramentoMetas.$inferInsert;
  */
 export const kpis = mysqlTable("kpis", {
   id: int("id").autoincrement().primaryKey(),
-  empresaId: int("empresaId").notNull(),
+  empresaId: int("empresaId"), // null = KPI do Grupo
   objetivoId: int("objetivoId"),
   nome: varchar("nome", { length: 255 }).notNull(),
   descricao: text("descricao"),
@@ -304,3 +304,35 @@ export const auditoria = mysqlTable("auditoria", {
 
 export type Auditoria = typeof auditoria.$inferSelect;
 export type InsertAuditoria = typeof auditoria.$inferInsert;
+
+/**
+ * Identidade Organizacional do Grupo Arqueo
+ */
+export const identidadeGrupo = mysqlTable("identidade_grupo", {
+  id: int("id").autoincrement().primaryKey(),
+  missao: text("missao"),
+  visao: text("visao"),
+  valores: text("valores"),
+  politica: text("politica"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IdentidadeGrupo = typeof identidadeGrupo.$inferSelect;
+export type InsertIdentidadeGrupo = typeof identidadeGrupo.$inferInsert;
+
+/**
+ * Objetivos Estratégicos do Grupo
+ */
+export const objetivosGrupo = mysqlTable("objetivos_grupo", {
+  id: int("id").autoincrement().primaryKey(),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  prazo: date("prazo"),
+  status: mysqlEnum("status", ["planejado", "em_andamento", "concluido", "cancelado"]).default("planejado"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ObjetivoGrupo = typeof objetivosGrupo.$inferSelect;
+export type InsertObjetivoGrupo = typeof objetivosGrupo.$inferInsert;

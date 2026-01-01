@@ -128,3 +128,16 @@
 - [x] Estatísticas consolidadas
 - [ ] Gráficos de desempenho avançados
 - [ ] Filtros por período/área/responsável
+
+
+## Nova Implementação - Planejamento Macro do Grupo
+- [x] Criar tabela de Planejamento Macro do Grupo no banco
+- [x] Implementar Identidade Organizacional do Grupo (MVV + Política)
+- [x] Criar página de Planejamento Macro do Grupo
+- [x] Implementar Objetivos Estratégicos do Grupo
+- [x] Criar KPIs Consolidados do Grupo (mínimo 5)
+- [x] Adicionar validação de mínimo 5 KPIs para o Grupo (alerta visual)
+- [x] Criar link de acesso ao Planejamento Macro na Home
+- [ ] Adicionar validação de mínimo 5 KPIs por empresa
+- [ ] Implementar consolidação automática de KPIs das empresas
+- [ ] Atualizar Dashboard com seção de Planejamento Macro

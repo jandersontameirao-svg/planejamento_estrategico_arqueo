@@ -9,6 +9,7 @@ import Empresas from "./pages/Empresas";
 import IdentidadeOrganizacional from "./pages/IdentidadeOrganizacional";
 import KPIs from "./pages/KPIs";
 import Dashboard from "./pages/Dashboard";
+import PlanejamentoGrupo from "./pages/PlanejamentoGrupo";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
         {(params) => <KPIs empresaId={Number(params.id)} />}
       </Route>
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -482,3 +482,96 @@ export async function getDashboardEmpresa(empresaId: number) {
     valoresAno,
   };
 }
+
+
+// Identidade do Grupo
+export async function getIdentidadeGrupo() {
+  const db = await getDb();
+  if (!db) return null;
+  const { identidadeGrupo } = await import("../drizzle/schema");
+  const result = await db.select().from(identidadeGrupo).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function upsertIdentidadeGrupo(data: {
+  missao?: string;
+  visao?: string;
+  valores?: string;
+  politica?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { identidadeGrupo } = await import("../drizzle/schema");
+  
+  const existing = await db.select().from(identidadeGrupo).limit(1);
+  
+  if (existing.length > 0) {
+    await db.update(identidadeGrupo).set(data).where(eq(identidadeGrupo.id, existing[0].id));
+  } else {
+    await db.insert(identidadeGrupo).values(data);
+  }
+}
+
+// Objetivos do Grupo
+export async function getObjetivosGrupo() {
+  const db = await getDb();
+  if (!db) return [];
+  const { objetivosGrupo } = await import("../drizzle/schema");
+  return await db.select().from(objetivosGrupo);
+}
+
+export async function createObjetivoGrupo(data: {
+  titulo: string;
+  descricao?: string;
+  prazo?: Date;
+  status?: "planejado" | "em_andamento" | "concluido" | "cancelado";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { objetivosGrupo } = await import("../drizzle/schema");
+  const result = await db.insert(objetivosGrupo).values(data);
+  return Number(result[0].insertId);
+}
+
+export async function updateObjetivoGrupo(id: number, data: Partial<{
+  titulo: string;
+  descricao: string;
+  prazo: Date;
+  status: "planejado" | "em_andamento" | "concluido" | "cancelado";
+}>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { objetivosGrupo } = await import("../drizzle/schema");
+  await db.update(objetivosGrupo).set(data).where(eq(objetivosGrupo.id, id));
+}
+
+export async function deleteObjetivoGrupo(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { objetivosGrupo } = await import("../drizzle/schema");
+  await db.delete(objetivosGrupo).where(eq(objetivosGrupo.id, id));
+}
+
+// KPIs do Grupo (empresaId = null)
+export async function getKPIsGrupo() {
+  const db = await getDb();
+  if (!db) return [];
+  const { kpis } = await import("../drizzle/schema");
+  const { isNull } = await import("drizzle-orm");
+  return await db.select().from(kpis).where(isNull(kpis.empresaId));
+}
+
+export async function createKPIGrupo(data: {
+  nome: string;
+  unidadeMedida: string;
+  tipo: "financeiro" | "operacional" | "cliente" | "processo";
+  frequencia: "mensal" | "trimestral" | "anual";
+  responsavel?: string;
+  ativo?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { kpis } = await import("../drizzle/schema");
+  const result = await db.insert(kpis).values({ ...data, empresaId: null });
+  return Number(result[0].insertId);
+}

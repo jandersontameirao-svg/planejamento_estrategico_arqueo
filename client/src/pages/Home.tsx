@@ -4,10 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { Building2, LayoutDashboard, LogOut } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
+  const [, setLocation] = useLocation();
   const { data: empresas, isLoading: loadingEmpresas } = trpc.empresas.list.useQuery(
     undefined,
     { enabled: isAuthenticated }
@@ -139,26 +140,27 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Card Planejamento Macro do Grupo */}
-        <Card className="mb-8 border-2 border-primary/20 hover:border-primary/40 transition-colors cursor-pointer">
+        {/* Card do Planejamento Macro do Grupo */}
+        <Card className="mb-8 border-2 border-primary/20 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation("/planejamento-grupo")}>
           <CardHeader>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <div className="p-3 bg-primary/10 rounded-lg">
                 <LayoutDashboard className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-2xl">Planejamento Macro – Grupo Arqueo</CardTitle>
-                <CardDescription className="text-base">
-                  Visão consolidada do grupo empresarial
-                </CardDescription>
+                <CardTitle className="text-xl">Planejamento Macro – Grupo Arqueo</CardTitle>
+                <CardDescription>Visão consolidada do grupo empresarial</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
               <span className="text-sm text-muted-foreground">Status: Operacional</span>
             </div>
+            <Button variant="outline" className="w-full" onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-grupo"); }}>
+              Acessar Planejamento Macro
+            </Button>
           </CardContent>
         </Card>
 

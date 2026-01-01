@@ -350,6 +350,103 @@ export const appRouter = router({
         return await getDashboardEmpresa(input.empresaId);
       }),
   }),
+
+  planejamentoGrupo: router({
+    // Identidade do Grupo
+    getIdentidade: protectedProcedure
+      .query(async () => {
+        const { getIdentidadeGrupo } = await import("./db");
+        return await getIdentidadeGrupo();
+      }),
+    upsertIdentidade: protectedProcedure
+      .input(z.object({
+        missao: z.string().optional(),
+        visao: z.string().optional(),
+        valores: z.string().optional(),
+        politica: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Apenas administradores podem editar o planejamento do Grupo");
+        }
+        const { upsertIdentidadeGrupo } = await import("./db");
+        await upsertIdentidadeGrupo(input);
+        return { success: true };
+      }),
+    
+    // Objetivos do Grupo
+    getObjetivos: protectedProcedure
+      .query(async () => {
+        const { getObjetivosGrupo } = await import("./db");
+        return await getObjetivosGrupo();
+      }),
+    createObjetivo: protectedProcedure
+      .input(z.object({
+        titulo: z.string().min(1),
+        descricao: z.string().optional(),
+        prazo: z.date().optional(),
+        status: z.enum(["planejado", "em_andamento", "concluido", "cancelado"]).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem criar objetivos do Grupo");
+        }
+        const { createObjetivoGrupo } = await import("./db");
+        const id = await createObjetivoGrupo(input);
+        return { id };
+      }),
+    updateObjetivo: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        titulo: z.string().min(1).optional(),
+        descricao: z.string().optional(),
+        prazo: z.date().optional(),
+        status: z.enum(["planejado", "em_andamento", "concluido", "cancelado"]).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem editar objetivos do Grupo");
+        }
+        const { id, ...data } = input;
+        const { updateObjetivoGrupo } = await import("./db");
+        await updateObjetivoGrupo(id, data);
+        return { success: true };
+      }),
+    deleteObjetivo: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Apenas administradores podem deletar objetivos do Grupo");
+        }
+        const { deleteObjetivoGrupo } = await import("./db");
+        await deleteObjetivoGrupo(input.id);
+        return { success: true };
+      }),
+    
+    // KPIs do Grupo
+    getKPIs: protectedProcedure
+      .query(async () => {
+        const { getKPIsGrupo } = await import("./db");
+        return await getKPIsGrupo();
+      }),
+    createKPI: protectedProcedure
+      .input(z.object({
+        nome: z.string().min(1),
+        unidadeMedida: z.string(),
+        tipo: z.enum(["financeiro", "operacional", "cliente", "processo"]),
+        frequencia: z.enum(["mensal", "trimestral", "anual"]),
+        responsavel: z.string().optional(),
+        ativo: z.boolean().default(true),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem criar KPIs do Grupo");
+        }
+        const { createKPIGrupo } = await import("./db");
+        const id = await createKPIGrupo(input);
+        return { id };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
