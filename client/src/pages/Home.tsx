@@ -110,6 +110,12 @@ export default function Home() {
             <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-medium">
               {user?.role === "admin" ? "Administrador" : user?.role === "gestor" ? "Gestor" : "Usuário"}
             </span>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/dashboard">
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                Dashboard
+              </Link>
+            </Button>
             {user?.role === "admin" && (
               <Button variant="outline" size="sm" asChild>
                 <Link href="/empresas">
@@ -167,50 +173,49 @@ export default function Home() {
           ) : empresas && empresas.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {empresas.map((empresa) => (
-                <Card
-                  key={empresa.id}
-                  className="hover:shadow-lg transition-shadow cursor-pointer"
-                >
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <Building2 className="h-6 w-6 text-primary" />
+                <Link key={empresa.id} href={`/empresa/${empresa.id}/identidade`}>
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <Building2 className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">{empresa.nome}</CardTitle>
+                          <CardDescription>
+                            {empresa.tipoAtuacao === "servicos"
+                              ? "Serviços"
+                              : empresa.tipoAtuacao === "produtos"
+                              ? "Produtos"
+                              : "Serviços + Produtos"}
+                          </CardDescription>
+                        </div>
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">{empresa.nome}</CardTitle>
-                        <CardDescription>
-                          {empresa.tipoAtuacao === "servicos"
-                            ? "Serviços"
-                            : empresa.tipoAtuacao === "produtos"
-                            ? "Produtos"
-                            : "Serviços + Produtos"}
-                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Status:</span>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              empresa.status === "ativa"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {empresa.status === "ativa" ? "Ativa" : "Inativa"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                          <span className="text-xs text-muted-foreground">
+                            Status RAG: Verde
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Status:</span>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            empresa.status === "ativa"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
-                        >
-                          {empresa.status === "ativa" ? "Ativa" : "Inativa"}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                        <span className="text-xs text-muted-foreground">
-                          Status RAG: Verde
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           ) : (

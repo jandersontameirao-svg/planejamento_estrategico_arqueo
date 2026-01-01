@@ -299,3 +299,186 @@ export async function deleteCanal(id: number) {
   const { canais } = await import("../drizzle/schema");
   await db.delete(canais).where(eq(canais.id, id));
 }
+
+// KPIs
+export async function getKPIsByEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const { kpis } = await import("../drizzle/schema");
+  return await db.select().from(kpis).where(eq(kpis.empresaId, empresaId));
+}
+
+export async function createKPI(data: {
+  empresaId: number;
+  nome: string;
+  unidadeMedida: string;
+  tipo: "financeiro" | "operacional" | "cliente" | "processo";
+  frequencia: "mensal" | "trimestral" | "anual";
+  responsavel?: string;
+  ativo?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { kpis } = await import("../drizzle/schema");
+  const result = await db.insert(kpis).values(data);
+  return Number(result[0].insertId);
+}
+
+export async function updateKPI(id: number, data: Partial<{
+  nome: string;
+  unidadeMedida: string;
+  tipo: "financeiro" | "operacional" | "cliente" | "processo";
+  frequencia: "mensal" | "trimestral" | "anual";
+  responsavel: string;
+  ativo: boolean;
+}>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { kpis } = await import("../drizzle/schema");
+  await db.update(kpis).set(data).where(eq(kpis.id, id));
+}
+
+export async function deleteKPI(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { kpis } = await import("../drizzle/schema");
+  await db.delete(kpis).where(eq(kpis.id, id));
+}
+
+// KPI Valores
+export async function getKPIValores(kpiId: number, ano?: number, mes?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const { kpiValores } = await import("../drizzle/schema");
+  
+  let conditions = [eq(kpiValores.kpiId, kpiId)];
+  if (ano) conditions.push(eq(kpiValores.ano, ano));
+  if (mes) conditions.push(eq(kpiValores.mes, mes));
+  
+  return await db.select().from(kpiValores).where(and(...conditions));
+}
+
+export async function upsertKPIValor(data: {
+  kpiId: number;
+  ano: number;
+  mes: number;
+  meta: number;
+  realizado?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { kpiValores } = await import("../drizzle/schema");
+  
+  // Calcular percentual e status RAG
+  const percentual = data.realizado && data.meta > 0 
+    ? (data.realizado / data.meta) * 100 
+    : null;
+  
+  let statusRag: "verde" | "amarelo" | "vermelho" | null = null;
+  if (percentual !== null) {
+    if (percentual >= 90) statusRag = "verde";
+    else if (percentual >= 70) statusRag = "amarelo";
+    else statusRag = "vermelho";
+  }
+  
+  const values = {
+    ...data,
+    meta: data.meta.toString(),
+    realizado: data.realizado?.toString(),
+    percentualAtingimento: percentual?.toString(),
+    statusRag,
+  };
+  
+  // Verificar se já existe
+  const existing = await db.select().from(kpiValores)
+    .where(and(
+      eq(kpiValores.kpiId, data.kpiId),
+      eq(kpiValores.ano, data.ano),
+      eq(kpiValores.mes, data.mes)
+    ))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    await db.update(kpiValores)
+      .set(values)
+      .where(and(
+        eq(kpiValores.kpiId, data.kpiId),
+        eq(kpiValores.ano, data.ano),
+        eq(kpiValores.mes, data.mes)
+      ));
+  } else {
+    await db.insert(kpiValores).values(values);
+  }
+}
+
+
+// Dashboard - Estatísticas consolidadas
+export async function getDashboardGrupo() {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { empresas, kpis, kpiValores } = await import("../drizzle/schema");
+  
+  // Total de empresas
+  const totalEmpresas = await db.select().from(empresas);
+  const empresasAtivas = totalEmpresas.filter(e => e.status === "ativa");
+  
+  // Total de KPIs
+  const totalKpis = await db.select().from(kpis);
+  
+  // KPIs por status RAG (último mês)
+  const anoAtual = new Date().getFullYear();
+  const mesAtual = new Date().getMonth() + 1;
+  
+  const valoresRecentes = await db.select()
+    .from(kpiValores)
+    .where(and(
+      eq(kpiValores.ano, anoAtual),
+      eq(kpiValores.mes, mesAtual)
+    ));
+  
+  const statusRag = {
+    verde: valoresRecentes.filter(v => v.statusRag === "verde").length,
+    amarelo: valoresRecentes.filter(v => v.statusRag === "amarelo").length,
+    vermelho: valoresRecentes.filter(v => v.statusRag === "vermelho").length,
+  };
+  
+  return {
+    totalEmpresas: totalEmpresas.length,
+    empresasAtivas: empresasAtivas.length,
+    totalKpis: totalKpis.length,
+    statusRag,
+  };
+}
+
+export async function getDashboardEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { kpis, kpiValores } = await import("../drizzle/schema");
+  
+  // KPIs da empresa
+  const kpisEmpresa = await db.select().from(kpis).where(eq(kpis.empresaId, empresaId));
+  
+  // Valores do ano atual
+  const anoAtual = new Date().getFullYear();
+  const mesAtual = new Date().getMonth() + 1;
+  
+  const valoresAno = await db.select()
+    .from(kpiValores)
+    .where(eq(kpiValores.ano, anoAtual));
+  
+  const valoresMesAtual = valoresAno.filter(v => v.mes === mesAtual);
+  
+  const statusRag = {
+    verde: valoresMesAtual.filter(v => v.statusRag === "verde").length,
+    amarelo: valoresMesAtual.filter(v => v.statusRag === "amarelo").length,
+    vermelho: valoresMesAtual.filter(v => v.statusRag === "vermelho").length,
+  };
+  
+  return {
+    totalKpis: kpisEmpresa.length,
+    statusRag,
+    valoresAno,
+  };
+}

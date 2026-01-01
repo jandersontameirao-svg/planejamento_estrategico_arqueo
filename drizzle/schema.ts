@@ -176,7 +176,11 @@ export const kpis = mysqlTable("kpis", {
   descricao: text("descricao"),
   area: varchar("area", { length: 100 }),
   responsavelId: int("responsavelId"),
+  responsavel: varchar("responsavel", { length: 255 }),
   unidadeMedida: varchar("unidadeMedida", { length: 50 }),
+  tipo: mysqlEnum("tipo", ["financeiro", "operacional", "cliente", "processo"]).default("financeiro"),
+  frequencia: mysqlEnum("frequencia", ["mensal", "trimestral", "anual"]).default("mensal"),
+  ativo: boolean("ativo").default(true),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

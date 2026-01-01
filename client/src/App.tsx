@@ -6,6 +6,9 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Empresas from "./pages/Empresas";
+import IdentidadeOrganizacional from "./pages/IdentidadeOrganizacional";
+import KPIs from "./pages/KPIs";
+import Dashboard from "./pages/Dashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -13,6 +16,13 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path="/empresas" component={Empresas} />
+      <Route path="/empresa/:id/identidade">
+        {(params) => <IdentidadeOrganizacional empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/empresa/:id/kpis">
+        {(params) => <KPIs empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/dashboard" component={Dashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

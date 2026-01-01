@@ -129,6 +129,227 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  identidade: router({
+    getByEmpresa: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getIdentidadeByEmpresa } = await import("./db");
+        return await getIdentidadeByEmpresa(input.empresaId);
+      }),
+    upsert: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        missao: z.string().optional(),
+        visao: z.string().optional(),
+        valores: z.string().optional(),
+        politica: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem editar a identidade organizacional");
+        }
+        const { empresaId, ...data } = input;
+        const { upsertIdentidade } = await import("./db");
+        await upsertIdentidade(empresaId, data);
+        return { success: true };
+      }),
+  }),
+
+  produtos: router({
+    listByEmpresa: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getProdutosByEmpresa } = await import("./db");
+        return await getProdutosByEmpresa(input.empresaId);
+      }),
+    create: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        nome: z.string().min(1),
+        tipo: z.enum(["produto", "servico"]),
+        ativo: z.boolean().default(true),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem criar produtos/serviços");
+        }
+        const { createProduto } = await import("./db");
+        const id = await createProduto(input);
+        return { id };
+      }),
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        nome: z.string().min(1).optional(),
+        tipo: z.enum(["produto", "servico"]).optional(),
+        ativo: z.boolean().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem editar produtos/serviços");
+        }
+        const { id, ...data } = input;
+        const { updateProduto } = await import("./db");
+        await updateProduto(id, data);
+        return { success: true };
+      }),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem deletar produtos/serviços");
+        }
+        const { deleteProduto } = await import("./db");
+        await deleteProduto(input.id);
+        return { success: true };
+      }),
+  }),
+
+  canais: router({
+    listByEmpresa: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getCanaisByEmpresa } = await import("./db");
+        return await getCanaisByEmpresa(input.empresaId);
+      }),
+    create: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        nome: z.string().min(1),
+        tipo: z.string().optional(),
+        ativo: z.boolean().default(true),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem criar canais");
+        }
+        const { createCanal } = await import("./db");
+        const id = await createCanal(input);
+        return { id };
+      }),
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        nome: z.string().min(1).optional(),
+        tipo: z.string().optional(),
+        ativo: z.boolean().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem editar canais");
+        }
+        const { id, ...data } = input;
+        const { updateCanal } = await import("./db");
+        await updateCanal(id, data);
+        return { success: true };
+      }),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem deletar canais");
+        }
+        const { deleteCanal } = await import("./db");
+        await deleteCanal(input.id);
+        return { success: true };
+      }),
+  }),
+
+  kpis: router({
+    listByEmpresa: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getKPIsByEmpresa } = await import("./db");
+        return await getKPIsByEmpresa(input.empresaId);
+      }),
+    create: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        nome: z.string().min(1),
+        unidadeMedida: z.string(),
+        tipo: z.enum(["financeiro", "operacional", "cliente", "processo"]),
+        frequencia: z.enum(["mensal", "trimestral", "anual"]),
+        responsavel: z.string().optional(),
+        ativo: z.boolean().default(true),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem criar KPIs");
+        }
+        const { createKPI } = await import("./db");
+        const id = await createKPI(input);
+        return { id };
+      }),
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        nome: z.string().min(1).optional(),
+        unidadeMedida: z.string().optional(),
+        tipo: z.enum(["financeiro", "operacional", "cliente", "processo"]).optional(),
+        frequencia: z.enum(["mensal", "trimestral", "anual"]).optional(),
+        responsavel: z.string().optional(),
+        ativo: z.boolean().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem editar KPIs");
+        }
+        const { id, ...data } = input;
+        const { updateKPI } = await import("./db");
+        await updateKPI(id, data);
+        return { success: true };
+      }),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem deletar KPIs");
+        }
+        const { deleteKPI } = await import("./db");
+        await deleteKPI(input.id);
+        return { success: true };
+      }),
+    getValores: protectedProcedure
+      .input(z.object({ 
+        kpiId: z.number(),
+        ano: z.number().optional(),
+        mes: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { getKPIValores } = await import("./db");
+        return await getKPIValores(input.kpiId, input.ano, input.mes);
+      }),
+    upsertValor: protectedProcedure
+      .input(z.object({
+        kpiId: z.number(),
+        ano: z.number(),
+        mes: z.number(),
+        meta: z.number(),
+        realizado: z.number().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin" && ctx.user.role !== "gestor") {
+          throw new Error("Apenas administradores e gestores podem registrar valores de KPIs");
+        }
+        const { upsertKPIValor } = await import("./db");
+        await upsertKPIValor(input);
+        return { success: true };
+      }),
+  }),
+  dashboard: router({
+    grupo: protectedProcedure
+      .query(async () => {
+        const { getDashboardGrupo } = await import("./db");
+        return await getDashboardGrupo();
+      }),
+    empresa: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getDashboardEmpresa } = await import("./db");
+        return await getDashboardEmpresa(input.empresaId);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -112,3 +112,19 @@
 - [x] Cards de empresas individuais
 - [x] Exibição de status RAG por empresa
 - [x] Navegação condicional por perfil de usuário
+
+
+## Novos Itens - Implementação Atual
+- [x] Módulo de Identidade Organizacional completo
+- [x] Formulário de edição de Missão, Visão, Valores e Política
+- [x] Página de visualização da Identidade Organizaci- [x] Módulo de KPIs Estratégicos completo
+- [x] Cadastro de KPIs com metas mensais
+- [x] Registro de valores realizados
+- [x] Cálculo automático de percentual de atingimento
+- [x] Sistema de status RAG (Verde/Amarelo/Vermelho)ático
+- [- [ ] Visão mensal e anual de KPIs
+- [x] Dashboard Executivo do Grupo
+- [x] Dashboard por Empresa
+- [x] Estatísticas consolidadas
+- [ ] Gráficos de desempenho avançados
+- [ ] Filtros por período/área/responsável
