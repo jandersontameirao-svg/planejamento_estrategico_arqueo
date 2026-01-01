@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 interface KpiValoresDialogProps {
   kpiId: number;
@@ -218,9 +219,46 @@ export default function KpiValoresDialog({
             </form>
           </div>
 
-          {/* Histórico de Valores */}
+          {/* Gráfico de Evolução */}
           <div>
-            <h3 className="font-semibold mb-4">Histórico de Valores</h3>
+            <h3 className="font-semibold mb-4">Evolução Temporal</h3>
+            {valores && valores.length > 0 ? (
+              <div className="mb-6">
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={valores.slice().reverse()}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey={(v) => `${meses.find((m) => m.value === v.mes)?.label.substring(0, 3)}/${v.ano}`}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Tooltip 
+                      formatter={(value: number) => value.toFixed(2)}
+                      labelFormatter={(label) => `Período: ${label}`}
+                    />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey={(v) => v.meta ? parseFloat(v.meta) : 0} 
+                      name="Meta"
+                      stroke="#f97316" 
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey={(v) => v.realizado ? parseFloat(v.realizado) : 0}
+                      name="Realizado"
+                      stroke="#3b82f6" 
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            ) : null}
+            
+            <h3 className="font-semibold mb-4 mt-6">Histórico de Valores</h3>
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
               {valores && valores.length > 0 ? (
                 valores.map((valor) => (

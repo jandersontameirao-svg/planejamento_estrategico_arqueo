@@ -186,3 +186,21 @@
 - [ ] Registrar base de clientes
 - [ ] Registrar ticket médio
 - [ ] Desdobramento por produto/canal
+
+
+## Nova Implementação - Continuação
+- [x] Implementar gráficos de evolução temporal dos KPIs (linha/barra)
+- [x] Adicionar visualização meta vs realizado ao longo dos meses
+- [x] Implementar visualização de valores consolidados do Grupo nas empresas
+- [x] Empresas visualizam valores do Grupo (não têm valores próprios)
+- [x] Remover lançamento de valores individuais por empresa
+- [x] Adicionar nota explicativa na aba BSC das empresas
+- [ ] Criar módulo de Objetivos Estratégicos
+- [ ] Vincular objetivos às perspectivas BSC
+- [ ] Permitir desdobramento de objetivos do Grupo para empresas
+- [ ] Vincular objetivos com KPIs
+- [ ] Criar módulo de Análise de Cenário (Raio-X)
+- [ ] Registrar histórico de faturamento
+- [ ] Registrar base de clientes
+- [ ] Registrar ticket médio
+- [ ] Desdobramento por produto/canal

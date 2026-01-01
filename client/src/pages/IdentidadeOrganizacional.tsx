@@ -26,7 +26,8 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
 
   const { data: identidade, isLoading, refetch } = trpc.identidade.getByEmpresa.useQuery({ empresaId });
   const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
-  const { data: kpis } = trpc.kpis.listByEmpresa.useQuery({ empresaId });
+  // Buscar KPIs do Grupo para visualização consolidada
+  const { data: kpis } = trpc.planejamentoGrupo.getKPIs.useQuery();
 
   const upsertMutation = trpc.identidade.upsert.useMutation({
     onSuccess: () => {
@@ -219,6 +220,14 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                     Visão estratégica organizada nas 4 perspectivas do BSC
                   </CardDescription>
                 </CardHeader>
+                <CardContent>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-900">
+                      <strong>Nota:</strong> Os KPIs e valores exibidos são consolidados do <strong>Planejamento Macro do Grupo Arqueo</strong>. 
+                      Para lançar ou editar valores, acesse o Planejamento Macro na página inicial.
+                    </p>
+                  </div>
+                </CardContent>
               </Card>
 
               {/* Perspectiva Financeira */}
@@ -235,9 +244,9 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  {kpis?.filter(k => k.perspectivaBSC === "financeira").length ? (
+                  {kpis?.filter((k: any) => k.perspectivaBSC === "financeira").length ? (
                     <div className="grid gap-4 md:grid-cols-2">
-                      {kpis.filter(k => k.perspectivaBSC === "financeira").map((kpi) => (
+                      {kpis.filter((k: any) => k.perspectivaBSC === "financeira").map((kpi: any) => (
                         <Card key={kpi.id} className="hover:shadow-md transition-shadow">
                           <CardHeader>
                             <CardTitle className="text-base">{kpi.nome}</CardTitle>
@@ -278,9 +287,9 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  {kpis?.filter(k => k.perspectivaBSC === "clientes").length ? (
+                  {kpis?.filter((k: any) => k.perspectivaBSC === "clientes").length ? (
                     <div className="grid gap-4 md:grid-cols-2">
-                      {kpis.filter(k => k.perspectivaBSC === "clientes").map((kpi) => (
+                      {kpis.filter((k: any) => k.perspectivaBSC === "clientes").map((kpi: any) => (
                         <Card key={kpi.id} className="hover:shadow-md transition-shadow">
                           <CardHeader>
                             <CardTitle className="text-base">{kpi.nome}</CardTitle>
@@ -321,9 +330,9 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  {kpis?.filter(k => k.perspectivaBSC === "processos").length ? (
+                  {kpis?.filter((k: any) => k.perspectivaBSC === "processos").length ? (
                     <div className="grid gap-4 md:grid-cols-2">
-                      {kpis.filter(k => k.perspectivaBSC === "processos").map((kpi) => (
+                      {kpis.filter((k: any) => k.perspectivaBSC === "processos").map((kpi: any) => (
                         <Card key={kpi.id} className="hover:shadow-md transition-shadow">
                           <CardHeader>
                             <CardTitle className="text-base">{kpi.nome}</CardTitle>
@@ -364,9 +373,9 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  {kpis?.filter(k => k.perspectivaBSC === "aprendizado").length ? (
+                  {kpis?.filter((k: any) => k.perspectivaBSC === "aprendizado").length ? (
                     <div className="grid gap-4 md:grid-cols-2">
-                      {kpis.filter(k => k.perspectivaBSC === "aprendizado").map((kpi) => (
+                      {kpis.filter((k: any) => k.perspectivaBSC === "aprendizado").map((kpi: any) => (
                         <Card key={kpi.id} className="hover:shadow-md transition-shadow">
                           <CardHeader>
                             <CardTitle className="text-base">{kpi.nome}</CardTitle>
