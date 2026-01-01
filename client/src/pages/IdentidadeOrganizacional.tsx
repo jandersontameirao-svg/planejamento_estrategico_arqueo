@@ -16,6 +16,7 @@ interface IdentidadeOrganizacionalProps {
 export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrganizacionalProps) {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState<"identidade" | "bsc">("identidade");
   const [formData, setFormData] = useState({
     missao: "",
     visao: "",
@@ -25,6 +26,7 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
 
   const { data: identidade, isLoading, refetch } = trpc.identidade.getByEmpresa.useQuery({ empresaId });
   const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
+  const { data: kpis } = trpc.kpis.listByEmpresa.useQuery({ empresaId });
 
   const upsertMutation = trpc.identidade.upsert.useMutation({
     onSuccess: () => {
@@ -92,12 +94,37 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
       <main className="container py-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Identidade Organizacional</h1>
+            <h1 className="text-3xl font-bold mb-2">{empresa?.nome}</h1>
             <p className="text-muted-foreground">
-              Defina a missão, visão, valores e política da empresa
+              Planejamento estratégico da empresa
             </p>
           </div>
 
+          {/* Tabs */}
+          <div className="flex gap-2 mb-6 border-b">
+            <button
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === "identidade"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setActiveTab("identidade")}
+            >
+              Identidade Organizacional
+            </button>
+            <button
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === "bsc"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setActiveTab("bsc")}
+            >
+              BSC (Balanced Scorecard)
+            </button>
+          </div>
+
+          {activeTab === "identidade" && (
           <form onSubmit={handleSubmit} className="space-y-6">
             <Card>
               <CardHeader>
@@ -180,6 +207,193 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
               </div>
             )}
           </form>
+          )}
+
+          {/* BSC */}
+          {activeTab === "bsc" && (
+            <div className="space-y-6">
+              <Card className="bg-muted/30">
+                <CardHeader>
+                  <CardTitle>Balanced Scorecard - {empresa?.nome}</CardTitle>
+                  <CardDescription>
+                    Visão estratégica organizada nas 4 perspectivas do BSC
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              {/* Perspectiva Financeira */}
+              <Card className="border-2 border-arqueo-laranja/30">
+                <CardHeader className="bg-arqueo-laranja/10">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-arqueo-laranja rounded-lg">
+                      <Building2 className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Perspectiva Financeira</CardTitle>
+                      <CardDescription>Como somos vistos pelos acionistas?</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {kpis?.filter(k => k.perspectivaBSC === "financeira").length ? (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {kpis.filter(k => k.perspectivaBSC === "financeira").map((kpi) => (
+                        <Card key={kpi.id} className="hover:shadow-md transition-shadow">
+                          <CardHeader>
+                            <CardTitle className="text-base">{kpi.nome}</CardTitle>
+                            <CardDescription>{kpi.unidadeMedida}</CardDescription>
+                          </CardHeader>
+                          <CardContent className="text-sm space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Tipo:</span>
+                              <span className="font-medium capitalize">{kpi.tipo}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Frequência:</span>
+                              <span className="font-medium capitalize">{kpi.frequencia}</span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      Nenhum KPI cadastrado nesta perspectiva. Acesse a aba KPIs para adicionar.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Perspectiva de Clientes */}
+              <Card className="border-2 border-arqueo-azul/30">
+                <CardHeader className="bg-arqueo-azul/10">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-arqueo-azul rounded-lg">
+                      <Building2 className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Perspectiva de Clientes</CardTitle>
+                      <CardDescription>Como somos vistos pelos clientes?</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {kpis?.filter(k => k.perspectivaBSC === "clientes").length ? (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {kpis.filter(k => k.perspectivaBSC === "clientes").map((kpi) => (
+                        <Card key={kpi.id} className="hover:shadow-md transition-shadow">
+                          <CardHeader>
+                            <CardTitle className="text-base">{kpi.nome}</CardTitle>
+                            <CardDescription>{kpi.unidadeMedida}</CardDescription>
+                          </CardHeader>
+                          <CardContent className="text-sm space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Tipo:</span>
+                              <span className="font-medium capitalize">{kpi.tipo}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Frequência:</span>
+                              <span className="font-medium capitalize">{kpi.frequencia}</span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      Nenhum KPI cadastrado nesta perspectiva. Acesse a aba KPIs para adicionar.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Perspectiva de Processos Internos */}
+              <Card className="border-2 border-arqueo-bordo/30">
+                <CardHeader className="bg-arqueo-bordo/10">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-arqueo-bordo rounded-lg">
+                      <Building2 className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Perspectiva de Processos Internos</CardTitle>
+                      <CardDescription>Em que processos devemos nos destacar?</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {kpis?.filter(k => k.perspectivaBSC === "processos").length ? (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {kpis.filter(k => k.perspectivaBSC === "processos").map((kpi) => (
+                        <Card key={kpi.id} className="hover:shadow-md transition-shadow">
+                          <CardHeader>
+                            <CardTitle className="text-base">{kpi.nome}</CardTitle>
+                            <CardDescription>{kpi.unidadeMedida}</CardDescription>
+                          </CardHeader>
+                          <CardContent className="text-sm space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Tipo:</span>
+                              <span className="font-medium capitalize">{kpi.tipo}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Frequência:</span>
+                              <span className="font-medium capitalize">{kpi.frequencia}</span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      Nenhum KPI cadastrado nesta perspectiva. Acesse a aba KPIs para adicionar.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Perspectiva de Aprendizado e Crescimento */}
+              <Card className="border-2 border-arqueo-amarelo/30">
+                <CardHeader className="bg-arqueo-amarelo/10">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-arqueo-amarelo rounded-lg">
+                      <Building2 className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Perspectiva de Aprendizado e Crescimento</CardTitle>
+                      <CardDescription>Como sustentar nossa capacidade de mudar e melhorar?</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {kpis?.filter(k => k.perspectivaBSC === "aprendizado").length ? (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {kpis.filter(k => k.perspectivaBSC === "aprendizado").map((kpi) => (
+                        <Card key={kpi.id} className="hover:shadow-md transition-shadow">
+                          <CardHeader>
+                            <CardTitle className="text-base">{kpi.nome}</CardTitle>
+                            <CardDescription>{kpi.unidadeMedida}</CardDescription>
+                          </CardHeader>
+                          <CardContent className="text-sm space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Tipo:</span>
+                              <span className="font-medium capitalize">{kpi.tipo}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Frequência:</span>
+                              <span className="font-medium capitalize">{kpi.frequencia}</span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      Nenhum KPI cadastrado nesta perspectiva. Acesse a aba KPIs para adicionar.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </main>
     </div>

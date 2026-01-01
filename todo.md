@@ -156,3 +156,13 @@
 - [ ] Adicionar validação de balanceamento entre perspectivas
 - [ ] Criar Mapa Estratégico BSC visual
 - [ ] Implementar relações de causa e efeito entre objetivos
+
+
+## Reorganização BSC - Integração com Planejamento Macro e Empresas
+- [x] Adicionar aba "BSC" no Planejamento Macro do Grupo
+- [x] Criar visualização BSC com 4 perspectivas no Planejamento Macro
+- [x] Adicionar aba "BSC" na página de Identidade Organizacional de cada empresa
+- [x] Criar visualização BSC com 4 perspectivas para cada empresa
+- [x] Remover Dashboard BSC separado (/dashboard-bsc)
+- [x] Remover botão "BSC" do header da Home
+- [x] Ajustar rotas e navegação

@@ -117,12 +117,7 @@ export default function Home() {
                 Dashboard
               </Link>
             </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/dashboard-bsc">
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                BSC
-              </Link>
-            </Button>
+
             {user?.role === "admin" && (
               <Button variant="outline" size="sm" asChild>
                 <Link href="/empresas">
