@@ -125,6 +125,7 @@ export const objetivos = mysqlTable("objetivos", {
   ano: int("ano").notNull(),
   nome: varchar("nome", { length: 255 }).notNull(),
   descricao: text("descricao"),
+  perspectivaBSC: mysqlEnum("perspectivaBSC", ["financeira", "clientes", "processos", "aprendizado"]),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -180,6 +181,7 @@ export const kpis = mysqlTable("kpis", {
   unidadeMedida: varchar("unidadeMedida", { length: 50 }),
   tipo: mysqlEnum("tipo", ["financeiro", "operacional", "cliente", "processo"]).default("financeiro"),
   frequencia: mysqlEnum("frequencia", ["mensal", "trimestral", "anual"]).default("mensal"),
+  perspectivaBSC: mysqlEnum("perspectivaBSC", ["financeira", "clientes", "processos", "aprendizado"]),
   ativo: boolean("ativo").default(true),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -328,6 +330,7 @@ export const objetivosGrupo = mysqlTable("objetivos_grupo", {
   id: int("id").autoincrement().primaryKey(),
   titulo: varchar("titulo", { length: 255 }).notNull(),
   descricao: text("descricao"),
+  perspectivaBSC: mysqlEnum("perspectivaBSC", ["financeira", "clientes", "processos", "aprendizado"]),
   prazo: date("prazo"),
   status: mysqlEnum("status", ["planejado", "em_andamento", "concluido", "cancelado"]).default("planejado"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

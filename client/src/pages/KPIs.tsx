@@ -24,6 +24,7 @@ export default function KPIs({ empresaId }: KPIsProps) {
     unidadeMedida: "",
     tipo: "financeiro" as "financeiro" | "operacional" | "cliente" | "processo",
     frequencia: "mensal" as "mensal" | "trimestral" | "anual",
+    perspectivaBSC: "financeira" as "financeira" | "clientes" | "processos" | "aprendizado",
     responsavel: "",
   });
 
@@ -48,6 +49,7 @@ export default function KPIs({ empresaId }: KPIsProps) {
       unidadeMedida: "",
       tipo: "financeiro",
       frequencia: "mensal",
+      perspectivaBSC: "financeira",
       responsavel: "",
     });
   };
@@ -181,6 +183,23 @@ export default function KPIs({ empresaId }: KPIsProps) {
                       </Select>
                     </div>
                     <div className="grid gap-2">
+                      <Label htmlFor="perspectivaBSC">Perspectiva BSC</Label>
+                      <Select
+                        value={formData.perspectivaBSC}
+                        onValueChange={(value: any) => setFormData({ ...formData, perspectivaBSC: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="financeira">Financeira</SelectItem>
+                          <SelectItem value="clientes">Clientes</SelectItem>
+                          <SelectItem value="processos">Processos Internos</SelectItem>
+                          <SelectItem value="aprendizado">Aprendizado e Crescimento</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
                       <Label htmlFor="responsavel">Responsável</Label>
                       <Input
                         id="responsavel"
@@ -241,6 +260,12 @@ export default function KPIs({ empresaId }: KPIsProps) {
                       <span className="text-muted-foreground">Frequência:</span>
                       <span className="font-medium capitalize">{kpi.frequencia || "mensal"}</span>
                     </div>
+                    {kpi.perspectivaBSC && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Perspectiva BSC:</span>
+                        <span className="font-medium capitalize">{kpi.perspectivaBSC}</span>
+                      </div>
+                    )}
                     {kpi.responsavel && (
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Responsável:</span>

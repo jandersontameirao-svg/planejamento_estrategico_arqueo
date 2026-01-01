@@ -141,3 +141,18 @@
 - [ ] Adicionar validação de mínimo 5 KPIs por empresa
 - [ ] Implementar consolidação automática de KPIs das empresas
 - [ ] Atualizar Dashboard com seção de Planejamento Macro
+
+
+## Implementação BSC (Balanced Scorecard)
+- [x] Adicionar campo perspectivaBSC aos KPIs (financeira, clientes, processos, aprendizado)
+- [x] Adicionar campo perspectivaBSC aos Objetivos
+- [x] Migrar banco de dados com novas colunas
+- [x] Atualizar interface de criação/edição de KPIs com perspectiva BSC
+- [x] Atualizar interface de criação/edição de KPIs do Grupo com perspectiva BSC
+- [ ] Atualizar interface de criação/edição de Objetivos com perspectiva BSC
+- [x] Criar Dashboard BSC com 4 perspectivas
+- [x] Implementar visualização por perspectiva nos KPIs
+- [ ] Implementar visualização por perspectiva nos Objetivos
+- [ ] Adicionar validação de balanceamento entre perspectivas
+- [ ] Criar Mapa Estratégico BSC visual
+- [ ] Implementar relações de causa e efeito entre objetivos

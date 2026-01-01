@@ -10,6 +10,7 @@ import IdentidadeOrganizacional from "./pages/IdentidadeOrganizacional";
 import KPIs from "./pages/KPIs";
 import Dashboard from "./pages/Dashboard";
 import PlanejamentoGrupo from "./pages/PlanejamentoGrupo";
+import DashboardBSC from "./pages/DashboardBSC";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -25,6 +26,7 @@ function Router() {
       </Route>
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
+      <Route path="/dashboard-bsc" component={DashboardBSC} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

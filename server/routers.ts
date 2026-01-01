@@ -435,6 +435,7 @@ export const appRouter = router({
         unidadeMedida: z.string(),
         tipo: z.enum(["financeiro", "operacional", "cliente", "processo"]),
         frequencia: z.enum(["mensal", "trimestral", "anual"]),
+        perspectivaBSC: z.enum(["financeira", "clientes", "processos", "aprendizado"]).optional(),
         responsavel: z.string().optional(),
         ativo: z.boolean().default(true),
       }))

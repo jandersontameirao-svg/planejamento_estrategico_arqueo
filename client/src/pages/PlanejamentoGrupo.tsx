@@ -52,6 +52,7 @@ export default function PlanejamentoGrupo() {
   const [unidadeMedida, setUnidadeMedida] = useState("");
   const [tipoKPI, setTipoKPI] = useState<"financeiro" | "operacional" | "cliente" | "processo">("financeiro");
   const [frequenciaKPI, setFrequenciaKPI] = useState<"mensal" | "trimestral" | "anual">("mensal");
+  const [perspectivaBSC, setPerspectivaBSC] = useState<"financeira" | "clientes" | "processos" | "aprendizado">("financeira");
   const [responsavelKPI, setResponsavelKPI] = useState("");
 
   const handleCreateKPI = async () => {
@@ -66,12 +67,14 @@ export default function PlanejamentoGrupo() {
         unidadeMedida,
         tipo: tipoKPI,
         frequencia: frequenciaKPI,
+        perspectivaBSC,
         responsavel: responsavelKPI || undefined,
       });
       toast.success("KPI criado com sucesso!");
       setShowKPIForm(false);
       setNomeKPI("");
       setUnidadeMedida("");
+      setPerspectivaBSC("financeira");
       setResponsavelKPI("");
       refetchKPIs();
     } catch (error: any) {
@@ -261,7 +264,7 @@ export default function PlanejamentoGrupo() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="tipoKPI">Tipo</Label>
                       <select
@@ -287,6 +290,23 @@ export default function PlanejamentoGrupo() {
                         <option value="mensal">Mensal</option>
                         <option value="trimestral">Trimestral</option>
                         <option value="anual">Anual</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="perspectivaBSC">Perspectiva BSC *</Label>
+                      <select
+                        id="perspectivaBSC"
+                        className="w-full px-3 py-2 border rounded-md"
+                        value={perspectivaBSC}
+                        onChange={(e) => setPerspectivaBSC(e.target.value as any)}
+                      >
+                        <option value="financeira">Financeira</option>
+                        <option value="clientes">Clientes</option>
+                        <option value="processos">Processos Internos</option>
+                        <option value="aprendizado">Aprendizado e Crescimento</option>
                       </select>
                     </div>
                     <div className="space-y-2">
