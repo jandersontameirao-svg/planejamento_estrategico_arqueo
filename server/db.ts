@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, type InsertEmpresa, kpiValores } from "../drizzle/schema";
+import { InsertUser, users, type InsertEmpresa, kpiValores, kpis, objetivosGrupo, type InsertObjetivoGrupo, objetivoGrupoKpis, projetosGrupo, type InsertProjetoGrupo, projetoGrupoKpis } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -661,4 +661,71 @@ export async function upsertKpiValor(data: {
         updatedAt: new Date(),
       },
     });
+}
+
+
+
+// ==================== Projetos do Grupo ====================
+
+export async function getProjetosGrupo() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select().from(projetosGrupo);
+  return result;
+}
+
+export async function createProjetoGrupo(data: InsertProjetoGrupo) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(projetosGrupo).values(data);
+}
+
+export async function updateProjetoGrupo(id: number, data: Partial<InsertProjetoGrupo>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(projetosGrupo).set(data).where(eq(projetosGrupo.id, id));
+}
+
+export async function deleteProjetoGrupo(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(projetosGrupo).where(eq(projetosGrupo.id, id));
+}
+
+// Vinculação de Projetos a KPIs
+export async function vincularProjetoKPI(projetoId: number, kpiId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(projetoGrupoKpis).values({ projetoId, kpiId });
+}
+
+export async function desvincularProjetoKPI(projetoId: number, kpiId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(projetoGrupoKpis)
+    .where(and(
+      eq(projetoGrupoKpis.projetoId, projetoId),
+      eq(projetoGrupoKpis.kpiId, kpiId)
+    ));
+}
+
+export async function getKPIsVinculadosProjeto(projetoId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .select({
+      kpi: kpis,
+    })
+    .from(projetoGrupoKpis)
+    .innerJoin(kpis, eq(projetoGrupoKpis.kpiId, kpis.id))
+    .where(eq(projetoGrupoKpis.projetoId, projetoId));
+  
+  return result.map(r => r.kpi);
 }

@@ -210,3 +210,25 @@
 - [x] Adicionar botão "Criar KPI" na aba BSC do Planejamento Macro
 - [x] Adicionar formulário de criação de KPI na aba BSC
 - [ ] Permitir edição e exclusão de KPIs na aba BSC do Planejamento Macro
+
+
+## Módulo de Objetivos Estratégicos
+- [ ] Criar tabela de objetivos estratégicos no banco
+- [ ] Vincular objetivos a perspectivas BSC
+- [ ] Permitir desdobramento de objetivos do Grupo para empresas
+- [ ] Vincular KPIs a objetivos estratégicos
+- [ ] Criar interface de gestão de objetivos
+- [ ] Adicionar aba "Objetivos" no Planejamento Macro
+- [ ] Adicionar aba "Objetivos" nas empresas
+- [ ] Implementar CRUD completo de objetivos
+
+## Módulo de Projetos e Iniciativas
+- [ ] Criar tabela de projetos/iniciativas no banco
+- [ ] Vincular projetos a objetivos estratégicos
+- [ ] Vincular projetos a KPIs
+- [ ] Adicionar campos de status, prazos, responsáveis
+- [ ] Criar interface de gestão de projetos
+- [ ] Implementar calendário Gantt visual
+- [ ] Adicionar aba "Projetos" no Planejamento Macro
+- [ ] Adicionar aba "Projetos" nas empresas
+- [ ] Implementar CRUD completo de projetos

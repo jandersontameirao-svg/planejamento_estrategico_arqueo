@@ -339,3 +339,49 @@ export const objetivosGrupo = mysqlTable("objetivos_grupo", {
 
 export type ObjetivoGrupo = typeof objetivosGrupo.$inferSelect;
 export type InsertObjetivoGrupo = typeof objetivosGrupo.$inferInsert;
+
+/**
+ * Projetos Estratégicos do Grupo
+ */
+export const projetosGrupo = mysqlTable("projetos_grupo", {
+  id: int("id").autoincrement().primaryKey(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  objetivoId: int("objetivoId"), // vinculado a objetivos_grupo
+  area: varchar("area", { length: 100 }),
+  responsavel: varchar("responsavel", { length: 255 }),
+  dataInicio: date("dataInicio"),
+  dataFim: date("dataFim"),
+  status: mysqlEnum("status", ["planejado", "em_andamento", "concluido", "cancelado"]).default("planejado").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProjetoGrupo = typeof projetosGrupo.$inferSelect;
+export type InsertProjetoGrupo = typeof projetosGrupo.$inferInsert;
+
+/**
+ * Vinculação de Projetos do Grupo a KPIs
+ */
+export const projetoGrupoKpis = mysqlTable("projeto_grupo_kpis", {
+  id: int("id").autoincrement().primaryKey(),
+  projetoId: int("projetoId").notNull(),
+  kpiId: int("kpiId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ProjetoGrupoKpi = typeof projetoGrupoKpis.$inferSelect;
+export type InsertProjetoGrupoKpi = typeof projetoGrupoKpis.$inferInsert;
+
+/**
+ * Vinculação de Objetivos do Grupo a KPIs
+ */
+export const objetivoGrupoKpis = mysqlTable("objetivo_grupo_kpis", {
+  id: int("id").autoincrement().primaryKey(),
+  objetivoId: int("objetivoId").notNull(),
+  kpiId: int("kpiId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ObjetivoGrupoKpi = typeof objetivoGrupoKpis.$inferSelect;
+export type InsertObjetivoGrupoKpi = typeof objetivoGrupoKpis.$inferInsert;
