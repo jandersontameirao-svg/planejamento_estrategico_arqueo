@@ -10,6 +10,7 @@ import { Building2, Plus, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+import KpiValoresDialog from "@/components/KpiValoresDialog";
 
 interface KPIsProps {
   empresaId: number;
@@ -19,6 +20,8 @@ export default function KPIs({ empresaId }: KPIsProps) {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [valoresDialogOpen, setValoresDialogOpen] = useState(false);
+  const [selectedKpi, setSelectedKpi] = useState<{ id: number; nome: string } | null>(null);
   const [formData, setFormData] = useState({
     nome: "",
     unidadeMedida: "",
@@ -273,8 +276,16 @@ export default function KPIs({ empresaId }: KPIsProps) {
                       </div>
                     )}
                     <div className="pt-3 border-t">
-                      <Button variant="outline" size="sm" className="w-full">
-                        Ver Detalhes
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => {
+                          setSelectedKpi({ id: kpi.id, nome: kpi.nome });
+                          setValoresDialogOpen(true);
+                        }}
+                      >
+                        Lançar Valores
                       </Button>
                     </div>
                   </div>
@@ -300,6 +311,16 @@ export default function KPIs({ empresaId }: KPIsProps) {
           </Card>
         )}
       </main>
+
+      {/* Dialog de Lançamento de Valores */}
+      {selectedKpi && (
+        <KpiValoresDialog
+          kpiId={selectedKpi.id}
+          kpiNome={selectedKpi.nome}
+          open={valoresDialogOpen}
+          onOpenChange={setValoresDialogOpen}
+        />
+      )}
     </div>
   );
 }

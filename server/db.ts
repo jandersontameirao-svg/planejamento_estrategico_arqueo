@@ -1,6 +1,6 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, type InsertEmpresa } from "../drizzle/schema";
+import { InsertUser, users, type InsertEmpresa, kpiValores } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -574,4 +574,91 @@ export async function createKPIGrupo(data: {
   const { kpis } = await import("../drizzle/schema");
   const result = await db.insert(kpis).values({ ...data, empresaId: null });
   return Number(result[0].insertId);
+}
+
+
+// ============================================
+// KPI Valores Mensais
+// ============================================
+
+export async function getKpiValoresByKpi(kpiId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .select()
+    .from(kpiValores)
+    .where(eq(kpiValores.kpiId, kpiId))
+    .orderBy(desc(kpiValores.ano), desc(kpiValores.mes));
+  
+  return result;
+}
+
+export async function getKpiValorByKpiAndPeriodo(kpiId: number, ano: number, mes: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db
+    .select()
+    .from(kpiValores)
+    .where(
+      and(
+        eq(kpiValores.kpiId, kpiId),
+        eq(kpiValores.ano, ano),
+        eq(kpiValores.mes, mes)
+      )
+    )
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function upsertKpiValor(data: {
+  kpiId: number;
+  ano: number;
+  mes: number;
+  meta?: number;
+  realizado?: number;
+}) {
+  const db = await getDb();
+  if (!db) return;
+
+  // Calcular percentual de atingimento e status RAG
+  let percentualAtingimento: number | null = null;
+  let statusRag: "verde" | "amarelo" | "vermelho" | null = null;
+
+  if (data.meta && data.realizado) {
+    percentualAtingimento = (data.realizado / data.meta) * 100;
+    
+    if (percentualAtingimento >= 90) {
+      statusRag = "verde";
+    } else if (percentualAtingimento >= 70) {
+      statusRag = "amarelo";
+    } else {
+      statusRag = "vermelho";
+    }
+  }
+
+  const values = {
+    kpiId: data.kpiId,
+    ano: data.ano,
+    mes: data.mes,
+    meta: data.meta?.toString(),
+    realizado: data.realizado?.toString(),
+    percentualAtingimento: percentualAtingimento?.toFixed(2),
+    statusRag,
+  };
+
+  await db
+    .insert(kpiValores)
+    .values(values)
+    .onDuplicateKeyUpdate({
+      set: {
+        meta: values.meta,
+        realizado: values.realizado,
+        percentualAtingimento: values.percentualAtingimento,
+        statusRag: values.statusRag,
+        updatedAt: new Date(),
+      },
+    });
 }

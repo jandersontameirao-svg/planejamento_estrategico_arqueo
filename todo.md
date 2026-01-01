@@ -166,3 +166,23 @@
 - [x] Remover Dashboard BSC separado (/dashboard-bsc)
 - [x] Remover botão "BSC" do header da Home
 - [x] Ajustar rotas e navegação
+
+
+## Ajustes e Novas Implementações
+- [x] Remover aba "KPIs Consolidados" do Planejamento Macro do Grupo
+- [x] Manter apenas abas "Identidade" e "BSC" no Planejamento Macro
+- [x] Implementar lançamento de valores mensais nos KPIs
+- [x] Adicionar campos de meta mensal e valor realizado mensal
+- [x] Criar interface de registro de valores por mês/ano
+- [x] Calcular automaticamente percentual de atingimento e status RAG
+- [x] Histórico de valores com status RAG visual
+- [ ] Implementar gráficos de evolução temporal dos KPIs
+- [ ] Criar módulo de Objetivos Estratégicos
+- [ ] Vincular objetivos às perspectivas BSC
+- [ ] Permitir desdobramento de objetivos do Grupo para empresas
+- [ ] Vincular objetivos com KPIs
+- [ ] Implementar módulo de Análise de Cenário (Raio-X)
+- [ ] Registrar histórico de faturamento
+- [ ] Registrar base de clientes
+- [ ] Registrar ticket médio
+- [ ] Desdobramento por produto/canal

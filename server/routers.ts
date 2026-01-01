@@ -448,6 +448,43 @@ export const appRouter = router({
         return { id };
       }),
   }),
+
+  // ============================================
+  // KPI Valores Mensais
+  // ============================================
+  kpiValores: router({
+    listByKpi: protectedProcedure
+      .input(z.object({ kpiId: z.number() }))
+      .query(async ({ input }) => {
+        const { getKpiValoresByKpi } = await import("./db");
+        return await getKpiValoresByKpi(input.kpiId);
+      }),
+
+    getByPeriodo: protectedProcedure
+      .input(z.object({ 
+        kpiId: z.number(),
+        ano: z.number(),
+        mes: z.number()
+      }))
+      .query(async ({ input }) => {
+        const { getKpiValorByKpiAndPeriodo } = await import("./db");
+        return await getKpiValorByKpiAndPeriodo(input.kpiId, input.ano, input.mes);
+      }),
+
+    upsert: protectedProcedure
+      .input(z.object({
+        kpiId: z.number(),
+        ano: z.number(),
+        mes: z.number(),
+        meta: z.number().optional(),
+        realizado: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { upsertKpiValor } = await import("./db");
+        await upsertKpiValor(input);
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

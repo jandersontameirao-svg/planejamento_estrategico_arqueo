@@ -13,7 +13,7 @@ import { toast } from "sonner";
 export default function PlanejamentoGrupo() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"identidade" | "objetivos" | "kpis" | "bsc">("identidade");
+  const [activeTab, setActiveTab] = useState<"identidade" | "bsc">("identidade");
 
   // Identidade
   const { data: identidade, refetch: refetchIdentidade } = trpc.planejamentoGrupo.getIdentidade.useQuery();
@@ -124,21 +124,7 @@ export default function PlanejamentoGrupo() {
           >
             Identidade
           </button>
-          <button
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === "kpis"
-                ? "border-b-2 border-primary text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveTab("kpis")}
-          >
-            KPIs Consolidados
-            {needsMoreKPIs && (
-              <span className="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-800 rounded-full">
-                {kpiCount}/5 mínimo
-              </span>
-            )}
-          </button>
+
           <button
             className={`px-4 py-2 font-medium transition-colors ${
               activeTab === "bsc"
@@ -218,8 +204,8 @@ export default function PlanejamentoGrupo() {
           </Card>
         )}
 
-        {/* KPIs */}
-        {activeTab === "kpis" && (
+        {/* KPIs removido - agora apenas no BSC */}
+        {false && (
           <div className="space-y-6">
             {needsMoreKPIs && (
               <Card className="border-red-200 bg-red-50">
@@ -342,9 +328,9 @@ export default function PlanejamentoGrupo() {
               </Card>
             )}
 
-            {kpis && kpis.length > 0 ? (
+            {kpis?.length ? (
               <div className="grid gap-4">
-                {kpis.map((kpi) => (
+                {kpis?.map((kpi) => (
                   <Card key={kpi.id}>
                     <CardHeader>
                       <div className="flex items-start justify-between">
