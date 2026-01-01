@@ -204,3 +204,9 @@
 - [ ] Registrar base de clientes
 - [ ] Registrar ticket médio
 - [ ] Desdobramento por produto/canal
+
+
+## Correção Urgente
+- [x] Adicionar botão "Criar KPI" na aba BSC do Planejamento Macro
+- [x] Adicionar formulário de criação de KPI na aba BSC
+- [ ] Permitir edição e exclusão de KPIs na aba BSC do Planejamento Macro

@@ -370,11 +370,103 @@ export default function PlanejamentoGrupo() {
           <div className="space-y-6">
             <Card className="bg-muted/30">
               <CardHeader>
-                <CardTitle>Balanced Scorecard do Grupo Arqueo</CardTitle>
-                <CardDescription>
-                  Visão estratégica organizada nas 4 perspectivas do BSC
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Balanced Scorecard do Grupo Arqueo</CardTitle>
+                    <CardDescription>
+                      Visão estratégica organizada nas 4 perspectivas do BSC
+                    </CardDescription>
+                  </div>
+                  {user?.role === "admin" || user?.role === "gestor" ? (
+                    <Button onClick={() => setShowKPIForm(!showKPIForm)}>
+                      {showKPIForm ? "Cancelar" : "+ Criar KPI"}
+                    </Button>
+                  ) : null}
+                </div>
               </CardHeader>
+              {showKPIForm && (
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Nome do KPI</Label>
+                      <Input
+                        value={nomeKPI}
+                        onChange={(e) => setNomeKPI(e.target.value)}
+                        placeholder="Ex: Faturamento Mensal"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Unidade de Medida</Label>
+                      <Input
+                        value={unidadeMedida}
+                        onChange={(e) => setUnidadeMedida(e.target.value)}
+                        placeholder="Ex: R$, %, unidades"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Tipo</Label>
+                      <select
+                        className="w-full border rounded-md p-2"
+                        value={tipoKPI}
+                        onChange={(e) => setTipoKPI(e.target.value as any)}
+                      >
+                        <option value="financeiro">Financeiro</option>
+                        <option value="operacional">Operacional</option>
+                        <option value="cliente">Cliente</option>
+                        <option value="processo">Processo</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Frequência</Label>
+                      <select
+                        className="w-full border rounded-md p-2"
+                        value={frequenciaKPI}
+                        onChange={(e) => setFrequenciaKPI(e.target.value as any)}
+                      >
+                        <option value="mensal">Mensal</option>
+                        <option value="trimestral">Trimestral</option>
+                        <option value="anual">Anual</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Perspectiva BSC</Label>
+                      <select
+                        className="w-full border rounded-md p-2"
+                        value={perspectivaBSC}
+                        onChange={(e) => setPerspectivaBSC(e.target.value as any)}
+                      >
+                        <option value="financeira">Financeira</option>
+                        <option value="clientes">Clientes</option>
+                        <option value="processos">Processos Internos</option>
+                        <option value="aprendizado">Aprendizado e Crescimento</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Responsável (opcional)</Label>
+                      <Input
+                        value={responsavelKPI}
+                        onChange={(e) => setResponsavelKPI(e.target.value)}
+                        placeholder="Nome do responsável"
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex gap-2">
+                    <Button onClick={handleCreateKPI} disabled={createKPI.isPending}>
+                      Salvar KPI
+                    </Button>
+                    <Button variant="outline" onClick={() => setShowKPIForm(false)}>
+                      Cancelar
+                    </Button>
+                  </div>
+                  {needsMoreKPIs && (
+                    <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <p className="text-sm text-yellow-900">
+                        <strong>Atenção:</strong> O Grupo precisa de pelo menos 5 KPIs. Atualmente: {kpiCount}/5
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              )}
             </Card>
 
             {/* Perspectiva Financeira */}
