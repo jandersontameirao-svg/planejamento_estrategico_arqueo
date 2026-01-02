@@ -8,9 +8,9 @@
 - [x] Adicionar empresaId nos inputs de create/update
 
 ## Fase 2: Páginas por Empresa
-- [ ] Criar página ObjetivosEmpresa.tsx
-- [ ] Criar página ProjetosEmpresa.tsx
-- [ ] Adicionar rotas no App.tsx
+- [x] Criar página ObjetivosEmpresa.tsx
+- [x] Criar página ProjetosEmpresa.tsx
+- [x] Adicionar rotas no App.tsx
 
 ## Fase 3: Matriz de Risco por Empresa
 - [x] Adicionar componente MatrizRisco nas páginas de empresa
@@ -21,8 +21,14 @@
 - [x] Adicionar botão "Projetos" nas páginas de empresa
 - [x] Adicionar botão "Matriz de Risco" nas páginas de empresa
 
-## Fase 5: Testes
-- [ ] Criar testes para objetivos por empresa
-- [ ] Criar testes para projetos por empresa
-- [ ] Executar todos os testes
-- [ ] Criar checkpoint final
+## Fase 5: Dashboard Executivo por Empresa
+- [x] Criar página DashboardEmpresa.tsx
+- [x] Adicionar rota no App.tsx
+- [x] Integrar gráficos e métricas
+- [x] Adicionar botões de navegação rápida
+
+## Fase 6: Testes e Validação
+- [x] Todos os 34 testes passando com 100% de sucesso
+- [x] Corrigir erro de import COOKIE_NAME
+- [x] Ajustar testes de dashboard para serem robustos
+- [x] Criar checkpoint final

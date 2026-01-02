@@ -13,6 +13,9 @@ import PlanejamentoGrupo from "./pages/PlanejamentoGrupo";
 import Relatorios from "./pages/Relatorios";
 import PlanoAcaoEmpresa from "./pages/PlanoAcaoEmpresa";
 import MatrizRiscoEmpresa from "./pages/MatrizRiscoEmpresa";
+import ObjetivosEmpresa from "./pages/ObjetivosEmpresa";
+import ProjetosEmpresa from "./pages/ProjetosEmpresa";
+import DashboardEmpresa from "./pages/DashboardEmpresa";
 
 
 function Router() {
@@ -30,8 +33,18 @@ function Router() {
       <Route path="/empresa/:id/plano-acao">
         {(params) => <PlanoAcaoEmpresa empresaId={Number(params.id)} />}
       </Route>
-      <Route path="/empresa/:id/matriz-risco" component={MatrizRiscoEmpresa} />
-      <Route path="/dashboard" component={Dashboard} />      <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
+       <Route path="/empresa/:id/matriz-risco" component={MatrizRiscoEmpresa} />
+      <Route path="/empresa/:id/objetivos">
+        {(params) => <ObjetivosEmpresa empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/empresa/:id/projetos">
+        {(params) => <ProjetosEmpresa empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/empresa/:id/dashboard">
+        {(params) => <DashboardEmpresa empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />
       {/* Final fallback route */}

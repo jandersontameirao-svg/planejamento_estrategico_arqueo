@@ -210,6 +210,12 @@ export default function PlanoAcaoEmpresa({ empresaId }: PlanoAcaoEmpresaProps) {
             <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/identidade`)}>
               Identidade
             </Button>
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/objetivos`)}>
+              Objetivos
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/projetos`)}>
+              Projetos
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/kpis`)}>
               KPIs
             </Button>

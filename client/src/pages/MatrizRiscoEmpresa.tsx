@@ -51,6 +51,18 @@ export default function MatrizRiscoEmpresa() {
             </Button>
             <Button
               variant="outline"
+              onClick={() => setLocation(`/empresa/${empresaId}/objetivos`)}
+            >
+              Objetivos
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setLocation(`/empresa/${empresaId}/projetos`)}
+            >
+              Projetos
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => setLocation(`/empresa/${empresaId}/kpis`)}
             >
               KPIs

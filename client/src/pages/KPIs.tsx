@@ -115,6 +115,12 @@ export default function KPIs({ empresaId }: KPIsProps) {
             <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/identidade`)}>
               Identidade
             </Button>
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/objetivos`)}>
+              Objetivos
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/projetos`)}>
+              Projetos
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/plano-acao`)}>
               Plano de Ação
             </Button>

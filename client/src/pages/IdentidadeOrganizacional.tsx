@@ -85,6 +85,12 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/objetivos`)}>
+              Objetivos
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/projetos`)}>
+              Projetos
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/kpis`)}>
               KPIs
             </Button>
