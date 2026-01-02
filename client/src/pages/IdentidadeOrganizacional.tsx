@@ -15,6 +15,7 @@ import { GraficosStakeholders } from "@/components/GraficosStakeholders";
 import { GraficosRBV } from "@/components/GraficosRBV";
 import { GraficosSWOT } from "@/components/GraficosSWOT";
 import { GraficosOKR } from "@/components/GraficosOKR";
+import { AnalisesNavigation } from "@/components/AnalisesNavigation";
 
 interface IdentidadeOrganizacionalProps {
   empresaId: number;
@@ -275,89 +276,11 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
             </p>
           </div>
 
-          {/* Tabs */}
-          <div className="flex gap-2 mb-6 border-b">
-            <button
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === "identidade"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => setActiveTab("identidade")}
-            >
-              Identidade Organizacional
-            </button>
-            <button
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === "bsc"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => setActiveTab("bsc")}
-            >
-              BSC (Balanced Scorecard)
-            </button>
-            <button
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === "pestel"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => setActiveTab("pestel")}
-            >
-              PESTEL
-            </button>
-            <button
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === "forcas"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => setActiveTab("forcas")}
-            >
-              5 Forças de Porter
-            </button>
-            <button
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === "stakeholders"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => setActiveTab("stakeholders")}
-            >
-              Stakeholders
-            </button>
-            <button
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === "rbv"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => setActiveTab("rbv")}
-            >
-              RBV/VRIO
-            </button>
-            <button
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === "swot"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => setActiveTab("swot")}
-            >
-              SWOT/TOWS
-            </button>
-            <button
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === "okr"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => setActiveTab("okr")}
-            >
-              OKR
-            </button>
+          {/* Analyses Navigation */}
+          <div className="mb-8">
+            <AnalisesNavigation activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
+
 
           {activeTab === "identidade" && (
           <form onSubmit={handleSubmit} className="space-y-6">
