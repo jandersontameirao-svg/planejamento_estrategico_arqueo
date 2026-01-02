@@ -485,6 +485,82 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  // Objetivos Estratégicos do Grupo
+  objetivosGrupo: router({
+    list: publicProcedure.query(async () => {
+      const { getObjetivosGrupo } = await import("./db");
+      return await getObjetivosGrupo();
+    }),
+    
+    create: protectedProcedure
+      .input(z.object({
+        titulo: z.string(),
+        descricao: z.string().optional(),
+        perspectivaBSC: z.enum(["financeira", "clientes", "processos", "aprendizado"]).optional(),
+        prazo: z.string().optional(),
+        status: z.enum(["planejado", "em_andamento", "concluido", "cancelado"]).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { createObjetivoGrupo } = await import("./db");
+        await createObjetivoGrupo(input as any);
+        return { success: true };
+      }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        titulo: z.string().optional(),
+        descricao: z.string().optional(),
+        perspectivaBSC: z.enum(["financeira", "clientes", "processos", "aprendizado"]).optional(),
+        prazo: z.string().optional(),
+        status: z.enum(["planejado", "em_andamento", "concluido", "cancelado"]).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateObjetivoGrupo } = await import("./db");
+        const { id, ...data } = input;
+        await updateObjetivoGrupo(id, data as any);
+        return { success: true };
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteObjetivoGrupo } = await import("./db");
+        await deleteObjetivoGrupo(input.id);
+        return { success: true };
+      }),
+    
+    vincularKPI: protectedProcedure
+      .input(z.object({
+        objetivoId: z.number(),
+        kpiId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { vincularObjetivoKPI } = await import("./db");
+        await vincularObjetivoKPI(input.objetivoId, input.kpiId);
+        return { success: true };
+      }),
+    
+    desvincularKPI: protectedProcedure
+      .input(z.object({
+        objetivoId: z.number(),
+        kpiId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { desvincularObjetivoKPI } = await import("./db");
+        await desvincularObjetivoKPI(input.objetivoId, input.kpiId);
+        return { success: true };
+      }),
+    
+    getKPIsVinculados: publicProcedure
+      .input(z.object({ objetivoId: z.number() }))
+      .query(async ({ input }) => {
+        const { getKPIsVinculadosObjetivo } = await import("./db");
+        return await getKPIsVinculadosObjetivo(input.objetivoId);
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;

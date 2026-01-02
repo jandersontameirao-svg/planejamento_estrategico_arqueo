@@ -213,22 +213,29 @@
 
 
 ## Módulo de Objetivos Estratégicos
-- [ ] Criar tabela de objetivos estratégicos no banco
-- [ ] Vincular objetivos a perspectivas BSC
-- [ ] Permitir desdobramento de objetivos do Grupo para empresas
-- [ ] Vincular KPIs a objetivos estratégicos
+- [x] Criar tabela de objetivos estratégicos no banco
+- [x] Vincular objetivos a perspectivas BSC
+- [x] Vincular KPIs a objetivos estratégicos (tabela de vinculação)
 - [ ] Criar interface de gestão de objetivos
 - [ ] Adicionar aba "Objetivos" no Planejamento Macro
-- [ ] Adicionar aba "Objetivos" nas empresas
 - [ ] Implementar CRUD completo de objetivos
+- [ ] Permitir desdobramento de objetivos do Grupo para empresas
+- [ ] Adicionar aba "Objetivos" nas empresas
 
 ## Módulo de Projetos e Iniciativas
-- [ ] Criar tabela de projetos/iniciativas no banco
-- [ ] Vincular projetos a objetivos estratégicos
-- [ ] Vincular projetos a KPIs
-- [ ] Adicionar campos de status, prazos, responsáveis
+- [x] Criar tabela de projetos/iniciativas no banco
+- [x] Vincular projetos a objetivos estratégicos
+- [x] Vincular projetos a KPIs (tabela de vinculação)
+- [x] Adicionar campos de status, prazos, responsáveis
 - [ ] Criar interface de gestão de projetos
 - [ ] Implementar calendário Gantt visual
 - [ ] Adicionar aba "Projetos" no Planejamento Macro
 - [ ] Adicionar aba "Projetos" nas empresas
 - [ ] Implementar CRUD completo de projetos
+
+## Módulo de Relatórios
+- [ ] Criar página de relatórios consolidados
+- [ ] Implementar exportação em PDF
+- [ ] Incluir gráficos de KPIs no relatório
+- [ ] Incluir objetivos e projetos no relatório
+- [ ] Permitir filtros por período e empresa

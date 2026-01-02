@@ -665,6 +665,40 @@ export async function upsertKpiValor(data: {
 
 
 
+// Vinculação de Objetivos a KPIs
+export async function vincularObjetivoKPI(objetivoId: number, kpiId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(objetivoGrupoKpis).values({ objetivoId, kpiId });
+}
+
+export async function desvincularObjetivoKPI(objetivoId: number, kpiId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(objetivoGrupoKpis)
+    .where(and(
+      eq(objetivoGrupoKpis.objetivoId, objetivoId),
+      eq(objetivoGrupoKpis.kpiId, kpiId)
+    ));
+}
+
+export async function getKPIsVinculadosObjetivo(objetivoId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .select({
+      kpi: kpis,
+    })
+    .from(objetivoGrupoKpis)
+    .innerJoin(kpis, eq(objetivoGrupoKpis.kpiId, kpis.id))
+    .where(eq(objetivoGrupoKpis.objetivoId, objetivoId));
+  
+  return result.map(r => r.kpi);
+}
+
 // ==================== Projetos do Grupo ====================
 
 export async function getProjetosGrupo() {

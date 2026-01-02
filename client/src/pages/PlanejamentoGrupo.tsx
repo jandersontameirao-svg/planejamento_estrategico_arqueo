@@ -13,7 +13,7 @@ import { toast } from "sonner";
 export default function PlanejamentoGrupo() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"identidade" | "bsc">("identidade");
+  const [activeTab, setActiveTab] = useState<"identidade" | "objetivos" | "bsc">("identidade");
 
   // Identidade
   const { data: identidade, refetch: refetchIdentidade } = trpc.planejamentoGrupo.getIdentidade.useQuery();
