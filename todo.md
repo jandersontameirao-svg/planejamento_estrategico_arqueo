@@ -372,3 +372,20 @@
 - [x] Adicionar gráficos de desempenho por perspectiva (radar e barras)
 - [x] Melhorar visual do componente SWOT com matriz colorida (4 quadrantes)
 - [x] Adicionar seleção visual de tipo (Forças, Fraquezas, Oportunidades, Ameaças)
+
+
+## Bug Report - Componentes não mostrando melhorias
+- [ ] Verificar cada componente no navegador (PESTEL, 5 Forças, Stakeholders, VRIO, SWOT, OKR, BSC)
+- [ ] Identificar quais componentes estão mostrando versão antiga
+- [ ] Verificar se os arquivos Lite corretos estão sendo importados
+- [ ] Corrigir imports ou componentes problemáticos
+- [ ] Validar que todas as melhorias estão visíveis
+
+
+## Reorganização do Sistema - Empresas vs Planejamento Macro
+- [x] Criar página /planejamento-macro com BSC Consolidado
+- [x] Criar página /empresa/:id/planejamento com todos os componentes de análise
+- [x] Ajustar rotas no App.tsx
+- [x] Implementar BSC Consolidado com 4 perspectivas, gráfico radar e comparativo por empresa
+- [x] Ajustar links na Home para nova estrutura
+- [x] Testar navegação e validar estrutura completa

@@ -149,7 +149,7 @@ export default function Home() {
         </div>
 
         {/* Card do Planejamento Macro do Grupo */}
-        <Card className="mb-8 border-2 border-primary/20 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation("/planejamento-grupo")}>
+        <Card className="mb-8 border-2 border-primary/20 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation("/planejamento-macro")}>
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="p-3 bg-primary/10 rounded-lg">
@@ -157,7 +157,7 @@ export default function Home() {
               </div>
               <div>
                 <CardTitle className="text-xl">Planejamento Macro – Grupo Arqueo</CardTitle>
-                <CardDescription>Visão consolidada do grupo empresarial</CardDescription>
+                <CardDescription>BSC Consolidado de todas as empresas do grupo</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -166,7 +166,7 @@ export default function Home() {
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
               <span className="text-sm text-muted-foreground">Status: Operacional</span>
             </div>
-            <Button variant="outline" className="w-full" onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-grupo"); }}>
+            <Button variant="outline" className="w-full" onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-macro"); }}>
               Acessar Planejamento Macro
             </Button>
           </CardContent>
@@ -183,7 +183,7 @@ export default function Home() {
           ) : empresas && empresas.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {empresas.map((empresa) => (
-                <Link key={empresa.id} href={`/empresa/${empresa.id}/identidade`}>
+                <Link key={empresa.id} href={`/empresa/${empresa.id}/planejamento`}>
                   <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
                     <CardHeader>
                       <div className="flex items-center gap-3">
