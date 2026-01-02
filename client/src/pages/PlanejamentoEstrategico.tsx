@@ -270,6 +270,63 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
             </div>
           ))}
         </div>
+
+        {/* Botão de Exportação Consolidada */}
+        <div className="mt-12 flex justify-center">
+          <Button
+            onClick={() => {
+              const elemento = document.createElement("div");
+              let conteudoHTML = `
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                  <h1 style="color: #333; text-align: center; border-bottom: 3px solid #f97316; padding-bottom: 10px;">
+                    Relatório Consolidado de Planejamento Estratégico
+                  </h1>
+                  <p style="color: #666; text-align: center; margin-top: 10px;">
+                    Gerado em: ${new Date().toLocaleString("pt-BR")}
+                  </p>
+                  <hr style="margin: 30px 0; border: none; border-top: 2px solid #ddd;">
+              `;
+              
+              analises.forEach((analise, index) => {
+                const content = contentRefs.current[analise.id]?.innerText || "Sem dados";
+                conteudoHTML += `
+                  <div style="page-break-inside: avoid; margin-bottom: 30px;">
+                    <h2 style="color: #f97316; border-left: 4px solid #f97316; padding-left: 10px; margin-top: ${index > 0 ? '40px' : '0'};">
+                      ${analise.titulo}
+                    </h2>
+                    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                      <pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 12px; color: #333;">${content}</pre>
+                    </div>
+                  </div>
+                `;
+              });
+              
+              conteudoHTML += `
+                  <hr style="margin-top: 40px; border: none; border-top: 1px solid #ddd;">
+                  <p style="color: #999; text-align: center; font-size: 12px; margin-top: 20px;">
+                    Documento gerado automaticamente pelo Sistema de Gestão Estratégica
+                  </p>
+                </div>
+              `;
+              
+              elemento.innerHTML = conteudoHTML;
+              
+              const opt: any = {
+                margin: 10,
+                filename: `relatorio-consolidado-${new Date().toISOString().split("T")[0]}.pdf`,
+                image: { type: "jpeg" as const, quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: "portrait", unit: "mm", format: "a4" },
+              };
+              
+              html2pdf().set(opt).from(elemento).save();
+            }}
+            className="gap-2 bg-orange-600 hover:bg-orange-700 text-white px-8 py-6 text-lg"
+          >
+            <FileDown className="h-5 w-5" />
+            Gerar Relatório Consolidado em PDF
+          </Button>
+        </div>
       </main>
     </div>
   );

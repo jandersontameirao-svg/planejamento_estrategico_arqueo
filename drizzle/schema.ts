@@ -591,3 +591,5 @@ export const analiseVrio = mysqlTable("analise_vrio", {
 
 export type AnaliseVrio = typeof analiseVrio.$inferSelect;
 export type InsertAnaliseVrio = typeof analiseVrio.$inferInsert;
+
+// Análises Estratégicas - Histórico
