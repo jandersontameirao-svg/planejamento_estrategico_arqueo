@@ -862,3 +862,74 @@ export async function getProjetosByEmpresa(empresaId: number) {
   
   return await db.select().from(projetosGrupo).where(eq(projetosGrupo.empresaId, empresaId));
 }
+
+
+// ============================================
+// Gestão de Usuários - Funções Adicionais
+// ============================================
+
+export async function getUsersWithEmpresa() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { usuarioEmpresas } = await import("../drizzle/schema");
+  
+  return await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      empresaId: usuarioEmpresas.empresaId,
+      createdAt: users.createdAt,
+    })
+    .from(users)
+    .leftJoin(usuarioEmpresas, eq(users.id, usuarioEmpresas.usuarioId));
+}
+
+export async function getUsersByEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { usuarioEmpresas } = await import("../drizzle/schema");
+  
+  return await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      createdAt: users.createdAt,
+    })
+    .from(users)
+    .innerJoin(usuarioEmpresas, eq(users.id, usuarioEmpresas.usuarioId))
+    .where(eq(usuarioEmpresas.empresaId, empresaId));
+}
+
+export async function vincularUsuarioEmpresaDb(usuarioId: number, empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { usuarioEmpresas } = await import("../drizzle/schema");
+  
+  return await db.insert(usuarioEmpresas).values({
+    usuarioId,
+    empresaId,
+  });
+}
+
+export async function desvincularUsuarioEmpresaDb(usuarioId: number, empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { usuarioEmpresas } = await import("../drizzle/schema");
+  
+  return await db
+    .delete(usuarioEmpresas)
+    .where(
+      and(
+        eq(usuarioEmpresas.usuarioId, usuarioId),
+        eq(usuarioEmpresas.empresaId, empresaId)
+      )
+    );
+}

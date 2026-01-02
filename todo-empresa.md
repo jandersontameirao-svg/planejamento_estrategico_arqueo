@@ -96,3 +96,14 @@
 - [x] Criar ranking de performance
 - [x] Adicionar filtros por período
 - [x] Testes do dashboard comparativo
+
+## Fase 15: Módulo de Cadastro e Gestão de Usuários
+- [x] Criar routers de usuários (list, create, update, delete)
+- [x] Implementar roles (admin, gestor, usuario)
+- [x] Adicionar permissões por role
+- [x] Criar página de Gestão de Usuários
+- [x] Implementar formulário de cadastro
+- [x] Adicionar vinculação usuário-empresa
+- [x] Implementar controle de acesso por role
+- [x] Criar página de Perfil de Usuário
+- [x] Testes de gestão de usuários

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Building2, LayoutDashboard, LogOut, FileText, CheckCircle2 } from "lucide-react";
+import { Building2, LayoutDashboard, LogOut, FileText, CheckCircle2, Users } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 export default function Home() {
@@ -118,12 +118,20 @@ export default function Home() {
               </Link>
             </Button>
             {user?.role === "admin" && (
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/empresas">
-                  <Building2 className="mr-2 h-4 w-4" />
-                  Gerenciar Empresas
-                </Link>
-              </Button>
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/empresas">
+                    <Building2 className="mr-2 h-4 w-4" />
+                    Gerenciar Empresas
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/gestao-usuarios">
+                    <Users className="mr-2 h-4 w-4" />
+                    Usuários
+                  </Link>
+                </Button>
+              </>
             )}
             <Button variant="ghost" size="sm" onClick={() => logout()}>
               <LogOut className="h-4 w-4" />
