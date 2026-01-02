@@ -25,6 +25,7 @@ import CincoForcasPorter from "./pages/CincoForcasPorter";
 import AnaliseStakeholders from "./pages/AnaliseStakeholders";
 import AnaliseRbvVrio from "./pages/AnaliseRbvVrio";
 import AnaliseSwoTtows from "./pages/AnaliseSwoTtows";
+import AnalisesVRIO from "./pages/AnalisesVRIO";
 
 
 function Router() {
@@ -66,6 +67,7 @@ function Router() {
       <Route path="/analise-stakeholders/:id" component={AnaliseStakeholders} />
       <Route path="/analise-rbv-vrio/:id" component={AnaliseRbvVrio} />
       <Route path="/analise-swot-tows/:id" component={AnaliseSwoTtows} />
+      <Route path="/analises-vrio" component={AnalisesVRIO} />
       <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />
