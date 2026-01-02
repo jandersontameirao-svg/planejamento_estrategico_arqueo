@@ -16,6 +16,8 @@ import MatrizRiscoEmpresa from "./pages/MatrizRiscoEmpresa";
 import ObjetivosEmpresa from "./pages/ObjetivosEmpresa";
 import ProjetosEmpresa from "./pages/ProjetosEmpresa";
 import DashboardEmpresa from "./pages/DashboardEmpresa";
+import AnalisePreditiva from "./pages/AnalisePreditiva";
+import PortalStakeholders from "./pages/PortalStakeholders";
 
 
 function Router() {
@@ -42,6 +44,12 @@ function Router() {
       </Route>
       <Route path="/empresa/:id/dashboard">
         {(params) => <DashboardEmpresa empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/empresa/:id/analise-preditiva">
+        {(params) => <AnalisePreditiva empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/portal-stakeholders/:token">
+        {(params) => <PortalStakeholders token={params.token} />}
       </Route>
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />

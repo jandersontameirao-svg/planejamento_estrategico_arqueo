@@ -763,6 +763,106 @@ export const appRouter = router({
       }),
   }),
 
+  // Analise Preditiva
+  analisePreditiva: router({
+    getAlertas: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const { getObjetivosByEmpresa, getProjetosByEmpresa } = await import("./db");
+        
+        const objetivos = await getObjetivosByEmpresa(input.empresaId);
+        const projetos = await getProjetosByEmpresa(input.empresaId);
+        
+        const alertas = [];
+        
+        // Analise de objetivos
+        for (const obj of objetivos) {
+          const diasRestantes = obj.prazo ? 
+            Math.ceil((new Date(obj.prazo).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 
+            null;
+          
+          // Alerta se faltam menos de 30 dias
+          if (diasRestantes && diasRestantes < 30 && diasRestantes > 0) {
+            alertas.push({
+              tipo: "objetivo",
+              severidade: diasRestantes < 7 ? "critico" : "aviso",
+              titulo: `Objetivo "${obj.titulo}" vence em ${diasRestantes} dias`,
+              mensagem: `O objetivo estrategico vence em ${diasRestantes} dias. Verifique o progresso.`,
+              dataAlerta: new Date(),
+              diasRestantes,
+            });
+          }
+        }
+        
+        // Analise de projetos
+        for (const proj of projetos) {
+          const diasRestantes = proj.dataFim ? 
+            Math.ceil((new Date(proj.dataFim).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 
+            null;
+          
+          if (diasRestantes && diasRestantes < 30 && diasRestantes > 0) {
+            alertas.push({
+              tipo: "projeto",
+              severidade: diasRestantes < 7 ? "critico" : "aviso",
+              titulo: `Projeto "${proj.nome}" vence em ${diasRestantes} dias`,
+              mensagem: `O projeto vence em ${diasRestantes} dias.`,
+              dataAlerta: new Date(),
+              diasRestantes,
+            });
+          }
+        }
+        
+        return alertas.sort((a, b) => a.diasRestantes - b.diasRestantes);
+      }),
+    
+    getTendencias: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getProjetosByEmpresa } = await import("./db");
+        
+        const projetos = await getProjetosByEmpresa(input.empresaId);
+        
+        // Agrupar por status e calcular tendencias
+        const statusCount = {
+          planejado: 0,
+          em_andamento: 0,
+          concluido: 0,
+          cancelado: 0,
+        };
+        
+        let totalProgresso = 0;
+        let projetosComProgresso = 0;
+        
+        for (const proj of projetos) {
+          statusCount[proj.status as keyof typeof statusCount]++;
+          // Calcular progresso baseado em datas
+          if (proj.dataInicio && proj.dataFim) {
+            const now = new Date().getTime();
+            const start = new Date(proj.dataInicio).getTime();
+            const end = new Date(proj.dataFim).getTime();
+            
+            if (now >= end) {
+              totalProgresso += 100;
+            } else if (now <= start) {
+              totalProgresso += 0;
+            } else {
+              totalProgresso += Math.round(((now - start) / (end - start)) * 100);
+            }
+            projetosComProgresso++;
+          }
+        }
+        
+        const progressoMedio = projetosComProgresso > 0 ? Math.round(totalProgresso / projetosComProgresso) : 0;
+        
+        return {
+          statusCount,
+          progressoMedio,
+          totalProjetos: projetos.length,
+          previsaoDesvios: progressoMedio < 50 ? "alto" : progressoMedio < 75 ? "medio" : "baixo",
+        };
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;

@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { GanttChart } from "@/components/GanttChart";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { FolderKanban, Plus, Pencil, Trash2, Building2, AlertCircle, Calendar } from "lucide-react";
@@ -429,6 +430,13 @@ export default function ProjetosEmpresa({ empresaId }: ProjetosEmpresaProps) {
             </CardContent>
           </Card>
         </div>
+
+        {/* Gráfico de Gantt */}
+        {filteredProjetos.length > 0 && (
+          <div className="mb-8">
+            <GanttChart projetos={filteredProjetos} height={300} />
+          </div>
+        )}
 
         {/* Lista de Projetos */}
         {filteredProjetos.length === 0 ? (
