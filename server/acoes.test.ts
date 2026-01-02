@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
@@ -14,9 +14,21 @@ describe("Módulo de Plano de Ação", () => {
   };
 
   const caller = appRouter.createCaller(mockContext);
+  let empresaId: number;
+
+  beforeAll(async () => {
+    // Criar empresa de teste
+    const empresa = await caller.empresas.create({
+      nome: "Empresa Teste Ações",
+      tipoAtuacao: "servicos",
+      status: "ativa",
+    });
+    empresaId = empresa.id;
+  });
 
   it("deve criar uma ação", async () => {
     const acao = await caller.acoesGrupo.create({
+      empresaId,
       descricao: "Implementar novo sistema de CRM",
       responsavel: "João Silva",
       prazo: "2025-06-30",
@@ -35,6 +47,7 @@ describe("Módulo de Plano de Ação", () => {
   it("deve atualizar uma ação", async () => {
     // Criar ação
     await caller.acoesGrupo.create({
+      empresaId,
       descricao: "Ação para atualizar",
       status: "pendente",
     });
@@ -57,6 +70,7 @@ describe("Módulo de Plano de Ação", () => {
   it("deve deletar uma ação", async () => {
     // Criar ação
     await caller.acoesGrupo.create({
+      empresaId,
       descricao: "Ação para deletar",
       status: "cancelada",
     });
@@ -94,6 +108,7 @@ describe("Módulo de Plano de Ação", () => {
     if (objetivo) {
       // Criar ação vinculada
       const resultado = await caller.acoesGrupo.create({
+        empresaId,
         descricao: "Ação vinculada a objetivo",
         objetivoId: objetivo.id,
         status: "pendente",
@@ -123,6 +138,7 @@ describe("Módulo de Plano de Ação", () => {
     if (projeto) {
       // Criar ação vinculada
       const resultado = await caller.acoesGrupo.create({
+        empresaId,
         descricao: "Ação vinculada a projeto",
         projetoId: projeto.id,
         status: "pendente",
@@ -141,11 +157,13 @@ describe("Módulo de Plano de Ação", () => {
   it("deve filtrar ações por status", async () => {
     // Criar ações com diferentes status
     await caller.acoesGrupo.create({
+      empresaId,
       descricao: "Ação pendente",
       status: "pendente",
     });
 
     await caller.acoesGrupo.create({
+      empresaId,
       descricao: "Ação em andamento",
       status: "em_andamento",
     });
@@ -168,6 +186,7 @@ describe("Módulo de Plano de Ação", () => {
 
     // Criar ação com responsável específico
     await caller.acoesGrupo.create({
+      empresaId,
       descricao: "Ação de Maria",
       responsavel: responsavelTeste,
       status: "pendente",
@@ -183,6 +202,7 @@ describe("Módulo de Plano de Ação", () => {
 
   it("deve criar ação com todos os campos preenchidos", async () => {
     const resultado = await caller.acoesGrupo.create({
+      empresaId,
       descricao: "Ação completa com todos os campos",
       responsavel: "Pedro Oliveira",
       prazo: "2025-12-31",

@@ -788,6 +788,13 @@ export async function getAcaoById(id: number) {
   return result[0];
 }
 
+export async function getAcoesByEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(acoesGrupo).where(eq(acoesGrupo.empresaId, empresaId));
+}
+
 export async function getAcoesByObjetivo(objetivoId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

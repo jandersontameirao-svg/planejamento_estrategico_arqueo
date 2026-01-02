@@ -117,19 +117,6 @@ export default function Home() {
                 Dashboard
               </Link>
             </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/relatorios">
-                <FileText className="mr-2 h-4 w-4" />
-                Relatórios
-              </Link>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/plano-acao">
-                <CheckCircle2 className="mr-2 h-4 w-4" />
-                Plano de Ação
-              </Link>
-            </Button>
-
             {user?.role === "admin" && (
               <Button variant="outline" size="sm" asChild>
                 <Link href="/empresas">

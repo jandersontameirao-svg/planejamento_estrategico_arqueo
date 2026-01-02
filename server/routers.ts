@@ -655,6 +655,13 @@ export const appRouter = router({
       return await getAcoesGrupo();
     }),
     
+    listByEmpresa: publicProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAcoesByEmpresa } = await import("./db");
+        return await getAcoesByEmpresa(input.empresaId);
+      }),
+    
     listByObjetivo: publicProcedure
       .input(z.object({ objetivoId: z.number() }))
       .query(async ({ input }) => {
@@ -685,6 +692,7 @@ export const appRouter = router({
     
     create: protectedProcedure
       .input(z.object({
+        empresaId: z.number(),
         descricao: z.string(),
         responsavel: z.string().optional(),
         prazo: z.string().optional(),

@@ -21,12 +21,16 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, Clock, Circle, AlertCircle, Plus, Pencil, Trash2, Target, FolderKanban, DollarSign, User, Calendar as CalendarIcon, LayoutList, LayoutGrid } from "lucide-react";
+import { CheckCircle2, Clock, Circle, AlertCircle, Plus, Pencil, Trash2, Target, FolderKanban, DollarSign, User, Calendar as CalendarIcon, LayoutList, LayoutGrid, Building2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function PlanoAcao() {
+interface PlanoAcaoEmpresaProps {
+  empresaId: number;
+}
+
+export default function PlanoAcaoEmpresa({ empresaId }: PlanoAcaoEmpresaProps) {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -35,7 +39,8 @@ export default function PlanoAcao() {
   const [filtroResponsavel, setFiltroResponsavel] = useState<string>("");
   const [visualizacao, setVisualizacao] = useState<"lista" | "kanban">("lista");
 
-  const { data: acoes, refetch: refetchAcoes } = trpc.acoesGrupo.list.useQuery();
+  const { data: acoes, refetch: refetchAcoes } = trpc.acoesGrupo.listByEmpresa.useQuery({ empresaId });
+  const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
   const { data: objetivos } = trpc.objetivosGrupo.list.useQuery();
   const { data: projetos } = trpc.projetosGrupo.list.useQuery();
 
@@ -122,7 +127,7 @@ export default function PlanoAcao() {
         ...formData,
       });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate({ empresaId, ...formData });
     }
   };
 
@@ -194,15 +199,22 @@ export default function PlanoAcao() {
               ← Voltar
             </Button>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-6 w-6 text-primary" />
+              <Building2 className="h-6 w-6 text-primary" />
               <div>
-                <h1 className="font-semibold">Plano de Ação</h1>
-                <p className="text-xs text-muted-foreground">Desdobramento operacional</p>
+                <h1 className="font-semibold">{empresa?.nome}</h1>
+                <p className="text-xs text-muted-foreground">Plano de Ação</p>
               </div>
             </div>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/identidade`)}>
+              Identidade
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/kpis`)}>
+              KPIs
+            </Button>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
               <Button onClick={() => { setEditingAcao(null); resetForm(); }}>
                 <Plus className="mr-2 h-4 w-4" />
                 Nova Ação
@@ -344,10 +356,11 @@ export default function PlanoAcao() {
                   </Button>
                 </div>
               </form>
-            </DialogContent>
-          </Dialog>
+             </DialogContent>
+           </Dialog>
+          </div>
         </div>
-      </header>
+       </header>
 
       <main className="container py-8">
         <div className="mb-8">

@@ -88,6 +88,9 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
             <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/kpis`)}>
               KPIs
             </Button>
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/plano-acao`)}>
+              Plano de Ação
+            </Button>
           </div>
         </div>
       </header>

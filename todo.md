@@ -322,3 +322,14 @@
 - [x] Adicionar tooltips com detalhes ao hover
 - [x] Integrar Matriz de Risco no Dashboard
 - [x] Criar testes para Matriz de Risco
+
+
+## Correções e Melhorias Solicitadas
+- [x] Verificar visualização da Matriz de Risco no Dashboard
+- [x] Corrigir exibição da Matriz de Risco se necessário
+- [x] Adicionar campo empresaId na tabela acoes_grupo
+- [x] Criar routers de Plano de Ação filtrados por empresa
+- [x] Adicionar aba "Plano de Ação" nas páginas de empresa
+- [x] Implementar interface de Plano de Ação por empresa
+- [x] Permitir visualização consolidada no nível do grupo
+- [x] Criar testes para Plano de Ação por empresa

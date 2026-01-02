@@ -396,6 +396,7 @@ export type InsertObjetivoGrupoKpi = typeof objetivoGrupoKpis.$inferInsert;
  */
 export const acoesGrupo = mysqlTable("acoes_grupo", {
   id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(), // Cada ação pertence a uma empresa
   descricao: text("descricao").notNull(),
   responsavel: varchar("responsavel", { length: 255 }),
   prazo: date("prazo"),
