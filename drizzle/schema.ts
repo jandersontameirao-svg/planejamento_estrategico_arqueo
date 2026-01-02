@@ -336,6 +336,8 @@ export const objetivosGrupo = mysqlTable("objetivos_grupo", {
   status: mysqlEnum("status", ["planejado", "em_andamento", "concluido", "cancelado"]).default("planejado"),
   impacto: mysqlEnum("impacto", ["baixo", "medio", "alto"]).default("medio"),
   probabilidade: mysqlEnum("probabilidade", ["baixa", "media", "alta"]).default("media"),
+  metodologia: varchar("metodologia", { length: 100 }).default("matriz_risco_padrao"), // matriz_risco_padrao, iso31000, coso, etc
+  observacoes: text("observacoes"), // Observações sobre como deve ser utilizado
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -359,6 +361,8 @@ export const projetosGrupo = mysqlTable("projetos_grupo", {
   status: mysqlEnum("status", ["planejado", "em_andamento", "concluido", "cancelado"]).default("planejado").notNull(),
   impacto: mysqlEnum("impacto", ["baixo", "medio", "alto"]).default("medio"),
   probabilidade: mysqlEnum("probabilidade", ["baixa", "media", "alta"]).default("media"),
+  metodologia: varchar("metodologia", { length: 100 }).default("matriz_risco_padrao"), // matriz_risco_padrao, iso31000, coso, etc
+  observacoes: text("observacoes"), // Observações sobre como deve ser utilizado
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

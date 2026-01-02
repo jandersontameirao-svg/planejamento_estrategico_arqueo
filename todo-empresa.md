@@ -107,3 +107,12 @@
 - [x] Implementar controle de acesso por role
 - [x] Criar página de Perfil de Usuário
 - [x] Testes de gestão de usuários
+
+## Fase 16: Framework de Metodologia na Matriz de Risco
+- [x] Adicionar campos de metodologia ao schema
+- [x] Adicionar campo de observações ao schema
+- [x] Criar routers para metodologia
+- [x] Implementar framework de metodologia na página
+- [x] Adicionar seção de observações e guia de uso
+- [x] Criar visualização de matriz com metodologia
+- [x] Testes de matriz de risco com metodologia
