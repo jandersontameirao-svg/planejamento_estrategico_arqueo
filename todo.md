@@ -255,3 +255,18 @@
 - [ ] Adicionar calendário Gantt visual
 - [ ] Implementar vinculação de projetos a objetivos/KPIs
 - [ ] Adicionar controle de status, prazos e responsáveis
+
+
+## Implementação Final - Formulários, Gantt e Relatórios
+- [x] Implementar formulário completo de Objetivos Estratégicos
+- [x] Adicionar listagem de objetivos por perspectiva BSC
+- [x] Implementar vinculação visual de KPIs aos objetivos
+- [x] Implementar edição e exclusão de objetivos
+- [x] Implementar formulário completo de Projetos/Iniciativas
+- [x] Adicionar listagem de projetos com filtros
+- [x] Implementar vinculação de projetos a objetivos/KPIs
+- [x] Desenvolver calendário Gantt visual interativo
+- [x] Criar página de relatórios consolidados
+- [x] Implementar exportação de relatórios em PDF
+- [x] Incluir gráficos de KPIs nos relatórios
+- [x] Incluir objetivos e projetos nos relatórios

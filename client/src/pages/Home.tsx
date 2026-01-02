@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Building2, LayoutDashboard, LogOut } from "lucide-react";
+import { Building2, LayoutDashboard, LogOut, FileText } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 export default function Home() {
@@ -115,6 +115,12 @@ export default function Home() {
               <Link href="/dashboard">
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 Dashboard
+              </Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/relatorios">
+                <FileText className="mr-2 h-4 w-4" />
+                Relatórios
               </Link>
             </Button>
 
