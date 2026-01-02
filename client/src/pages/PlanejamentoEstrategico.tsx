@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -17,7 +17,10 @@ interface AnaliseCard {
   icone: React.ReactNode;
   cor: string;
   componente?: React.ComponentType<any>;
-  completude?: number; // 0-100
+}
+
+interface CompletudeState {
+  [key: string]: number; // 0-100
 }
 
 const analises: AnaliseCard[] = [
@@ -28,7 +31,6 @@ const analises: AnaliseCard[] = [
     icone: <Building2 className="h-8 w-8" />,
     cor: "bg-orange-500",
     componente: IdentidadeOrganizacional,
-    completude: 100,
   },
   {
     id: "bsc",
@@ -36,7 +38,6 @@ const analises: AnaliseCard[] = [
     descricao: "Balanced Scorecard",
     icone: <BarChart3 className="h-8 w-8" />,
     cor: "bg-blue-600",
-    completude: 0,
   },
   {
     id: "pestel",
@@ -44,7 +45,6 @@ const analises: AnaliseCard[] = [
     descricao: "Análise Ambiental",
     icone: <Zap className="h-8 w-8" />,
     cor: "bg-orange-500",
-    completude: 0,
   },
   {
     id: "forcas",
@@ -52,7 +52,6 @@ const analises: AnaliseCard[] = [
     descricao: "Porter",
     icone: <TrendingUp className="h-8 w-8" />,
     cor: "bg-blue-500",
-    completude: 0,
   },
   {
     id: "stakeholders",
@@ -60,7 +59,6 @@ const analises: AnaliseCard[] = [
     descricao: "Poder x Interesse",
     icone: <Users className="h-8 w-8" />,
     cor: "bg-purple-500",
-    completude: 0,
   },
   {
     id: "vrio",
@@ -69,7 +67,6 @@ const analises: AnaliseCard[] = [
     icone: <Target className="h-8 w-8" />,
     cor: "bg-blue-500",
     componente: AnalisesVRIO,
-    completude: 0,
   },
   {
     id: "swot",
@@ -77,7 +74,6 @@ const analises: AnaliseCard[] = [
     descricao: "Forças e Oportunidades",
     icone: <AlertCircle className="h-8 w-8" />,
     cor: "bg-green-500",
-    completude: 0,
   },
   {
     id: "okr",
@@ -85,7 +81,6 @@ const analises: AnaliseCard[] = [
     descricao: "Objetivos e Resultados",
     icone: <Lightbulb className="h-8 w-8" />,
     cor: "bg-cyan-500",
-    completude: 0,
   },
 ];
 
@@ -94,20 +89,36 @@ interface PlanejamentoEstrategicoProps {
 }
 
 export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoEstrategicoProps) {
-  const [, setLocation] = useLocation();
-  const [selectedAnalise, setSelectedAnalise] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [analiseAtualId, setAnaliseAtualId] = useState<string | null>(null);
+  const [completude, setCompletude] = useState<CompletudeState>({
+    identidade: 100,
+    bsc: 0,
+    pestel: 0,
+    forcas: 0,
+    stakeholders: 0,
+    vrio: 0,
+    swot: 0,
+    okr: 0,
+  });
 
-  const analiseAtual = analises.find((a) => a.id === selectedAnalise);
+  const atualizarCompletude = useCallback((analiseId: string, novoPercentual: number) => {
+    setCompletude((prev) => ({
+      ...prev,
+      [analiseId]: Math.min(100, Math.max(0, novoPercentual)),
+    }));
+  }, []);
+
+  const analiseAtual = analises.find((a) => a.id === analiseAtualId);
 
   const handleCardClick = (id: string) => {
-    setSelectedAnalise(id);
+    setAnaliseAtualId(id);
     setIsOpen(true);
   };
 
   const handleClose = () => {
     setIsOpen(false);
-    setSelectedAnalise(null);
+    setAnaliseAtualId(null);
   };
 
   return (
@@ -147,12 +158,12 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
                     <div className="w-full">
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-xs font-semibold text-gray-700">Completude</span>
-                        <span className="text-xs font-bold text-gray-900">{analise.completude || 0}%</span>
+                        <span className="text-xs font-bold text-gray-900">{completude[analise.id] || 0}%</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
                           className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all"
-                          style={{ width: `${analise.completude || 0}%` }}
+                          style={{ width: `${completude[analise.id] || 0}%` }}
                         ></div>
                       </div>
                     </div>
@@ -166,28 +177,29 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
 
       {/* Modal para Análises */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="flex flex-row items-center justify-between">
+        <DialogContent className="max-w-7xl w-full max-h-[95vh] overflow-hidden flex flex-col">
+          {/* Header fixo */}
+          <div className="flex flex-row items-center justify-between border-b pb-4 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className={`${analiseAtual?.cor} p-2 rounded-lg text-white`}>
                 {analiseAtual?.icone}
               </div>
               <div>
-                <DialogTitle>{analiseAtual?.titulo}</DialogTitle>
+                <DialogTitle className="text-2xl">{analiseAtual?.titulo}</DialogTitle>
               </div>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 flex-shrink-0"
             >
               <X className="h-4 w-4" />
             </Button>
-          </DialogHeader>
+          </div>
 
-          {/* Conteúdo da Análise */}
-          <div className="mt-6">
+          {/* Conteúdo da Análise - scrollable */}
+          <div className="overflow-y-auto flex-1 pr-4">
             {analiseAtual?.id === "identidade" && (
               <IdentidadeOrganizacional empresaId={empresaId} />
             )}
