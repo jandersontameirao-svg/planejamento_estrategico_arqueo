@@ -118,6 +118,9 @@ export default function KPIs({ empresaId }: KPIsProps) {
             <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/plano-acao`)}>
               Plano de Ação
             </Button>
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/matriz-risco`)}>
+              Matriz de Risco
+            </Button>
             {canEdit && (
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>

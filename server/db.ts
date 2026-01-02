@@ -843,3 +843,22 @@ export async function deleteAcaoGrupo(id: number) {
   
   await db.delete(acoesGrupo).where(eq(acoesGrupo.id, id));
 }
+
+
+// ============================================
+// Funções para Objetivos e Projetos por Empresa
+// ============================================
+
+export async function getObjetivosByEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(objetivosGrupo).where(eq(objetivosGrupo.empresaId, empresaId));
+}
+
+export async function getProjetosByEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(projetosGrupo).where(eq(projetosGrupo.empresaId, empresaId));
+}

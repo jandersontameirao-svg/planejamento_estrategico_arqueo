@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import PlanejamentoGrupo from "./pages/PlanejamentoGrupo";
 import Relatorios from "./pages/Relatorios";
 import PlanoAcaoEmpresa from "./pages/PlanoAcaoEmpresa";
+import MatrizRiscoEmpresa from "./pages/MatrizRiscoEmpresa";
 
 
 function Router() {
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/empresa/:id/plano-acao">
         {(params) => <PlanoAcaoEmpresa empresaId={Number(params.id)} />}
       </Route>
+      <Route path="/empresa/:id/matriz-risco" component={MatrizRiscoEmpresa} />
       <Route path="/dashboard" component={Dashboard} />      <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />

@@ -213,6 +213,9 @@ export default function PlanoAcaoEmpresa({ empresaId }: PlanoAcaoEmpresaProps) {
             <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/kpis`)}>
               KPIs
             </Button>
+            <Button variant="outline" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/matriz-risco`)}>
+              Matriz de Risco
+            </Button>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
               <Button onClick={() => { setEditingAcao(null); resetForm(); }}>

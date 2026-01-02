@@ -328,6 +328,7 @@ export type InsertIdentidadeGrupo = typeof identidadeGrupo.$inferInsert;
  */
 export const objetivosGrupo = mysqlTable("objetivos_grupo", {
   id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId"), // NULL = grupo, NOT NULL = empresa específica
   titulo: varchar("titulo", { length: 255 }).notNull(),
   descricao: text("descricao"),
   perspectivaBSC: mysqlEnum("perspectivaBSC", ["financeira", "clientes", "processos", "aprendizado"]),
@@ -347,6 +348,7 @@ export type InsertObjetivoGrupo = typeof objetivosGrupo.$inferInsert;
  */
 export const projetosGrupo = mysqlTable("projetos_grupo", {
   id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId"), // NULL = grupo, NOT NULL = empresa específica
   nome: varchar("nome", { length: 255 }).notNull(),
   descricao: text("descricao"),
   objetivoId: int("objetivoId"), // vinculado a objetivos_grupo

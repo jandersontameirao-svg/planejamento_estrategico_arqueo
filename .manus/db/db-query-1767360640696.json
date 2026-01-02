@@ -1,0 +1,18 @@
+{
+  "query": "SHOW COLUMNS FROM objetivos_grupo LIKE 'empresaId';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SHOW COLUMNS FROM objetivos_grupo LIKE 'empresaId';",
+  "rows": [
+    {
+      "Field": "empresaId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nempresaId\tint(11)\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

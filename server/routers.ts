@@ -492,9 +492,17 @@ export const appRouter = router({
       const { getObjetivosGrupo } = await import("./db");
       return await getObjetivosGrupo();
     }),
+
+    listByEmpresa: publicProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getObjetivosByEmpresa } = await import("./db");
+        return await getObjetivosByEmpresa(input.empresaId);
+      }),
     
     create: protectedProcedure
       .input(z.object({
+        empresaId: z.number().optional(),
         titulo: z.string(),
         descricao: z.string().optional(),
         perspectivaBSC: z.enum(["financeira", "clientes", "processos", "aprendizado"]).optional(),
@@ -512,6 +520,7 @@ export const appRouter = router({
     update: protectedProcedure
       .input(z.object({
         id: z.number(),
+        empresaId: z.number().optional(),
         titulo: z.string().optional(),
         descricao: z.string().optional(),
         perspectivaBSC: z.enum(["financeira", "clientes", "processos", "aprendizado"]).optional(),
@@ -571,9 +580,17 @@ export const appRouter = router({
       const { getProjetosGrupo } = await import("./db");
       return await getProjetosGrupo();
     }),
+
+    listByEmpresa: publicProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getProjetosByEmpresa } = await import("./db");
+        return await getProjetosByEmpresa(input.empresaId);
+      }),
     
     create: protectedProcedure
       .input(z.object({
+        empresaId: z.number().optional(),
         nome: z.string(),
         descricao: z.string().optional(),
         dataInicio: z.string().optional(),
@@ -592,6 +609,7 @@ export const appRouter = router({
     update: protectedProcedure
       .input(z.object({
         id: z.number(),
+        empresaId: z.number().optional(),
         nome: z.string().optional(),
         descricao: z.string().optional(),
         dataInicio: z.string().optional(),
