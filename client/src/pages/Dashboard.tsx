@@ -106,6 +106,9 @@ export default function Dashboard() {
             <Button variant="ghost" onClick={() => setLocation("/")}>
               ← Voltar
             </Button>
+            <Button variant="outline" onClick={() => setLocation("/dashboard-comparativo")}>
+              Comparativo
+            </Button>
             <div className="flex items-center gap-2">
               <BarChart3 className="h-6 w-6 text-primary" />
               <div>

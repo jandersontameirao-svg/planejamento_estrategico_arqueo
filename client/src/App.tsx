@@ -18,6 +18,7 @@ import ProjetosEmpresa from "./pages/ProjetosEmpresa";
 import DashboardEmpresa from "./pages/DashboardEmpresa";
 import AnalisePreditiva from "./pages/AnalisePreditiva";
 import PortalStakeholders from "./pages/PortalStakeholders";
+import DashboardComparativo from "./pages/DashboardComparativo";
 
 
 function Router() {
@@ -52,6 +53,7 @@ function Router() {
         {(params) => <PortalStakeholders token={params.token} />}
       </Route>
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/dashboard-comparativo" component={DashboardComparativo} />
       <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />

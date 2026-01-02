@@ -863,6 +863,136 @@ export const appRouter = router({
       }),
   }),
 
+  // Email e Notificacoes
+  email: router({
+    enviarAlerta: protectedProcedure
+      .input(z.object({
+        destinatario: z.string().email(),
+        tipo: z.enum(["objetivo", "projeto"]),
+        titulo: z.string(),
+        mensagem: z.string(),
+        severidade: z.enum(["critico", "aviso"]),
+        diasRestantes: z.number(),
+        empresa: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { enviarAlertaCritico } = await import("./email");
+        return await enviarAlertaCritico(input.destinatario, {
+          tipo: input.tipo,
+          titulo: input.titulo,
+          mensagem: input.mensagem,
+          severidade: input.severidade,
+          diasRestantes: input.diasRestantes,
+          empresa: input.empresa,
+        });
+      }),
+  }),
+
+  // Calendario
+  calendario: router({
+    gerarICS: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const { getObjetivosByEmpresa, getProjetosByEmpresa } = await import("./db");
+        const { criarEventoCalendario, gerarDownloadICS } = await import("./calendar");
+        
+        const objetivos = await getObjetivosByEmpresa(input.empresaId);
+        const projetos = await getProjetosByEmpresa(input.empresaId);
+        
+        const eventos = [];
+        
+        // Converter objetivos para eventos
+        for (const obj of objetivos) {
+          if (obj.prazo) {
+            eventos.push(
+              criarEventoCalendario(
+                `obj-${obj.id}`,
+                obj.titulo || "Objetivo sem título",
+                new Date(),
+                new Date(obj.prazo),
+                "objetivo",
+                obj.status || "planejado"
+              )
+            );
+          }
+        }
+        
+        // Converter projetos para eventos
+        for (const proj of projetos) {
+          if (proj.dataInicio && proj.dataFim) {
+            eventos.push(
+              criarEventoCalendario(
+                `proj-${proj.id}`,
+                proj.nome || "Projeto sem nome",
+                new Date(proj.dataInicio),
+                new Date(proj.dataFim),
+                "projeto",
+                proj.status,
+                proj.descricao || undefined,
+                proj.area || undefined,
+                proj.responsavel || undefined
+              )
+            );
+          }
+        }
+        
+        const icsBuffer = gerarDownloadICS(eventos);
+        return {
+          success: true,
+          data: icsBuffer.toString("base64"),
+          filename: `planejamento-${input.empresaId}-${new Date().toISOString().split("T")[0]}.ics`,
+        };
+      }),
+    
+    gerarURLGoogleCalendar: publicProcedure
+      .input(z.object({
+        titulo: z.string(),
+        dataInicio: z.date(),
+        dataFim: z.date(),
+        descricao: z.string().optional(),
+        local: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { gerarURLGoogleCalendar } = await import("./calendar");
+        const url = gerarURLGoogleCalendar({
+          id: `evt-${Date.now()}`,
+          titulo: input.titulo,
+          dataInicio: input.dataInicio,
+          dataFim: input.dataFim,
+          descricao: input.descricao,
+          local: input.local,
+          tipo: "projeto",
+          status: "em_andamento",
+        });
+        return { url };
+      }),
+    
+    gerarURLOutlook: publicProcedure
+      .input(z.object({
+        titulo: z.string(),
+        dataInicio: z.date(),
+        dataFim: z.date(),
+        descricao: z.string().optional(),
+        local: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { gerarURLOutlook } = await import("./calendar");
+        const url = gerarURLOutlook({
+          id: `evt-${Date.now()}`,
+          titulo: input.titulo,
+          dataInicio: input.dataInicio,
+          dataFim: input.dataFim,
+          descricao: input.descricao,
+          local: input.local,
+          tipo: "projeto",
+          status: "em_andamento",
+        });
+        return { url };
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;

@@ -71,3 +71,28 @@
 - [x] Adicionar filtros e exportação para stakeholders
 - [x] Implementar segurança e permissões
 - [x] Testes do portal de stakeholders
+
+## Fase 12: Notificações por Email
+- [x] Instalar biblioteca nodemailer
+- [x] Criar serviço de envio de emails
+- [x] Adicionar router de notificações
+- [x] Implementar alertas críticos por email
+- [x] Criar templates de email
+- [x] Configurar SMTP
+- [x] Testes de notificações
+
+## Fase 13: Integração com Calendário
+- [x] Criar router de calendário
+- [x] Implementar geração de eventos iCal
+- [x] Adicionar links de sincronização Google Calendar
+- [x] Adicionar links de sincronização Outlook
+- [x] Criar página de sincronização
+- [x] Testes de integração calendário
+
+## Fase 14: Dashboard Comparativo Entre Empresas
+- [x] Criar página DashboardComparativo.tsx
+- [x] Implementar comparação de KPIs
+- [x] Adicionar gráficos comparativos
+- [x] Criar ranking de performance
+- [x] Adicionar filtros por período
+- [x] Testes do dashboard comparativo
