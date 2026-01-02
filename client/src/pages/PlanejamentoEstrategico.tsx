@@ -6,6 +6,9 @@ import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Ligh
 import { useLocation } from "wouter";
 import IdentidadeOrganizacional from "./IdentidadeOrganizacional";
 import AnalisesVRIO from "./AnalisesVRIO";
+import AnalisePestelCompleta from "./AnalisePestelCompleta";
+import CincoForcasCompleta from "./CincoForcasCompleta";
+import { AnalisesStakeholdersCompleta, AnaliseSwoTtowsCompleta, AnaliseOkrCompleta, AnaliseBscCompleta } from "./AnalisesRestantes";
 
 interface AnaliseCard {
   id: string;
@@ -14,6 +17,7 @@ interface AnaliseCard {
   icone: React.ReactNode;
   cor: string;
   componente?: React.ComponentType<any>;
+  completude?: number; // 0-100
 }
 
 const analises: AnaliseCard[] = [
@@ -24,6 +28,7 @@ const analises: AnaliseCard[] = [
     icone: <Building2 className="h-8 w-8" />,
     cor: "bg-orange-500",
     componente: IdentidadeOrganizacional,
+    completude: 100,
   },
   {
     id: "bsc",
@@ -31,6 +36,7 @@ const analises: AnaliseCard[] = [
     descricao: "Balanced Scorecard",
     icone: <BarChart3 className="h-8 w-8" />,
     cor: "bg-blue-600",
+    completude: 0,
   },
   {
     id: "pestel",
@@ -38,6 +44,7 @@ const analises: AnaliseCard[] = [
     descricao: "Análise Ambiental",
     icone: <Zap className="h-8 w-8" />,
     cor: "bg-orange-500",
+    completude: 0,
   },
   {
     id: "forcas",
@@ -45,6 +52,7 @@ const analises: AnaliseCard[] = [
     descricao: "Porter",
     icone: <TrendingUp className="h-8 w-8" />,
     cor: "bg-blue-500",
+    completude: 0,
   },
   {
     id: "stakeholders",
@@ -52,6 +60,7 @@ const analises: AnaliseCard[] = [
     descricao: "Poder x Interesse",
     icone: <Users className="h-8 w-8" />,
     cor: "bg-purple-500",
+    completude: 0,
   },
   {
     id: "vrio",
@@ -60,6 +69,7 @@ const analises: AnaliseCard[] = [
     icone: <Target className="h-8 w-8" />,
     cor: "bg-blue-500",
     componente: AnalisesVRIO,
+    completude: 0,
   },
   {
     id: "swot",
@@ -67,6 +77,7 @@ const analises: AnaliseCard[] = [
     descricao: "Forças e Oportunidades",
     icone: <AlertCircle className="h-8 w-8" />,
     cor: "bg-green-500",
+    completude: 0,
   },
   {
     id: "okr",
@@ -74,6 +85,7 @@ const analises: AnaliseCard[] = [
     descricao: "Objetivos e Resultados",
     icone: <Lightbulb className="h-8 w-8" />,
     cor: "bg-cyan-500",
+    completude: 0,
   },
 ];
 
@@ -131,8 +143,19 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
                       <p className="text-sm text-gray-600 mt-1">{analise.descricao}</p>
                     </div>
 
-                    {/* Indicador de seleção */}
-                    <div className="w-12 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full"></div>
+                    {/* Indicador de Completude */}
+                    <div className="w-full">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs font-semibold text-gray-700">Completude</span>
+                        <span className="text-xs font-bold text-gray-900">{analise.completude || 0}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all"
+                          style={{ width: `${analise.completude || 0}%` }}
+                        ></div>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -168,15 +191,13 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
             {analiseAtual?.id === "identidade" && (
               <IdentidadeOrganizacional empresaId={empresaId} />
             )}
+            {analiseAtual?.id === "pestel" && <AnalisePestelCompleta empresaId={empresaId} />}
+            {analiseAtual?.id === "forcas" && <CincoForcasCompleta empresaId={empresaId} />}
+            {analiseAtual?.id === "stakeholders" && <AnalisesStakeholdersCompleta />}
             {analiseAtual?.id === "vrio" && <AnalisesVRIO />}
-            {!analiseAtual?.componente && (
-              <div className="text-center py-12">
-                <p className="text-gray-600 text-lg">
-                  Análise <strong>{analiseAtual?.titulo}</strong> em desenvolvimento
-                </p>
-                <p className="text-gray-500 mt-2">Esta funcionalidade será disponibilizada em breve</p>
-              </div>
-            )}
+            {analiseAtual?.id === "swot" && <AnaliseSwoTtowsCompleta />}
+            {analiseAtual?.id === "okr" && <AnaliseOkrCompleta />}
+            {analiseAtual?.id === "bsc" && <AnaliseBscCompleta />}
           </div>
         </DialogContent>
       </Dialog>
