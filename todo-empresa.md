@@ -129,3 +129,13 @@
 - [x] Adicionar hover effects nos itens
 - [x] Exibir matriz sempre (mesmo sem dados)
 - [x] Corrigir renderização de componente
+
+
+## Fase 18: Drag-and-Drop na Matriz de Risco
+- [x] Adicionar suporte a drag-and-drop no componente
+- [x] Implementar lógica de cálculo de quadrante baseado em posição do mouse
+- [x] Adicionar feedback visual durante drag (highlight de quadrante)
+- [x] Implementar drop handler para atualizar impacto e probabilidade
+- [x] Adicionar validações de drop
+- [x] Testar drag-and-drop completo
+- [x] Adicionar cursor feedback durante drag
