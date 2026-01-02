@@ -16,6 +16,8 @@ import { GraficosRBV } from "@/components/GraficosRBV";
 import { GraficosSWOT } from "@/components/GraficosSWOT";
 import { GraficosOKR } from "@/components/GraficosOKR";
 import { AnalisesNavigation } from "@/components/AnalisesNavigation";
+import { AnalisadorVRIO } from "@/components/AnalisadorVRIO";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 interface IdentidadeOrganizacionalProps {
   empresaId: number;
@@ -24,7 +26,7 @@ interface IdentidadeOrganizacionalProps {
 export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrganizacionalProps) {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"identidade" | "bsc" | "pestel" | "forcas" | "stakeholders" | "rbv" | "swot" | "okr">("identidade");
+  const [activeTab, setActiveTab] = useState<"identidade" | "bsc" | "pestel" | "forcas" | "stakeholders" | "rbv" | "swot" | "okr" | "vrio">("identidade");
   const [formData, setFormData] = useState({
     missao: "",
     visao: "",
@@ -278,7 +280,7 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
 
           {/* Analyses Navigation */}
           <div className="mb-8">
-            <AnalisesNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+            <AnalisesNavigation activeTab={activeTab as any} onTabChange={setActiveTab as any} />
           </div>
 
 
@@ -951,6 +953,24 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                   )}
                 </CardContent>
               </Card>
+            </div>
+          )}
+
+          {activeTab === "vrio" && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Análise VRIO Interativa</h2>
+                <p className="text-muted-foreground mb-6">
+                  Avalie os recursos organizacionais segundo o modelo VRIO (Valor, Raridade, Imitabilidade, Organização)
+                </p>
+              </div>
+              <AnalisadorVRIO 
+                empresaId={empresaId}
+                onSave={async (recursos) => {
+                  console.log("Recursos VRIO salvos:", recursos);
+                  toast.success("Análise VRIO salva com sucesso!");
+                }}
+              />
             </div>
           )}
         </div>
