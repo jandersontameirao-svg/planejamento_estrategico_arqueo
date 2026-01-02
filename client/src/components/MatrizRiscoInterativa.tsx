@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Edit2, Save } from "lucide-react";
+import { Save } from "lucide-react";
 
 interface ItemRisco {
   id: number;
@@ -183,107 +183,113 @@ export function MatrizRiscoInterativa({ objetivos, projetos }: MatrizRiscoIntera
               const probabilidadePos = { baixa: 100, media: 300, alta: 500 }[item.probabilidade];
 
               return (
-                <g key={`${item.tipo}-${item.id}`}>
-                  <Dialog open={isDialogOpen && selectedItem?.id === item.id} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <circle
-                        cx={probabilidadePos}
-                        cy={impactoPos}
-                        r="20"
-                        fill={cor}
-                        stroke="#333"
-                        strokeWidth="2"
-                        style={{ cursor: "pointer", opacity: 0.8 }}
-                        onClick={() => handleEditItem(item)}
-                      />
-                    </DialogTrigger>
-                    <text
-                      x={probabilidadePos}
-                      y={impactoPos + 5}
-                      textAnchor="middle"
-                      className="text-xs font-bold"
-                      fill="white"
-                      style={{ cursor: "pointer", pointerEvents: "none" }}
-                    >
-                      {item.tipo === "objetivo" ? "O" : "P"}
-                    </text>
-
-                    <DialogContent className="max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Editar {item.tipo === "objetivo" ? "Objetivo" : "Projeto"}</DialogTitle>
-                        <DialogDescription>{item.nome}</DialogDescription>
-                      </DialogHeader>
-
-                      <div className="space-y-4">
-                        <div>
-                          <label className="text-sm font-medium">Impacto</label>
-                          <Select value={formData.impacto} onValueChange={(value: any) => setFormData({ ...formData, impacto: value })}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="baixo">Baixo</SelectItem>
-                              <SelectItem value="medio">Médio</SelectItem>
-                              <SelectItem value="alto">Alto</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div>
-                          <label className="text-sm font-medium">Probabilidade</label>
-                          <Select value={formData.probabilidade} onValueChange={(value: any) => setFormData({ ...formData, probabilidade: value })}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="baixa">Baixa</SelectItem>
-                              <SelectItem value="media">Média</SelectItem>
-                              <SelectItem value="alta">Alta</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div>
-                          <label className="text-sm font-medium">Metodologia</label>
-                          <Select value={formData.metodologia} onValueChange={(value) => setFormData({ ...formData, metodologia: value })}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="matriz_risco_padrao">Matriz Padrão 3x3</SelectItem>
-                              <SelectItem value="iso31000">ISO 31000</SelectItem>
-                              <SelectItem value="coso">COSO</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div>
-                          <label className="text-sm font-medium">Observações</label>
-                          <Textarea
-                            value={formData.observacoes}
-                            onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-                            placeholder="Adicione observações sobre como este item deve ser utilizado..."
-                            className="min-h-24"
-                          />
-                        </div>
-
-                        <div className="flex gap-2 justify-end">
-                          <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                            Cancelar
-                          </Button>
-                          <Button onClick={handleSave} disabled={updateObjetivoMutation.isPending || updateProjetoMutation.isPending}>
-                            <Save className="h-4 w-4 mr-2" />
-                            Salvar
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                <g key={`${item.tipo}-${item.id}`} onClick={() => handleEditItem(item)} style={{ cursor: "pointer" }}>
+                  <circle
+                    cx={probabilidadePos}
+                    cy={impactoPos}
+                    r="20"
+                    fill={cor}
+                    stroke="#333"
+                    strokeWidth="2"
+                    style={{ opacity: 0.8, transition: "opacity 0.2s" }}
+                    onMouseEnter={(e) => {
+                      (e.target as SVGCircleElement).style.opacity = "1";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as SVGCircleElement).style.opacity = "0.8";
+                    }}
+                  />
+                  <text
+                    x={probabilidadePos}
+                    y={impactoPos + 5}
+                    textAnchor="middle"
+                    className="text-xs font-bold"
+                    fill="white"
+                    style={{ pointerEvents: "none" }}
+                  >
+                    {item.tipo === "objetivo" ? "O" : "P"}
+                  </text>
                 </g>
               );
             })}
           </svg>
         </div>
+
+        {/* Dialog fora do SVG */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                Editar {selectedItem?.tipo === "objetivo" ? "Objetivo" : "Projeto"}
+              </DialogTitle>
+              <DialogDescription>{selectedItem?.nome}</DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Impacto</label>
+                <Select value={formData.impacto} onValueChange={(value: any) => setFormData({ ...formData, impacto: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="baixo">Baixo</SelectItem>
+                    <SelectItem value="medio">Médio</SelectItem>
+                    <SelectItem value="alto">Alto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Probabilidade</label>
+                <Select value={formData.probabilidade} onValueChange={(value: any) => setFormData({ ...formData, probabilidade: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="baixa">Baixa</SelectItem>
+                    <SelectItem value="media">Média</SelectItem>
+                    <SelectItem value="alta">Alta</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Metodologia</label>
+                <Select value={formData.metodologia} onValueChange={(value) => setFormData({ ...formData, metodologia: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="matriz_risco_padrao">Matriz Padrão 3x3</SelectItem>
+                    <SelectItem value="iso31000">ISO 31000</SelectItem>
+                    <SelectItem value="coso">COSO</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Observações</label>
+                <Textarea
+                  value={formData.observacoes}
+                  onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
+                  placeholder="Adicione observações sobre como este item deve ser utilizado..."
+                  className="min-h-24"
+                />
+              </div>
+
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleSave} disabled={updateObjetivoMutation.isPending || updateProjetoMutation.isPending}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Legenda */}
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">

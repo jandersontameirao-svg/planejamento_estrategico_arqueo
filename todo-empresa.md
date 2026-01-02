@@ -125,3 +125,5 @@
 - [x] Implementar validações de entrada
 - [x] Adicionar feedback visual de salvamento
 - [x] Testes de matriz interativa
+- [x] Corrigir interatividade dos cliques (Dialog fora do SVG)
+- [x] Adicionar hover effects nos itens
