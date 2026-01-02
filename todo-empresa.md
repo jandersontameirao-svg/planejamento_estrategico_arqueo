@@ -127,3 +127,5 @@
 - [x] Testes de matriz interativa
 - [x] Corrigir interatividade dos cliques (Dialog fora do SVG)
 - [x] Adicionar hover effects nos itens
+- [x] Exibir matriz sempre (mesmo sem dados)
+- [x] Corrigir renderização de componente

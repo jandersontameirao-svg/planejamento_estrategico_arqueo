@@ -156,17 +156,13 @@ export default function MatrizRiscoEmpresa() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {objetivos.length === 0 && projetos.length === 0 ? (
-              <div className="text-center py-12 text-slate-500">
-                <p className="text-lg font-medium mb-2">
-                  Nenhum objetivo ou projeto cadastrado
-                </p>
+            <MatrizRiscoInterativa objetivos={objetivos} projetos={projetos} />
+            {objetivos.length === 0 && projetos.length === 0 && (
+              <div className="text-center py-6 text-slate-500 mt-4">
                 <p className="text-sm">
-                  Adicione objetivos e projetos no Planejamento Macro para visualizar a matriz de risco
+                  Adicione objetivos e projetos no Planejamento Macro para visualizar itens na matriz
                 </p>
               </div>
-            ) : (
-              <MatrizRiscoInterativa objetivos={objetivos} projetos={projetos} />
             )}
           </CardContent>
         </Card>
