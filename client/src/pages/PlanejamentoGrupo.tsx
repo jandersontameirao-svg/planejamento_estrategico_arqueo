@@ -73,6 +73,8 @@ export default function PlanejamentoGrupo() {
   const [objetivoPerspectiva, setObjetivoPerspectiva] = useState<"financeira" | "clientes" | "processos" | "aprendizado">("financeira");
   const [objetivoPrazo, setObjetivoPrazo] = useState("");
   const [objetivoStatus, setObjetivoStatus] = useState<"planejado" | "em_andamento" | "concluido" | "cancelado">("planejado");
+  const [objetivoImpacto, setObjetivoImpacto] = useState<"baixo" | "medio" | "alto">("medio");
+  const [objetivoProbabilidade, setObjetivoProbabilidade] = useState<"baixa" | "media" | "alta">("media");
 
   const [showVincularKPIDialog, setShowVincularKPIDialog] = useState(false);
   const [objetivoParaVincular, setObjetivoParaVincular] = useState<any>(null);
@@ -89,6 +91,8 @@ export default function PlanejamentoGrupo() {
       setObjetivoPerspectiva(objetivo.perspectivaBSC || "financeira");
       setObjetivoPrazo(objetivo.prazo || "");
       setObjetivoStatus(objetivo.status || "planejado");
+      setObjetivoImpacto(objetivo.impacto || "medio");
+      setObjetivoProbabilidade(objetivo.probabilidade || "media");
     } else {
       setEditingObjetivo(null);
       setObjetivoTitulo("");
@@ -96,6 +100,8 @@ export default function PlanejamentoGrupo() {
       setObjetivoPerspectiva("financeira");
       setObjetivoPrazo("");
       setObjetivoStatus("planejado");
+      setObjetivoImpacto("medio");
+      setObjetivoProbabilidade("media");
     }
     setShowObjetivoDialog(true);
   };
@@ -115,6 +121,8 @@ export default function PlanejamentoGrupo() {
           perspectivaBSC: objetivoPerspectiva,
           prazo: objetivoPrazo,
           status: objetivoStatus,
+          impacto: objetivoImpacto,
+          probabilidade: objetivoProbabilidade,
         });
         toast.success("Objetivo atualizado com sucesso!");
       } else {
@@ -124,6 +132,8 @@ export default function PlanejamentoGrupo() {
           perspectivaBSC: objetivoPerspectiva,
           prazo: objetivoPrazo,
           status: objetivoStatus,
+          impacto: objetivoImpacto,
+          probabilidade: objetivoProbabilidade,
         });
         toast.success("Objetivo criado com sucesso!");
       }
@@ -582,6 +592,36 @@ export default function PlanejamentoGrupo() {
                   value={objetivoPrazo}
                   onChange={(e) => setObjetivoPrazo(e.target.value)}
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="objetivoImpacto">Impacto</Label>
+                  <Select value={objetivoImpacto} onValueChange={(v: any) => setObjetivoImpacto(v)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="baixo">Baixo</SelectItem>
+                      <SelectItem value="medio">Médio</SelectItem>
+                      <SelectItem value="alto">Alto</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="objetivoProbabilidade">Probabilidade</Label>
+                  <Select value={objetivoProbabilidade} onValueChange={(v: any) => setObjetivoProbabilidade(v)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="baixa">Baixa</SelectItem>
+                      <SelectItem value="media">Média</SelectItem>
+                      <SelectItem value="alta">Alta</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="flex gap-2 justify-end">
@@ -1267,6 +1307,8 @@ function ProjetosTab({ user, kpis, objetivos }: any) {
   const [projetoDataFim, setProjetoDataFim] = useState("");
   const [projetoStatus, setProjetoStatus] = useState<"planejado" | "em_andamento" | "concluido" | "cancelado">("planejado");
   const [projetoResponsavel, setProjetoResponsavel] = useState("");
+  const [projetoImpacto, setProjetoImpacto] = useState<"baixo" | "medio" | "alto">("medio");
+  const [projetoProbabilidade, setProjetoProbabilidade] = useState<"baixa" | "media" | "alta">("media");
 
   const [showVincularDialog, setShowVincularDialog] = useState(false);
   const [projetoParaVincular, setProjetoParaVincular] = useState<any>(null);
@@ -1286,6 +1328,8 @@ function ProjetosTab({ user, kpis, objetivos }: any) {
       setProjetoDataFim(projeto.dataFim || "");
       setProjetoStatus(projeto.status || "planejado");
       setProjetoResponsavel(projeto.responsavel || "");
+      setProjetoImpacto(projeto.impacto || "medio");
+      setProjetoProbabilidade(projeto.probabilidade || "media");
     } else {
       setEditingProjeto(null);
       setProjetoNome("");
@@ -1294,6 +1338,8 @@ function ProjetosTab({ user, kpis, objetivos }: any) {
       setProjetoDataFim("");
       setProjetoStatus("planejado");
       setProjetoResponsavel("");
+      setProjetoImpacto("medio");
+      setProjetoProbabilidade("media");
     }
     setShowProjetoDialog(true);
   };
@@ -1314,6 +1360,8 @@ function ProjetosTab({ user, kpis, objetivos }: any) {
           dataFim: projetoDataFim,
           status: projetoStatus,
           responsavel: projetoResponsavel,
+          impacto: projetoImpacto,
+          probabilidade: projetoProbabilidade,
         });
         toast.success("Projeto atualizado com sucesso!");
       } else {
@@ -1324,6 +1372,8 @@ function ProjetosTab({ user, kpis, objetivos }: any) {
           dataFim: projetoDataFim,
           status: projetoStatus,
           responsavel: projetoResponsavel,
+          impacto: projetoImpacto,
+          probabilidade: projetoProbabilidade,
         });
         toast.success("Projeto criado com sucesso!");
       }
@@ -1603,6 +1653,35 @@ function ProjetosTab({ user, kpis, objetivos }: any) {
                   value={projetoResponsavel}
                   onChange={(e) => setProjetoResponsavel(e.target.value)}
                 />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="projetoImpacto">Impacto</Label>
+                <Select value={projetoImpacto} onValueChange={(v: any) => setProjetoImpacto(v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="baixo">Baixo</SelectItem>
+                    <SelectItem value="medio">Médio</SelectItem>
+                    <SelectItem value="alto">Alto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="projetoProbabilidade">Probabilidade</Label>
+                <Select value={projetoProbabilidade} onValueChange={(v: any) => setProjetoProbabilidade(v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="baixa">Baixa</SelectItem>
+                    <SelectItem value="media">Média</SelectItem>
+                    <SelectItem value="alta">Alta</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

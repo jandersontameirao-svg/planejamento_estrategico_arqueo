@@ -500,6 +500,8 @@ export const appRouter = router({
         perspectivaBSC: z.enum(["financeira", "clientes", "processos", "aprendizado"]).optional(),
         prazo: z.string().optional(),
         status: z.enum(["planejado", "em_andamento", "concluido", "cancelado"]).optional(),
+        impacto: z.enum(["baixo", "medio", "alto"]).optional(),
+        probabilidade: z.enum(["baixa", "media", "alta"]).optional(),
       }))
       .mutation(async ({ input }) => {
         const { createObjetivoGrupo } = await import("./db");
@@ -515,6 +517,8 @@ export const appRouter = router({
         perspectivaBSC: z.enum(["financeira", "clientes", "processos", "aprendizado"]).optional(),
         prazo: z.string().optional(),
         status: z.enum(["planejado", "em_andamento", "concluido", "cancelado"]).optional(),
+        impacto: z.enum(["baixo", "medio", "alto"]).optional(),
+        probabilidade: z.enum(["baixa", "media", "alta"]).optional(),
       }))
       .mutation(async ({ input }) => {
         const { updateObjetivoGrupo } = await import("./db");
@@ -576,6 +580,8 @@ export const appRouter = router({
         dataFim: z.string().optional(),
         status: z.enum(["planejado", "em_andamento", "concluido", "cancelado"]).optional(),
         responsavel: z.string().optional(),
+        impacto: z.enum(["baixo", "medio", "alto"]).optional(),
+        probabilidade: z.enum(["baixa", "media", "alta"]).optional(),
       }))
       .mutation(async ({ input }) => {
         const { createProjetoGrupo } = await import("./db");
@@ -592,6 +598,8 @@ export const appRouter = router({
         dataFim: z.string().optional(),
         status: z.enum(["planejado", "em_andamento", "concluido", "cancelado"]).optional(),
         responsavel: z.string().optional(),
+        impacto: z.enum(["baixo", "medio", "alto"]).optional(),
+        probabilidade: z.enum(["baixa", "media", "alta"]).optional(),
       }))
       .mutation(async ({ input }) => {
         const { updateProjetoGrupo } = await import("./db");

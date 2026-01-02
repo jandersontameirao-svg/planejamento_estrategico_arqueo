@@ -333,6 +333,8 @@ export const objetivosGrupo = mysqlTable("objetivos_grupo", {
   perspectivaBSC: mysqlEnum("perspectivaBSC", ["financeira", "clientes", "processos", "aprendizado"]),
   prazo: date("prazo"),
   status: mysqlEnum("status", ["planejado", "em_andamento", "concluido", "cancelado"]).default("planejado"),
+  impacto: mysqlEnum("impacto", ["baixo", "medio", "alto"]).default("medio"),
+  probabilidade: mysqlEnum("probabilidade", ["baixa", "media", "alta"]).default("media"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -353,6 +355,8 @@ export const projetosGrupo = mysqlTable("projetos_grupo", {
   dataInicio: date("dataInicio"),
   dataFim: date("dataFim"),
   status: mysqlEnum("status", ["planejado", "em_andamento", "concluido", "cancelado"]).default("planejado").notNull(),
+  impacto: mysqlEnum("impacto", ["baixo", "medio", "alto"]).default("medio"),
+  probabilidade: mysqlEnum("probabilidade", ["baixa", "media", "alta"]).default("media"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
