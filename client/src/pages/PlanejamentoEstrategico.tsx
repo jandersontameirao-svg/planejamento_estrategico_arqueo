@@ -142,9 +142,9 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
       case "identidade":
         return <IdentidadeOrganizacionalLite empresaId={empresaId} />;
       case "pestel":
-        return <AnalisePestelLite empresaId={empresaId} />;
+        return <AnalisePestelLite />;
       case "forcas":
-        return <CincoForcasLite empresaId={empresaId} />;
+        return <CincoForcasLite />;
       case "stakeholders":
         return <StakeholdersLite />;
       case "vrio":
