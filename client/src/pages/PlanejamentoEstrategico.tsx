@@ -1,12 +1,14 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown } from "lucide-react";
+import { useCompletudeStorage } from "@/hooks/useLocalStorage";
 import IdentidadeOrganizacional from "./IdentidadeOrganizacional";
 import AnalisesVRIO from "./AnalisesVRIO";
 import AnalisePestelCompleta from "./AnalisePestelCompleta";
 import CincoForcasCompleta from "./CincoForcasCompleta";
 import { AnalisesStakeholdersCompleta, AnaliseSwoTtowsCompleta, AnaliseOkrCompleta, AnaliseBscCompleta } from "./AnalisesRestantes";
+import html2pdf from "html2pdf.js";
 
 interface AnaliseCard {
   id: string;
@@ -15,10 +17,6 @@ interface AnaliseCard {
   icone: React.ReactNode;
   cor: string;
   componente?: React.ComponentType<any>;
-}
-
-interface CompletudeState {
-  [key: string]: number; // 0-100
 }
 
 interface ExpandedState {
@@ -91,16 +89,8 @@ interface PlanejamentoEstrategicoProps {
 
 export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoEstrategicoProps) {
   const [expanded, setExpanded] = useState<ExpandedState>({});
-  const [completude, setCompletude] = useState<CompletudeState>({
-    identidade: 100,
-    bsc: 0,
-    pestel: 0,
-    forcas: 0,
-    stakeholders: 0,
-    vrio: 0,
-    swot: 0,
-    okr: 0,
-  });
+  const { completude } = useCompletudeStorage();
+  const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const toggleExpanded = useCallback((id: string) => {
     setExpanded((prev) => ({
@@ -109,11 +99,22 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
     }));
   }, []);
 
-  const atualizarCompletude = useCallback((analiseId: string, novoPercentual: number) => {
-    setCompletude((prev) => ({
-      ...prev,
-      [analiseId]: Math.min(100, Math.max(0, novoPercentual)),
-    }));
+  const exportarPDF = useCallback((analise: AnaliseCard) => {
+    const element = contentRefs.current[analise.id];
+    if (!element) {
+      alert("Conteúdo não encontrado para exportação");
+      return;
+    }
+
+    const opt: any = {
+      margin: 10,
+      filename: `${analise.titulo}-${new Date().toISOString().split("T")[0]}.pdf`,
+      image: { type: "jpeg" as const, quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: "portrait", unit: "mm", format: "a4" },
+    };
+
+    html2pdf().set(opt).from(element).save();
   }, []);
 
   const renderConteudo = (analise: AnaliseCard) => {
@@ -145,7 +146,7 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
       <header className="border-b bg-white shadow-sm">
         <div className="container py-6">
           <h1 className="text-3xl font-bold text-gray-900">Planejamento Estratégico</h1>
-          <p className="text-gray-600 mt-2">Clique em cada card para expandir e visualizar/editar a análise</p>
+          <p className="text-gray-600 mt-2">Clique em cada card para expandir e visualizar/editar a análise. Os dados são salvos automaticamente.</p>
         </div>
       </header>
 
@@ -178,15 +179,31 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
                       {/* Indicador de Completude */}
                       <div className="flex items-center gap-3 flex-shrink-0">
                         <div className="text-right">
-                          <div className="text-sm font-semibold text-gray-900">{completude[analise.id] || 0}%</div>
+                          <div className="text-sm font-semibold text-gray-900">{(completude as any)[analise.id] || 0}%</div>
                           <div className="w-24 bg-gray-200 rounded-full h-2 mt-1">
                             <div
                               className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all"
-                              style={{ width: `${completude[analise.id] || 0}%` }}
+                              style={{ width: `${(completude as any)[analise.id] || 0}%` }}
                             ></div>
                           </div>
                         </div>
                       </div>
+
+                      {/* Botão de Exportar PDF */}
+                      {expanded[analise.id] && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-shrink-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            exportarPDF(analise);
+                          }}
+                          title="Exportar como PDF"
+                        >
+                          <FileDown className="h-4 w-4" />
+                        </Button>
+                      )}
 
                       {/* Botão de Expandir */}
                       <Button
@@ -213,7 +230,12 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
               {expanded[analise.id] && (
                 <Card className="mt-2 border-2 border-primary/30 rounded-t-none">
                   <CardContent className="pt-6">
-                    <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div
+                      ref={(el) => {
+                        if (el) contentRefs.current[analise.id] = el;
+                      }}
+                      className="animate-in fade-in slide-in-from-top-2 duration-300"
+                    >
                       {renderConteudo(analise)}
                     </div>
                   </CardContent>

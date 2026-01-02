@@ -27,6 +27,7 @@ import AnaliseRbvVrio from "./pages/AnaliseRbvVrio";
 import AnaliseSwoTtows from "./pages/AnaliseSwoTtows";
 import AnalisesVRIO from "./pages/AnalisesVRIO";
 import PlanejamentoEstrategico from "./pages/PlanejamentoEstrategico";
+import DashboardResumoExecutivo from "./pages/DashboardResumoExecutivo";
 
 
 function Router() {
@@ -72,6 +73,7 @@ function Router() {
       <Route path="/planejamento-estrategico/:id?">
         {(params) => <PlanejamentoEstrategico empresaId={params.id ? Number(params.id) : 1} />}
       </Route>
+      <Route path="/resumo-executivo" component={DashboardResumoExecutivo} />
       <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />
