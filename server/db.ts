@@ -525,6 +525,8 @@ export async function createObjetivoGrupo(data: {
   descricao?: string;
   prazo?: Date;
   status?: "planejado" | "em_andamento" | "concluido" | "cancelado";
+  impacto?: "baixo" | "medio" | "alto";
+  probabilidade?: "baixa" | "media" | "alta";
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -538,6 +540,8 @@ export async function updateObjetivoGrupo(id: number, data: Partial<{
   descricao: string;
   prazo: Date;
   status: "planejado" | "em_andamento" | "concluido" | "cancelado";
+  impacto: "baixo" | "medio" | "alto";
+  probabilidade: "baixa" | "media" | "alta";
 }>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

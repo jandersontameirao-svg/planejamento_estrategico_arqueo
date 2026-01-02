@@ -306,3 +306,19 @@
 - [x] Estilizar cards do Kanban
 - [x] Adicionar animações de transição
 - [x] Criar testes para o Kanban
+
+
+## Matriz de Risco (Impacto vs Probabilidade)
+- [x] Adicionar campos impacto e probabilidade em objetivos_grupo (schema)
+- [x] Adicionar campos impacto e probabilidade em projetos_grupo (schema)
+- [x] Atualizar routers de objetivos para aceitar impacto/probabilidade
+- [x] Atualizar routers de projetos para aceitar impacto/probabilidade
+- [x] Adicionar campos de risco no formulário de Objetivos
+- [x] Adicionar campos de risco no formulário de Projetos
+- [x] Criar componente MatrizRisco visual
+- [x] Implementar gráfico 2D com eixos Impacto (x) e Probabilidade (y)
+- [x] Plotar objetivos e projetos como pontos na matriz
+- [x] Adicionar cores por quadrante de risco
+- [x] Adicionar tooltips com detalhes ao hover
+- [x] Integrar Matriz de Risco no Dashboard
+- [x] Criar testes para Matriz de Risco

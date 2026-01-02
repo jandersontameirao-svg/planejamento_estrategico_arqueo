@@ -7,6 +7,7 @@ import { trpc } from "@/lib/trpc";
 import { BarChart3, Building2, TrendingUp, Target, Calendar, CheckCircle2, Clock, Circle, AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { MatrizRisco } from "@/components/MatrizRisco";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -412,6 +413,11 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Matriz de Risco */}
+        {(objetivos && objetivos.length > 0) || (projetos && projetos.length > 0) ? (
+          <MatrizRisco objetivos={objetivos || []} projetos={projetos || []} />
+        ) : null}
 
         {/* Lista de Top KPIs */}
         {kpis && kpis.length > 0 && (
