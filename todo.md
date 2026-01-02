@@ -333,3 +333,11 @@
 - [x] Implementar interface de Plano de Ação por empresa
 - [x] Permitir visualização consolidada no nível do grupo
 - [x] Criar testes para Plano de Ação por empresa
+
+
+## Componentes Lite - Reformulação Visual
+- [x] Reformular VrioLite com sliders, gráficos e classificação de vantagem competitiva
+- [x] Reformular SwotLite com seletor de tipo, gráfico de distribuição e matriz visual
+- [x] Reformular OkrLite com Key Results, gráficos de progresso e métricas
+- [x] Reformular BscLite com indicadores por perspectiva, radar e barras
+- [x] Testar integração de todos os componentes Lite na página de Planejamento Estratégico
