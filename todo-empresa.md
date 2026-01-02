@@ -116,3 +116,12 @@
 - [x] Adicionar seção de observações e guia de uso
 - [x] Criar visualização de matriz com metodologia
 - [x] Testes de matriz de risco com metodologia
+
+## Fase 17: Matriz de Risco Interativa para Preenchimento
+- [x] Criar routers tRPC para atualizar impacto e probabilidade
+- [x] Criar routers tRPC para atualizar metodologia e observações
+- [x] Implementar formulário interativo na matriz
+- [x] Adicionar dialogs para edição de campos
+- [x] Implementar validações de entrada
+- [x] Adicionar feedback visual de salvamento
+- [x] Testes de matriz interativa

@@ -3,7 +3,7 @@ import { ArrowLeft, Building2, Target, Briefcase } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
-import { MatrizRisco } from "@/components/MatrizRisco";
+import { MatrizRiscoInterativa } from "@/components/MatrizRiscoInterativa";
 
 export default function MatrizRiscoEmpresa() {
   const params = useParams();
@@ -166,7 +166,7 @@ export default function MatrizRiscoEmpresa() {
                 </p>
               </div>
             ) : (
-              <MatrizRisco objetivos={objetivos} projetos={projetos} />
+              <MatrizRiscoInterativa objetivos={objetivos} projetos={projetos} />
             )}
           </CardContent>
         </Card>

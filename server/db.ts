@@ -933,3 +933,50 @@ export async function desvincularUsuarioEmpresaDb(usuarioId: number, empresaId: 
       )
     );
 }
+
+
+// Atualizar dados de risco de objetivo
+export async function updateObjetivoRisco(
+  objetivoId: number,
+  impacto: "baixo" | "medio" | "alto",
+  probabilidade: "baixa" | "media" | "alta",
+  metodologia?: string,
+  observacoes?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { objetivosGrupo } = await import("../drizzle/schema");
+  
+  return await db.update(objetivosGrupo)
+    .set({
+      impacto,
+      probabilidade,
+      metodologia: metodologia || "matriz_risco_padrao",
+      observacoes: observacoes || null,
+    })
+    .where(eq(objetivosGrupo.id, objetivoId));
+}
+
+// Atualizar dados de risco de projeto
+export async function updateProjetoRisco(
+  projetoId: number,
+  impacto: "baixo" | "medio" | "alto",
+  probabilidade: "baixa" | "media" | "alta",
+  metodologia?: string,
+  observacoes?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { projetosGrupo } = await import("../drizzle/schema");
+  
+  return await db.update(projetosGrupo)
+    .set({
+      impacto,
+      probabilidade,
+      metodologia: metodologia || "matriz_risco_padrao",
+      observacoes: observacoes || null,
+    })
+    .where(eq(projetosGrupo.id, projetoId));
+}

@@ -994,8 +994,38 @@ export const appRouter = router({
       }),
   }),
 
-  // Gestão de Usuários - Funções Adicionais
-  // (router usuarios já existe com funcionalidades básicas)
+  // Gestao de Usuarios - Funcoes Adicionais
+  // (router usuarios ja existe com funcionalidades basicas)
+
+  riscos: router({
+    updateObjetivoRisco: protectedProcedure
+      .input(z.object({
+        objetivoId: z.number(),
+        impacto: z.enum(["baixo", "medio", "alto"]),
+        probabilidade: z.enum(["baixa", "media", "alta"]),
+        metodologia: z.string().optional(),
+        observacoes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateObjetivoRisco } = await import("./db");
+        await updateObjetivoRisco(input.objetivoId, input.impacto, input.probabilidade, input.metodologia, input.observacoes);
+        return { success: true };
+      }),
+    
+    updateProjetoRisco: protectedProcedure
+      .input(z.object({
+        projetoId: z.number(),
+        impacto: z.enum(["baixo", "medio", "alto"]),
+        probabilidade: z.enum(["baixa", "media", "alta"]),
+        metodologia: z.string().optional(),
+        observacoes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateProjetoRisco } = await import("./db");
+        await updateProjetoRisco(input.projetoId, input.impacto, input.probabilidade, input.metodologia, input.observacoes);
+        return { success: true };
+      }),
+  }),
 
 });
 
