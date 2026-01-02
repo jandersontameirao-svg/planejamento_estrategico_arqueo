@@ -785,50 +785,13 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
           {/* RBV/VRIO */}
           {activeTab === "rbv" && (
             <div className="space-y-6">
-              <Card className="bg-muted/30">
-                <CardHeader>
-                  <CardTitle>RBV/VRIO</CardTitle>
-                  <CardDescription>
-                    Análise de Recursos e Capacidades: Valioso, Raro, Inimitável e Organizado
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-sm text-blue-900">
-                      <strong>RBV/VRIO</strong> identifica recursos e capacidades que geram vantagem competitiva sustentável.
-                    </p>
-                  </div>
-                  
-                  <div className="border rounded-lg p-4">
-                    <Label className="text-base font-semibold mb-2 block">Recursos e Capacidades Valiosos</Label>
-                    <Textarea placeholder="Quais recursos/capacidades agregam valor aos clientes?" rows={3} disabled={!canEdit} value={rbvData.valioso} onChange={(e) => setRbvData({...rbvData, valioso: e.target.value})} />
-                  </div>
-                  
-                  <div className="border rounded-lg p-4">
-                    <Label className="text-base font-semibold mb-2 block">Recursos Raros</Label>
-                    <Textarea placeholder="Quais recursos são difíceis de encontrar no mercado?" rows={3} disabled={!canEdit} value={rbvData.raro} onChange={(e) => setRbvData({...rbvData, raro: e.target.value})} />
-                  </div>
-                  
-                  <div className="border rounded-lg p-4">
-                    <Label className="text-base font-semibold mb-2 block">Recursos Inimitáveis</Label>
-                    <Textarea placeholder="Quais recursos são difíceis de copiar pelos concorrentes?" rows={3} disabled={!canEdit} value={rbvData.inimitavel} onChange={(e) => setRbvData({...rbvData, inimitavel: e.target.value})} />
-                  </div>
-                  
-                  <div className="border rounded-lg p-4">
-                    <Label className="text-base font-semibold mb-2 block">Organização para Explorar</Label>
-                    <Textarea placeholder="A empresa está organizada para explorar esses recursos?" rows={3} disabled={!canEdit} value={rbvData.organizado} onChange={(e) => setRbvData({...rbvData, organizado: e.target.value})} />
-                  </div>
-                  
-                  {canEdit && (
-                    <div className="flex justify-end">
-                      <Button onClick={handleSaveRbvVrio} disabled={saveRbvVrioMutation.isPending} size="lg">
-                        <Save className="mr-2 h-4 w-4" />
-                        Salvar Análise RBV/VRIO
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <AnalisadorVRIO 
+                empresaId={empresaId}
+                onSave={async (recursos) => {
+                  console.log("Recursos VRIO salvos:", recursos);
+                  toast.success("Análise VRIO salva com sucesso!");
+                }}
+              />
             </div>
           )}
 

@@ -563,3 +563,31 @@ export const analiseOkr = mysqlTable("analise_okr", {
 
 export type AnaliseOkr = typeof analiseOkr.$inferSelect;
 export type InsertAnaliseOkr = typeof analiseOkr.$inferInsert;
+
+
+/**
+ * VRIO - Análise Detalhada de Recursos (Valor, Raridade, Imitabilidade, Organização)
+ */
+export const analiseVrio = mysqlTable("analise_vrio", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  recursoNome: varchar("recurso_nome", { length: 255 }).notNull(),
+  valor: int("valor").notNull(), // 0-5
+  raridade: int("raridade").notNull(), // 0-5
+  imitabilidade: int("imitabilidade").notNull(), // 0-5
+  organizacao: int("organizacao").notNull(), // 0-5
+  media: decimal("media", { precision: 3, scale: 2 }).notNull(),
+  classificacao: mysqlEnum("classificacao", [
+    "vantagem_sustentavel",
+    "vantagem_temporaria",
+    "paridade_competitiva",
+    "desvantagem"
+  ]).notNull(),
+  recomendacoes: text("recomendacoes"),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AnaliseVrio = typeof analiseVrio.$inferSelect;
+export type InsertAnaliseVrio = typeof analiseVrio.$inferInsert;
