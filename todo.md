@@ -270,3 +270,13 @@
 - [x] Implementar exportação de relatórios em PDF
 - [x] Incluir gráficos de KPIs nos relatórios
 - [x] Incluir objetivos e projetos nos relatórios
+
+
+## Dashboard de Acompanhamento em Tempo Real
+- [x] Criar cards de progresso dos objetivos estratégicos
+- [x] Implementar visualização de status dos projetos
+- [x] Desenvolver gráficos de tendência dos KPIs consolidados
+- [x] Adicionar métricas-chave executivas
+- [x] Implementar indicadores visuais de performance
+- [x] Integrar todos os componentes no Dashboard
+- [x] Criar testes para o dashboard
