@@ -294,3 +294,15 @@
 - [x] Adicionar visualização por responsável
 - [x] Criar página dedicada de Plano de Ação
 - [x] Implementar testes unitários
+
+
+## Visualização Kanban do Plano de Ação
+- [x] Instalar biblioteca de drag and drop (@dnd-kit)
+- [x] Criar componente KanbanBoard
+- [x] Implementar colunas por status (Pendente, Em Andamento, Concluída, Cancelada)
+- [x] Implementar drag and drop entre colunas
+- [x] Atualizar status automaticamente ao mover cards
+- [x] Adicionar botão de alternância Lista/Kanban
+- [x] Estilizar cards do Kanban
+- [x] Adicionar animações de transição
+- [x] Criar testes para o Kanban

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, Clock, Circle, AlertCircle, Plus, Pencil, Trash2, Target, FolderKanban, DollarSign, User, Calendar as CalendarIcon } from "lucide-react";
+import { CheckCircle2, Clock, Circle, AlertCircle, Plus, Pencil, Trash2, Target, FolderKanban, DollarSign, User, Calendar as CalendarIcon, LayoutList, LayoutGrid } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -33,6 +33,7 @@ export default function PlanoAcao() {
   const [editingAcao, setEditingAcao] = useState<any>(null);
   const [filtroStatus, setFiltroStatus] = useState<string>("todos");
   const [filtroResponsavel, setFiltroResponsavel] = useState<string>("");
+  const [visualizacao, setVisualizacao] = useState<"lista" | "kanban">("lista");
 
   const { data: acoes, refetch: refetchAcoes } = trpc.acoesGrupo.list.useQuery();
   const { data: objetivos } = trpc.objetivosGrupo.list.useQuery();
@@ -412,7 +413,27 @@ export default function PlanoAcao() {
         {/* Filtros */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Filtros</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Filtros</CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  variant={visualizacao === "lista" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setVisualizacao("lista")}
+                >
+                  <LayoutList className="mr-2 h-4 w-4" />
+                  Lista
+                </Button>
+                <Button
+                  variant={visualizacao === "kanban" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setVisualizacao("kanban")}
+                >
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Kanban
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
@@ -445,15 +466,16 @@ export default function PlanoAcao() {
           </CardContent>
         </Card>
 
-        {/* Lista de Ações */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Ações Cadastradas</CardTitle>
-            <CardDescription>
-              {acoesFiltradas?.length || 0} ações encontradas
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+        {/* Lista ou Kanban de Ações */}
+        {visualizacao === "lista" ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Ações Cadastradas</CardTitle>
+              <CardDescription>
+                {acoesFiltradas?.length || 0} ações encontradas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
             {!acoesFiltradas || acoesFiltradas.length === 0 ? (
               <div className="text-center py-12">
                 <CheckCircle2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -548,7 +570,179 @@ export default function PlanoAcao() {
             )}
           </CardContent>
         </Card>
+        ) : (
+          <KanbanBoard
+            acoes={acoesFiltradas || []}
+            objetivos={objetivos || []}
+            projetos={projetos || []}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onStatusChange={(id, status) => {
+              updateMutation.mutate({ id, status });
+            }}
+          />
+        )}
       </main>
+    </div>
+  );
+}
+
+// Componente Kanban Board
+interface KanbanBoardProps {
+  acoes: any[];
+  objetivos: any[];
+  projetos: any[];
+  onEdit: (acao: any) => void;
+  onDelete: (id: number) => void;
+  onStatusChange: (id: number, status: "pendente" | "em_andamento" | "concluida" | "cancelada") => void;
+}
+
+function KanbanBoard({ acoes, objetivos, projetos, onEdit, onDelete, onStatusChange }: KanbanBoardProps) {
+  const [activeId, setActiveId] = useState<number | null>(null);
+
+  const colunas: Array<{ id: "pendente" | "em_andamento" | "concluida" | "cancelada"; titulo: string; cor: string }> = [
+    { id: "pendente", titulo: "Pendente", cor: "bg-gray-100" },
+    { id: "em_andamento", titulo: "Em Andamento", cor: "bg-blue-50" },
+    { id: "concluida", titulo: "Concluída", cor: "bg-green-50" },
+    { id: "cancelada", titulo: "Cancelada", cor: "bg-red-50" },
+  ];
+
+  const acoesPorStatus = {
+    pendente: acoes.filter(a => (a.status || "pendente") === "pendente"),
+    em_andamento: acoes.filter(a => a.status === "em_andamento"),
+    concluida: acoes.filter(a => a.status === "concluida"),
+    cancelada: acoes.filter(a => a.status === "cancelada"),
+  };
+
+  const handleDragStart = (id: number) => {
+    setActiveId(id);
+  };
+
+  const handleDragEnd = (status: "pendente" | "em_andamento" | "concluida" | "cancelada") => {
+    if (activeId !== null) {
+      onStatusChange(activeId, status);
+      setActiveId(null);
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "pendente":
+        return <Circle className="h-4 w-4 text-gray-400" />;
+      case "em_andamento":
+        return <Clock className="h-4 w-4 text-blue-500" />;
+      case "concluida":
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case "cancelada":
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Circle className="h-4 w-4" />;
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {colunas.map((coluna) => (
+        <Card key={coluna.id} className={coluna.cor}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              {getStatusIcon(coluna.id)}
+              {coluna.titulo}
+              <Badge variant="secondary" className="ml-auto">
+                {acoesPorStatus[coluna.id].length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent
+            className="space-y-3 min-h-[400px]"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => handleDragEnd(coluna.id)}
+          >
+            {acoesPorStatus[coluna.id].map((acao) => {
+              const objetivo = objetivos.find(o => o.id === acao.objetivoId);
+              const projeto = projetos.find(p => p.id === acao.projetoId);
+
+              return (
+                <div
+                  key={acao.id}
+                  draggable
+                  onDragStart={() => handleDragStart(acao.id)}
+                  className="p-3 bg-card border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-move"
+                >
+                  <div className="space-y-2">
+                    <p className="font-medium text-sm line-clamp-2">{acao.descricao}</p>
+
+                    {(acao.responsavel || acao.prazo || acao.custo) && (
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        {acao.responsavel && (
+                          <div className="flex items-center gap-1">
+                            <User className="h-3 w-3" />
+                            {acao.responsavel}
+                          </div>
+                        )}
+                        {acao.prazo && (
+                          <div className="flex items-center gap-1">
+                            <CalendarIcon className="h-3 w-3" />
+                            {new Date(acao.prazo).toLocaleDateString('pt-BR')}
+                          </div>
+                        )}
+                        {acao.custo && (
+                          <div className="flex items-center gap-1">
+                            <DollarSign className="h-3 w-3" />
+                            R$ {acao.custo ? parseFloat(acao.custo).toFixed(2) : '0.00'}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {(objetivo || projeto) && (
+                      <div className="flex flex-wrap gap-1">
+                        {objetivo && (
+                          <Badge variant="outline" className="text-xs flex items-center gap-1">
+                            <Target className="h-2 w-2" />
+                            {objetivo.titulo}
+                          </Badge>
+                        )}
+                        {projeto && (
+                          <Badge variant="outline" className="text-xs flex items-center gap-1">
+                            <FolderKanban className="h-2 w-2" />
+                            {projeto.nome}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex gap-1 pt-2 border-t">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={() => onEdit(acao)}
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={() => onDelete(acao.id)}
+                      >
+                        <Trash2 className="h-3 w-3 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {acoesPorStatus[coluna.id].length === 0 && (
+              <div className="text-center py-8 text-muted-foreground text-sm">
+                Nenhuma ação
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
