@@ -591,3 +591,21 @@ export const analiseVrio = mysqlTable("analise_vrio", {
 
 export type AnaliseVrio = typeof analiseVrio.$inferSelect;
 export type InsertAnaliseVrio = typeof analiseVrio.$inferInsert;
+
+/**
+ * Indicadores do Balanced Scorecard por empresa
+ */
+export const bscIndicadores = mysqlTable("bsc_indicadores", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  perspectiva: mysqlEnum("perspectiva", ["financeira", "cliente", "processos", "aprendizado"]).notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  meta: decimal("meta", { precision: 15, scale: 2 }).notNull(),
+  valorAtual: decimal("valorAtual", { precision: 15, scale: 2 }).default("0"),
+  unidade: varchar("unidade", { length: 50 }), // %, R$, unidades, etc
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BscIndicador = typeof bscIndicadores.$inferSelect;
+export type InsertBscIndicador = typeof bscIndicadores.$inferInsert;

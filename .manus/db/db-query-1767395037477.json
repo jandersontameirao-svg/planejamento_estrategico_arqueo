@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO bsc_indicadores (empresaId, perspectiva, nome, meta, valorAtual, unidade) VALUES\n(1, 'financeira', 'ROI', 100, 90, '%'),\n(1, 'financeira', 'Margem de Lucro', 100, 85, '%'),\n(1, 'cliente', 'NPS', 100, 82, 'pontos'),\n(1, 'cliente', 'Taxa de Retenção', 100, 88, '%'),\n(1, 'processos', 'Eficiência Operacional', 100, 75, '%'),\n(1, 'processos', 'Tempo de Entrega', 100, 80, '%'),\n(1, 'aprendizado', 'Satisfação dos Colaboradores', 100, 70, '%'),\n(1, 'aprendizado', 'Horas de Treinamento', 100, 65, 'horas')",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute INSERT INTO bsc_indicadores (empresaId, perspectiva, nome, meta, valorAtual, unidade) VALUES\n(1, 'financeira', 'ROI', 100, 90, '%'),\n(1, 'financeira', 'Margem de Lucro', 100, 85, '%'),\n(1, 'cliente', 'NPS', 100, 82, 'pontos'),\n(1, 'cliente', 'Taxa de Retenção', 100, 88, '%'),\n(1, 'processos', 'Eficiência Operacional', 100, 75, '%'),\n(1, 'processos', 'Tempo de Entrega', 100, 80, '%'),\n(1, 'aprendizado', 'Satisfação dos Colaboradores', 100, 70, '%'),\n(1, 'aprendizado', 'Horas de Treinamento', 100, 65, 'horas')",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 79
+}

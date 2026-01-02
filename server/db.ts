@@ -980,3 +980,61 @@ export async function updateProjetoRisco(
     })
     .where(eq(projetosGrupo.id, projetoId));
 }
+
+
+// ==================== BSC Indicadores ====================
+
+export async function saveBscIndicadores(
+  empresaId: number,
+  indicadores: Array<{
+    perspectiva: "financeira" | "cliente" | "processos" | "aprendizado";
+    nome: string;
+    meta: number;
+    valorAtual?: number;
+    unidade?: string;
+  }>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { bscIndicadores } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  // Deletar indicadores existentes da empresa
+  await db.delete(bscIndicadores).where(eq(bscIndicadores.empresaId, empresaId));
+
+  // Inserir novos indicadores
+  if (indicadores.length > 0) {
+    await db.insert(bscIndicadores).values(
+      indicadores.map(ind => ({
+        empresaId,
+        perspectiva: ind.perspectiva,
+        nome: ind.nome,
+        meta: ind.meta.toString(),
+        valorAtual: (ind.valorAtual ?? 0).toString(),
+        unidade: ind.unidade,
+      }))
+    );
+  }
+
+  return { success: true };
+}
+
+export async function getBscIndicadoresByEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { bscIndicadores } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  return await db.select().from(bscIndicadores).where(eq(bscIndicadores.empresaId, empresaId));
+}
+
+export async function getAllBscIndicadores() {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { bscIndicadores } = await import("../drizzle/schema");
+
+  return await db.select().from(bscIndicadores);
+}

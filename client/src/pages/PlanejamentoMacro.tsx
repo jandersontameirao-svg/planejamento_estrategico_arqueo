@@ -7,41 +7,52 @@ import { DollarSign, Users, Settings, GraduationCap, TrendingUp, Building2 } fro
 export default function PlanejamentoMacro() {
   // Buscar dados de todas as empresas
   const { data: empresas = [] } = trpc.empresas.list.useQuery();
+  
+  // Buscar todos os indicadores BSC de todas as empresas
+  const { data: todosIndicadores = [] } = trpc.bsc.getAll.useQuery();
 
-  // Dados mock para demonstração - substituir por dados reais do backend
+  // Agregar dados por perspectiva
+  const agregaPerspectiva = (perspectiva: "financeira" | "cliente" | "processos" | "aprendizado") => {
+    const indicadores = todosIndicadores.filter(ind => ind.perspectiva === perspectiva);
+    
+    if (indicadores.length === 0) {
+      return { valor: 0, meta: 100, empresas: [] };
+    }
+
+    // Calcular média dos valores atuais e metas
+    const valorTotal = indicadores.reduce((sum, ind) => sum + Number(ind.valorAtual || 0), 0);
+    const metaTotal = indicadores.reduce((sum, ind) => sum + Number(ind.meta || 0), 0);
+    const valor = indicadores.length > 0 ? Math.round(valorTotal / indicadores.length) : 0;
+    const meta = indicadores.length > 0 ? Math.round(metaTotal / indicadores.length) : 100;
+
+    // Agrupar por empresa
+    const empresasMap = new Map<number, { nome: string; valores: number[]; metas: number[] }>();
+    
+    indicadores.forEach(ind => {
+      const empresa = empresas.find(e => e.id === ind.empresaId);
+      if (!empresa) return;
+      
+      if (!empresasMap.has(ind.empresaId)) {
+        empresasMap.set(ind.empresaId, { nome: empresa.nome, valores: [], metas: [] });
+      }
+      
+      empresasMap.get(ind.empresaId)!.valores.push(Number(ind.valorAtual || 0));
+      empresasMap.get(ind.empresaId)!.metas.push(Number(ind.meta || 0));
+    });
+
+    const empresasAgregadas = Array.from(empresasMap.entries()).map(([id, data]) => ({
+      nome: data.nome,
+      valor: data.valores.length > 0 ? Math.round(data.valores.reduce((a, b) => a + b, 0) / data.valores.length) : 0,
+    }));
+
+    return { valor, meta, empresas: empresasAgregadas };
+  };
+
   const dadosConsolidados = {
-    financeira: {
-      valor: 85,
-      meta: 100,
-      empresas: [
-        { nome: "Arqueoproject", valor: 90 },
-        { nome: "Arqueogis", valor: 80 },
-      ],
-    },
-    cliente: {
-      valor: 78,
-      meta: 90,
-      empresas: [
-        { nome: "Arqueoproject", valor: 82 },
-        { nome: "Arqueogis", valor: 74 },
-      ],
-    },
-    processos: {
-      valor: 72,
-      meta: 85,
-      empresas: [
-        { nome: "Arqueoproject", valor: 75 },
-        { nome: "Arqueogis", valor: 69 },
-      ],
-    },
-    aprendizado: {
-      valor: 68,
-      meta: 80,
-      empresas: [
-        { nome: "Arqueoproject", valor: 70 },
-        { nome: "Arqueogis", valor: 66 },
-      ],
-    },
+    financeira: agregaPerspectiva("financeira"),
+    cliente: agregaPerspectiva("cliente"),
+    processos: agregaPerspectiva("processos"),
+    aprendizado: agregaPerspectiva("aprendizado"),
   };
 
   const dadosRadar = [
@@ -67,22 +78,25 @@ export default function PlanejamentoMacro() {
     },
   ];
 
-  const dadosComparativos = [
-    {
-      empresa: "Arqueoproject",
-      financeira: 90,
-      cliente: 82,
-      processos: 75,
-      aprendizado: 70,
-    },
-    {
-      empresa: "Arqueogis",
-      financeira: 80,
-      cliente: 74,
-      processos: 69,
-      aprendizado: 66,
-    },
-  ];
+  // Gerar dados comparativos por empresa
+  const dadosComparativos = empresas.map(empresa => {
+    const indicadoresEmpresa = todosIndicadores.filter(ind => ind.empresaId === empresa.id);
+    
+    const calcularMediaPerspectiva = (perspectiva: "financeira" | "cliente" | "processos" | "aprendizado") => {
+      const inds = indicadoresEmpresa.filter(ind => ind.perspectiva === perspectiva);
+      if (inds.length === 0) return 0;
+      const total = inds.reduce((sum, ind) => sum + Number(ind.valorAtual || 0), 0);
+      return Math.round(total / inds.length);
+    };
+
+    return {
+      empresa: empresa.nome,
+      financeira: calcularMediaPerspectiva("financeira"),
+      cliente: calcularMediaPerspectiva("cliente"),
+      processos: calcularMediaPerspectiva("processos"),
+      aprendizado: calcularMediaPerspectiva("aprendizado"),
+    };
+  });
 
   const calcularDesempenho = (valor: number, meta: number) => {
     const percentual = (valor / meta) * 100;

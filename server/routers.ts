@@ -1113,6 +1113,40 @@ export const appRouter = router({
       }),
   }),
 
+  bsc: router({
+    // Salvar indicadores BSC de uma empresa
+    saveIndicadores: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        indicadores: z.array(z.object({
+          perspectiva: z.enum(["financeira", "cliente", "processos", "aprendizado"]),
+          nome: z.string(),
+          meta: z.number(),
+          valorAtual: z.number().optional(),
+          unidade: z.string().optional(),
+        })),
+      }))
+      .mutation(async ({ input }) => {
+        const { saveBscIndicadores } = await import("./db");
+        return await saveBscIndicadores(input.empresaId, input.indicadores);
+      }),
+
+    // Buscar indicadores BSC de uma empresa
+    getByEmpresa: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getBscIndicadoresByEmpresa } = await import("./db");
+        return await getBscIndicadoresByEmpresa(input.empresaId);
+      }),
+
+    // Buscar indicadores BSC de todas as empresas (para agregação)
+    getAll: protectedProcedure
+      .query(async () => {
+        const { getAllBscIndicadores } = await import("./db");
+        return await getAllBscIndicadores();
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;

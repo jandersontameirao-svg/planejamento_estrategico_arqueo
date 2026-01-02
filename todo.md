@@ -389,3 +389,12 @@
 - [x] Implementar BSC Consolidado com 4 perspectivas, gráfico radar e comparativo por empresa
 - [x] Ajustar links na Home para nova estrutura
 - [x] Testar navegação e validar estrutura completa
+
+
+## Agregação Real do BSC Macro
+- [x] Criar tabela bsc_indicadores no schema do banco de dados
+- [x] Criar procedures tRPC (saveIndicadores, getByEmpresa, getAll)
+- [x] Criar funções no db.ts (saveBscIndicadores, getBscIndicadoresByEmpresa, getAllBscIndicadores)
+- [x] Atualizar PlanejamentoMacro para agregar dados reais de todas as empresas
+- [x] Implementar cálculo de médias por perspectiva e por empresa
+- [x] Testar agregação com dados de múltiplas empresas (Arqueoproject: 83%, 81%, 74%, 66% | Arqueogis: 78%, 76%, 71%, 64%)
