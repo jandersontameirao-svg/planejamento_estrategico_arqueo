@@ -11,6 +11,7 @@ import KPIs from "./pages/KPIs";
 import Dashboard from "./pages/Dashboard";
 import PlanejamentoGrupo from "./pages/PlanejamentoGrupo";
 import Relatorios from "./pages/Relatorios";
+import PlanoAcao from "./pages/PlanoAcao";
 
 
 function Router() {
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
       <Route path="/relatorios" component={Relatorios} />
+      <Route path="/plano-acao" component={PlanoAcao} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, type InsertEmpresa, kpiValores, kpis, objetivosGrupo, type InsertObjetivoGrupo, objetivoGrupoKpis, projetosGrupo, type InsertProjetoGrupo, projetoGrupoKpis } from "../drizzle/schema";
+import { InsertUser, users, type InsertEmpresa, kpiValores, kpis, objetivosGrupo, type InsertObjetivoGrupo, objetivoGrupoKpis, projetosGrupo, type InsertProjetoGrupo, projetoGrupoKpis, acoesGrupo, type InsertAcaoGrupo } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -762,4 +762,73 @@ export async function getKPIsVinculadosProjeto(projetoId: number) {
     .where(eq(projetoGrupoKpis.projetoId, projetoId));
   
   return result.map(r => r.kpi);
+}
+
+
+// ============================================
+// Ações do Plano de Ação
+// ============================================
+
+export async function getAcoesGrupo() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(acoesGrupo).orderBy(acoesGrupo.prazo);
+}
+
+export async function getAcaoById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select().from(acoesGrupo).where(eq(acoesGrupo.id, id));
+  return result[0];
+}
+
+export async function getAcoesByObjetivo(objetivoId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(acoesGrupo).where(eq(acoesGrupo.objetivoId, objetivoId));
+}
+
+export async function getAcoesByProjeto(projetoId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(acoesGrupo).where(eq(acoesGrupo.projetoId, projetoId));
+}
+
+export async function getAcoesByStatus(status: "pendente" | "em_andamento" | "concluida" | "cancelada") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(acoesGrupo).where(eq(acoesGrupo.status, status));
+}
+
+export async function getAcoesByResponsavel(responsavel: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(acoesGrupo).where(eq(acoesGrupo.responsavel, responsavel));
+}
+
+export async function createAcaoGrupo(data: InsertAcaoGrupo) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(acoesGrupo).values(data);
+}
+
+export async function updateAcaoGrupo(id: number, data: Partial<InsertAcaoGrupo>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(acoesGrupo).set(data).where(eq(acoesGrupo.id, id));
+}
+
+export async function deleteAcaoGrupo(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(acoesGrupo).where(eq(acoesGrupo.id, id));
 }

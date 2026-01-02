@@ -280,3 +280,17 @@
 - [x] Implementar indicadores visuais de performance
 - [x] Integrar todos os componentes no Dashboard
 - [x] Criar testes para o dashboard
+
+
+## Módulo de Plano de Ação
+- [x] Criar tabela de ações no banco de dados
+- [x] Adicionar campos: descrição, responsável, prazo, custo, status
+- [x] Criar routers de CRUD para ações
+- [x] Vincular ações a objetivos estratégicos
+- [x] Vincular ações a projetos/iniciativas
+- [x] Implementar interface de cadastro de ações
+- [x] Implementar listagem de ações com filtros
+- [x] Adicionar visualização por status
+- [x] Adicionar visualização por responsável
+- [x] Criar página dedicada de Plano de Ação
+- [x] Implementar testes unitários

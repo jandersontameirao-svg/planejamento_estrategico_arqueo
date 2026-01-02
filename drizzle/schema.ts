@@ -385,3 +385,24 @@ export const objetivoGrupoKpis = mysqlTable("objetivo_grupo_kpis", {
 
 export type ObjetivoGrupoKpi = typeof objetivoGrupoKpis.$inferSelect;
 export type InsertObjetivoGrupoKpi = typeof objetivoGrupoKpis.$inferInsert;
+
+
+/**
+ * Plano de Ação - Ações vinculadas a Objetivos e Projetos
+ */
+export const acoesGrupo = mysqlTable("acoes_grupo", {
+  id: int("id").autoincrement().primaryKey(),
+  descricao: text("descricao").notNull(),
+  responsavel: varchar("responsavel", { length: 255 }),
+  prazo: date("prazo"),
+  custo: decimal("custo", { precision: 10, scale: 2 }),
+  status: mysqlEnum("status", ["pendente", "em_andamento", "concluida", "cancelada"]).default("pendente"),
+  objetivoId: int("objetivoId"), // Vinculação opcional a objetivo
+  projetoId: int("projetoId"), // Vinculação opcional a projeto
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AcaoGrupo = typeof acoesGrupo.$inferSelect;
+export type InsertAcaoGrupo = typeof acoesGrupo.$inferInsert;

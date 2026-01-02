@@ -638,6 +638,97 @@ export const appRouter = router({
       }),
   }),
 
+  /**
+   * Plano de Ação - Ações vinculadas a Objetivos e Projetos
+   */
+  acoesGrupo: router({
+    list: publicProcedure.query(async () => {
+      const { getAcoesGrupo } = await import("./db");
+      return await getAcoesGrupo();
+    }),
+    
+    listByObjetivo: publicProcedure
+      .input(z.object({ objetivoId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAcoesByObjetivo } = await import("./db");
+        return await getAcoesByObjetivo(input.objetivoId);
+      }),
+    
+    listByProjeto: publicProcedure
+      .input(z.object({ projetoId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAcoesByProjeto } = await import("./db");
+        return await getAcoesByProjeto(input.projetoId);
+      }),
+    
+    listByStatus: publicProcedure
+      .input(z.object({ status: z.enum(["pendente", "em_andamento", "concluida", "cancelada"]) }))
+      .query(async ({ input }) => {
+        const { getAcoesByStatus } = await import("./db");
+        return await getAcoesByStatus(input.status);
+      }),
+    
+    listByResponsavel: publicProcedure
+      .input(z.object({ responsavel: z.string() }))
+      .query(async ({ input }) => {
+        const { getAcoesByResponsavel } = await import("./db");
+        return await getAcoesByResponsavel(input.responsavel);
+      }),
+    
+    create: protectedProcedure
+      .input(z.object({
+        descricao: z.string(),
+        responsavel: z.string().optional(),
+        prazo: z.string().optional(),
+        custo: z.string().optional(),
+        status: z.enum(["pendente", "em_andamento", "concluida", "cancelada"]).optional(),
+        objetivoId: z.number().optional(),
+        projetoId: z.number().optional(),
+        observacoes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { prazo, ...rest } = input;
+        const { createAcaoGrupo } = await import("./db");
+        const data = {
+          ...rest,
+          ...(prazo ? { prazo: new Date(prazo) } : {}),
+        };
+        await createAcaoGrupo(data);
+        return { success: true };
+      }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        descricao: z.string().optional(),
+        responsavel: z.string().optional(),
+        prazo: z.string().optional(),
+        custo: z.string().optional(),
+        status: z.enum(["pendente", "em_andamento", "concluida", "cancelada"]).optional(),
+        objetivoId: z.number().optional(),
+        projetoId: z.number().optional(),
+        observacoes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, prazo, ...rest } = input;
+        const { updateAcaoGrupo } = await import("./db");
+        const data = {
+          ...rest,
+          ...(prazo ? { prazo: new Date(prazo) } : {}),
+        };
+        await updateAcaoGrupo(id, data);
+        return { success: true };
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteAcaoGrupo } = await import("./db");
+        await deleteAcaoGrupo(input.id);
+        return { success: true };
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;
