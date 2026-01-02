@@ -13,7 +13,7 @@ import { toast } from "sonner";
 export default function PlanejamentoGrupo() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"identidade" | "objetivos" | "bsc">("identidade");
+  const [activeTab, setActiveTab] = useState<"identidade" | "objetivos" | "projetos" | "bsc">("identidade");
 
   // Identidade
   const { data: identidade, refetch: refetchIdentidade } = trpc.planejamentoGrupo.getIdentidade.useQuery();
@@ -127,6 +127,28 @@ export default function PlanejamentoGrupo() {
 
           <button
             className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === "objetivos"
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveTab("objetivos")}
+          >
+            Objetivos Estratégicos
+          </button>
+
+          <button
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === "projetos"
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveTab("projetos")}
+          >
+            Projetos e Iniciativas
+          </button>
+
+          <button
+            className={`px-4 py-2 font-medium transition-colors ${
               activeTab === "bsc"
                 ? "border-b-2 border-primary text-primary"
                 : "text-muted-foreground hover:text-foreground"
@@ -202,6 +224,66 @@ export default function PlanejamentoGrupo() {
               )}
             </CardContent>
           </Card>
+        )}
+
+        {/* Objetivos Estratégicos */}
+        {activeTab === "objetivos" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Objetivos Estratégicos do Grupo</CardTitle>
+                    <CardDescription>
+                      Defina os objetivos estratégicos organizados nas 4 perspectivas do BSC
+                    </CardDescription>
+                  </div>
+                  {user?.role === "admin" && (
+                    <Button onClick={() => alert("Funcionalidade em desenvolvimento")}>
+                      + Criar Objetivo
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12 text-muted-foreground">
+                  <Target className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Funcionalidade de Objetivos Estratégicos em desenvolvimento</p>
+                  <p className="text-sm mt-2">Backend já implementado. Interface visual em construção.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Projetos e Iniciativas */}
+        {activeTab === "projetos" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Projetos e Iniciativas Estratégicas</CardTitle>
+                    <CardDescription>
+                      Gerencie os projetos e iniciativas vinculados aos objetivos estratégicos
+                    </CardDescription>
+                  </div>
+                  {user?.role === "admin" && (
+                    <Button onClick={() => alert("Funcionalidade em desenvolvimento")}>
+                      + Criar Projeto
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12 text-muted-foreground">
+                  <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Funcionalidade de Projetos e Iniciativas em desenvolvimento</p>
+                  <p className="text-sm mt-2">Backend já implementado. Interface visual com Gantt em construção.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* KPIs removido - agora apenas no BSC */}

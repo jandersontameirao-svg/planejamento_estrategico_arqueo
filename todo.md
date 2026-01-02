@@ -239,3 +239,19 @@
 - [ ] Incluir gráficos de KPIs no relatório
 - [ ] Incluir objetivos e projetos no relatório
 - [ ] Permitir filtros por período e empresa
+
+
+## Interface de Objetivos Estratégicos - Nova Implementação
+- [x] Adicionar aba "Objetivos" no Planejamento Macro
+- [ ] Criar formulário de cadastro de objetivos (placeholder criado)
+- [ ] Implementar listagem de objetivos por perspectiva BSC
+- [ ] Adicionar interface de vinculação de KPIs aos objetivos
+- [ ] Implementar edição e exclusão de objetivos
+
+## Interface de Projetos e Iniciativas - Nova Implementação
+- [x] Adicionar aba "Projetos" no Planejamento Macro
+- [ ] Criar formulário de cadastro de projetos (placeholder criado)
+- [ ] Implementar listagem de projetos
+- [ ] Adicionar calendário Gantt visual
+- [ ] Implementar vinculação de projetos a objetivos/KPIs
+- [ ] Adicionar controle de status, prazos e responsáveis
