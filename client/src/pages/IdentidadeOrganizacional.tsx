@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
@@ -486,12 +487,51 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                     Análise dos fatores externos: Político, Econômico, Social, Tecnológico, Ecológico e Legal
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-900">
                       <strong>PESTEL</strong> analisa o ambiente externo da empresa. Identifique oportunidades e ameaças em cada fator.
                     </p>
                   </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Político</Label>
+                    <Textarea placeholder="Legislação, políticas governamentais, estabilidade política..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Econômico</Label>
+                    <Textarea placeholder="Taxa de juros, inflação, crescimento econômico, crise..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Social</Label>
+                    <Textarea placeholder="Tendências demográficas, cultura, valores, estilo de vida..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Tecnológico</Label>
+                    <Textarea placeholder="Inovação, automação, inteligência artificial, cibersegurança..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Ecológico</Label>
+                    <Textarea placeholder="Sustentabilidade, mudanças climáticas, recursos naturais..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Legal</Label>
+                    <Textarea placeholder="Regulamentação, conformidade, direitos trabalhistas, proteção de dados..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  {canEdit && (
+                    <div className="flex justify-end">
+                      <Button type="submit" size="lg">
+                        <Save className="mr-2 h-4 w-4" />
+                        Salvar Análise PESTEL
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -507,12 +547,46 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                     Análise da competitividade: Rivalidade, Poder dos Fornecedores, Poder dos Clientes, Ameaça de Novos Entrantes e Ameaça de Substitutos
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-900">
                       <strong>5 Forças de Porter</strong> avalia a intensidade da competição no setor e a atratividade do mercado.
                     </p>
                   </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Rivalidade entre Concorrentes</Label>
+                    <Textarea placeholder="Número de concorrentes, diferença de produtos, custos de saída..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Poder dos Fornecedores</Label>
+                    <Textarea placeholder="Número de fornecedores, dependência, custos de mudança..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Poder dos Clientes</Label>
+                    <Textarea placeholder="Concentração de clientes, sensibilidade ao preço, poder de negociação..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Ameaça de Novos Entrantes</Label>
+                    <Textarea placeholder="Barreiras de entrada, capital necessário, economia de escala..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Ameaça de Produtos Substitutos</Label>
+                    <Textarea placeholder="Disponibilidade de substitutos, preço, desempenho..." rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  {canEdit && (
+                    <div className="flex justify-end">
+                      <Button type="submit" size="lg">
+                        <Save className="mr-2 h-4 w-4" />
+                        Salvar Análise 5 Forças
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -528,12 +602,47 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                     Matriz de Poder x Interesse: identifique e gerencie as partes interessadas
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-900">
                       <strong>Stakeholders</strong> são grupos com interesse na empresa. Mapeie seu poder e interesse para definir estratégias de engajamento.
                     </p>
                   </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="border-2 border-red-300 bg-red-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-red-900 mb-2">Alto Poder / Alto Interesse</h4>
+                      <p className="text-sm text-red-800 mb-2">Gerenciar Ativamente</p>
+                      <Textarea placeholder="Ex: Acionistas, Conselho, Clientes-chave" rows={3} disabled={!canEdit} />
+                    </div>
+                    
+                    <div className="border-2 border-yellow-300 bg-yellow-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-yellow-900 mb-2">Alto Poder / Baixo Interesse</h4>
+                      <p className="text-sm text-yellow-800 mb-2">Manter Satisfeito</p>
+                      <Textarea placeholder="Ex: Governo, Reguladores, Bancos" rows={3} disabled={!canEdit} />
+                    </div>
+                    
+                    <div className="border-2 border-yellow-300 bg-yellow-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-yellow-900 mb-2">Baixo Poder / Alto Interesse</h4>
+                      <p className="text-sm text-yellow-800 mb-2">Manter Informado</p>
+                      <Textarea placeholder="Ex: Funcionários, Fornecedores, Comunidade" rows={3} disabled={!canEdit} />
+                    </div>
+                    
+                    <div className="border-2 border-green-300 bg-green-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-green-900 mb-2">Baixo Poder / Baixo Interesse</h4>
+                      <p className="text-sm text-green-800 mb-2">Monitorar</p>
+                      <Textarea placeholder="Ex: Público geral, Concorrentes indiretos" rows={3} disabled={!canEdit} />
+                    </div>
+                  </div>
+                  
+                  {canEdit && (
+                    <div className="flex justify-end">
+                      <Button type="submit" size="lg">
+                        <Save className="mr-2 h-4 w-4" />
+                        Salvar Análise de Stakeholders
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -549,12 +658,41 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                     Análise de Recursos e Capacidades: Valioso, Raro, Inimitável e Organizado
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-900">
                       <strong>RBV/VRIO</strong> identifica recursos e capacidades que geram vantagem competitiva sustentável.
                     </p>
                   </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Recursos e Capacidades Valiosos</Label>
+                    <Textarea placeholder="Quais recursos/capacidades agregam valor aos clientes?" rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Recursos Raros</Label>
+                    <Textarea placeholder="Quais recursos são difíceis de encontrar no mercado?" rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Recursos Inimitáveis</Label>
+                    <Textarea placeholder="Quais recursos são difíceis de copiar pelos concorrentes?" rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Organização para Explorar</Label>
+                    <Textarea placeholder="A empresa está organizada para explorar esses recursos?" rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  {canEdit && (
+                    <div className="flex justify-end">
+                      <Button type="submit" size="lg">
+                        <Save className="mr-2 h-4 w-4" />
+                        Salvar Análise RBV/VRIO
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -570,12 +708,52 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                     Análise de Forças, Fraquezas, Oportunidades e Ameaças
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-900">
                       <strong>SWOT</strong> integra análises internas (Forças/Fraquezas) e externas (Oportunidades/Ameaças). <strong>TOWS</strong> usa essa matriz para gerar estratégias.
                     </p>
                   </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="border-2 border-green-300 bg-green-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-green-900 mb-2">Forças (Strengths)</h4>
+                      <p className="text-sm text-green-800 mb-2">Internas - Positivas</p>
+                      <Textarea placeholder="Competências, recursos, vantagens..." rows={4} disabled={!canEdit} />
+                    </div>
+                    
+                    <div className="border-2 border-red-300 bg-red-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-red-900 mb-2">Fraquezas (Weaknesses)</h4>
+                      <p className="text-sm text-red-800 mb-2">Internas - Negativas</p>
+                      <Textarea placeholder="Limitações, desvantagens, gaps..." rows={4} disabled={!canEdit} />
+                    </div>
+                    
+                    <div className="border-2 border-blue-300 bg-blue-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-blue-900 mb-2">Oportunidades (Opportunities)</h4>
+                      <p className="text-sm text-blue-800 mb-2">Externas - Positivas</p>
+                      <Textarea placeholder="Mercados, tendências, possibilidades..." rows={4} disabled={!canEdit} />
+                    </div>
+                    
+                    <div className="border-2 border-yellow-300 bg-yellow-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-yellow-900 mb-2">Ameaças (Threats)</h4>
+                      <p className="text-sm text-yellow-800 mb-2">Externas - Negativas</p>
+                      <Textarea placeholder="Riscos, competição, mudanças..." rows={4} disabled={!canEdit} />
+                    </div>
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Estratégias TOWS</Label>
+                    <Textarea placeholder="Estratégias derivadas da matriz SWOT (SO, ST, WO, WT)..." rows={4} disabled={!canEdit} />
+                  </div>
+                  
+                  {canEdit && (
+                    <div className="flex justify-end">
+                      <Button type="submit" size="lg">
+                        <Save className="mr-2 h-4 w-4" />
+                        Salvar Análise SWOT/TOWS
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -591,12 +769,54 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                     Metodologia de definição de objetivos e resultados-chave mensuráveis
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-900">
                       <strong>OKR</strong> define objetivos ambiciosos e resultados-chave mensuráveis para alinhar a organização e medir progresso.
                     </p>
                   </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Objetivo 1</Label>
+                    <Input placeholder="Ex: Aumentar participação de mercado" disabled={!canEdit} />
+                    <div className="mt-3 space-y-2">
+                      <p className="text-sm font-semibold">Key Results:</p>
+                      <Input placeholder="KR1: Aumentar vendas em 30%" disabled={!canEdit} />
+                      <Input placeholder="KR2: Conquistar 5 novos clientes estratégicos" disabled={!canEdit} />
+                      <Input placeholder="KR3: Reduzir churn de clientes em 20%" disabled={!canEdit} />
+                    </div>
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Objetivo 2</Label>
+                    <Input placeholder="Ex: Melhorar satisfação do cliente" disabled={!canEdit} />
+                    <div className="mt-3 space-y-2">
+                      <p className="text-sm font-semibold">Key Results:</p>
+                      <Input placeholder="KR1: Aumentar NPS para 70+" disabled={!canEdit} />
+                      <Input placeholder="KR2: Reduzir tempo de resposta em 50%" disabled={!canEdit} />
+                      <Input placeholder="KR3: Atingir 95% de resolução na 1ª chamada" disabled={!canEdit} />
+                    </div>
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <Label className="text-base font-semibold mb-2 block">Objetivo 3</Label>
+                    <Input placeholder="Ex: Inovar em produtos/serviços" disabled={!canEdit} />
+                    <div className="mt-3 space-y-2">
+                      <p className="text-sm font-semibold">Key Results:</p>
+                      <Input placeholder="KR1: Lançar 2 novos produtos" disabled={!canEdit} />
+                      <Input placeholder="KR2: Atingir 40% de receita de novos produtos" disabled={!canEdit} />
+                      <Input placeholder="KR3: Implementar 3 melhorias de processo" disabled={!canEdit} />
+                    </div>
+                  </div>
+                  
+                  {canEdit && (
+                    <div className="flex justify-end">
+                      <Button type="submit" size="lg">
+                        <Save className="mr-2 h-4 w-4" />
+                        Salvar OKRs
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
