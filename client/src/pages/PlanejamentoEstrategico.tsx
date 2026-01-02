@@ -1,8 +1,10 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown } from "lucide-react";
 import { useCompletudeStorage } from "@/hooks/useLocalStorage";
+import { useSalvamentoMultiplo } from "@/hooks/useSalvamento";
+import { SalvandoInline } from "@/components/SalvandoIndicador";
 import IdentidadeOrganizacional from "./IdentidadeOrganizacional";
 import AnalisesVRIO from "./AnalisesVRIO";
 import AnalisePestelCompleta from "./AnalisePestelCompleta";
@@ -91,6 +93,21 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const { completude } = useCompletudeStorage();
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const { statusPorAnalise, mensagensPorAnalise, iniciarSalvamento, marcarSalvo, marcarErro } =
+    useSalvamentoMultiplo();
+
+  // Simular salvamento ao expandir/colapsar
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      Object.keys(expanded).forEach((id) => {
+        if (expanded[id] && statusPorAnalise[id] === "inativo") {
+          iniciarSalvamento(id, "Carregando análise...");
+          setTimeout(() => marcarSalvo(id, "Análise carregada"), 800);
+        }
+      });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [expanded, statusPorAnalise, iniciarSalvamento, marcarSalvo]);
 
   const toggleExpanded = useCallback((id: string) => {
     setExpanded((prev) => ({
@@ -187,6 +204,13 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
                             ></div>
                           </div>
                         </div>
+                        {/* Status de Salvamento */}
+                        {statusPorAnalise[analise.id] && (
+                          <SalvandoInline
+                            status={statusPorAnalise[analise.id]}
+                            className="flex-shrink-0"
+                          />
+                        )}
                       </div>
 
                       {/* Botão de Exportar PDF */}
