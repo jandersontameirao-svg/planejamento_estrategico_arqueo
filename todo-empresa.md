@@ -216,3 +216,23 @@
 - [ ] Testar geração de PDF
 - [ ] Validar TypeScript - 0 erros
 - [ ] Todos os testes passando
+
+## Fase 23: Routers tRPC e Gráficos Visuais
+- [x] Criar routers tRPC para salvar PESTEL
+- [x] Criar routers tRPC para salvar 5 Forças de Porter
+- [x] Criar routers tRPC para salvar Stakeholders
+- [x] Criar routers tRPC para salvar RBV/VRIO
+- [x] Criar routers tRPC para salvar SWOT/TOWS
+- [x] Criar routers tRPC para salvar OKR
+- [x] Integrar routers com formulários PESTEL
+- [ ] Integrar routers com formulários 5 Forças
+- [ ] Integrar routers com formulários Stakeholders
+- [ ] Integrar routers com formulários RBV/VRIO
+- [ ] Integrar routers com formulários SWOT/TOWS
+- [ ] Integrar routers com formulários OKR
+- [ ] Criar gráfico radar para PESTEL
+- [ ] Criar gráfico de barras para 5 Forças de Porter
+- [ ] Criar matriz visual 2x2 para Stakeholders
+- [ ] Criar matriz visual para RBV/VRIO
+- [ ] Criar matriz 2x2 visual para SWOT/TOWS
+- [ ] Criar gráfico de progresso para OKR

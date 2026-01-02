@@ -24,6 +24,14 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
     valores: "",
     politica: "",
   });
+  const [pestelData, setPestelData] = useState({
+    politico: "",
+    economico: "",
+    social: "",
+    tecnologico: "",
+    ecologico: "",
+    legal: "",
+  });
 
   const { data: identidade, isLoading, refetch } = trpc.identidade.getByEmpresa.useQuery({ empresaId });
   const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
@@ -37,6 +45,15 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
     },
     onError: (error) => {
       toast.error(error.message);
+    },
+  });
+
+  const savePestelMutation = trpc.analises.savePestel.useMutation({
+    onSuccess: () => {
+      toast.success("PESTEL salvo com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao salvar PESTEL: " + error.message);
     },
   });
 
@@ -56,6 +73,13 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
     upsertMutation.mutate({
       empresaId,
       ...formData,
+    });
+  };
+
+  const handleSavePestel = () => {
+    savePestelMutation.mutate({
+      empresaId,
+      ...pestelData,
     });
   };
 
@@ -494,39 +518,87 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                     </p>
                   </div>
                   
+                  {/* Gráfico Radar PESTEL */}
+                  <div className="bg-white border rounded-lg p-6 h-96">
+                    <h3 className="text-lg font-semibold mb-4">Visualização PESTEL</h3>
+                    <div className="flex items-center justify-center h-80 bg-muted/20 rounded text-muted-foreground">
+                      <p>Gráfico Radar (Recharts) - Mostrará distribuição dos 6 fatores</p>
+                    </div>
+                  </div>
+                  
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Político</Label>
-                    <Textarea placeholder="Legislação, políticas governamentais, estabilidade política..." rows={3} disabled={!canEdit} />
+                    <Textarea 
+                      placeholder="Legislação, políticas governamentais, estabilidade política..." 
+                      rows={3} 
+                      disabled={!canEdit}
+                      value={pestelData.politico}
+                      onChange={(e) => setPestelData({...pestelData, politico: e.target.value})}
+                    />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Econômico</Label>
-                    <Textarea placeholder="Taxa de juros, inflação, crescimento econômico, crise..." rows={3} disabled={!canEdit} />
+                    <Textarea 
+                      placeholder="Taxa de juros, inflação, crescimento econômico, crise..." 
+                      rows={3} 
+                      disabled={!canEdit}
+                      value={pestelData.economico}
+                      onChange={(e) => setPestelData({...pestelData, economico: e.target.value})}
+                    />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Social</Label>
-                    <Textarea placeholder="Tendências demográficas, cultura, valores, estilo de vida..." rows={3} disabled={!canEdit} />
+                    <Textarea 
+                      placeholder="Tendências demográficas, cultura, valores, estilo de vida..." 
+                      rows={3} 
+                      disabled={!canEdit}
+                      value={pestelData.social}
+                      onChange={(e) => setPestelData({...pestelData, social: e.target.value})}
+                    />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Tecnológico</Label>
-                    <Textarea placeholder="Inovação, automação, inteligência artificial, cibersegurança..." rows={3} disabled={!canEdit} />
+                    <Textarea 
+                      placeholder="Inovação, automação, inteligência artificial, cibersegurança..." 
+                      rows={3} 
+                      disabled={!canEdit}
+                      value={pestelData.tecnologico}
+                      onChange={(e) => setPestelData({...pestelData, tecnologico: e.target.value})}
+                    />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Ecológico</Label>
-                    <Textarea placeholder="Sustentabilidade, mudanças climáticas, recursos naturais..." rows={3} disabled={!canEdit} />
+                    <Textarea 
+                      placeholder="Sustentabilidade, mudanças climáticas, recursos naturais..." 
+                      rows={3} 
+                      disabled={!canEdit}
+                      value={pestelData.ecologico}
+                      onChange={(e) => setPestelData({...pestelData, ecologico: e.target.value})}
+                    />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Legal</Label>
-                    <Textarea placeholder="Regulamentação, conformidade, direitos trabalhistas, proteção de dados..." rows={3} disabled={!canEdit} />
+                    <Textarea 
+                      placeholder="Regulamentação, conformidade, direitos trabalhistas, proteção de dados..." 
+                      rows={3} 
+                      disabled={!canEdit}
+                      value={pestelData.legal}
+                      onChange={(e) => setPestelData({...pestelData, legal: e.target.value})}
+                    />
                   </div>
                   
                   {canEdit && (
                     <div className="flex justify-end">
-                      <Button type="submit" size="lg">
+                      <Button 
+                        onClick={handleSavePestel}
+                        disabled={savePestelMutation.isPending}
+                        size="lg"
+                      >
                         <Save className="mr-2 h-4 w-4" />
                         Salvar Análise PESTEL
                       </Button>

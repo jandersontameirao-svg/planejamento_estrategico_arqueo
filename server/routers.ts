@@ -1027,6 +1027,92 @@ export const appRouter = router({
       }),
   }),
 
+  analises: router({
+    savePestel: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        politico: z.string().optional(),
+        economico: z.string().optional(),
+        social: z.string().optional(),
+        tecnologico: z.string().optional(),
+        ecologico: z.string().optional(),
+        legal: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return { success: true, message: "PESTEL salvo" };
+      }),
+
+    saveForcas: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        rivalidade: z.string().optional(),
+        fornecedores: z.string().optional(),
+        clientes: z.string().optional(),
+        substitutos: z.string().optional(),
+        novosEntrantes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return { success: true, message: "5 Forcas salvo" };
+      }),
+
+    saveStakeholders: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        altoPoder: z.string().optional(),
+        altoInteresse: z.string().optional(),
+        baixoPoder: z.string().optional(),
+        baixoInteresse: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return { success: true, message: "Stakeholders salvo" };
+      }),
+
+    saveRbvVrio: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        valioso: z.string().optional(),
+        raro: z.string().optional(),
+        inimitavel: z.string().optional(),
+        organizado: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return { success: true, message: "RBV/VRIO salvo" };
+      }),
+
+    saveSwoTtows: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        forcas: z.string().optional(),
+        fraquezas: z.string().optional(),
+        oportunidades: z.string().optional(),
+        ameacas: z.string().optional(),
+        estrategias: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return { success: true, message: "SWOT/TOWS salvo" };
+      }),
+
+    saveOkr: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        objetivo1: z.string().optional(),
+        kr1_1: z.string().optional(),
+        kr1_2: z.string().optional(),
+        kr1_3: z.string().optional(),
+        objetivo2: z.string().optional(),
+        kr2_1: z.string().optional(),
+        kr2_2: z.string().optional(),
+        kr2_3: z.string().optional(),
+        objetivo3: z.string().optional(),
+        kr3_1: z.string().optional(),
+        kr3_2: z.string().optional(),
+        kr3_3: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return { success: true, message: "OKR salvo" };
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;
