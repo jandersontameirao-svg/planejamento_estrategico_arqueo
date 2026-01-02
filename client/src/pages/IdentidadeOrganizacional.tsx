@@ -32,6 +32,46 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
     ecologico: "",
     legal: "",
   });
+  const [forcasData, setForcasData] = useState({
+    rivalidade: "",
+    fornecedores: "",
+    clientes: "",
+    novosEntrantes: "",
+    substitutos: "",
+  });
+  const [stakeholdersData, setStakeholdersData] = useState({
+    altoPoder: "",
+    altoInteresse: "",
+    baixoPoder: "",
+    baixoInteresse: "",
+  });
+  const [rbvData, setRbvData] = useState({
+    valioso: "",
+    raro: "",
+    inimitavel: "",
+    organizado: "",
+  });
+  const [swotData, setSwotData] = useState({
+    forcas: "",
+    fraquezas: "",
+    oportunidades: "",
+    ameacas: "",
+    estrategias: "",
+  });
+  const [okrData, setOkrData] = useState({
+    objetivo1: "",
+    kr1_1: "",
+    kr1_2: "",
+    kr1_3: "",
+    objetivo2: "",
+    kr2_1: "",
+    kr2_2: "",
+    kr2_3: "",
+    objetivo3: "",
+    kr3_1: "",
+    kr3_2: "",
+    kr3_3: "",
+  });
 
   const { data: identidade, isLoading, refetch } = trpc.identidade.getByEmpresa.useQuery({ empresaId });
   const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
@@ -54,6 +94,51 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
     },
     onError: (error) => {
       toast.error("Erro ao salvar PESTEL: " + error.message);
+    },
+  });
+
+  const saveForcasMutation = trpc.analises.saveForcas.useMutation({
+    onSuccess: () => {
+      toast.success("5 Forças salvo com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao salvar 5 Forças: " + error.message);
+    },
+  });
+
+  const saveStakeholdersMutation = trpc.analises.saveStakeholders.useMutation({
+    onSuccess: () => {
+      toast.success("Stakeholders salvo com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao salvar Stakeholders: " + error.message);
+    },
+  });
+
+  const saveRbvVrioMutation = trpc.analises.saveRbvVrio.useMutation({
+    onSuccess: () => {
+      toast.success("RBV/VRIO salvo com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao salvar RBV/VRIO: " + error.message);
+    },
+  });
+
+  const saveSwoTtowsMutation = trpc.analises.saveSwoTtows.useMutation({
+    onSuccess: () => {
+      toast.success("SWOT/TOWS salvo com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao salvar SWOT/TOWS: " + error.message);
+    },
+  });
+
+  const saveOkrMutation = trpc.analises.saveOkr.useMutation({
+    onSuccess: () => {
+      toast.success("OKR salvo com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao salvar OKR: " + error.message);
     },
   });
 
@@ -80,6 +165,52 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
     savePestelMutation.mutate({
       empresaId,
       ...pestelData,
+    });
+  };
+
+  const handleSaveForcas = () => {
+    saveForcasMutation.mutate({
+      empresaId,
+      rivalidade: forcasData.rivalidade,
+      fornecedores: forcasData.fornecedores,
+      clientes: forcasData.clientes,
+      novosEntrantes: forcasData.novosEntrantes,
+      substitutos: forcasData.substitutos,
+    });
+  };
+
+  const handleSaveStakeholders = () => {
+    saveStakeholdersMutation.mutate({
+      empresaId,
+      ...stakeholdersData,
+    });
+  };
+
+  const handleSaveRbvVrio = () => {
+    saveRbvVrioMutation.mutate({
+      empresaId,
+      valioso: rbvData.valioso,
+      raro: rbvData.raro,
+      inimitavel: rbvData.inimitavel,
+      organizado: rbvData.organizado,
+    });
+  };
+
+  const handleSaveSwotTows = () => {
+    saveSwoTtowsMutation.mutate({
+      empresaId,
+      forcas: swotData.forcas,
+      fraquezas: swotData.fraquezas,
+      oportunidades: swotData.oportunidades,
+      ameacas: swotData.ameacas,
+      estrategias: swotData.estrategias,
+    });
+  };
+
+  const handleSaveOkr = () => {
+    saveOkrMutation.mutate({
+      empresaId,
+      ...okrData,
     });
   };
 
