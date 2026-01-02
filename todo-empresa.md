@@ -154,3 +154,23 @@
 - [x] Testes da nova matriz 5x5
 - [x] Validar TypeScript - 0 erros
 - [x] Todos os 34 testes passando
+
+## Fase 20: Análises Estratégicas por Empresa
+- [x] Adicionar campos ao schema para PESTEL
+- [x] Adicionar campos ao schema para 5 Forças de Porter
+- [x] Adicionar campos ao schema para Stakeholders
+- [x] Adicionar campos ao schema para RBV/VRIO
+- [x] Adicionar campos ao schema para SWOT/TOWS
+- [x] Adicionar campos ao schema para OKR
+- [x] Criar página de Análise PESTEL
+- [x] Criar página de 5 Forças de Porter
+- [x] Criar página de Análise de Stakeholders
+- [x] Criar página de RBV/VRIO
+- [x] Criar página de SWOT/TOWS
+- [x] Criar página de OKR
+- [ ] Implementar routers tRPC para análises
+- [ ] Adicionar navegação nas páginas de empresa
+- [ ] Integrar componentes de análise
+- [ ] Testar todas as análises
+- [x] Validar TypeScript - 0 erros
+- [x] Todos os 34 testes passando

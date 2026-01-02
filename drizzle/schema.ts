@@ -417,3 +417,149 @@ export const acoesGrupo = mysqlTable("acoes_grupo", {
 
 export type AcaoGrupo = typeof acoesGrupo.$inferSelect;
 export type InsertAcaoGrupo = typeof acoesGrupo.$inferInsert;
+
+
+/**
+ * Análise PESTEL - Fatores Externos
+ */
+export const analisePestel = mysqlTable("analise_pestel", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  // Político
+  politico: text("politico"),
+  // Econômico
+  economico: text("economico"),
+  // Social
+  social: text("social"),
+  // Tecnológico
+  tecnologico: text("tecnologico"),
+  // Ambiental
+  ambiental: text("ambiental"),
+  // Legal
+  legal: text("legal"),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AnalisePestel = typeof analisePestel.$inferSelect;
+export type InsertAnalisePestel = typeof analisePestel.$inferInsert;
+
+/**
+ * 5 Forças de Porter
+ */
+export const cincoForcasPorter = mysqlTable("cinco_forcas_porter", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  // Ameaça de Novos Entrantes
+  ameacaNovoEntrantes: text("ameaca_novo_entrantes"),
+  intensidadeNovoEntrantes: mysqlEnum("intensidade_novo_entrantes", ["baixa", "media", "alta"]).default("media"),
+  // Poder de Barganha dos Fornecedores
+  poderFornecedores: text("poder_fornecedores"),
+  intensidadeFornecedores: mysqlEnum("intensidade_fornecedores", ["baixa", "media", "alta"]).default("media"),
+  // Poder de Barganha dos Clientes
+  poderClientes: text("poder_clientes"),
+  intensidadeClientes: mysqlEnum("intensidade_clientes", ["baixa", "media", "alta"]).default("media"),
+  // Ameaça de Produtos Substitutos
+  ameacaSubstitutos: text("ameaca_substitutos"),
+  intensidadeSubstitutos: mysqlEnum("intensidade_substitutos", ["baixa", "media", "alta"]).default("media"),
+  // Rivalidade entre Competidores
+  rivalidadeCompetidores: text("rivalidade_competidores"),
+  intensidadeRivalidade: mysqlEnum("intensidade_rivalidade", ["baixa", "media", "alta"]).default("media"),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CincoForcasPorter = typeof cincoForcasPorter.$inferSelect;
+export type InsertCincoForcasPorter = typeof cincoForcasPorter.$inferInsert;
+
+/**
+ * Análise de Stakeholders
+ */
+export const analiseStakeholders = mysqlTable("analise_stakeholders", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  poder: mysqlEnum("poder", ["baixo", "medio", "alto"]).default("medio"),
+  interesse: mysqlEnum("interesse", ["baixo", "medio", "alto"]).default("medio"),
+  estrategia: text("estrategia"),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AnaliseStakeholders = typeof analiseStakeholders.$inferSelect;
+export type InsertAnaliseStakeholders = typeof analiseStakeholders.$inferInsert;
+
+/**
+ * RBV/VRIO - Análise de Recursos e Capacidades
+ */
+export const analiseRbvVrio = mysqlTable("analise_rbv_vrio", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  recurso: varchar("recurso", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  // VRIO: Valioso, Raro, Inimitável, Organizado
+  valioso: boolean("valioso").default(false),
+  raro: boolean("raro").default(false),
+  inimitavel: boolean("inimitavel").default(false),
+  organizado: boolean("organizado").default(false),
+  vantagem: mysqlEnum("vantagem", ["desvantagem", "paridade", "vantagem_temporaria", "vantagem_sustentavel"]).default("paridade"),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AnaliseRbvVrio = typeof analiseRbvVrio.$inferSelect;
+export type InsertAnaliseRbvVrio = typeof analiseRbvVrio.$inferInsert;
+
+/**
+ * SWOT/TOWS - Análise de Forças, Fraquezas, Oportunidades e Ameaças
+ */
+export const analiseSwoTtows = mysqlTable("analise_swot_tows", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  tipo: mysqlEnum("tipo", ["forca", "fraqueza", "oportunidade", "ameaca"]).notNull(),
+  descricao: text("descricao").notNull(),
+  impacto: mysqlEnum("impacto", ["baixo", "medio", "alto"]).default("medio"),
+  estrategia: text("estrategia"),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AnaliseSwoTtows = typeof analiseSwoTtows.$inferSelect;
+export type InsertAnaliseSwoTtows = typeof analiseSwoTtows.$inferInsert;
+
+/**
+ * OKR - Objetivos e Resultados-Chave
+ */
+export const analiseOkr = mysqlTable("analise_okr", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  objetivo: varchar("objetivo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  // Resultados-Chave
+  resultadoChave1: text("resultado_chave_1"),
+  metaResultado1: varchar("meta_resultado_1", { length: 255 }),
+  statusResultado1: mysqlEnum("status_resultado_1", ["nao_iniciado", "em_progresso", "concluido", "cancelado"]).default("nao_iniciado"),
+  
+  resultadoChave2: text("resultado_chave_2"),
+  metaResultado2: varchar("meta_resultado_2", { length: 255 }),
+  statusResultado2: mysqlEnum("status_resultado_2", ["nao_iniciado", "em_progresso", "concluido", "cancelado"]).default("nao_iniciado"),
+  
+  resultadoChave3: text("resultado_chave_3"),
+  metaResultado3: varchar("meta_resultado_3", { length: 255 }),
+  statusResultado3: mysqlEnum("status_resultado_3", ["nao_iniciado", "em_progresso", "concluido", "cancelado"]).default("nao_iniciado"),
+  
+  periodo: varchar("periodo", { length: 100 }),
+  progresso: int("progresso").default(0),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AnaliseOkr = typeof analiseOkr.$inferSelect;
+export type InsertAnaliseOkr = typeof analiseOkr.$inferInsert;

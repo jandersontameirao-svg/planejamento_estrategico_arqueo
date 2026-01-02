@@ -20,6 +20,11 @@ import AnalisePreditiva from "./pages/AnalisePreditiva";
 import PortalStakeholders from "./pages/PortalStakeholders";
 import DashboardComparativo from "./pages/DashboardComparativo";
 import GestaoUsuarios from "./pages/GestaoUsuarios";
+import AnalisePestel from "./pages/AnalisePestel";
+import CincoForcasPorter from "./pages/CincoForcasPorter";
+import AnaliseStakeholders from "./pages/AnaliseStakeholders";
+import AnaliseRbvVrio from "./pages/AnaliseRbvVrio";
+import AnaliseSwoTtows from "./pages/AnaliseSwoTtows";
 
 
 function Router() {
@@ -56,6 +61,11 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/dashboard-comparativo" component={DashboardComparativo} />
       <Route path="/gestao-usuarios" component={GestaoUsuarios} />
+      <Route path="/analise-pestel/:id" component={AnalisePestel} />
+      <Route path="/cinco-forcas-porter/:id" component={CincoForcasPorter} />
+      <Route path="/analise-stakeholders/:id" component={AnaliseStakeholders} />
+      <Route path="/analise-rbv-vrio/:id" component={AnaliseRbvVrio} />
+      <Route path="/analise-swot-tows/:id" component={AnaliseSwoTtows} />
       <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />
