@@ -33,10 +33,7 @@ const coresIcone = {
 };
 
 export default function AnalisePestelLite() {
-  const [fatores, setFatores] = useState<FatorPestel[]>([
-    { id: "1", categoria: "Político", impacto: 3, probabilidade: 4, descricao: "Mudanças na legislação" },
-    { id: "2", categoria: "Econômico", impacto: 4, probabilidade: 3, descricao: "Inflação e juros" },
-  ]);
+  const [fatores, setFatores] = useState<FatorPestel[]>([]);
 
   const [novoFator, setNovoFator] = useState<Partial<FatorPestel>>({
     categoria: "Político",

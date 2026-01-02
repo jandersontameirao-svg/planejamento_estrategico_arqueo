@@ -30,10 +30,7 @@ const coresIcone = {
 };
 
 export default function CincoForcasLite() {
-  const [forcas, setForcas] = useState<Forca[]>([
-    { id: "1", tipo: "Rivalidade", intensidade: 4, descricao: "Competição intensa no mercado" },
-    { id: "2", tipo: "Fornecedores", intensidade: 3, descricao: "Poder moderado dos fornecedores" },
-  ]);
+  const [forcas, setForcas] = useState<Forca[]>([]);
 
   const [novaForca, setNovaForca] = useState<Partial<Forca>>({
     tipo: "Rivalidade",

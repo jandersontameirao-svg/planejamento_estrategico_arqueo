@@ -14,10 +14,10 @@ interface Perspectiva {
 
 export default function BscLite() {
   const [perspectivas, setPerspectivas] = useState<Perspectiva[]>([
-    { id: "1", nome: "Financeira", indicadores: ["ROI", "Receita"], desempenho: 75 },
-    { id: "2", nome: "Cliente", indicadores: ["Satisfação", "Retenção"], desempenho: 80 },
-    { id: "3", nome: "Processos", indicadores: ["Eficiência", "Qualidade"], desempenho: 70 },
-    { id: "4", nome: "Aprendizado", indicadores: ["Inovação", "Desenvolvimento"], desempenho: 65 },
+    { id: "1", nome: "Financeira", indicadores: [], desempenho: 0 },
+    { id: "2", nome: "Cliente", indicadores: [], desempenho: 0 },
+    { id: "3", nome: "Processos", indicadores: [], desempenho: 0 },
+    { id: "4", nome: "Aprendizado", indicadores: [], desempenho: 0 },
   ]);
 
   const atualizarDesempenho = (id: string, desempenho: number) => {

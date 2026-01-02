@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, nome FROM empresas ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, nome FROM empresas ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Arqueoproject Projetos e Pesquisas LTDA"
+    },
+    {
+      "id": "30001",
+      "nome": "arqueogis geoprocessamento"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\n1\tArqueoproject Projetos e Pesquisas LTDA\n30001\tarqueogis geoprocessamento\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

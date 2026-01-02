@@ -13,9 +13,7 @@ interface OKR {
 }
 
 export default function OkrLite() {
-  const [okrs, setOkrs] = useState<OKR[]>([
-    { id: "1", objetivo: "Aumentar receita", resultados: ["Crescer 20%", "Novos clientes"], progresso: 60 },
-  ]);
+  const [okrs, setOkrs] = useState<OKR[]>([]);
 
   const [novoObjetivo, setNovoObjetivo] = useState("");
 

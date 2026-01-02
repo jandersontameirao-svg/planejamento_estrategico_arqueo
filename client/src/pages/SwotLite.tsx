@@ -9,18 +9,10 @@ interface ItemSwot {
 }
 
 export default function SwotLite() {
-  const [forcas, setForcas] = useState<ItemSwot[]>([
-    { id: "1", descricao: "Equipe técnica experiente" },
-  ]);
-  const [fraquezas, setFraquezas] = useState<ItemSwot[]>([
-    { id: "1", descricao: "Recursos limitados" },
-  ]);
-  const [oportunidades, setOportunidades] = useState<ItemSwot[]>([
-    { id: "1", descricao: "Crescimento de demanda" },
-  ]);
-  const [ameacas, setAmeacas] = useState<ItemSwot[]>([
-    { id: "1", descricao: "Concorrência aumentando" },
-  ]);
+  const [forcas, setForcas] = useState<ItemSwot[]>([]);
+  const [fraquezas, setFraquezas] = useState<ItemSwot[]>([]);
+  const [oportunidades, setOportunidades] = useState<ItemSwot[]>([]);
+  const [ameacas, setAmeacas] = useState<ItemSwot[]>([]);
 
   const [novoItem, setNovoItem] = useState("");
 

@@ -22,10 +22,7 @@ const classificarQuadrante = (poder: number, interesse: number) => {
 };
 
 export default function StakeholdersLite() {
-  const [stakeholders, setStakeholders] = useState<Stakeholder[]>([
-    { id: "1", nome: "IPHAN", poder: 5, interesse: 4, descricao: "Órgão regulador" },
-    { id: "2", nome: "Clientes", poder: 4, interesse: 5, descricao: "Usuários dos serviços" },
-  ]);
+  const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
 
   const [novoStakeholder, setNovoStakeholder] = useState<Partial<Stakeholder>>({
     nome: "",
