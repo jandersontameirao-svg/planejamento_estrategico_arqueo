@@ -341,3 +341,12 @@
 - [x] Reformular OkrLite com Key Results, gráficos de progresso e métricas
 - [x] Reformular BscLite com indicadores por perspectiva, radar e barras
 - [x] Testar integração de todos os componentes Lite na página de Planejamento Estratégico
+
+
+## Melhorias de Interface - PESTEL
+- [x] Melhorar visual da análise PESTEL para ficar mais prática e amigável
+- [x] Adicionar cards coloridos por categoria (Político, Econômico, Social, Tecnológico, Ambiental, Legal)
+- [x] Melhorar formulário de adição de fatores com seleção visual de categoria
+- [x] Adicionar matriz de risco (scatter plot) e gráfico de barras por categoria
+- [x] Adicionar filtro por categoria clicável
+- [x] Melhorar visualização de fatores com barras de progresso
