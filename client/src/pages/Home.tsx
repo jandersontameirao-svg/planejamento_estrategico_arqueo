@@ -31,8 +31,8 @@ export default function Home() {
         <header className="border-b bg-card">
           <div className="container flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <Building2 className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold">Planejamento Estratégico</span>
+              <img src="/logo-arqueo.svg" alt="Grupo Arqueo" className="h-8 w-8" />
+              <span className="text-xl font-bold">Grupo Arqueo</span>
             </div>
             <Button asChild>
               <a href={getLoginUrl()}>Entrar</a>
@@ -44,10 +44,10 @@ export default function Home() {
           <div className="container max-w-4xl text-center py-16">
             <div className="mb-8">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
-                <Building2 className="h-10 w-10 text-primary" />
+                <img src="/logo-arqueo.svg" alt="Grupo Arqueo" className="h-12 w-12" />
               </div>
               <h1 className="text-4xl font-bold mb-4">
-                Sistema de Gestão Estratégica
+                Planejamento Estratégico Grupo Arqueo
               </h1>
               <p className="text-xl text-muted-foreground mb-8">
                 Planejamento estratégico corporativo para o Grupo Arqueo
