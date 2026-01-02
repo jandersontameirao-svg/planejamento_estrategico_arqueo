@@ -16,7 +16,7 @@ interface IdentidadeOrganizacionalProps {
 export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrganizacionalProps) {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"identidade" | "bsc">("identidade");
+  const [activeTab, setActiveTab] = useState<"identidade" | "bsc" | "pestel" | "forcas" | "stakeholders" | "rbv" | "swot" | "okr">("identidade");
   const [formData, setFormData] = useState({
     missao: "",
     visao: "",
@@ -134,6 +134,66 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
               onClick={() => setActiveTab("bsc")}
             >
               BSC (Balanced Scorecard)
+            </button>
+            <button
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === "pestel"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setActiveTab("pestel")}
+            >
+              PESTEL
+            </button>
+            <button
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === "forcas"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setActiveTab("forcas")}
+            >
+              5 Forças de Porter
+            </button>
+            <button
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === "stakeholders"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setActiveTab("stakeholders")}
+            >
+              Stakeholders
+            </button>
+            <button
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === "rbv"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setActiveTab("rbv")}
+            >
+              RBV/VRIO
+            </button>
+            <button
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === "swot"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setActiveTab("swot")}
+            >
+              SWOT/TOWS
+            </button>
+            <button
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === "okr"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => setActiveTab("okr")}
+            >
+              OKR
             </button>
           </div>
 
@@ -411,6 +471,132 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                       Nenhum KPI cadastrado nesta perspectiva. Acesse a aba KPIs para adicionar.
                     </p>
                   )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* PESTEL */}
+          {activeTab === "pestel" && (
+            <div className="space-y-6">
+              <Card className="bg-muted/30">
+                <CardHeader>
+                  <CardTitle>Análise PESTEL</CardTitle>
+                  <CardDescription>
+                    Análise dos fatores externos: Político, Econômico, Social, Tecnológico, Ecológico e Legal
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-900">
+                      <strong>PESTEL</strong> analisa o ambiente externo da empresa. Identifique oportunidades e ameaças em cada fator.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* 5 Forças de Porter */}
+          {activeTab === "forcas" && (
+            <div className="space-y-6">
+              <Card className="bg-muted/30">
+                <CardHeader>
+                  <CardTitle>5 Forças de Porter</CardTitle>
+                  <CardDescription>
+                    Análise da competitividade: Rivalidade, Poder dos Fornecedores, Poder dos Clientes, Ameaça de Novos Entrantes e Ameaça de Substitutos
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-900">
+                      <strong>5 Forças de Porter</strong> avalia a intensidade da competição no setor e a atratividade do mercado.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Stakeholders */}
+          {activeTab === "stakeholders" && (
+            <div className="space-y-6">
+              <Card className="bg-muted/30">
+                <CardHeader>
+                  <CardTitle>Análise de Stakeholders</CardTitle>
+                  <CardDescription>
+                    Matriz de Poder x Interesse: identifique e gerencie as partes interessadas
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-900">
+                      <strong>Stakeholders</strong> são grupos com interesse na empresa. Mapeie seu poder e interesse para definir estratégias de engajamento.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* RBV/VRIO */}
+          {activeTab === "rbv" && (
+            <div className="space-y-6">
+              <Card className="bg-muted/30">
+                <CardHeader>
+                  <CardTitle>RBV/VRIO</CardTitle>
+                  <CardDescription>
+                    Análise de Recursos e Capacidades: Valioso, Raro, Inimitável e Organizado
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-900">
+                      <strong>RBV/VRIO</strong> identifica recursos e capacidades que geram vantagem competitiva sustentável.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* SWOT/TOWS */}
+          {activeTab === "swot" && (
+            <div className="space-y-6">
+              <Card className="bg-muted/30">
+                <CardHeader>
+                  <CardTitle>SWOT/TOWS</CardTitle>
+                  <CardDescription>
+                    Análise de Forças, Fraquezas, Oportunidades e Ameaças
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-900">
+                      <strong>SWOT</strong> integra análises internas (Forças/Fraquezas) e externas (Oportunidades/Ameaças). <strong>TOWS</strong> usa essa matriz para gerar estratégias.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* OKR */}
+          {activeTab === "okr" && (
+            <div className="space-y-6">
+              <Card className="bg-muted/30">
+                <CardHeader>
+                  <CardTitle>OKR (Objectives and Key Results)</CardTitle>
+                  <CardDescription>
+                    Metodologia de definição de objetivos e resultados-chave mensuráveis
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-900">
+                      <strong>OKR</strong> define objetivos ambiciosos e resultados-chave mensuráveis para alinhar a organização e medir progresso.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>

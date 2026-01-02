@@ -174,3 +174,16 @@
 - [ ] Testar todas as análises
 - [x] Validar TypeScript - 0 erros
 - [x] Todos os 34 testes passando
+
+## Fase 21: Integração de Análises como Abas na Identidade Organizacional
+- [x] Reorganizar IdentidadeOrganizacional.tsx com abas
+- [x] Adicionar aba de PESTEL
+- [x] Adicionar aba de 5 Forças de Porter
+- [x] Adicionar aba de Stakeholders
+- [x] Adicionar aba de RBV/VRIO
+- [x] Adicionar aba de SWOT/TOWS
+- [x] Adicionar aba de OKR
+- [ ] Remover rotas individuais das análises
+- [x] Testar navegação entre abas
+- [x] Validar TypeScript - 0 erros
+- [x] Todos os 34 testes passando
