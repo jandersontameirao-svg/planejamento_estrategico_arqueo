@@ -9,6 +9,12 @@ import { Building2, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+import { GraficosPestel } from "@/components/GraficosPestel";
+import { Graficos5Forcas } from "@/components/Graficos5Forcas";
+import { GraficosStakeholders } from "@/components/GraficosStakeholders";
+import { GraficosRBV } from "@/components/GraficosRBV";
+import { GraficosSWOT } from "@/components/GraficosSWOT";
+import { GraficosOKR } from "@/components/GraficosOKR";
 
 interface IdentidadeOrganizacionalProps {
   empresaId: number;
@@ -650,12 +656,7 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                   </div>
                   
                   {/* Gráfico Radar PESTEL */}
-                  <div className="bg-white border rounded-lg p-6 h-96">
-                    <h3 className="text-lg font-semibold mb-4">Visualização PESTEL</h3>
-                    <div className="flex items-center justify-center h-80 bg-muted/20 rounded text-muted-foreground">
-                      <p>Gráfico Radar (Recharts) - Mostrará distribuição dos 6 fatores</p>
-                    </div>
-                  </div>
+                  <GraficosPestel politico={pestelData.politico} economico={pestelData.economico} social={pestelData.social} tecnologico={pestelData.tecnologico} ecologico={pestelData.ecologico} legal={pestelData.legal} />
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Político</Label>
@@ -759,32 +760,32 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Rivalidade entre Concorrentes</Label>
-                    <Textarea placeholder="Número de concorrentes, diferença de produtos, custos de saída..." rows={3} disabled={!canEdit} />
+                    <Textarea placeholder="Número de concorrentes, diferença de produtos, custos de saída..." rows={3} disabled={!canEdit} value={forcasData.rivalidade} onChange={(e) => setForcasData({...forcasData, rivalidade: e.target.value})} />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Poder dos Fornecedores</Label>
-                    <Textarea placeholder="Número de fornecedores, dependência, custos de mudança..." rows={3} disabled={!canEdit} />
+                    <Textarea placeholder="Número de fornecedores, dependência, custos de mudança..." rows={3} disabled={!canEdit} value={forcasData.fornecedores} onChange={(e) => setForcasData({...forcasData, fornecedores: e.target.value})} />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Poder dos Clientes</Label>
-                    <Textarea placeholder="Concentração de clientes, sensibilidade ao preço, poder de negociação..." rows={3} disabled={!canEdit} />
+                    <Textarea placeholder="Concentração de clientes, sensibilidade ao preço, poder de negociação..." rows={3} disabled={!canEdit} value={forcasData.clientes} onChange={(e) => setForcasData({...forcasData, clientes: e.target.value})} />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Ameaça de Novos Entrantes</Label>
-                    <Textarea placeholder="Barreiras de entrada, capital necessário, economia de escala..." rows={3} disabled={!canEdit} />
+                    <Textarea placeholder="Barreiras de entrada, capital necessário, economia de escala..." rows={3} disabled={!canEdit} value={forcasData.novosEntrantes} onChange={(e) => setForcasData({...forcasData, novosEntrantes: e.target.value})} />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Ameaça de Produtos Substitutos</Label>
-                    <Textarea placeholder="Disponibilidade de substitutos, preço, desempenho..." rows={3} disabled={!canEdit} />
+                    <Textarea placeholder="Disponibilidade de substitutos, preço, desempenho..." rows={3} disabled={!canEdit} value={forcasData.substitutos} onChange={(e) => setForcasData({...forcasData, substitutos: e.target.value})} />
                   </div>
                   
                   {canEdit && (
                     <div className="flex justify-end">
-                      <Button type="submit" size="lg">
+                      <Button onClick={handleSaveForcas} disabled={saveForcasMutation.isPending} size="lg">
                         <Save className="mr-2 h-4 w-4" />
                         Salvar Análise 5 Forças
                       </Button>
@@ -835,6 +836,11 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                       <h4 className="font-semibold text-green-900 mb-2">Baixo Poder / Baixo Interesse</h4>
                       <p className="text-sm text-green-800 mb-2">Monitorar</p>
                       <Textarea placeholder="Ex: Público geral, Concorrentes indiretos" rows={3} disabled={!canEdit} />
+                  </div>
+                  
+                  <div className="border rounded-lg p-4">
+                    <h3 className="text-lg font-semibold mb-4">Matriz de Stakeholders</h3>
+                    <GraficosStakeholders altoPoder={stakeholdersData.altoPoder} altoInteresse={stakeholdersData.altoInteresse} baixoPoder={stakeholdersData.baixoPoder} baixoInteresse={stakeholdersData.baixoInteresse} />
                     </div>
                   </div>
                   
@@ -870,27 +876,27 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Recursos e Capacidades Valiosos</Label>
-                    <Textarea placeholder="Quais recursos/capacidades agregam valor aos clientes?" rows={3} disabled={!canEdit} />
+                    <Textarea placeholder="Quais recursos/capacidades agregam valor aos clientes?" rows={3} disabled={!canEdit} value={rbvData.valioso} onChange={(e) => setRbvData({...rbvData, valioso: e.target.value})} />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Recursos Raros</Label>
-                    <Textarea placeholder="Quais recursos são difíceis de encontrar no mercado?" rows={3} disabled={!canEdit} />
+                    <Textarea placeholder="Quais recursos são difíceis de encontrar no mercado?" rows={3} disabled={!canEdit} value={rbvData.raro} onChange={(e) => setRbvData({...rbvData, raro: e.target.value})} />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Recursos Inimitáveis</Label>
-                    <Textarea placeholder="Quais recursos são difíceis de copiar pelos concorrentes?" rows={3} disabled={!canEdit} />
+                    <Textarea placeholder="Quais recursos são difíceis de copiar pelos concorrentes?" rows={3} disabled={!canEdit} value={rbvData.inimitavel} onChange={(e) => setRbvData({...rbvData, inimitavel: e.target.value})} />
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Organização para Explorar</Label>
-                    <Textarea placeholder="A empresa está organizada para explorar esses recursos?" rows={3} disabled={!canEdit} />
+                    <Textarea placeholder="A empresa está organizada para explorar esses recursos?" rows={3} disabled={!canEdit} value={rbvData.organizado} onChange={(e) => setRbvData({...rbvData, organizado: e.target.value})} />
                   </div>
                   
                   {canEdit && (
                     <div className="flex justify-end">
-                      <Button type="submit" size="lg">
+                      <Button onClick={handleSaveRbvVrio} disabled={saveRbvVrioMutation.isPending} size="lg">
                         <Save className="mr-2 h-4 w-4" />
                         Salvar Análise RBV/VRIO
                       </Button>
@@ -922,36 +928,36 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                     <div className="border-2 border-green-300 bg-green-50 rounded-lg p-4">
                       <h4 className="font-semibold text-green-900 mb-2">Forças (Strengths)</h4>
                       <p className="text-sm text-green-800 mb-2">Internas - Positivas</p>
-                      <Textarea placeholder="Competências, recursos, vantagens..." rows={4} disabled={!canEdit} />
+                      <Textarea placeholder="Competências, recursos, vantagens..." rows={4} disabled={!canEdit} value={swotData.forcas} onChange={(e) => setSwotData({...swotData, forcas: e.target.value})} />
                     </div>
                     
                     <div className="border-2 border-red-300 bg-red-50 rounded-lg p-4">
                       <h4 className="font-semibold text-red-900 mb-2">Fraquezas (Weaknesses)</h4>
                       <p className="text-sm text-red-800 mb-2">Internas - Negativas</p>
-                      <Textarea placeholder="Limitações, desvantagens, gaps..." rows={4} disabled={!canEdit} />
+                      <Textarea placeholder="Limitações, desvantagens, gaps..." rows={4} disabled={!canEdit} value={swotData.fraquezas} onChange={(e) => setSwotData({...swotData, fraquezas: e.target.value})} />
                     </div>
                     
                     <div className="border-2 border-blue-300 bg-blue-50 rounded-lg p-4">
                       <h4 className="font-semibold text-blue-900 mb-2">Oportunidades (Opportunities)</h4>
                       <p className="text-sm text-blue-800 mb-2">Externas - Positivas</p>
-                      <Textarea placeholder="Mercados, tendências, possibilidades..." rows={4} disabled={!canEdit} />
+                      <Textarea placeholder="Mercados, tendências, possibilidades..." rows={4} disabled={!canEdit} value={swotData.oportunidades} onChange={(e) => setSwotData({...swotData, oportunidades: e.target.value})} />
                     </div>
                     
                     <div className="border-2 border-yellow-300 bg-yellow-50 rounded-lg p-4">
                       <h4 className="font-semibold text-yellow-900 mb-2">Ameaças (Threats)</h4>
                       <p className="text-sm text-yellow-800 mb-2">Externas - Negativas</p>
-                      <Textarea placeholder="Riscos, competição, mudanças..." rows={4} disabled={!canEdit} />
+                      <Textarea placeholder="Riscos, competição, mudanças..." rows={4} disabled={!canEdit} value={swotData.ameacas} onChange={(e) => setSwotData({...swotData, ameacas: e.target.value})} />
                     </div>
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Estratégias TOWS</Label>
-                    <Textarea placeholder="Estratégias derivadas da matriz SWOT (SO, ST, WO, WT)..." rows={4} disabled={!canEdit} />
+                    <Textarea placeholder="Estratégias derivadas da matriz SWOT (SO, ST, WO, WT)..." rows={4} disabled={!canEdit} value={swotData.estrategias} onChange={(e) => setSwotData({...swotData, estrategias: e.target.value})} />
                   </div>
                   
                   {canEdit && (
                     <div className="flex justify-end">
-                      <Button type="submit" size="lg">
+                      <Button onClick={handleSaveSwotTows} disabled={saveSwoTtowsMutation.isPending} size="lg">
                         <Save className="mr-2 h-4 w-4" />
                         Salvar Análise SWOT/TOWS
                       </Button>
@@ -981,40 +987,40 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Objetivo 1</Label>
-                    <Input placeholder="Ex: Aumentar participação de mercado" disabled={!canEdit} />
+                    <Input placeholder="Ex: Aumentar participação de mercado" disabled={!canEdit} value={okrData.objetivo1} onChange={(e) => setOkrData({...okrData, objetivo1: e.target.value})} />
                     <div className="mt-3 space-y-2">
                       <p className="text-sm font-semibold">Key Results:</p>
-                      <Input placeholder="KR1: Aumentar vendas em 30%" disabled={!canEdit} />
-                      <Input placeholder="KR2: Conquistar 5 novos clientes estratégicos" disabled={!canEdit} />
-                      <Input placeholder="KR3: Reduzir churn de clientes em 20%" disabled={!canEdit} />
+                      <Input placeholder="KR1: Aumentar vendas em 30%" disabled={!canEdit} value={okrData.kr1_1} onChange={(e) => setOkrData({...okrData, kr1_1: e.target.value})} />
+                      <Input placeholder="KR2: Conquistar 5 novos clientes estratégicos" disabled={!canEdit} value={okrData.kr1_2} onChange={(e) => setOkrData({...okrData, kr1_2: e.target.value})} />
+                      <Input placeholder="KR3: Reduzir churn de clientes em 20%" disabled={!canEdit} value={okrData.kr1_3} onChange={(e) => setOkrData({...okrData, kr1_3: e.target.value})} />
                     </div>
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Objetivo 2</Label>
-                    <Input placeholder="Ex: Melhorar satisfação do cliente" disabled={!canEdit} />
+                    <Input placeholder="Ex: Melhorar satisfação do cliente" disabled={!canEdit} value={okrData.objetivo2} onChange={(e) => setOkrData({...okrData, objetivo2: e.target.value})} />
                     <div className="mt-3 space-y-2">
                       <p className="text-sm font-semibold">Key Results:</p>
-                      <Input placeholder="KR1: Aumentar NPS para 70+" disabled={!canEdit} />
-                      <Input placeholder="KR2: Reduzir tempo de resposta em 50%" disabled={!canEdit} />
-                      <Input placeholder="KR3: Atingir 95% de resolução na 1ª chamada" disabled={!canEdit} />
+                      <Input placeholder="KR1: Aumentar NPS para 70+" disabled={!canEdit} value={okrData.kr2_1} onChange={(e) => setOkrData({...okrData, kr2_1: e.target.value})} />
+                      <Input placeholder="KR2: Reduzir tempo de resposta em 50%" disabled={!canEdit} value={okrData.kr2_2} onChange={(e) => setOkrData({...okrData, kr2_2: e.target.value})} />
+                      <Input placeholder="KR3: Atingir 95% de resolução na 1ª chamada" disabled={!canEdit} value={okrData.kr2_3} onChange={(e) => setOkrData({...okrData, kr2_3: e.target.value})} />
                     </div>
                   </div>
                   
                   <div className="border rounded-lg p-4">
                     <Label className="text-base font-semibold mb-2 block">Objetivo 3</Label>
-                    <Input placeholder="Ex: Inovar em produtos/serviços" disabled={!canEdit} />
+                    <Input placeholder="Ex: Inovar em produtos/serviços" disabled={!canEdit} value={okrData.objetivo3} onChange={(e) => setOkrData({...okrData, objetivo3: e.target.value})} />
                     <div className="mt-3 space-y-2">
                       <p className="text-sm font-semibold">Key Results:</p>
-                      <Input placeholder="KR1: Lançar 2 novos produtos" disabled={!canEdit} />
-                      <Input placeholder="KR2: Atingir 40% de receita de novos produtos" disabled={!canEdit} />
-                      <Input placeholder="KR3: Implementar 3 melhorias de processo" disabled={!canEdit} />
+                      <Input placeholder="KR1: Lançar 2 novos produtos" disabled={!canEdit} value={okrData.kr3_1} onChange={(e) => setOkrData({...okrData, kr3_1: e.target.value})} />
+                      <Input placeholder="KR2: Atingir 40% de receita de novos produtos" disabled={!canEdit} value={okrData.kr3_2} onChange={(e) => setOkrData({...okrData, kr3_2: e.target.value})} />
+                      <Input placeholder="KR3: Implementar 3 melhorias de processo" disabled={!canEdit} value={okrData.kr3_3} onChange={(e) => setOkrData({...okrData, kr3_3: e.target.value})} />
                     </div>
                   </div>
                   
                   {canEdit && (
                     <div className="flex justify-end">
-                      <Button type="submit" size="lg">
+                      <Button onClick={handleSaveOkr} disabled={saveOkrMutation.isPending} size="lg">
                         <Save className="mr-2 h-4 w-4" />
                         Salvar OKRs
                       </Button>
