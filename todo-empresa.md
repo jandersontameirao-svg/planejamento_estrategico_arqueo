@@ -139,3 +139,18 @@
 - [x] Adicionar validações de drop
 - [x] Testar drag-and-drop completo
 - [x] Adicionar cursor feedback durante drag
+
+## Fase 19: Matriz de Risco 5x5 com Ameaças e Oportunidades
+- [x] Criar novo componente MatrizRisco5x5.tsx
+- [x] Implementar formato 5x5 profissional (Ameaças e Oportunidades)
+- [x] Adicionar probabilidades em percentuais (10%, 30%, 50%, 70%, 90%)
+- [x] Implementar cores por nível de risco (Vermelho, Laranja, Amarelo, Verde)
+- [x] Adicionar cálculo automático de nível de risco
+- [x] Implementar cliques para editar itens
+- [x] Adicionar dialog de edição com Select e Textarea
+- [x] Integrar MatrizRisco5x5 na página de Matriz de Risco
+- [x] Adicionar legenda de cores
+- [x] Criar dados de teste para visualização
+- [x] Testes da nova matriz 5x5
+- [x] Validar TypeScript - 0 erros
+- [x] Todos os 34 testes passando
