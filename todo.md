@@ -350,3 +350,15 @@
 - [x] Adicionar matriz de risco (scatter plot) e gráfico de barras por categoria
 - [x] Adicionar filtro por categoria clicável
 - [x] Melhorar visualização de fatores com barras de progresso
+
+
+## Melhorias de Interface - Stakeholders e 5 Forças
+- [x] Melhorar componente Stakeholders com matriz poder×interesse visual
+- [x] Adicionar 4 cards coloridos por quadrante (Gerenciar de Perto, Manter Satisfeito, Manter Informado, Monitorar)
+- [x] Implementar scatter plot interativo com quadrantes coloridos de fundo
+- [x] Adicionar filtro clicável por quadrante
+- [x] Melhorar componente 5 Forças de Porter
+- [x] Adicionar 5 cards coloridos por tipo de força (Rivalidade, Fornecedores, Clientes, Novos Entrantes, Substitutos)
+- [x] Adicionar gráfico radar das 5 forças e gráfico de barras por tipo
+- [x] Adicionar classificação de atratividade do setor (Muito Atrativo, Atrativo, Pouco Atrativo, Não Atrativo)
+- [x] Melhorar formulário com seleção visual de tipo de força
