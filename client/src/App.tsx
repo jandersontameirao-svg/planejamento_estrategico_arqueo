@@ -26,6 +26,7 @@ import AnaliseStakeholders from "./pages/AnaliseStakeholders";
 import AnaliseRbvVrio from "./pages/AnaliseRbvVrio";
 import AnaliseSwoTtows from "./pages/AnaliseSwoTtows";
 import AnalisesVRIO from "./pages/AnalisesVRIO";
+import PlanejamentoEstrategico from "./pages/PlanejamentoEstrategico";
 
 
 function Router() {
@@ -68,6 +69,9 @@ function Router() {
       <Route path="/analise-rbv-vrio/:id" component={AnaliseRbvVrio} />
       <Route path="/analise-swot-tows/:id" component={AnaliseSwoTtows} />
       <Route path="/analises-vrio" component={AnalisesVRIO} />
+      <Route path="/planejamento-estrategico/:id?">
+        {(params) => <PlanejamentoEstrategico empresaId={params.id ? Number(params.id) : 1} />}
+      </Route>
       <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />
