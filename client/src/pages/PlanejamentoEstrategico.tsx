@@ -5,11 +5,14 @@ import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Ligh
 import { useCompletudeStorage } from "@/hooks/useLocalStorage";
 import { useSalvamentoMultiplo } from "@/hooks/useSalvamento";
 import { SalvandoInline } from "@/components/SalvandoIndicador";
-import IdentidadeOrganizacional from "./IdentidadeOrganizacional";
-import AnalisesVRIO from "./AnalisesVRIO";
-import AnalisePestelCompleta from "./AnalisePestelCompleta";
-import CincoForcasCompleta from "./CincoForcasCompleta";
-import { AnalisesStakeholdersCompleta, AnaliseSwoTtowsCompleta, AnaliseOkrCompleta, AnaliseBscCompleta } from "./AnalisesRestantes";
+import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
+import AnalisePestelLite from "./AnalisePestelLite";
+import CincoForcasLite from "./CincoForcasLite";
+import StakeholdersLite from "./StakeholdersLite";
+import VrioLite from "./VrioLite";
+import SwotLite from "./SwotLite";
+import OkrLite from "./OkrLite";
+import BscLite from "./BscLite";
 import html2pdf from "html2pdf.js";
 
 interface AnaliseCard {
@@ -32,7 +35,7 @@ const analises: AnaliseCard[] = [
     descricao: "Missão, Visão, Valores",
     icone: <Building2 className="h-8 w-8" />,
     cor: "bg-orange-500",
-    componente: IdentidadeOrganizacional,
+    componente: IdentidadeOrganizacionalLite,
   },
   {
     id: "bsc",
@@ -137,21 +140,21 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
   const renderConteudo = (analise: AnaliseCard) => {
     switch (analise.id) {
       case "identidade":
-        return <IdentidadeOrganizacional empresaId={empresaId} />;
+        return <IdentidadeOrganizacionalLite empresaId={empresaId} />;
       case "pestel":
-        return <AnalisePestelCompleta empresaId={empresaId} />;
+        return <AnalisePestelLite empresaId={empresaId} />;
       case "forcas":
-        return <CincoForcasCompleta empresaId={empresaId} />;
+        return <CincoForcasLite empresaId={empresaId} />;
       case "stakeholders":
-        return <AnalisesStakeholdersCompleta />;
+        return <StakeholdersLite />;
       case "vrio":
-        return <AnalisesVRIO />;
+        return <VrioLite />;
       case "swot":
-        return <AnaliseSwoTtowsCompleta />;
+        return <SwotLite />;
       case "okr":
-        return <AnaliseOkrCompleta />;
+        return <OkrLite />;
       case "bsc":
-        return <AnaliseBscCompleta />;
+        return <BscLite />;
       default:
         return null;
     }
@@ -174,10 +177,9 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
             <div key={analise.id} className="w-full">
               {/* Card Header - Sempre Visível */}
               <Card
-                className={`cursor-pointer transition-all duration-300 border-2 ${
+                className={`transition-all duration-300 border-2 ${
                   expanded[analise.id] ? "border-primary/50 shadow-lg" : "hover:border-primary/30"
                 }`}
-                onClick={() => toggleExpanded(analise.id)}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
