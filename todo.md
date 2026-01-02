@@ -362,3 +362,13 @@
 - [x] Adicionar gráfico radar das 5 forças e gráfico de barras por tipo
 - [x] Adicionar classificação de atratividade do setor (Muito Atrativo, Atrativo, Pouco Atrativo, Não Atrativo)
 - [x] Melhorar formulário com seleção visual de tipo de força
+
+
+## Melhorias Visuais - OKR, BSC e SWOT
+- [x] Melhorar visual do componente OKR com cards coloridos (Objetivos, Key Results, Progresso Geral, No Alvo)
+- [x] Adicionar gráficos de progresso (barras horizontais por objetivo, pizza para progresso geral)
+- [x] Adicionar sliders para definir metas e progresso dos Key Results
+- [x] Melhorar visual do componente BSC com cards por perspectiva (Financeira, Cliente, Processos, Aprendizado)
+- [x] Adicionar gráficos de desempenho por perspectiva (radar e barras)
+- [x] Melhorar visual do componente SWOT com matriz colorida (4 quadrantes)
+- [x] Adicionar seleção visual de tipo (Forças, Fraquezas, Oportunidades, Ameaças)
