@@ -242,7 +242,7 @@ export default function Home() {
                   <Button asChild>
                     <Link href="/empresas">
                       <Building2 className="mr-2 h-4 w-4" />
-                      Gerenciar Empresas
+                      Criar Primeira Empresa
                     </Link>
                   </Button>
                 )}

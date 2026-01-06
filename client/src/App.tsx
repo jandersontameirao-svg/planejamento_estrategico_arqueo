@@ -30,13 +30,15 @@ import PlanejamentoEstrategico from "./pages/PlanejamentoEstrategico";
 import DashboardResumoExecutivo from "./pages/DashboardResumoExecutivo";
 import PlanejamentoEstrategicoEmpresa from "./pages/PlanejamentoEstrategicoEmpresa";
 import PlanejamentoMacro from "./pages/PlanejamentoMacro";
+import DashboardGrupo from "./pages/DashboardGrupo";
 
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+       <Route path="/" component={Home} />
+      <Route path="/dashboard-grupo" component={DashboardGrupo} />
       <Route path="/empresas" component={Empresas} />
       <Route path="/empresa/:id/identidade">
         {(params) => <IdentidadeOrganizacional empresaId={Number(params.id)} />}

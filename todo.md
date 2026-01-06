@@ -409,3 +409,12 @@
 - [x] Adicionar componente OKR do Grupo
 - [x] Criar interface com cards expansíveis para cada análise
 - [x] Adicionar botão de gerar relatório consolidado em PDF
+
+
+## Dashboard do Grupo Arqueo
+- [x] Criar componente DashboardGrupo com visão consolidada
+- [x] Adicionar cards de métricas principais (Total Empresas: 2, Desempenho Médio: 76%, Indicadores BSC: 16, Alertas: 0)
+- [x] Adicionar gráficos de desempenho BSC consolidado (barras por perspectiva e por empresa)
+- [x] Adicionar lista de empresas com status, indicadores e badges de desempenho
+- [x] Adicionar rota /dashboard-grupo
+- [x] Integrar com header da página Home (botão Dashboard)
