@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { Building2, Users, DollarSign, TrendingUp, Target, AlertCircle } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Link } from "wouter";
 
@@ -73,7 +74,12 @@ export default function DashboardGrupo() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/10">
+      <PageHeader 
+        title="Dashboard - Grupo Arqueo"
+        description="Visão consolidada do desempenho de todas as empresas do grupo"
+      />
+      <div className="container mx-auto py-8 space-y-6">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Dashboard - Grupo Arqueo</h1>
@@ -227,6 +233,7 @@ export default function DashboardGrupo() {
           })}
         </div>
       </Card>
+      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
 import AnalisePestelLite from "./AnalisePestelLite";
 import CincoForcasLite from "./CincoForcasLite";
@@ -107,17 +108,19 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Planejamento Estratégico</h1>
-          <p className="text-gray-600 mt-1">{empresaNome}</p>
-        </div>
-      </div>
-
-      <p className="text-gray-600">
-        Clique em cada card para expandir e visualizar/editar a análise. Os dados são salvos automaticamente.
-      </p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/10">
+      <PageHeader 
+        title={`Planejamento Estratégico - ${empresaNome}`}
+        description="Defina e acompanhe as análises estratégicas da empresa"
+      />
+      <div className="container mx-auto py-8 space-y-6">
+      <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+        <CardContent className="pt-6">
+          <p className="text-center text-muted-foreground">
+            👇 Clique em cada card para expandir e visualizar/editar a análise. Os dados são salvos automaticamente.
+          </p>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {analises.map((analise) => {
@@ -151,11 +154,22 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
         })}
       </div>
 
-      <div className="flex justify-center mt-8">
-        <Button size="lg" className="gap-2">
-          <FileDown className="h-5 w-5" />
-          Gerar Relatório Consolidado em PDF
-        </Button>
+      <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold">Relatório Consolidado</h3>
+              <p className="text-sm text-muted-foreground">
+                Gere um PDF com todas as análises estratégicas da empresa
+              </p>
+            </div>
+            <Button size="lg" className="gap-2">
+              <FileDown className="h-5 w-5" />
+              Gerar PDF
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
       </div>
     </div>
   );

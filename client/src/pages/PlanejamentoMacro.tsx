@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { ChevronDown, ChevronUp, FileText } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 import { useState } from "react";
 import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
 import BscLite from "./BscLite";
@@ -69,7 +70,12 @@ export default function PlanejamentoMacro() {
   ];
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/10">
+      <PageHeader 
+        title="Planejamento Macro - Grupo Arqueo"
+        description="Planejamento estratégico consolidado do grupo"
+      />
+      <div className="container mx-auto py-8 space-y-6">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Planejamento Estratégico - Grupo Arqueo</h1>
@@ -135,6 +141,7 @@ export default function PlanejamentoMacro() {
           </Button>
         </div>
       </Card>
+      </div>
     </div>
   );
 }

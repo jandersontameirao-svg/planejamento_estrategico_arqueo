@@ -418,3 +418,39 @@
 - [x] Adicionar lista de empresas com status, indicadores e badges de desempenho
 - [x] Adicionar rota /dashboard-grupo
 - [x] Integrar com header da página Home (botão Dashboard)
+
+
+## Implementação das Recomendações
+
+### 1. Persistência de Análises do Grupo
+- [ ] Criar tabelas no banco para análises do grupo (identidade, pestel, stakeholders, swot, okr)
+- [ ] Criar procedures tRPC para salvar e buscar análises do grupo
+- [ ] Conectar IdentidadeOrganizacionalLite ao banco (empresaId=0 para grupo)
+- [ ] Conectar AnalisePestelLite ao banco
+- [ ] Conectar StakeholdersLite ao banco
+- [ ] Conectar SwotLite ao banco
+- [ ] Conectar OkrLite ao banco
+
+### 2. Filtro Temporal no Dashboard
+- [ ] Adicionar seletor de período no DashboardGrupo (Mensal, Trimestral, Anual, Tudo)
+- [ ] Filtrar dados BSC por período selecionado
+- [ ] Adicionar gráfico de linha mostrando evolução temporal do desempenho
+- [ ] Adicionar comparação período atual vs período anterior
+
+### 3. Geração de PDF dos Relatórios
+- [ ] Criar função de geração de PDF no backend
+- [ ] Implementar template de relatório consolidado do grupo
+- [ ] Implementar template de relatório individual da empresa
+- [ ] Conectar botões "Gerar Relatório em PDF" aos endpoints
+- [ ] Adicionar download automático do PDF gerado
+
+
+## Melhorias de Layout e Navegação
+- [x] Criar componente PageHeader reutilizável com botões Voltar e Home
+- [x] Melhorar espaçamento e tipografia das páginas
+- [x] Adicionar gradientes de fundo (from-background via-background to-accent/10)
+- [x] Melhorar cards com bordas coloridas e espaçamento consistente
+- [x] Adicionar navegação em PlanejamentoEstrategicoEmpresa
+- [x] Adicionar navegação em PlanejamentoMacro
+- [x] Adicionar navegação em DashboardGrupo
+- [x] Padronizar header sticky com backdrop blur em todas as páginas
