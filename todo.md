@@ -398,3 +398,14 @@
 - [x] Atualizar PlanejamentoMacro para agregar dados reais de todas as empresas
 - [x] Implementar cálculo de médias por perspectiva e por empresa
 - [x] Testar agregação com dados de múltiplas empresas (Arqueoproject: 83%, 81%, 74%, 66% | Arqueogis: 78%, 76%, 71%, 64%)
+
+
+## Análises Estratégicas do Grupo no Planejamento Macro
+- [x] Adicionar componente Identidade do Grupo no Planejamento Macro
+- [x] Adicionar componente BSC do Grupo
+- [x] Adicionar componente PESTEL do Grupo
+- [x] Adicionar componente Stakeholders do Grupo
+- [x] Adicionar componente SWOT do Grupo
+- [x] Adicionar componente OKR do Grupo
+- [x] Criar interface com cards expansíveis para cada análise
+- [x] Adicionar botão de gerar relatório consolidado em PDF
