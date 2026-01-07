@@ -53,7 +53,14 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
   const [tipoSelecionado, setTipoSelecionado] = useState<"forcas" | "fraquezas" | "oportunidades" | "ameacas">("forcas");
 
   const adicionarItem = () => {
-    if (!novoItem) return;
+    if (!novoItem || novoItem.trim() === "") {
+      alert("Por favor, preencha a descrição do item antes de adicionar.");
+      return;
+    }
+    if (novoItem.length < 5) {
+      alert("A descrição deve ter pelo menos 5 caracteres.");
+      return;
+    }
     const item = { id: Date.now().toString(), descricao: novoItem };
     if (tipoSelecionado === "forcas") setForcas([...forcas, item]);
     else if (tipoSelecionado === "fraquezas") setFraquezas([...fraquezas, item]);

@@ -63,7 +63,14 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
   const [novoKR, setNovoKR] = useState({ okrId: "", descricao: "", meta: 100 });
 
   const adicionarOKR = () => {
-    if (!novoObjetivo) return;
+    if (!novoObjetivo || novoObjetivo.trim() === "") {
+      alert("Por favor, preencha o objetivo antes de adicionar.");
+      return;
+    }
+    if (novoObjetivo.length < 10) {
+      alert("O objetivo deve ter pelo menos 10 caracteres.");
+      return;
+    }
     setOkrs([...okrs, {
       id: Date.now().toString(),
       objetivo: novoObjetivo,
@@ -77,7 +84,14 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
   };
 
   const adicionarKR = (okrId: string) => {
-    if (!novoKR.descricao) return;
+    if (!novoKR.descricao || novoKR.descricao.trim() === "") {
+      alert("Por favor, preencha a descrição do Key Result antes de adicionar.");
+      return;
+    }
+    if (novoKR.descricao.length < 5) {
+      alert("A descrição do Key Result deve ter pelo menos 5 caracteres.");
+      return;
+    }
     setOkrs(okrs.map((o) => {
       if (o.id === okrId) {
         return {

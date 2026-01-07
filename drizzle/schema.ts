@@ -446,6 +446,23 @@ export type AnalisePestel = typeof analisePestel.$inferSelect;
 export type InsertAnalisePestel = typeof analisePestel.$inferInsert;
 
 /**
+ * PESTEL Fatores (nova estrutura)
+ */
+export const pestelFatores = mysqlTable("pestel_fatores", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  categoria: mysqlEnum("categoria", ["politico", "economico", "social", "tecnologico", "ambiental", "legal"]).notNull(),
+  descricao: text("descricao").notNull(),
+  impacto: int("impacto").notNull(), // 1-5
+  probabilidade: int("probabilidade").notNull(), // 1-5
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PestelFator = typeof pestelFatores.$inferSelect;
+export type InsertPestelFator = typeof pestelFatores.$inferInsert;
+
+/**
  * 5 Forças de Porter
  */
 export const cincoForcasPorter = mysqlTable("cinco_forcas_porter", {

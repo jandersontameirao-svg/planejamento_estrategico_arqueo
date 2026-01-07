@@ -1050,19 +1050,23 @@ export async function savePestelFatores(empresaId: number, fatores: Array<{
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const { sql } = await import("drizzle-orm");
+  const { pestelFatores } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
   
   // Deletar fatores existentes
-  await db.execute(sql`DELETE FROM pestel_fatores WHERE empresaId = ${empresaId}`);
+  await db.delete(pestelFatores).where(eq(pestelFatores.empresaId, empresaId));
   
   // Inserir novos fatores
   if (fatores.length > 0) {
-    for (const fator of fatores) {
-      await db.execute(sql`
-        INSERT INTO pestel_fatores (empresaId, categoria, descricao, impacto, probabilidade)
-        VALUES (${empresaId}, ${fator.categoria}, ${fator.descricao}, ${fator.impacto}, ${fator.probabilidade})
-      `);
-    }
+    await db.insert(pestelFatores).values(
+      fatores.map(fator => ({
+        empresaId,
+        categoria: fator.categoria,
+        descricao: fator.descricao,
+        impacto: fator.impacto,
+        probabilidade: fator.probabilidade,
+      }))
+    );
   }
   
   return { success: true };
@@ -1072,15 +1076,10 @@ export async function getPestelFatoresByEmpresa(empresaId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const { sql } = await import("drizzle-orm");
+  const { pestelFatores } = await import("../drizzle/schema");
+  const { eq, asc } = await import("drizzle-orm");
   
-  const result: any = await db.execute(sql`
-    SELECT id, empresaId, categoria, descricao, impacto, probabilidade, createdAt, updatedAt
-    FROM pestel_fatores
-    WHERE empresaId = ${empresaId}
-    ORDER BY createdAt ASC
-  `);
-  return result.rows || result;
+  return await db.select().from(pestelFatores).where(eq(pestelFatores.empresaId, empresaId)).orderBy(asc(pestelFatores.createdAt));
 }
 
 
@@ -1092,19 +1091,21 @@ export async function saveSwotItems(empresaId: number, items: Array<{
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const { sql } = await import("drizzle-orm");
+  const { analiseSwoTtows } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
   
   // Deletar itens existentes
-  await db.execute(sql`DELETE FROM analise_swot_tows WHERE empresaId = ${empresaId}`);
+  await db.delete(analiseSwoTtows).where(eq(analiseSwoTtows.empresaId, empresaId));
   
   // Inserir novos itens
   if (items.length > 0) {
-    for (const item of items) {
-      await db.execute(sql`
-        INSERT INTO analise_swot_tows (empresaId, tipo, descricao)
-        VALUES (${empresaId}, ${item.tipo}, ${item.descricao})
-      `);
-    }
+    await db.insert(analiseSwoTtows).values(
+      items.map(item => ({
+        empresaId,
+        tipo: item.tipo,
+        descricao: item.descricao,
+      }))
+    );
   }
   
   return { success: true };
@@ -1114,15 +1115,10 @@ export async function getSwotItemsByEmpresa(empresaId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const { sql } = await import("drizzle-orm");
+  const { analiseSwoTtows } = await import("../drizzle/schema");
+  const { eq, asc } = await import("drizzle-orm");
   
-  const result: any = await db.execute(sql`
-    SELECT id, empresaId, tipo, descricao, impacto, estrategia, observacoes, createdAt, updatedAt
-    FROM analise_swot_tows
-    WHERE empresaId = ${empresaId}
-    ORDER BY createdAt ASC
-  `);
-  return result.rows || result;
+  return await db.select().from(analiseSwoTtows).where(eq(analiseSwoTtows.empresaId, empresaId)).orderBy(asc(analiseSwoTtows.createdAt));
 }
 
 
@@ -1140,29 +1136,27 @@ export async function saveOkrObjectives(empresaId: number, objectives: Array<{
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const { sql } = await import("drizzle-orm");
+  const { analiseOkr } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
   
   // Deletar objetivos existentes
-  await db.execute(sql`DELETE FROM analise_okr WHERE empresaId = ${empresaId}`);
+  await db.delete(analiseOkr).where(eq(analiseOkr.empresaId, empresaId));
   
   // Inserir novos objetivos
   if (objectives.length > 0) {
-    for (const obj of objectives) {
-      await db.execute(sql`
-        INSERT INTO analise_okr (
-          empresaId, objetivo, descricao,
-          resultado_chave_1, meta_resultado_1,
-          resultado_chave_2, meta_resultado_2,
-          resultado_chave_3, meta_resultado_3
-        )
-        VALUES (
-          ${empresaId}, ${obj.objetivo}, ${obj.descricao},
-          ${obj.resultadoChave1 || null}, ${obj.metaResultado1 || null},
-          ${obj.resultadoChave2 || null}, ${obj.metaResultado2 || null},
-          ${obj.resultadoChave3 || null}, ${obj.metaResultado3 || null}
-        )
-      `);
-    }
+    await db.insert(analiseOkr).values(
+      objectives.map(obj => ({
+        empresaId,
+        objetivo: obj.objetivo,
+        descricao: obj.descricao,
+        resultadoChave1: obj.resultadoChave1 || null,
+        metaResultado1: obj.metaResultado1 || null,
+        resultadoChave2: obj.resultadoChave2 || null,
+        metaResultado2: obj.metaResultado2 || null,
+        resultadoChave3: obj.resultadoChave3 || null,
+        metaResultado3: obj.metaResultado3 || null,
+      }))
+    );
   }
   
   return { success: true };
@@ -1172,13 +1166,8 @@ export async function getOkrObjectivesByEmpresa(empresaId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const { sql } = await import("drizzle-orm");
+  const { analiseOkr } = await import("../drizzle/schema");
+  const { eq, asc } = await import("drizzle-orm");
   
-  const result: any = await db.execute(sql`
-    SELECT *
-    FROM analise_okr
-    WHERE empresaId = ${empresaId}
-    ORDER BY createdAt ASC
-  `);
-  return result.rows || result;
+  return await db.select().from(analiseOkr).where(eq(analiseOkr.empresaId, empresaId)).orderBy(asc(analiseOkr.createdAt));
 }

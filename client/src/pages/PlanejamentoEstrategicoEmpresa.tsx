@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { trpc } from "@/lib/trpc";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown } from "lucide-react";
@@ -96,8 +98,56 @@ const analises: AnaliseCard[] = [
 export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome }: PlanejamentoEstrategicoEmpresaProps) {
   const [expandedCards, setExpandedCards] = useState<{ [key: string]: boolean }>({});
 
+  // Buscar dados para calcular progresso
+  const { data: pestelData } = trpc.analises.getPestel.useQuery({ empresaId });
+  const { data: swotData } = trpc.analises.getSwot.useQuery({ empresaId });
+  const { data: okrData } = trpc.analises.getOkr.useQuery({ empresaId });
+  const { data: bscData } = trpc.bsc.getByEmpresa.useQuery({ empresaId });
+
   const toggleCard = (id: string) => {
     setExpandedCards((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  // Calcular progresso de cada análise
+  const calcularProgresso = (id: string): number => {
+    switch (id) {
+      case "pestel":
+        if (!pestelData || !Array.isArray(pestelData)) return 0;
+        // Mínimo 6 fatores (1 por categoria)
+        return Math.min(100, Math.round((pestelData.length / 6) * 100));
+      
+      case "swot":
+        if (!swotData || !Array.isArray(swotData)) return 0;
+        // Mínimo 8 itens (2 por quadrante)
+        return Math.min(100, Math.round((swotData.length / 8) * 100));
+      
+      case "okr":
+        if (!okrData || !Array.isArray(okrData)) return 0;
+        // Mínimo 3 objetivos
+        return Math.min(100, Math.round((okrData.length / 3) * 100));
+      
+      case "bsc":
+        if (!bscData || !Array.isArray(bscData)) return 0;
+        // Mínimo 8 indicadores (2 por perspectiva)
+        return Math.min(100, Math.round((bscData.length / 8) * 100));
+      
+      case "identidade":
+      case "5forcas":
+      case "stakeholders":
+      case "vrio":
+        // Análises sem persistência ainda
+        return 0;
+      
+      default:
+        return 0;
+    }
+  };
+
+  const getCorProgresso = (progresso: number): string => {
+    if (progresso === 0) return "bg-gray-400";
+    if (progresso < 50) return "bg-red-500";
+    if (progresso < 100) return "bg-yellow-500";
+    return "bg-green-500";
   };
 
   const renderComponente = (id: string) => {
@@ -125,6 +175,8 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {analises.map((analise) => {
           const isExpanded = expandedCards[analise.id];
+          const progresso = calcularProgresso(analise.id);
+          const corProgresso = getCorProgresso(progresso);
           return (
             <Card
               key={analise.id}
@@ -136,7 +188,12 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
                     {analise.icone}
                   </div>
                   <div>
-                    <CardTitle className="text-lg">{analise.titulo}</CardTitle>
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-lg">{analise.titulo}</CardTitle>
+                      <Badge className={`${corProgresso} text-white text-xs`}>
+                        {progresso}%
+                      </Badge>
+                    </div>
                     <CardDescription>{analise.descricao}</CardDescription>
                   </div>
                 </div>

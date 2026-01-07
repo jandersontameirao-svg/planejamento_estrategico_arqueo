@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `pestel_fatores` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`empresaId` int NOT NULL,\n\t`categoria` enum('politico','economico','social','tecnologico','ambiental','legal') NOT NULL,\n\t`descricao` text NOT NULL,\n\t`impacto` int NOT NULL,\n\t`probabilidade` int NOT NULL,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `pestel_fatores_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute CREATE TABLE IF NOT EXISTS `pestel_fatores` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`empresaId` int NOT NULL,\n\t`categoria` enum('politico','economico','social','tecnologico','ambiental','legal') NOT NULL,\n\t`descricao` text NOT NULL,\n\t`impacto` int NOT NULL,\n\t`probabilidade` int NOT NULL,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `pestel_fatores_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 127
+}
