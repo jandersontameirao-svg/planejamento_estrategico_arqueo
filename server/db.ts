@@ -1244,6 +1244,9 @@ export async function saveTemplateConfig(config: {
     });
   }
 
+  // Salvar versão no histórico
+  await saveTemplateVersion(config.empresaId, config);
+
   return await getTemplateConfig(config.empresaId);
 }
 
@@ -1282,4 +1285,98 @@ export async function updateTemplateLogoUrl(empresaId: number, logoUrl: string, 
   }
   
   return { success: true };
+}
+
+
+// Salvar versão no histórico
+export async function saveTemplateVersion(empresaId: number, config: any, userId?: string) {
+  const { templateVersions } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { eq, desc } = await import("drizzle-orm");
+  
+  // Buscar último número de versão
+  const lastVersion = await db.select()
+    .from(templateVersions)
+    .where(eq(templateVersions.empresaId, empresaId))
+    .orderBy(desc(templateVersions.versionNumber))
+    .limit(1);
+  
+  const nextVersion = lastVersion.length > 0 ? (lastVersion[0].versionNumber || 0) + 1 : 1;
+  
+  // Inserir nova versão
+  await db.insert(templateVersions).values({
+    empresaId,
+    versionNumber: nextVersion,
+    logoUrl: config.logoUrl || null,
+    logoKey: config.logoKey || null,
+    corPrimaria: config.corPrimaria,
+    corSecundaria: config.corSecundaria,
+    incluirPestel: config.incluirPestel ? 1 : 0,
+    incluirSwot: config.incluirSwot ? 1 : 0,
+    incluirOkr: config.incluirOkr ? 1 : 0,
+    incluirBsc: config.incluirBsc ? 1 : 0,
+    incluirGraficos: config.incluirGraficos ? 1 : 0,
+    incluirRecomendacoes: config.incluirRecomendacoes ? 1 : 0,
+    rodapePersonalizado: config.rodapePersonalizado || null,
+    createdBy: userId || null,
+  });
+  
+  return nextVersion;
+}
+
+// Listar versões de uma empresa
+export async function listTemplateVersions(empresaId: number) {
+  const { templateVersions } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) return [];
+  const { eq, desc } = await import("drizzle-orm");
+  
+  return await db.select()
+    .from(templateVersions)
+    .where(eq(templateVersions.empresaId, empresaId))
+    .orderBy(desc(templateVersions.versionNumber));
+}
+
+// Reverter para uma versão específica
+export async function revertToTemplateVersion(empresaId: number, versionNumber: number) {
+  const { templateVersions, templateConfigs } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { eq, and } = await import("drizzle-orm");
+  
+  // Buscar versão específica
+  const version = await db.select()
+    .from(templateVersions)
+    .where(and(
+      eq(templateVersions.empresaId, empresaId),
+      eq(templateVersions.versionNumber, versionNumber)
+    ))
+    .limit(1);
+  
+  if (version.length === 0) {
+    throw new Error("Versão não encontrada");
+  }
+  
+  const v = version[0];
+  
+  // Atualizar configuração atual
+  await db.update(templateConfigs)
+    .set({
+      logoUrl: v.logoUrl,
+      logoKey: v.logoKey,
+      corPrimaria: v.corPrimaria,
+      corSecundaria: v.corSecundaria,
+      incluirPestel: v.incluirPestel,
+      incluirSwot: v.incluirSwot,
+      incluirOkr: v.incluirOkr,
+      incluirBsc: v.incluirBsc,
+      incluirGraficos: v.incluirGraficos,
+      incluirRecomendacoes: v.incluirRecomendacoes,
+      rodapePersonalizado: v.rodapePersonalizado,
+      updatedAt: new Date(),
+    })
+    .where(eq(templateConfigs.empresaId, empresaId));
+  
+  return v;
 }

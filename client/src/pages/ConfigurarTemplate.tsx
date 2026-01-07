@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Save, FileText, Palette, Upload, Image as ImageIcon } from "lucide-react";
+import TemplatePreview from "@/components/TemplatePreview";
+import VersionHistory from "@/components/VersionHistory";
+import TemplateGallery from "@/components/TemplateGallery";
 
 export default function ConfigurarTemplate() {
   const { empresaId } = useParams<{ empresaId: string }>();
@@ -111,6 +114,20 @@ export default function ConfigurarTemplate() {
       </header>
 
       <main className="container py-8 space-y-6">
+        {/* Galeria de Templates */}
+        <TemplateGallery
+          onSelectTemplate={(template) => {
+            setCorPrimaria(template.corPrimaria);
+            setCorSecundaria(template.corSecundaria);
+            setIncluirPestel(template.incluirPestel);
+            setIncluirSwot(template.incluirSwot);
+            setIncluirOkr(template.incluirOkr);
+            setIncluirBsc(template.incluirBsc);
+            setIncluirGraficos(template.incluirGraficos);
+            setIncluirRecomendacoes(template.incluirRecomendacoes);
+          }}
+        />
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Configurações */}
           <div className="space-y-6">
@@ -342,13 +359,19 @@ export default function ConfigurarTemplate() {
           </div>
 
           {/* Preview */}
-          <div>
-            <Card className="sticky top-20">
+          <div className="sticky top-20">
+            <TemplatePreview
+              corPrimaria={corPrimaria}
+              corSecundaria={corSecundaria}
+              logoUrl={logoUrl}
+              rodapePersonalizado={rodapePersonalizado}
+              empresaNome={empresa?.nome || "Empresa"}
+            />
+            <VersionHistory empresaId={empresaIdNum} />
+            
+            <Card className="mt-6">
               <CardHeader>
-                <CardTitle>Preview do Template</CardTitle>
-                <CardDescription>
-                  Visualização aproximada do cabeçalho do relatório
-                </CardDescription>
+                <CardTitle className="text-sm">Preview Simples do Cabeçalho</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="border rounded-lg overflow-hidden">

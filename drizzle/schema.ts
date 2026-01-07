@@ -650,3 +650,28 @@ export const templateConfigs = mysqlTable("template_configs", {
 
 export type TemplateConfig = typeof templateConfigs.$inferSelect;
 export type InsertTemplateConfig = typeof templateConfigs.$inferInsert;
+
+/**
+ * Histórico de versões de configurações de templates
+ */
+export const templateVersions = mysqlTable("template_versions", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  versionNumber: int("versionNumber").notNull(),
+  logoUrl: text("logoUrl"),
+  logoKey: text("logoKey"),
+  corPrimaria: varchar("corPrimaria", { length: 7 }).notNull(),
+  corSecundaria: varchar("corSecundaria", { length: 7 }).notNull(),
+  incluirPestel: tinyint("incluirPestel").default(1).notNull(),
+  incluirSwot: tinyint("incluirSwot").default(1).notNull(),
+  incluirOkr: tinyint("incluirOkr").default(1).notNull(),
+  incluirBsc: tinyint("incluirBsc").default(1).notNull(),
+  incluirGraficos: tinyint("incluirGraficos").default(1).notNull(),
+  incluirRecomendacoes: tinyint("incluirRecomendacoes").default(1).notNull(),
+  rodapePersonalizado: text("rodapePersonalizado"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  createdBy: varchar("createdBy", { length: 255 }),
+});
+
+export type TemplateVersion = typeof templateVersions.$inferSelect;
+export type InsertTemplateVersion = typeof templateVersions.$inferInsert;

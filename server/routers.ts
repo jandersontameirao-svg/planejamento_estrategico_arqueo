@@ -1284,6 +1284,25 @@ export const appRouter = router({
         
         return { url, key };
       }),
+
+    // Listar versões anteriores
+    listVersions: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { listTemplateVersions } = await import("./db");
+        return await listTemplateVersions(input.empresaId);
+      }),
+
+    // Reverter para versão específica
+    revertToVersion: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        versionNumber: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { revertToTemplateVersion } = await import("./db");
+        return await revertToTemplateVersion(input.empresaId, input.versionNumber);
+      }),
   }),
 
   notifications: router({

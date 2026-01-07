@@ -528,19 +528,30 @@
 - [x] Implementar upload de logo com S3 na página ConfigurarTemplate
 - [x] Adicionar procedure tRPC para fazer upload e salvar URL do logo
 - [x] Atualizar funções de exportação PDF para renderizar logo personalizado
-- [ ] Criar componente de preview em tempo real do PDF
+- [x] Criar componente de preview em tempo real do PDF
 - [ ] Adicionar visualização do PDF com configurações atuais
 - [ ] Criar tabela template_versions para histórico
 - [ ] Implementar procedures para salvar e listar versões
-- [ ] Adicionar interface para visualizar e reverter versões anteriores
+- [x] Adicionar interface para visualizar e reverter versões anteriores
 
 
 ## Melhorias Templates - Upload Logo, Preview e Histórico
 - [x] Implementar upload de logo com S3 na página ConfigurarTemplate
 - [x] Adicionar procedure tRPC para fazer upload e salvar URL do logo
 - [x] Atualizar funções de exportação PDF para renderizar logo personalizado
-- [ ] Criar componente de preview em tempo real do PDF
+- [x] Criar componente de preview em tempo real do PDF
 - [ ] Adicionar visualização do PDF com configurações atuais
 - [ ] Criar tabela template_versions para histórico
 - [ ] Implementar procedures para salvar e listar versões
-- [ ] Adicionar interface para visualizar e reverter versões anteriores
+- [x] Adicionar interface para visualizar e reverter versões anteriores
+
+
+## Melhorias Finais Templates - Preview, Histórico e Galeria
+- [x] Criar componente de preview em tempo real do PDF
+- [x] Adicionar visualização do PDF com configurações atuais na página ConfigurarTemplate
+- [x] Criar tabela template_versions para histórico de versões
+- [x] Implementar procedures para salvar e listar versões anteriores
+- [x] Adicionar interface para visualizar e reverter versões
+- [x] Criar galeria de templates prontos (Executivo, Técnico, Minimalista)
+- [x] Implementar seleção de template pronto como ponto de partida
+- [x] Adicionar botão para aplicar template pronto

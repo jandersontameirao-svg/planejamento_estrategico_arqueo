@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS template_versions (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  empresa_id INT NOT NULL,\n  version_number INT NOT NULL,\n  logo_url TEXT,\n  logo_key TEXT,\n  cor_primaria VARCHAR(7) NOT NULL,\n  cor_secundaria VARCHAR(7) NOT NULL,\n  incluir_pestel TINYINT(1) DEFAULT 1,\n  incluir_swot TINYINT(1) DEFAULT 1,\n  incluir_okr TINYINT(1) DEFAULT 1,\n  incluir_bsc TINYINT(1) DEFAULT 1,\n  incluir_graficos TINYINT(1) DEFAULT 1,\n  incluir_recomendacoes TINYINT(1) DEFAULT 1,\n  rodape_personalizado TEXT,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  created_by VARCHAR(255),\n  INDEX idx_empresa_version (empresa_id, version_number)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute CREATE TABLE IF NOT EXISTS template_versions (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  empresa_id INT NOT NULL,\n  version_number INT NOT NULL,\n  logo_url TEXT,\n  logo_key TEXT,\n  cor_primaria VARCHAR(7) NOT NULL,\n  cor_secundaria VARCHAR(7) NOT NULL,\n  incluir_pestel TINYINT(1) DEFAULT 1,\n  incluir_swot TINYINT(1) DEFAULT 1,\n  incluir_okr TINYINT(1) DEFAULT 1,\n  incluir_bsc TINYINT(1) DEFAULT 1,\n  incluir_graficos TINYINT(1) DEFAULT 1,\n  incluir_recomendacoes TINYINT(1) DEFAULT 1,\n  rodape_personalizado TEXT,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  created_by VARCHAR(255),\n  INDEX idx_empresa_version (empresa_id, version_number)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1552
+}
