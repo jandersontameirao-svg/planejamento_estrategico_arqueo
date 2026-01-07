@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Building2, LayoutDashboard, LogOut, FileText, CheckCircle2, Users } from "lucide-react";
+import { Building2, LayoutDashboard, LogOut, FileText, CheckCircle2, Users, Bell, BarChart3 } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { NotificationButton } from "@/components/NotificationButton";
 
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
@@ -136,8 +137,15 @@ export default function Home() {
                 Dashboard
               </Link>
             </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/dashboard-comparativo">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                Comparativo
+              </Link>
+            </Button>
             {user?.role === "admin" && (
               <>
+                <NotificationButton />
                 <Button variant="outline" size="sm" asChild>
                   <Link href="/empresas">
                     <Building2 className="mr-2 h-4 w-4" />

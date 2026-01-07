@@ -1,0 +1,351 @@
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+
+interface EmpresaInfo {
+  nome: string;
+  logo?: string;
+}
+
+// Cores do tema
+const COLORS = {
+  primary: "#8B1538", // Bordo
+  secondary: "#FF6B35", // Laranja
+  accent: "#F7B801", // Amarelo
+  blue: "#4A90E2", // Azul
+  text: "#333333",
+  lightGray: "#F5F5F5",
+};
+
+function addHeader(doc: jsPDF, empresa: EmpresaInfo, titulo: string) {
+  // Retângulo de cabeçalho
+  doc.setFillColor(COLORS.primary);
+  doc.rect(0, 0, 210, 40, "F");
+
+  // Título
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(20);
+  doc.text(titulo, 105, 15, { align: "center" });
+
+  // Nome da empresa
+  doc.setFontSize(14);
+  doc.text(empresa.nome, 105, 28, { align: "center" });
+
+  // Data de geração
+  doc.setFontSize(10);
+  const dataAtual = new Date().toLocaleDateString("pt-BR");
+  doc.text(`Gerado em: ${dataAtual}`, 105, 35, { align: "center" });
+
+  // Reset cor do texto
+  doc.setTextColor(COLORS.text);
+}
+
+function addFooter(doc: jsPDF, pageNumber: number) {
+  const pageHeight = doc.internal.pageSize.height;
+  doc.setFontSize(9);
+  doc.setTextColor(128, 128, 128);
+  doc.text(
+    `Página ${pageNumber} | Sistema de Gestão Estratégica - Grupo Arqueo`,
+    105,
+    pageHeight - 10,
+    { align: "center" }
+  );
+}
+
+export function exportPestelPDF(
+  empresa: EmpresaInfo,
+  fatores: Array<{
+    categoria: string;
+    descricao: string;
+    impacto: number;
+    probabilidade: number;
+  }>
+) {
+  const doc = new jsPDF();
+
+  addHeader(doc, empresa, "Análise PESTEL");
+
+  // Introdução
+  doc.setFontSize(12);
+  doc.text("Fatores Macro-Ambientais", 14, 50);
+
+  let yPos = 60;
+
+  // Agrupar por categoria
+  const categorias = [
+    "politico",
+    "economico",
+    "social",
+    "tecnologico",
+    "ambiental",
+    "legal",
+  ];
+  const nomesCategorias: Record<string, string> = {
+    politico: "Político",
+    economico: "Econômico",
+    social: "Social",
+    tecnologico: "Tecnológico",
+    ambiental: "Ambiental",
+    legal: "Legal",
+  };
+
+  categorias.forEach((cat) => {
+    const fatoresCategoria = fatores.filter((f) => f.categoria === cat);
+
+    if (fatoresCategoria.length > 0) {
+      // Título da categoria
+      doc.setFillColor(COLORS.secondary);
+      doc.rect(14, yPos - 5, 182, 8, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(11);
+      doc.text(nomesCategorias[cat], 16, yPos);
+      yPos += 10;
+
+      doc.setTextColor(COLORS.text);
+      doc.setFontSize(10);
+
+      // Tabela de fatores
+      const tableData = fatoresCategoria.map((f) => [
+        f.descricao,
+        f.impacto.toString(),
+        f.probabilidade.toString(),
+        (f.impacto * f.probabilidade).toString(),
+      ]);
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [["Descrição", "Impacto", "Probabilidade", "Criticidade"]],
+        body: tableData,
+        theme: "grid",
+        headStyles: { fillColor: [139, 21, 56] },
+        margin: { left: 14, right: 14 },
+        styles: { fontSize: 9 },
+      });
+
+      yPos = (doc as any).lastAutoTable.finalY + 10;
+
+      // Nova página se necessário
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+    }
+  });
+
+  addFooter(doc, 1);
+
+  // Download
+  doc.save(`PESTEL_${empresa.nome}_${new Date().toISOString().split("T")[0]}.pdf`);
+}
+
+export function exportSwotPDF(
+  empresa: EmpresaInfo,
+  items: Array<{
+    tipo: string;
+    descricao: string;
+  }>
+) {
+  const doc = new jsPDF();
+
+  addHeader(doc, empresa, "Análise SWOT");
+
+  let yPos = 50;
+
+  // Matriz SWOT 2x2
+  const forcas = items.filter((i) => i.tipo === "forca");
+  const fraquezas = items.filter((i) => i.tipo === "fraqueza");
+  const oportunidades = items.filter((i) => i.tipo === "oportunidade");
+  const ameacas = items.filter((i) => i.tipo === "ameaca");
+
+  const quadrantes = [
+    { titulo: "Forças", items: forcas, cor: [76, 175, 80] },
+    { titulo: "Fraquezas", items: fraquezas, cor: [244, 67, 54] },
+    { titulo: "Oportunidades", items: oportunidades, cor: [33, 150, 243] },
+    { titulo: "Ameaças", items: ameacas, cor: [255, 152, 0] },
+  ];
+
+  quadrantes.forEach((quadrante, index) => {
+    // Título do quadrante
+    doc.setFillColor(...quadrante.cor);
+    doc.rect(14, yPos - 5, 182, 8, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(12);
+    doc.text(quadrante.titulo, 16, yPos);
+    yPos += 10;
+
+    doc.setTextColor(COLORS.text);
+    doc.setFontSize(10);
+
+    // Lista de itens
+    if (quadrante.items.length > 0) {
+      quadrante.items.forEach((item, i) => {
+        doc.text(`${i + 1}. ${item.descricao}`, 16, yPos);
+        yPos += 7;
+
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+      });
+    } else {
+      doc.setTextColor(128, 128, 128);
+      doc.text("Nenhum item cadastrado", 16, yPos);
+      yPos += 7;
+      doc.setTextColor(COLORS.text);
+    }
+
+    yPos += 5;
+  });
+
+  addFooter(doc, 1);
+
+  doc.save(`SWOT_${empresa.nome}_${new Date().toISOString().split("T")[0]}.pdf`);
+}
+
+export function exportOkrPDF(
+  empresa: EmpresaInfo,
+  objectives: Array<{
+    objetivo: string;
+    descricao: string;
+    resultadoChave1?: string;
+    metaResultado1?: string;
+    resultadoChave2?: string;
+    metaResultado2?: string;
+    resultadoChave3?: string;
+    metaResultado3?: string;
+  }>
+) {
+  const doc = new jsPDF();
+
+  addHeader(doc, empresa, "Objetivos e Key Results (OKR)");
+
+  let yPos = 50;
+
+  objectives.forEach((obj, index) => {
+    // Objetivo
+    doc.setFillColor(COLORS.blue);
+    doc.rect(14, yPos - 5, 182, 8, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(12);
+    doc.text(`Objetivo ${index + 1}: ${obj.objetivo}`, 16, yPos);
+    yPos += 10;
+
+    doc.setTextColor(COLORS.text);
+    doc.setFontSize(10);
+
+    if (obj.descricao) {
+      doc.text(`Descrição: ${obj.descricao}`, 16, yPos);
+      yPos += 7;
+    }
+
+    // Key Results
+    doc.setFontSize(11);
+    doc.setFont(undefined, "bold");
+    doc.text("Key Results:", 16, yPos);
+    yPos += 7;
+    doc.setFont(undefined, "normal");
+    doc.setFontSize(10);
+
+    const keyResults = [
+      { kr: obj.resultadoChave1, meta: obj.metaResultado1 },
+      { kr: obj.resultadoChave2, meta: obj.metaResultado2 },
+      { kr: obj.resultadoChave3, meta: obj.metaResultado3 },
+    ];
+
+    keyResults.forEach((kr, i) => {
+      if (kr.kr) {
+        doc.text(`  ${i + 1}. ${kr.kr}`, 18, yPos);
+        yPos += 6;
+        if (kr.meta) {
+          doc.setTextColor(128, 128, 128);
+          doc.text(`     Meta: ${kr.meta}`, 18, yPos);
+          yPos += 6;
+          doc.setTextColor(COLORS.text);
+        }
+      }
+    });
+
+    yPos += 10;
+
+    if (yPos > 250) {
+      doc.addPage();
+      yPos = 20;
+    }
+  });
+
+  addFooter(doc, 1);
+
+  doc.save(`OKR_${empresa.nome}_${new Date().toISOString().split("T")[0]}.pdf`);
+}
+
+export function exportBscPDF(
+  empresa: EmpresaInfo,
+  indicadores: Array<{
+    nome: string;
+    perspectiva: string;
+    meta: number;
+    realizado?: number;
+    unidade: string;
+  }>
+) {
+  const doc = new jsPDF();
+
+  addHeader(doc, empresa, "Balanced Scorecard (BSC)");
+
+  let yPos = 50;
+
+  const perspectivas = [
+    { id: "financeira", nome: "Financeira", cor: [76, 175, 80] },
+    { id: "clientes", nome: "Clientes", cor: [33, 150, 243] },
+    { id: "processos", nome: "Processos Internos", cor: [255, 152, 0] },
+    { id: "aprendizado", nome: "Aprendizado e Crescimento", cor: [156, 39, 176] },
+  ];
+
+  perspectivas.forEach((persp) => {
+    const indsPerspectiva = indicadores.filter((i) => i.perspectiva === persp.id);
+
+    if (indsPerspectiva.length > 0) {
+      // Título da perspectiva
+      doc.setFillColor(...persp.cor);
+      doc.rect(14, yPos - 5, 182, 8, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(12);
+      doc.text(persp.nome, 16, yPos);
+      yPos += 10;
+
+      doc.setTextColor(COLORS.text);
+
+      // Tabela de indicadores
+      const tableData = indsPerspectiva.map((ind) => {
+        const realizado = ind.realizado ?? 0;
+        const percentual = ind.meta > 0 ? ((realizado / ind.meta) * 100).toFixed(1) : "0.0";
+        return [
+          ind.nome,
+          `${ind.meta} ${ind.unidade}`,
+          `${realizado} ${ind.unidade}`,
+          `${percentual}%`,
+        ];
+      });
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [["Indicador", "Meta", "Realizado", "Atingimento"]],
+        body: tableData,
+        theme: "grid",
+        headStyles: { fillColor: persp.cor },
+        margin: { left: 14, right: 14 },
+        styles: { fontSize: 9 },
+      });
+
+      yPos = (doc as any).lastAutoTable.finalY + 10;
+
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+    }
+  });
+
+  addFooter(doc, 1);
+
+  doc.save(`BSC_${empresa.nome}_${new Date().toISOString().split("T")[0]}.pdf`);
+}

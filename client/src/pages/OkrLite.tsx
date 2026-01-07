@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Save, Plus, Trash2, Target, CheckCircle2 } from "lucide-react";
+import { Save, Plus, Trash2, Target, CheckCircle2, FileDown } from "lucide-react";
+import { exportOkrPDF } from "@/lib/pdfExport";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from "recharts";
 
 interface KeyResult {
@@ -380,11 +381,33 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
         </CardContent>
       </Card>
 
-      {/* Salvar */}
-      <Button onClick={handleSave} className="w-full gap-2 bg-cyan-600 hover:bg-cyan-700 text-white">
-        <Save className="h-4 w-4" />
-        Salvar OKRs
-      </Button>
+      {/* Salvar e Exportar */}
+      <div className="flex gap-2">
+        <Button onClick={handleSave} className="flex-1 gap-2 bg-cyan-600 hover:bg-cyan-700 text-white">
+          <Save className="h-4 w-4" />
+          Salvar OKRs
+        </Button>
+        <Button 
+          onClick={() => exportOkrPDF(
+            { nome: "Empresa" },
+            okrs.map(okr => ({
+              objetivo: okr.objetivo,
+              descricao: okr.objetivo,
+              resultadoChave1: okr.keyResults[0]?.descricao,
+              metaResultado1: okr.keyResults[0]?.meta.toString(),
+              resultadoChave2: okr.keyResults[1]?.descricao,
+              metaResultado2: okr.keyResults[1]?.meta.toString(),
+              resultadoChave3: okr.keyResults[2]?.descricao,
+              metaResultado3: okr.keyResults[2]?.meta.toString(),
+            }))
+          )}
+          variant="outline"
+          className="gap-2"
+        >
+          <FileDown className="h-4 w-4" />
+          Exportar PDF
+        </Button>
+      </div>
     </div>
   );
 }

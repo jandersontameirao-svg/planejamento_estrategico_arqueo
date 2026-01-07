@@ -497,3 +497,16 @@
 - [ ] Conectar IdentidadeOrganizacionalLite ao banco de dados
 - [ ] Testar persistência de todos os componentes
 - [ ] Adicionar indicadores de progresso (0-100%) em cada análise
+
+
+## Novas Funcionalidades - Exportação, Notificações e Dashboard Comparativo
+- [x] Implementar exportação de relatórios em PDF para análise PESTEL
+- [x] Implementar exportação de relatórios em PDF para análise SWOT
+- [x] Implementar exportação de relatórios em PDF para análise OKR
+- [x] Implementar exportação de relatórios em PDF para análise BSC
+- [x] Criar sistema de notificações automáticas para análises incompletas (<50%)
+- [x] Criar sistema de notificações para OKRs próximos do prazo sem progresso
+- [x] Desenvolver dashboard comparativo entre empresas do grupo
+- [x] Adicionar gráficos de radar no dashboard comparativo
+- [x] Adicionar gráficos de barras no dashboard comparativo
+- [x] Testar todas as novas funcionalidades

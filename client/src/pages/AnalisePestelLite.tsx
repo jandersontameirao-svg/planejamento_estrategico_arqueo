@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Save, Plus, Trash2, Building2, DollarSign, Users, Cpu, Leaf, Scale, AlertTriangle } from "lucide-react";
+import { Save, Plus, Trash2, Building2, DollarSign, Users, Cpu, Leaf, Scale, AlertTriangle, FileDown } from "lucide-react";
+import { exportPestelPDF } from "@/lib/pdfExport";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Cell } from "recharts";
 
 interface FatorPestel {
@@ -417,11 +418,29 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         </CardContent>
       </Card>
 
-      {/* Salvar */}
-      <Button onClick={handleSave} className="w-full gap-2 bg-orange-600 hover:bg-orange-700 text-white">
-        <Save className="h-4 w-4" />
-        Salvar Análise PESTEL
-      </Button>
+      {/* Salvar e Exportar */}
+      <div className="flex gap-2">
+        <Button onClick={handleSave} className="flex-1 gap-2 bg-orange-600 hover:bg-orange-700 text-white">
+          <Save className="h-4 w-4" />
+          Salvar Análise PESTEL
+        </Button>
+        <Button 
+          onClick={() => exportPestelPDF(
+            { nome: "Empresa" }, // TODO: pegar nome real da empresa
+            fatores.map(f => ({
+              categoria: f.categoria.toLowerCase(),
+              descricao: f.descricao,
+              impacto: f.impacto,
+              probabilidade: f.probabilidade,
+            }))
+          )}
+          variant="outline"
+          className="gap-2"
+        >
+          <FileDown className="h-4 w-4" />
+          Exportar PDF
+        </Button>
+      </div>
     </div>
   );
 }

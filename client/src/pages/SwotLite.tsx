@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Save, Plus, Trash2, Shield, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
+import { Save, Plus, Trash2, Shield, AlertTriangle, TrendingUp, TrendingDown, FileDown } from "lucide-react";
+import { exportSwotPDF } from "@/lib/pdfExport";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 interface ItemSwot {
@@ -246,11 +247,29 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
         </CardContent>
       </Card>
 
-      {/* Salvar */}
-      <Button onClick={handleSave} className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white">
-        <Save className="h-4 w-4" />
-        Salvar Análise SWOT
-      </Button>
+      {/* Salvar e Exportar */}
+      <div className="flex gap-2">
+        <Button onClick={handleSave} className="flex-1 gap-2 bg-green-600 hover:bg-green-700 text-white">
+          <Save className="h-4 w-4" />
+          Salvar Análise SWOT
+        </Button>
+        <Button 
+          onClick={() => exportSwotPDF(
+            { nome: "Empresa" },
+            [
+              ...forcas.map(f => ({ tipo: "forca", descricao: f.descricao })),
+              ...fraquezas.map(f => ({ tipo: "fraqueza", descricao: f.descricao })),
+              ...oportunidades.map(o => ({ tipo: "oportunidade", descricao: o.descricao })),
+              ...ameacas.map(a => ({ tipo: "ameaca", descricao: a.descricao })),
+            ]
+          )}
+          variant="outline"
+          className="gap-2"
+        >
+          <FileDown className="h-4 w-4" />
+          Exportar PDF
+        </Button>
+      </div>
     </div>
   );
 }

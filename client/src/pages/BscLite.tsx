@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Save, Plus, Trash2, DollarSign, Users, Settings, GraduationCap, BarChart3 } from "lucide-react";
+import { Save, Plus, Trash2, DollarSign, Users, Settings, GraduationCap, BarChart3, FileDown } from "lucide-react";
+import { exportBscPDF } from "@/lib/pdfExport";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
 import { trpc } from "@/lib/trpc";
 
@@ -316,11 +317,35 @@ export default function BscLite({ empresaId }: BscLiteProps) {
         })}
       </div>
 
-      {/* Salvar */}
-      <Button onClick={handleSave} className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
-        <Save className="h-4 w-4" />
-        Salvar Balanced Scorecard
-      </Button>
+      {/* Salvar e Exportar */}
+      <div className="flex gap-2">
+        <Button onClick={handleSave} className="flex-1 gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+          <Save className="h-4 w-4" />
+          Salvar Balanced Scorecard
+        </Button>
+        <Button 
+          onClick={() => {
+            const todosIndicadores = [
+              ...indicadores.financeira.map(i => ({ ...i, perspectiva: "financeira", unidade: "%" })),
+              ...indicadores.clientes.map(i => ({ ...i, perspectiva: "clientes", unidade: "%" })),
+              ...indicadores.processos.map(i => ({ ...i, perspectiva: "processos", unidade: "%" })),
+              ...indicadores.aprendizado.map(i => ({ ...i, perspectiva: "aprendizado", unidade: "%" })),
+            ];
+            exportBscPDF({ nome: "Empresa" }, todosIndicadores.map(i => ({
+              nome: i.nome,
+              perspectiva: i.perspectiva,
+              meta: i.meta,
+              realizado: i.atual,
+              unidade: i.unidade,
+            })));
+          }}
+          variant="outline"
+          className="gap-2"
+        >
+          <FileDown className="h-4 w-4" />
+          Exportar PDF
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1132,6 +1132,64 @@ export const appRouter = router({
         const { getOkrObjectivesByEmpresa } = await import("./db");
         return await getOkrObjectivesByEmpresa(input.empresaId);
       }),
+
+    // Buscar progresso de todas as empresas para dashboard comparativo
+    getProgressoTodasEmpresas: protectedProcedure
+      .query(async () => {
+        const { getDb } = await import("./db");
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const { empresas } = await import("../drizzle/schema");
+        const { sql } = await import("drizzle-orm");
+
+        const allEmpresas = await db.select().from(empresas);
+
+        const resultado = [];
+
+        for (const empresa of allEmpresas) {
+          const empresaId = empresa.id;
+
+          // PESTEL: 6 fatores esperados (1 por categoria)
+          const pestelCount: any = await db.execute(sql`
+            SELECT COUNT(*) as count FROM pestel_fatores WHERE empresaId = ${empresaId}
+          `);
+          const pestelTotal = pestelCount.rows?.[0]?.count || pestelCount[0]?.count || 0;
+          const progressoPestel = Math.min((pestelTotal / 6) * 100, 100);
+
+          // SWOT: 8 itens esperados (2 por quadrante)
+          const swotCount: any = await db.execute(sql`
+            SELECT COUNT(*) as count FROM analise_swot_tows WHERE empresaId = ${empresaId}
+          `);
+          const swotTotal = swotCount.rows?.[0]?.count || swotCount[0]?.count || 0;
+          const progressoSwot = Math.min((swotTotal / 8) * 100, 100);
+
+          // OKR: 3 objetivos esperados
+          const okrCount: any = await db.execute(sql`
+            SELECT COUNT(*) as count FROM analise_okr WHERE empresaId = ${empresaId}
+          `);
+          const okrTotal = okrCount.rows?.[0]?.count || okrCount[0]?.count || 0;
+          const progressoOkr = Math.min((okrTotal / 3) * 100, 100);
+
+          // BSC: 8 indicadores esperados (2 por perspectiva)
+          const bscCount: any = await db.execute(sql`
+            SELECT COUNT(*) as count FROM bsc_indicadores WHERE empresaId = ${empresaId}
+          `);
+          const bscTotal = bscCount.rows?.[0]?.count || bscCount[0]?.count || 0;
+          const progressoBsc = Math.min((bscTotal / 8) * 100, 100);
+
+          resultado.push({
+            empresaId,
+            nomeEmpresa: empresa.nome,
+            progressoPestel,
+            progressoSwot,
+            progressoOkr,
+            progressoBsc,
+          });
+        }
+
+        return resultado;
+      }),
   }),
 
   bsc: router({
@@ -1165,6 +1223,36 @@ export const appRouter = router({
       .query(async () => {
         const { getAllBscIndicadores } = await import("./db");
         return await getAllBscIndicadores();
+      }),
+  }),
+
+  notifications: router({
+    // Verificar e notificar análises incompletas
+    checkIncompleteAnalyses: protectedProcedure
+      .mutation(async () => {
+        const { checkAndNotifyIncompleteAnalyses } = await import("./notifications");
+        return await checkAndNotifyIncompleteAnalyses();
+      }),
+
+    // Verificar e notificar OKRs em risco
+    checkOkrsAtRisk: protectedProcedure
+      .mutation(async () => {
+        const { checkAndNotifyOkrsAtRisk } = await import("./notifications");
+        return await checkAndNotifyOkrsAtRisk();
+      }),
+
+    // Executar todas as verificações
+    checkAll: protectedProcedure
+      .mutation(async () => {
+        const { checkAndNotifyIncompleteAnalyses, checkAndNotifyOkrsAtRisk } = await import("./notifications");
+        const result1 = await checkAndNotifyIncompleteAnalyses();
+        const result2 = await checkAndNotifyOkrsAtRisk();
+        return {
+          success: true,
+          incompleteAnalyses: result1.count,
+          okrsAtRisk: result2.count,
+          total: result1.count + result2.count,
+        };
       }),
   }),
 
