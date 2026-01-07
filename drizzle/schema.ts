@@ -692,3 +692,35 @@ export const analiseComentarios = mysqlTable("analise_comentarios", {
 
 export type AnaliseComentario = typeof analiseComentarios.$inferSelect;
 export type InsertAnaliseComentario = typeof analiseComentarios.$inferInsert;
+
+/**
+ * Menções em comentários (@usuário)
+ */
+export const comentarioMencoes = mysqlTable("comentario_mencoes", {
+  id: int("id").autoincrement().primaryKey(),
+  comentarioId: int("comentarioId").notNull(),
+  usuarioMencionadoId: varchar("usuarioMencionadoId", { length: 64 }).notNull(),
+  usuarioMencionadoNome: varchar("usuarioMencionadoNome", { length: 255 }).notNull(),
+  notificado: tinyint("notificado").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ComentarioMencao = typeof comentarioMencoes.$inferSelect;
+export type InsertComentarioMencao = typeof comentarioMencoes.$inferInsert;
+
+/**
+ * Anexos em comentários (arquivos no S3)
+ */
+export const comentarioAnexos = mysqlTable("comentario_anexos", {
+  id: int("id").autoincrement().primaryKey(),
+  comentarioId: int("comentarioId").notNull(),
+  nomeArquivo: varchar("nomeArquivo", { length: 255 }).notNull(),
+  tipoArquivo: varchar("tipoArquivo", { length: 100 }).notNull(),
+  tamanhoBytes: int("tamanhoBytes").notNull(),
+  urlS3: text("urlS3").notNull(),
+  s3Key: text("s3Key").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ComentarioAnexo = typeof comentarioAnexos.$inferSelect;
+export type InsertComentarioAnexo = typeof comentarioAnexos.$inferInsert;

@@ -566,3 +566,17 @@
 - [x] Integrar CommentSection nos componentes PESTEL, SWOT, OKR e BSC
 - [ ] Adicionar indicador visual de quantidade de comentários em cada análise
 - [ ] Testar criação, edição e exclusão de comentários
+
+
+## Menções e Anexos em Comentários
+- [x] Criar tabela comentario_mencoes para rastrear menções
+- [x] Criar tabela comentario_anexos para armazenar anexos
+- [x] Adicionar schemas no Drizzle para menções e anexos
+- [x] Implementar função para detectar @menções no texto
+- [x] Criar procedure para enviar notificações aos usuários mencionados
+- [x] Implementar upload de anexos para S3 com validação de tipo/tamanho
+- [x] Adicionar campo de anexos no formulário de comentário
+- [x] Exibir menções destacadas (highlight) nos comentários
+- [x] Exibir lista de anexos com ícones e links para download
+- [ ] Testar menções e notificações automáticas
+- [ ] Testar upload e download de anexos

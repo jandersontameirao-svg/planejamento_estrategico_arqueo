@@ -1404,7 +1404,14 @@ export async function createComentario(data: {
     conteudo: data.conteudo,
   });
   
-  return result;
+  // Buscar o ID inserido
+  const { desc } = await import("drizzle-orm");
+  const inserted = await db.select().from(analiseComentarios)
+    .where(eq(analiseComentarios.autorId, data.autorId))
+    .orderBy(desc(analiseComentarios.createdAt))
+    .limit(1);
+  
+  return { insertId: inserted[0]?.id || 0, ...result };
 }
 
 // Listar comentários de uma análise
@@ -1493,4 +1500,135 @@ export async function countComentarios(empresaId: number, tipoAnalise: "pestel" 
     ));
   
   return result[0]?.count || 0;
+}
+
+
+// ============================================================================
+// Usuários
+// ============================================================================
+
+/**
+ * Listar todos os usuários
+ */
+export async function listUsers() {
+  const { users } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(users);
+}
+
+// ============================================================================
+// Menções em Comentários
+// ============================================================================
+
+/**
+ * Extrair menções (@usuario) do texto
+ */
+export function extractMentions(text: string): string[] {
+  const mentionRegex = /@(\w+)/g;
+  const mentions: string[] = [];
+  let match;
+  
+  while ((match = mentionRegex.exec(text)) !== null) {
+    mentions.push(match[1]);
+  }
+  
+  return [...new Set(mentions)]; // Remove duplicatas
+}
+
+/**
+ * Salvar menções de um comentário
+ */
+export async function saveMencoes(comentarioId: number, usuariosMencionados: Array<{ id: string; nome: string }>) {
+  const { comentarioMencoes } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  if (usuariosMencionados.length === 0) return [];
+  
+  const mencoes = usuariosMencionados.map(u => ({
+    comentarioId,
+    usuarioMencionadoId: u.id,
+    usuarioMencionadoNome: u.nome,
+    notificado: 0,
+  }));
+  
+  return await db.insert(comentarioMencoes).values(mencoes);
+}
+
+/**
+ * Listar menções de um comentário
+ */
+export async function listMencoes(comentarioId: number) {
+  const { comentarioMencoes } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(comentarioMencoes).where(eq(comentarioMencoes.comentarioId, comentarioId));
+}
+
+/**
+ * Marcar menção como notificada
+ */
+export async function markMencaoNotificada(mencaoId: number) {
+  const { comentarioMencoes } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.update(comentarioMencoes)
+    .set({ notificado: 1 })
+    .where(eq(comentarioMencoes.id, mencaoId));
+}
+
+// ============================================================================
+// Anexos em Comentários
+// ============================================================================
+
+/**
+ * Salvar anexo de um comentário
+ */
+export async function saveAnexo(comentarioId: number, anexo: {
+  nomeArquivo: string;
+  tipoArquivo: string;
+  tamanhoBytes: number;
+  urlS3: string;
+  s3Key: string;
+}) {
+  const { comentarioAnexos } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(comentarioAnexos).values({
+    comentarioId,
+    ...anexo,
+  });
+  
+  return result;
+}
+
+/**
+ * Listar anexos de um comentário
+ */
+export async function listAnexos(comentarioId: number) {
+  const { comentarioAnexos } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(comentarioAnexos).where(eq(comentarioAnexos.comentarioId, comentarioId));
+}
+
+/**
+ * Deletar anexo
+ */
+export async function deleteAnexo(anexoId: number, autorId: string) {
+  const { comentarioAnexos, analiseComentarios } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se o usuário é o autor do comentário
+  const anexo = await db.select().from(comentarioAnexos).where(eq(comentarioAnexos.id, anexoId)).limit(1);
+  if (anexo.length === 0) return false;
+  
+  const comentario = await db.select().from(analiseComentarios).where(eq(analiseComentarios.id, anexo[0].comentarioId)).limit(1);
+  if (comentario.length === 0 || comentario[0].autorId !== autorId) return false;
+  
+  await db.delete(comentarioAnexos).where(eq(comentarioAnexos.id, anexoId));
+  return true;
 }

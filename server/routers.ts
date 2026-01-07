@@ -1314,14 +1314,43 @@ export const appRouter = router({
         conteudo: z.string().min(1),
       }))
       .mutation(async ({ input, ctx }) => {
-        const { createComentario } = await import("./db");
-        return await createComentario({
+        const { createComentario, extractMentions, saveMencoes, listUsers } = await import("./db");
+        const { notifyOwner } = await import("./_core/notification");
+        
+        // Criar comentário
+        const comentario = await createComentario({
           empresaId: input.empresaId,
           tipoAnalise: input.tipoAnalise,
           autorId: ctx.user.openId,
           autorNome: ctx.user.name || "Usuário",
           conteudo: input.conteudo,
         });
+        
+        // Detectar menções (@usuario)
+        const mentions = extractMentions(input.conteudo);
+        if (mentions.length > 0) {
+          // Buscar usuários mencionados
+          const allUsers = await listUsers();
+          const mentionedUsers = allUsers.filter((u: any) => 
+            mentions.some((m: string) => u.name.toLowerCase().includes(m.toLowerCase()))
+          );
+          
+          if (mentionedUsers.length > 0) {
+            // Salvar menções
+            await saveMencoes(
+              comentario.insertId,
+              mentionedUsers.map((u: any) => ({ id: u.openId, nome: u.name }))
+            );
+            
+            // Notificar usuários mencionados (apenas o proprietário por enquanto)
+            await notifyOwner({
+              title: `Nova menção em comentário`,
+              content: `${ctx.user.name} mencionou você em um comentário: "${input.conteudo.substring(0, 100)}..."`
+            });
+          }
+        }
+        
+        return comentario;
       }),
 
     // Listar comentários
@@ -1363,6 +1392,57 @@ export const appRouter = router({
       .query(async ({ input }) => {
         const { countComentarios } = await import("./db");
         return await countComentarios(input.empresaId, input.tipoAnalise);
+      }),
+
+    // Upload de anexo
+    uploadAnexo: protectedProcedure
+      .input(z.object({
+        comentarioId: z.number(),
+        nomeArquivo: z.string(),
+        tipoArquivo: z.string(),
+        tamanhoBytes: z.number(),
+        base64Data: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { saveAnexo } = await import("./db");
+        const { storagePut } = await import("./storage");
+        
+        // Validar tamanho (máximo 10MB)
+        if (input.tamanhoBytes > 10 * 1024 * 1024) {
+          throw new Error("Arquivo muito grande. Tamanho máximo: 10MB");
+        }
+        
+        // Converter base64 para buffer
+        const buffer = Buffer.from(input.base64Data, "base64");
+        
+        // Upload para S3
+        const s3Key = `comentarios/${input.comentarioId}/${Date.now()}-${input.nomeArquivo}`;
+        const { url } = await storagePut(s3Key, buffer, input.tipoArquivo);
+        
+        // Salvar no banco
+        return await saveAnexo(input.comentarioId, {
+          nomeArquivo: input.nomeArquivo,
+          tipoArquivo: input.tipoArquivo,
+          tamanhoBytes: input.tamanhoBytes,
+          urlS3: url,
+          s3Key,
+        });
+      }),
+
+    // Listar anexos
+    listAnexos: protectedProcedure
+      .input(z.object({ comentarioId: z.number() }))
+      .query(async ({ input }) => {
+        const { listAnexos } = await import("./db");
+        return await listAnexos(input.comentarioId);
+      }),
+
+    // Deletar anexo
+    deleteAnexo: protectedProcedure
+      .input(z.object({ anexoId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const { deleteAnexo } = await import("./db");
+        return await deleteAnexo(input.anexoId, ctx.user.openId);
       }),
   }),
 
