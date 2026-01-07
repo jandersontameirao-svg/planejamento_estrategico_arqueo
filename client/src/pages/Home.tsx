@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Building2, LayoutDashboard, LogOut, FileText, CheckCircle2, Users, Bell, BarChart3 } from "lucide-react";
+import { Building2, LayoutDashboard, LogOut, FileText, CheckCircle2, Users, Bell, BarChart3, Target } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { NotificationButton } from "@/components/NotificationButton";
 
@@ -214,8 +214,7 @@ export default function Home() {
           ) : empresas && empresas.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {empresas.map((empresa) => (
-                <Link key={empresa.id} href={`/empresa/${empresa.id}/planejamento`}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                <Card key={empresa.id} className="hover:shadow-lg transition-shadow h-full">
                     <CardHeader>
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/10 rounded-lg">
@@ -253,10 +252,25 @@ export default function Home() {
                             Status RAG: Verde
                           </span>
                         </div>
+                        
+                        {/* Botões de ação */}
+                        <div className="flex gap-2 mt-4">
+                          <Link href={`/empresa/${empresa.id}/planejamento`} className="flex-1">
+                            <Button variant="outline" size="sm" className="w-full">
+                              <Target className="h-4 w-4 mr-2" />
+                              Planejamento
+                            </Button>
+                          </Link>
+                          <Link href={`/empresa/${empresa.id}/dashboard-analises`} className="flex-1">
+                            <Button variant="outline" size="sm" className="w-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30 hover:from-blue-500/20 hover:to-purple-500/20">
+                              <BarChart3 className="h-4 w-4 mr-2" />
+                              Dashboard
+                            </Button>
+                          </Link>
+                        </div>
                       </div>
                     </CardContent>
-                  </Card>
-                </Link>
+                </Card>
               ))}
             </div>
           ) : (

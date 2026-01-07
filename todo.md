@@ -593,3 +593,7 @@
 - [x] Adicionar botão "Voltar" em todas as páginas do sistema
 - [x] Adicionar logo do Grupo Arqueo no header das páginas
 - [ ] Testar navegação e validar dashboard
+
+## Melhorar Acesso ao Dashboard Visual
+- [x] Adicionar botão "Dashboard Visual" nos cards de empresas na página inicial
+- [x] Testar navegação do dashboard a partir da home
