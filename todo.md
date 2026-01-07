@@ -597,3 +597,19 @@
 ## Melhorar Acesso ao Dashboard Visual
 - [x] Adicionar botão "Dashboard Visual" nos cards de empresas na página inicial
 - [x] Testar navegação do dashboard a partir da home
+
+## Dashboard Visual do Grupo
+- [ ] Criar página DashboardGrupoAnalises com gráficos consolidados
+- [ ] Adicionar botão de acesso ao Dashboard do Grupo na home
+- [ ] Testar dashboard consolidado
+
+
+## Planejamento Estratégico do Grupo Arqueo (Mesma Estrutura das Empresas)
+- [x] Criar página PlanejamentoEstrategicoGrupo.tsx com 8 cards expansíveis
+- [x] Adaptar componentes Lite para aceitar empresaId=0 (análises do Grupo)
+- [x] Criar DashboardAnalisesGrupo.tsx com gráficos consolidados das análises do Grupo
+- [x] Adicionar rota /planejamento-grupo no App.tsx
+- [x] Adicionar botão "Planejamento do Grupo" na Home
+- [ ] Testar todas as análises do Grupo (salvar/carregar)
+- [ ] Testar dashboard visual do Grupo
+- [ ] Testar exportação de PDF consolidado do Grupo

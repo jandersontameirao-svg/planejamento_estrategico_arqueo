@@ -33,6 +33,8 @@ import PlanejamentoEstrategicoEmpresa from "./pages/PlanejamentoEstrategicoEmpre
 import PlanejamentoMacro from "./pages/PlanejamentoMacro";
 import DashboardGrupo from "./pages/DashboardGrupo";
 import ConfigurarTemplate from "./pages/ConfigurarTemplate";
+import PlanejamentoEstrategicoGrupo from "./pages/PlanejamentoEstrategicoGrupo";
+import DashboardAnalisesGrupo from "./pages/DashboardAnalisesGrupo";
 
 
 function Router() {
@@ -77,7 +79,6 @@ function Router() {
       <Route path="/analise-rbv-vrio/:id" component={AnaliseRbvVrio} />
       <Route path="/analise-swot-tows/:id" component={AnaliseSwoTtows} />
       <Route path="/analises-vrio" component={AnalisesVRIO} />
-      <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/empresa/:id/planejamento">
         {(params) => <PlanejamentoEstrategicoEmpresa empresaId={Number(params.id)} empresaNome="Empresa" />}
       </Route>
@@ -86,7 +87,9 @@ function Router() {
       </Route>
       <Route path="/empresa/:empresaId/configurar-template" component={ConfigurarTemplate} />
       <Route path="/resumo-executivo" component={DashboardResumoExecutivo} />
-      <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
+      <Route path="/planejamento-grupo" component={PlanejamentoEstrategicoGrupo} />
+      <Route path="/dashboard-analises-grupo" component={DashboardAnalisesGrupo} />
+      <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />
       {/* Final fallback route */}

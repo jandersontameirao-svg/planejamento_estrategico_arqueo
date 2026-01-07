@@ -179,16 +179,16 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Card do Planejamento Macro do Grupo */}
-        <Card className="mb-10 border-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150" onClick={() => setLocation("/planejamento-macro")}>
+        {/* Card do Planejamento Estratégico do Grupo */}
+        <Card className="mb-10 border-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150" onClick={() => setLocation("/planejamento-grupo")}>
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="p-3 bg-primary/10 rounded-lg">
-                <LayoutDashboard className="h-8 w-8 text-primary" />
+                <Target className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-xl">Planejamento Macro – Grupo Arqueo</CardTitle>
-                <CardDescription>BSC Consolidado de todas as empresas do grupo</CardDescription>
+                <CardTitle className="text-xl">Planejamento Estratégico – Grupo Arqueo</CardTitle>
+                <CardDescription>Análises estratégicas completas do Grupo (PESTEL, SWOT, OKR, BSC e mais)</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -197,8 +197,8 @@ export default function Home() {
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
               <span className="text-sm text-muted-foreground">Status: Operacional</span>
             </div>
-            <Button variant="outline" className="w-full" onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-macro"); }}>
-              Acessar Planejamento Macro
+            <Button variant="outline" className="w-full" onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-grupo"); }}>
+              Acessar Planejamento Estratégico
             </Button>
           </CardContent>
         </Card>
