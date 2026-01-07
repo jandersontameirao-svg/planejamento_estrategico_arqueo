@@ -471,3 +471,10 @@
 - [x] Adicionar transições suaves (duration-300, duration-700)
 - [x] Melhorar tipografia com gradientes de texto e hierarquia clara
 - [x] Implementar cards com glassmorphism (backdrop-blur-sm, gradientes)
+
+
+## Bug - Loop de Redirecionamento após Login
+- [x] Verificar callback OAuth e redirecionamento
+- [x] Verificar se session cookie está sendo salvo corretamente (cookie vazio)
+- [x] Verificar lógica de configuração de domínio do cookie
+- [x] Corrigir: Descomentada configuração de domínio em cookies.ts para funcionar com proxy Manus
