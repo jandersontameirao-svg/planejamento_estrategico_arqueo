@@ -630,3 +630,34 @@
 - [x] Testar todas as análises (salvar/carregar)
 - [x] Testar dashboard visual
 - [ ] Testar exportação de PDF
+
+
+## Áreas de Negócio - Estrutura Hierárquica de 4 Níveis
+- [ ] Criar tabela areas_negocio no banco de dados (id, nome, descricao, pais, status)
+- [ ] Adicionar coluna areaId na tabela empresas
+- [ ] Criar procedures tRPC para CRUD de áreas de negócio
+- [ ] Criar página /areas-negocio para listar e gerenciar áreas
+- [ ] Criar formulário para nova área de negócio
+- [ ] Criar página /area/:id/planejamento com 8 cards em grade 4x2
+- [ ] Criar página /area/:id/dashboard com gráficos consolidados
+- [ ] Atualizar Home para exibir áreas de negócio agrupadas
+- [ ] Migrar "Grupo Arqueo" para "Área de Negócio: Grupo Arqueo Brasil"
+- [ ] Vincular empresas existentes à área Grupo Arqueo Brasil
+- [ ] Testar criação de nova área de negócio
+- [ ] Testar planejamento estratégico por área
+
+
+## Áreas de Negócio - Estrutura Hierárquica de 4 Níveis
+- [x] Criar tabela areas_negocio no banco de dados
+- [x] Adicionar coluna areaId na tabela empresas
+- [x] Criar procedures tRPC para CRUD de áreas de negócio
+- [x] Criar página AreasNegocio.tsx para gerenciamento
+- [x] Criar página PlanejamentoEstrategicoArea.tsx (8 cards em grade 4x2)
+- [x] Criar página DashboardAnalisesArea.tsx com gráficos
+- [x] Adicionar rotas no App.tsx (/areas-negocio, /area/:id/planejamento, /area/:id/dashboard)
+- [x] Atualizar Home.tsx para exibir seção de Áreas de Negócio
+- [x] Migrar "Grupo Arqueo" para primeira área de negócio (Grupo Arqueo Brasil)
+- [x] Vincular empresas existentes à área Grupo Arqueo Brasil
+- [ ] Testar criação de nova área de negócio
+- [ ] Testar planejamento estratégico por área
+- [ ] Testar dashboard por área

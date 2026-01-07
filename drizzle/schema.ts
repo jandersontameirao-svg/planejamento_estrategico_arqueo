@@ -19,13 +19,30 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 /**
- * Empresas do grupo
+ * Áreas de Negócio (ex: Grupo Arqueo Brasil, Grupo Arqueo LATAM)
+ */
+export const areasNegocio = mysqlTable("areas_negocio", {
+  id: int("id").autoincrement().primaryKey(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  pais: varchar("pais", { length: 100 }),
+  status: mysqlEnum("status", ["ativa", "inativa"]).default("ativa").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AreaNegocio = typeof areasNegocio.$inferSelect;
+export type InsertAreaNegocio = typeof areasNegocio.$inferInsert;
+
+/**
+ * Empresas do grupo (vinculadas a uma área de negócio)
  */
 export const empresas = mysqlTable("empresas", {
   id: int("id").autoincrement().primaryKey(),
   nome: varchar("nome", { length: 255 }).notNull(),
   tipoAtuacao: mysqlEnum("tipoAtuacao", ["servicos", "produtos", "servicos_produtos"]).notNull(),
   status: mysqlEnum("status", ["ativa", "inativa"]).default("ativa").notNull(),
+  areaId: int("areaId"),
   observacoes: text("observacoes"),
   logoUrl: text("logoUrl"),
   logoKey: text("logoKey"),

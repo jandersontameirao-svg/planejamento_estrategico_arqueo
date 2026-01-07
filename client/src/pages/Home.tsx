@@ -7,6 +7,84 @@ import { Building2, LayoutDashboard, LogOut, FileText, CheckCircle2, Users, Bell
 import { Link, useLocation } from "wouter";
 import { NotificationButton } from "@/components/NotificationButton";
 
+// Componente para exibir cards das áreas de negócio
+function AreasNegocioCards() {
+  const [, setLocation] = useLocation();
+  const { data: areas, isLoading } = trpc.areasNegocio.list.useQuery();
+  
+  if (isLoading) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
+        <p className="text-sm text-muted-foreground">Carregando áreas...</p>
+      </div>
+    );
+  }
+  
+  if (!areas || areas.length === 0) {
+    return (
+      <Card className="border-dashed border-2 border-purple-200">
+        <CardContent className="py-8 text-center">
+          <Building2 className="h-12 w-12 mx-auto text-purple-300 mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Nenhuma área de negócio cadastrada</h3>
+          <p className="text-muted-foreground mb-4">Crie áreas de negócio para organizar as empresas do grupo</p>
+          <Button onClick={() => setLocation("/areas-negocio")} className="bg-purple-600 hover:bg-purple-700">
+            Criar Primeira Área
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {areas.map((area) => (
+        <Card 
+          key={area.id} 
+          className="border-2 border-purple-200/50 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer"
+          onClick={() => setLocation(`/area/${area.id}/planejamento`)}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-500/10 rounded-lg">
+                <Building2 className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">{area.nome}</CardTitle>
+                {area.pais && (
+                  <CardDescription className="text-xs">{area.pais}</CardDescription>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1 border-purple-200 text-purple-700 hover:bg-purple-50"
+                onClick={(e) => { e.stopPropagation(); setLocation(`/area/${area.id}/planejamento`); }}
+              >
+                <Target className="mr-1 h-3 w-3" />
+                Planejamento
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1 border-purple-200 text-purple-700 hover:bg-purple-50"
+                onClick={(e) => { e.stopPropagation(); setLocation(`/area/${area.id}/dashboard`); }}
+              >
+                <BarChart3 className="mr-1 h-3 w-3" />
+                Dashboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const [, setLocation] = useLocation();
@@ -203,29 +281,19 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        {/* Card do Planejamento Estratégico do Grupo Arqueo */}
-        <Card className="mb-10 border-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150" onClick={() => setLocation("/planejamento-grupo")}>
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Target className="h-8 w-8 text-primary" />
-              </div>
-              <div>
-                <CardTitle className="text-xl">Planejamento Estratégico – Grupo Arqueo</CardTitle>
-                <CardDescription>Análises estratégicas completas do Grupo (PESTEL, SWOT, OKR, BSC e mais)</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span className="text-sm text-muted-foreground">Status: Operacional</span>
-            </div>
-            <Button variant="outline" className="w-full" onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-grupo"); }}>
-              Acessar Planejamento Estratégico
+        {/* Seção de Áreas de Negócio */}
+        <div className="mb-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Building2 className="h-6 w-6 text-purple-600" />
+              Áreas de Negócio
+            </h2>
+            <Button variant="outline" onClick={() => setLocation("/areas-negocio")} className="border-purple-300 text-purple-700 hover:bg-purple-50">
+              Gerenciar Áreas
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+          <AreasNegocioCards />
+        </div>
 
         {/* Cards de Empresas */}
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">

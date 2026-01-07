@@ -1632,3 +1632,66 @@ export async function deleteAnexo(anexoId: number, autorId: string) {
   await db.delete(comentarioAnexos).where(eq(comentarioAnexos.id, anexoId));
   return true;
 }
+
+
+// ========================================
+// ÁREAS DE NEGÓCIO
+// ========================================
+
+export async function getAllAreasNegocio() {
+  const db = await getDb();
+  if (!db) return [];
+  const { areasNegocio } = await import("../drizzle/schema");
+  return await db.select().from(areasNegocio);
+}
+
+export async function getAreaNegocioById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const { areasNegocio } = await import("../drizzle/schema");
+  const result = await db.select().from(areasNegocio).where(eq(areasNegocio.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createAreaNegocio(data: { nome: string; descricao?: string; pais?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { areasNegocio } = await import("../drizzle/schema");
+  const result = await db.insert(areasNegocio).values(data);
+  return Number(result[0].insertId);
+}
+
+export async function updateAreaNegocio(id: number, data: { nome?: string; descricao?: string; pais?: string; status?: "ativa" | "inativa" }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { areasNegocio } = await import("../drizzle/schema");
+  await db.update(areasNegocio).set(data).where(eq(areasNegocio.id, id));
+}
+
+export async function deleteAreaNegocio(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { areasNegocio } = await import("../drizzle/schema");
+  await db.delete(areasNegocio).where(eq(areasNegocio.id, id));
+}
+
+export async function getEmpresasByAreaNegocio(areaId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const { empresas } = await import("../drizzle/schema");
+  return await db.select().from(empresas).where(eq(empresas.areaId, areaId));
+}
+
+export async function vincularEmpresaArea(empresaId: number, areaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { empresas } = await import("../drizzle/schema");
+  await db.update(empresas).set({ areaId }).where(eq(empresas.id, empresaId));
+}
+
+export async function desvincularEmpresaArea(empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { empresas } = await import("../drizzle/schema");
+  await db.update(empresas).set({ areaId: null }).where(eq(empresas.id, empresaId));
+}

@@ -37,6 +37,9 @@ import PlanejamentoEstrategicoGrupo from "./pages/PlanejamentoEstrategicoGrupo";
 import DashboardAnalisesGrupo from "./pages/DashboardAnalisesGrupo";
 import PlanejamentoEstrategicoParticipacoes from "./pages/PlanejamentoEstrategicoParticipacoes";
 import DashboardAnalisesParticipacoes from "./pages/DashboardAnalisesParticipacoes";
+import AreasNegocio from "./pages/AreasNegocio";
+import PlanejamentoEstrategicoArea from "./pages/PlanejamentoEstrategicoArea";
+import DashboardAnalisesArea from "./pages/DashboardAnalisesArea";
 
 
 function Router() {
@@ -93,6 +96,9 @@ function Router() {
       <Route path="/dashboard-analises-grupo" component={DashboardAnalisesGrupo} />
       <Route path="/planejamento-participacoes" component={PlanejamentoEstrategicoParticipacoes} />
       <Route path="/dashboard-analises-participacoes" component={DashboardAnalisesParticipacoes} />
+      <Route path="/areas-negocio" component={AreasNegocio} />
+      <Route path="/area/:id/planejamento" component={PlanejamentoEstrategicoArea} />
+      <Route path="/area/:id/dashboard" component={DashboardAnalisesArea} />
       <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />

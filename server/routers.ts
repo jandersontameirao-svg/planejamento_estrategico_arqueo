@@ -82,6 +82,89 @@ export const appRouter = router({
       }),
   }),
 
+  areasNegocio: router({
+    list: protectedProcedure.query(async () => {
+      const { getAllAreasNegocio } = await import("./db");
+      return await getAllAreasNegocio();
+    }),
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const { getAreaNegocioById } = await import("./db");
+        return await getAreaNegocioById(input.id);
+      }),
+    create: protectedProcedure
+      .input(z.object({
+        nome: z.string().min(1),
+        descricao: z.string().optional(),
+        pais: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Apenas administradores podem criar áreas de negócio" });
+        }
+        const { createAreaNegocio } = await import("./db");
+        const id = await createAreaNegocio(input);
+        return { id };
+      }),
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        nome: z.string().min(1).optional(),
+        descricao: z.string().optional(),
+        pais: z.string().optional(),
+        status: z.enum(["ativa", "inativa"]).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Apenas administradores podem editar áreas de negócio" });
+        }
+        const { id, ...data } = input;
+        const { updateAreaNegocio } = await import("./db");
+        await updateAreaNegocio(id, data);
+        return { success: true };
+      }),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Apenas administradores podem deletar áreas de negócio" });
+        }
+        const { deleteAreaNegocio } = await import("./db");
+        await deleteAreaNegocio(input.id);
+        return { success: true };
+      }),
+    getEmpresas: protectedProcedure
+      .input(z.object({ areaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getEmpresasByAreaNegocio } = await import("./db");
+        return await getEmpresasByAreaNegocio(input.areaId);
+      }),
+    vincularEmpresa: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        areaId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Apenas administradores podem vincular empresas" });
+        }
+        const { vincularEmpresaArea } = await import("./db");
+        await vincularEmpresaArea(input.empresaId, input.areaId);
+        return { success: true };
+      }),
+    desvincularEmpresa: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Apenas administradores podem desvincular empresas" });
+        }
+        const { desvincularEmpresaArea } = await import("./db");
+        await desvincularEmpresaArea(input.empresaId);
+        return { success: true };
+      }),
+  }),
+
   usuarios: router({
     list: protectedProcedure.query(async ({ ctx }) => {
       if (ctx.user.role !== "admin") {

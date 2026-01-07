@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO areas_negocio (nome, descricao, pais, status, createdAt, updatedAt) VALUES ('Grupo Arqueo Brasil', 'Área de negócio do Grupo Arqueo no Brasil', 'Brasil', 'ativa', NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute INSERT INTO areas_negocio (nome, descricao, pais, status, createdAt, updatedAt) VALUES ('Grupo Arqueo Brasil', 'Área de negócio do Grupo Arqueo no Brasil', 'Brasil', 'ativa', NOW(), NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 84
+}
