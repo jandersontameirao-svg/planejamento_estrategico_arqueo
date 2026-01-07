@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, date } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, date, tinyint } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -626,3 +626,27 @@ export const bscIndicadores = mysqlTable("bsc_indicadores", {
 
 export type BscIndicador = typeof bscIndicadores.$inferSelect;
 export type InsertBscIndicador = typeof bscIndicadores.$inferInsert;
+
+/**
+ * Configurações de templates personalizados para relatórios PDF
+ */
+export const templateConfigs = mysqlTable("template_configs", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  logoUrl: text("logoUrl"),
+  logoKey: text("logoKey"),
+  corPrimaria: varchar("corPrimaria", { length: 7 }).default("#8B1538").notNull(), // Bordo
+  corSecundaria: varchar("corSecundaria", { length: 7 }).default("#FF6B35").notNull(), // Laranja
+  incluirPestel: tinyint("incluirPestel").default(1).notNull(),
+  incluirSwot: tinyint("incluirSwot").default(1).notNull(),
+  incluirOkr: tinyint("incluirOkr").default(1).notNull(),
+  incluirBsc: tinyint("incluirBsc").default(1).notNull(),
+  incluirGraficos: tinyint("incluirGraficos").default(1).notNull(),
+  incluirRecomendacoes: tinyint("incluirRecomendacoes").default(1).notNull(),
+  rodapePersonalizado: text("rodapePersonalizado"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TemplateConfig = typeof templateConfigs.$inferSelect;
+export type InsertTemplateConfig = typeof templateConfigs.$inferInsert;

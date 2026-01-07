@@ -41,11 +41,23 @@ interface BscLiteProps {
   empresaId: number;
 }
 
+// Helper para converter config do banco para formato de exportação
+function convertTemplateConfig(config: any) {
+  if (!config) return undefined;
+  return {
+    corPrimaria: config.corPrimaria,
+    corSecundaria: config.corSecundaria,
+    rodapePersonalizado: config.rodapePersonalizado || undefined,
+  };
+}
+
 export default function BscLite({ empresaId }: BscLiteProps) {
   const utils = trpc.useUtils();
   
   // Buscar indicadores do banco
   const { data: indicadoresDb, isLoading } = trpc.bsc.getByEmpresa.useQuery({ empresaId });
+  const { data: templateConfig } = trpc.templates.getConfig.useQuery({ empresaId });
+  const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
   
   // Mutation para salvar indicadores
   const salvarMutation = trpc.bsc.saveIndicadores.useMutation({
@@ -325,19 +337,20 @@ export default function BscLite({ empresaId }: BscLiteProps) {
         </Button>
         <Button 
           onClick={() => {
-            const todosIndicadores = [
-              ...indicadores.financeira.map(i => ({ ...i, perspectiva: "financeira", unidade: "%" })),
-              ...indicadores.clientes.map(i => ({ ...i, perspectiva: "clientes", unidade: "%" })),
-              ...indicadores.processos.map(i => ({ ...i, perspectiva: "processos", unidade: "%" })),
-              ...indicadores.aprendizado.map(i => ({ ...i, perspectiva: "aprendizado", unidade: "%" })),
-            ];
-            exportBscPDF({ nome: "Empresa" }, todosIndicadores.map(i => ({
-              nome: i.nome,
-              perspectiva: i.perspectiva,
-              meta: i.meta,
-              realizado: i.atual,
-              unidade: i.unidade,
-            })));
+            const todosIndicadores = perspectivas.flatMap(p => 
+              p.indicadores.map(i => ({
+                nome: i.nome,
+                perspectiva: p.id,
+                meta: i.meta,
+                realizado: i.atual,
+                unidade: "%",
+              }))
+            );
+            exportBscPDF(
+              { nome: empresa?.nome || "Empresa" },
+              todosIndicadores,
+              convertTemplateConfig(templateConfig)
+            );
           }}
           variant="outline"
           className="gap-2"

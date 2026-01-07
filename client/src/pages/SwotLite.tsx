@@ -15,12 +15,29 @@ interface SwotLiteProps {
   empresaId: number;
 }
 
+// Helper para converter config do banco para formato de exportação
+function convertTemplateConfig(config: any) {
+  if (!config) return undefined;
+  return {
+    corPrimaria: config.corPrimaria,
+    corSecundaria: config.corSecundaria,
+    incluirPestel: !!config.incluirPestel,
+    incluirSwot: !!config.incluirSwot,
+    incluirOkr: !!config.incluirOkr,
+    incluirBsc: !!config.incluirBsc,
+    incluirGraficos: !!config.incluirGraficos,
+    incluirRecomendacoes: !!config.incluirRecomendacoes,
+    rodapePersonalizado: config.rodapePersonalizado || undefined,
+  };
+}
+
 export default function SwotLite({ empresaId }: SwotLiteProps) {
   const utils = trpc.useUtils();
   
   // Buscar itens do banco
-  const { data: itemsDb, isLoading } = trpc.analises.getSwot.useQuery({ empresaId });
-  
+  const { data: swotData, isLoading } = trpc.analises.getSwot.useQuery({ empresaId });
+  const { data: templateConfig } = trpc.templates.getConfig.useQuery({ empresaId });
+  const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });  
   // Mutation para salvar itens
   const salvarMutation = trpc.analises.saveSwot.useMutation({
     onSuccess: () => {
@@ -38,17 +55,17 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
 
   // Carregar itens do banco ao montar o componente
   useEffect(() => {
-    if (itemsDb && Array.isArray(itemsDb)) {
-      const forcasDb = itemsDb.filter((i: any) => i.tipo === "forca").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
-      const fraquezasDb = itemsDb.filter((i: any) => i.tipo === "fraqueza").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
-      const oportunidadesDb = itemsDb.filter((i: any) => i.tipo === "oportunidade").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
-      const ameacasDb = itemsDb.filter((i: any) => i.tipo === "ameaca").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
+    if (swotData && Array.isArray(swotData)) {
+      const forcasDb = swotData.filter((i: any) => i.tipo === "forca").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
+      const fraquezasDb = swotData.filter((i: any) => i.tipo === "fraqueza").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
+      const oportunidadesDb = swotData.filter((i: any) => i.tipo === "oportunidade").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
+      const ameacasDb = swotData.filter((i: any) => i.tipo === "ameaca").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
       setForcas(forcasDb);
       setFraquezas(fraquezasDb);
       setOportunidades(oportunidadesDb);
       setAmeacas(ameacasDb);
     }
-  }, [itemsDb]);
+  }, [swotData]);
 
   const [novoItem, setNovoItem] = useState("");
   const [tipoSelecionado, setTipoSelecionado] = useState<"forcas" | "fraquezas" | "oportunidades" | "ameacas">("forcas");
@@ -255,13 +272,14 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
         </Button>
         <Button 
           onClick={() => exportSwotPDF(
-            { nome: "Empresa" },
+            { nome: empresa?.nome || "Empresa" },
             [
               ...forcas.map(f => ({ tipo: "forca", descricao: f.descricao })),
               ...fraquezas.map(f => ({ tipo: "fraqueza", descricao: f.descricao })),
               ...oportunidades.map(o => ({ tipo: "oportunidade", descricao: o.descricao })),
               ...ameacas.map(a => ({ tipo: "ameaca", descricao: a.descricao })),
-            ]
+            ],
+            convertTemplateConfig(templateConfig)
           )}
           variant="outline"
           className="gap-2"

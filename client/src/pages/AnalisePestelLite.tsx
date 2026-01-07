@@ -29,11 +29,28 @@ interface AnalisePestelLiteProps {
   empresaId: number;
 }
 
+// Helper para converter config do banco para formato de exportação
+function convertTemplateConfig(config: any) {
+  if (!config) return undefined;
+  return {
+    corPrimaria: config.corPrimaria,
+    corSecundaria: config.corSecundaria,
+    incluirPestel: !!config.incluirPestel,
+    incluirSwot: !!config.incluirSwot,
+    incluirOkr: !!config.incluirOkr,
+    incluirBsc: !!config.incluirBsc,
+    incluirGraficos: !!config.incluirGraficos,
+    incluirRecomendacoes: !!config.incluirRecomendacoes,
+    rodapePersonalizado: config.rodapePersonalizado || undefined,
+  };
+}
+
 export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps) {
   const utils = trpc.useUtils();
   
-  // Buscar fatores do banco
-  const { data: fatoresDb, isLoading } = trpc.analises.getPestel.useQuery({ empresaId });
+  // Buscar fatores do banco  const { data: pestelData, isLoading } = trpc.analises.getPestel.useQuery({ empresaId });
+  const { data: templateConfig } = trpc.templates.getConfig.useQuery({ empresaId });
+  const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
   
   // Mutation para salvar fatores
   const salvarMutation = trpc.analises.savePestel.useMutation({
@@ -426,13 +443,14 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         </Button>
         <Button 
           onClick={() => exportPestelPDF(
-            { nome: "Empresa" }, // TODO: pegar nome real da empresa
+            { nome: empresa?.nome || "Empresa" },
             fatores.map(f => ({
               categoria: f.categoria.toLowerCase(),
               descricao: f.descricao,
               impacto: f.impacto,
               probabilidade: f.probabilidade,
-            }))
+            })),
+            convertTemplateConfig(templateConfig)
           )}
           variant="outline"
           className="gap-2"

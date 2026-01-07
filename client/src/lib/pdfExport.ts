@@ -6,8 +6,20 @@ interface EmpresaInfo {
   logo?: string;
 }
 
-// Cores do tema
-const COLORS = {
+interface TemplateConfig {
+  corPrimaria: string;
+  corSecundaria: string;
+  incluirPestel?: boolean;
+  incluirSwot?: boolean;
+  incluirOkr?: boolean;
+  incluirBsc?: boolean;
+  incluirGraficos?: boolean;
+  incluirRecomendacoes?: boolean;
+  rodapePersonalizado?: string;
+}
+
+// Cores padrão do tema (usadas se não houver configuração personalizada)
+const DEFAULT_COLORS = {
   primary: "#8B1538", // Bordo
   secondary: "#FF6B35", // Laranja
   accent: "#F7B801", // Amarelo
@@ -16,9 +28,19 @@ const COLORS = {
   lightGray: "#F5F5F5",
 };
 
-function addHeader(doc: jsPDF, empresa: EmpresaInfo, titulo: string) {
+function hexToRgb(hex: string): [number, number, number] {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
+    : [0, 0, 0];
+}
+
+function addHeader(doc: jsPDF, empresa: EmpresaInfo, titulo: string, config?: TemplateConfig) {
+  const primaryColor = config?.corPrimaria || DEFAULT_COLORS.primary;
+  const [r, g, b] = hexToRgb(primaryColor);
+  
   // Retângulo de cabeçalho
-  doc.setFillColor(COLORS.primary);
+  doc.setFillColor(r, g, b);
   doc.rect(0, 0, 210, 40, "F");
 
   // Título
@@ -36,15 +58,21 @@ function addHeader(doc: jsPDF, empresa: EmpresaInfo, titulo: string) {
   doc.text(`Gerado em: ${dataAtual}`, 105, 35, { align: "center" });
 
   // Reset cor do texto
-  doc.setTextColor(COLORS.text);
+  const [tr, tg, tb] = hexToRgb(DEFAULT_COLORS.text);
+  doc.setTextColor(tr, tg, tb);
 }
 
-function addFooter(doc: jsPDF, pageNumber: number) {
+function addFooter(doc: jsPDF, pageNumber: number, config?: TemplateConfig) {
   const pageHeight = doc.internal.pageSize.height;
   doc.setFontSize(9);
   doc.setTextColor(128, 128, 128);
+  
+  const footerText = config?.rodapePersonalizado 
+    ? `Página ${pageNumber} | ${config.rodapePersonalizado}`
+    : `Página ${pageNumber} | Sistema de Gestão Estratégica - Grupo Arqueo`;
+  
   doc.text(
-    `Página ${pageNumber} | Sistema de Gestão Estratégica - Grupo Arqueo`,
+    footerText,
     105,
     pageHeight - 10,
     { align: "center" }
@@ -58,11 +86,12 @@ export function exportPestelPDF(
     descricao: string;
     impacto: number;
     probabilidade: number;
-  }>
+  }>,
+  config?: TemplateConfig
 ) {
   const doc = new jsPDF();
 
-  addHeader(doc, empresa, "Análise PESTEL");
+  addHeader(doc, empresa, "Análise PESTEL", config);
 
   // Introdução
   doc.setFontSize(12);
@@ -131,7 +160,7 @@ export function exportPestelPDF(
     }
   });
 
-  addFooter(doc, 1);
+  addFooter(doc, 1, config);
 
   // Download
   doc.save(`PESTEL_${empresa.nome}_${new Date().toISOString().split("T")[0]}.pdf`);
@@ -142,11 +171,12 @@ export function exportSwotPDF(
   items: Array<{
     tipo: string;
     descricao: string;
-  }>
+  }>,
+  config?: TemplateConfig
 ) {
   const doc = new jsPDF();
 
-  addHeader(doc, empresa, "Análise SWOT");
+  addHeader(doc, empresa, "Análise SWOT", config);
 
   let yPos = 50;
 
@@ -196,7 +226,7 @@ export function exportSwotPDF(
     yPos += 5;
   });
 
-  addFooter(doc, 1);
+  addFooter(doc, 1, config);
 
   doc.save(`SWOT_${empresa.nome}_${new Date().toISOString().split("T")[0]}.pdf`);
 }
@@ -212,11 +242,12 @@ export function exportOkrPDF(
     metaResultado2?: string;
     resultadoChave3?: string;
     metaResultado3?: string;
-  }>
+  }>,
+  config?: TemplateConfig
 ) {
   const doc = new jsPDF();
 
-  addHeader(doc, empresa, "Objetivos e Key Results (OKR)");
+  addHeader(doc, empresa, "Objetivos e Key Results (OKR)", config);
 
   let yPos = 50;
 
@@ -272,7 +303,7 @@ export function exportOkrPDF(
     }
   });
 
-  addFooter(doc, 1);
+  addFooter(doc, 1, config);
 
   doc.save(`OKR_${empresa.nome}_${new Date().toISOString().split("T")[0]}.pdf`);
 }
@@ -285,11 +316,12 @@ export function exportBscPDF(
     meta: number;
     realizado?: number;
     unidade: string;
-  }>
+  }>,
+  config?: TemplateConfig
 ) {
   const doc = new jsPDF();
 
-  addHeader(doc, empresa, "Balanced Scorecard (BSC)");
+  addHeader(doc, empresa, "Balanced Scorecard (BSC)", config);
 
   let yPos = 50;
 
@@ -345,7 +377,7 @@ export function exportBscPDF(
     }
   });
 
-  addFooter(doc, 1);
+  addFooter(doc, 1, config);
 
   doc.save(`BSC_${empresa.nome}_${new Date().toISOString().split("T")[0]}.pdf`);
 }

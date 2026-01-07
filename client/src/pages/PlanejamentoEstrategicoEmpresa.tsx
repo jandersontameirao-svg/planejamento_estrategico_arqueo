@@ -3,8 +3,9 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import { Link } from "wouter";
 import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
 import AnalisePestelLite from "./AnalisePestelLite";
 import CincoForcasLite from "./CincoForcasLite";
@@ -163,6 +164,14 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
         title={`Planejamento Estratégico - ${empresaNome}`}
         description="Defina e acompanhe as análises estratégicas da empresa"
       />
+      <div className="container mx-auto pt-4">
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`/empresa/${empresaId}/configurar-template`}>
+            <Settings className="mr-2 h-4 w-4" />
+            Configurar Template de Relatórios
+          </Link>
+        </Button>
+      </div>
       <div className="container mx-auto py-8 space-y-6">
       <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
         <CardContent className="pt-6">

@@ -31,6 +31,7 @@ import DashboardResumoExecutivo from "./pages/DashboardResumoExecutivo";
 import PlanejamentoEstrategicoEmpresa from "./pages/PlanejamentoEstrategicoEmpresa";
 import PlanejamentoMacro from "./pages/PlanejamentoMacro";
 import DashboardGrupo from "./pages/DashboardGrupo";
+import ConfigurarTemplate from "./pages/ConfigurarTemplate";
 
 
 function Router() {
@@ -81,6 +82,7 @@ function Router() {
       <Route path="/planejamento-estrategico/:id?">
         {(params) => <PlanejamentoEstrategico empresaId={params.id ? Number(params.id) : 1} />}
       </Route>
+      <Route path="/empresa/:empresaId/configurar-template" component={ConfigurarTemplate} />
       <Route path="/resumo-executivo" component={DashboardResumoExecutivo} />
       <Route path="/planejamento-grupo" component={PlanejamentoGrupo} />
       <Route path="/relatorios" component={Relatorios} />

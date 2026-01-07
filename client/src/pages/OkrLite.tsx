@@ -25,11 +25,23 @@ interface OkrLiteProps {
   empresaId: number;
 }
 
+// Helper para converter config do banco para formato de exportação
+function convertTemplateConfig(config: any) {
+  if (!config) return undefined;
+  return {
+    corPrimaria: config.corPrimaria,
+    corSecundaria: config.corSecundaria,
+    rodapePersonalizado: config.rodapePersonalizado || undefined,
+  };
+}
+
 export default function OkrLite({ empresaId }: OkrLiteProps) {
   const utils = trpc.useUtils();
   
   // Buscar objetivos do banco
   const { data: objectivesDb, isLoading } = trpc.analises.getOkr.useQuery({ empresaId });
+  const { data: templateConfig } = trpc.templates.getConfig.useQuery({ empresaId });
+  const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
   
   // Mutation para salvar objetivos
   const salvarMutation = trpc.analises.saveOkr.useMutation({
@@ -389,7 +401,7 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
         </Button>
         <Button 
           onClick={() => exportOkrPDF(
-            { nome: "Empresa" },
+            { nome: empresa?.nome || "Empresa" },
             okrs.map(okr => ({
               objetivo: okr.objetivo,
               descricao: okr.objetivo,
@@ -399,7 +411,8 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
               metaResultado2: okr.keyResults[1]?.meta.toString(),
               resultadoChave3: okr.keyResults[2]?.descricao,
               metaResultado3: okr.keyResults[2]?.meta.toString(),
-            }))
+            })),
+            convertTemplateConfig(templateConfig)
           )}
           variant="outline"
           className="gap-2"

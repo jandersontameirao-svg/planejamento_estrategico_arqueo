@@ -1226,6 +1226,37 @@ export const appRouter = router({
       }),
   }),
 
+  templates: router({
+    // Buscar configuração de template de uma empresa
+    getConfig: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getTemplateConfig } = await import("./db");
+        return await getTemplateConfig(input.empresaId);
+      }),
+
+    // Salvar configuração de template
+    saveConfig: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        logoUrl: z.string().optional(),
+        logoKey: z.string().optional(),
+        corPrimaria: z.string(),
+        corSecundaria: z.string(),
+        incluirPestel: z.boolean(),
+        incluirSwot: z.boolean(),
+        incluirOkr: z.boolean(),
+        incluirBsc: z.boolean(),
+        incluirGraficos: z.boolean(),
+        incluirRecomendacoes: z.boolean(),
+        rodapePersonalizado: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { saveTemplateConfig } = await import("./db");
+        return await saveTemplateConfig(input);
+      }),
+  }),
+
   notifications: router({
     // Verificar e notificar análises incompletas
     checkIncompleteAnalyses: protectedProcedure

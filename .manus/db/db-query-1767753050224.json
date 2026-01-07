@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS template_configs (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  empresaId INT NOT NULL,\n  logoUrl TEXT,\n  logoKey TEXT,\n  corPrimaria VARCHAR(7) DEFAULT '#8B1538' NOT NULL,\n  corSecundaria VARCHAR(7) DEFAULT '#FF6B35' NOT NULL,\n  incluirPestel TINYINT DEFAULT 1 NOT NULL,\n  incluirSwot TINYINT DEFAULT 1 NOT NULL,\n  incluirOkr TINYINT DEFAULT 1 NOT NULL,\n  incluirBsc TINYINT DEFAULT 1 NOT NULL,\n  incluirGraficos TINYINT DEFAULT 1 NOT NULL,\n  incluirRecomendacoes TINYINT DEFAULT 1 NOT NULL,\n  rodapePersonalizado TEXT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute CREATE TABLE IF NOT EXISTS template_configs (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  empresaId INT NOT NULL,\n  logoUrl TEXT,\n  logoKey TEXT,\n  corPrimaria VARCHAR(7) DEFAULT '#8B1538' NOT NULL,\n  corSecundaria VARCHAR(7) DEFAULT '#FF6B35' NOT NULL,\n  incluirPestel TINYINT DEFAULT 1 NOT NULL,\n  incluirSwot TINYINT DEFAULT 1 NOT NULL,\n  incluirOkr TINYINT DEFAULT 1 NOT NULL,\n  incluirBsc TINYINT DEFAULT 1 NOT NULL,\n  incluirGraficos TINYINT DEFAULT 1 NOT NULL,\n  incluirRecomendacoes TINYINT DEFAULT 1 NOT NULL,\n  rodapePersonalizado TEXT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 218
+}

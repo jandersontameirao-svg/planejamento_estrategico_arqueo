@@ -510,3 +510,16 @@
 - [x] Adicionar gráficos de radar no dashboard comparativo
 - [x] Adicionar gráficos de barras no dashboard comparativo
 - [x] Testar todas as novas funcionalidades
+
+
+## Templates Personalizados para Relatórios PDF
+- [ ] Criar tabela de configurações de templates no banco de dados
+- [ ] Adicionar campos: logo, cor primária, cor secundária, seções habilitadas
+- [ ] Criar procedures tRPC para salvar e recuperar configurações de templates
+- [ ] Desenvolver página de configuração de templates por empresa
+- [ ] Adicionar upload de logo da empresa
+- [ ] Implementar seletor de cores para personalização
+- [ ] Criar checkboxes para habilitar/desabilitar seções do relatório
+- [ ] Adicionar preview em tempo real do template
+- [ ] Atualizar funções de exportação PDF para usar configurações personalizadas
+- [ ] Testar exportação com diferentes configurações de template

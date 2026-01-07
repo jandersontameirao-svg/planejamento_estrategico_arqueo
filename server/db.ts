@@ -1171,3 +1171,78 @@ export async function getOkrObjectivesByEmpresa(empresaId: number) {
   
   return await db.select().from(analiseOkr).where(eq(analiseOkr.empresaId, empresaId)).orderBy(asc(analiseOkr.createdAt));
 }
+
+
+// ============= TEMPLATE CONFIGS =============
+
+export async function getTemplateConfig(empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { templateConfigs } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  const result = await db.select().from(templateConfigs).where(eq(templateConfigs.empresaId, empresaId)).limit(1);
+  return result[0] || null;
+}
+
+export async function saveTemplateConfig(config: {
+  empresaId: number;
+  logoUrl?: string;
+  logoKey?: string;
+  corPrimaria: string;
+  corSecundaria: string;
+  incluirPestel: boolean;
+  incluirSwot: boolean;
+  incluirOkr: boolean;
+  incluirBsc: boolean;
+  incluirGraficos: boolean;
+  incluirRecomendacoes: boolean;
+  rodapePersonalizado?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { templateConfigs } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  // Verificar se já existe configuração
+  const existing = await getTemplateConfig(config.empresaId);
+
+  if (existing) {
+    // Atualizar
+    await db.update(templateConfigs)
+      .set({
+        logoUrl: config.logoUrl,
+        logoKey: config.logoKey,
+        corPrimaria: config.corPrimaria,
+        corSecundaria: config.corSecundaria,
+        incluirPestel: config.incluirPestel ? 1 : 0,
+        incluirSwot: config.incluirSwot ? 1 : 0,
+        incluirOkr: config.incluirOkr ? 1 : 0,
+        incluirBsc: config.incluirBsc ? 1 : 0,
+        incluirGraficos: config.incluirGraficos ? 1 : 0,
+        incluirRecomendacoes: config.incluirRecomendacoes ? 1 : 0,
+        rodapePersonalizado: config.rodapePersonalizado,
+      })
+      .where(eq(templateConfigs.empresaId, config.empresaId));
+  } else {
+    // Inserir
+    await db.insert(templateConfigs).values({
+      empresaId: config.empresaId,
+      logoUrl: config.logoUrl,
+      logoKey: config.logoKey,
+      corPrimaria: config.corPrimaria,
+      corSecundaria: config.corSecundaria,
+      incluirPestel: config.incluirPestel ? 1 : 0,
+      incluirSwot: config.incluirSwot ? 1 : 0,
+      incluirOkr: config.incluirOkr ? 1 : 0,
+      incluirBsc: config.incluirBsc ? 1 : 0,
+      incluirGraficos: config.incluirGraficos ? 1 : 0,
+      incluirRecomendacoes: config.incluirRecomendacoes ? 1 : 0,
+      rodapePersonalizado: config.rodapePersonalizado,
+    });
+  }
+
+  return await getTemplateConfig(config.empresaId);
+}
