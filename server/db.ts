@@ -1038,3 +1038,47 @@ export async function getAllBscIndicadores() {
 
   return await db.select().from(bscIndicadores);
 }
+
+
+// ========== PESTEL ==========
+export async function savePestelFatores(empresaId: number, fatores: Array<{
+  categoria: "politico" | "economico" | "social" | "tecnologico" | "ambiental" | "legal";
+  descricao: string;
+  impacto: number;
+  probabilidade: number;
+}>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { sql } = await import("drizzle-orm");
+  
+  // Deletar fatores existentes
+  await db.execute(sql`DELETE FROM pestel_fatores WHERE empresaId = ${empresaId}`);
+  
+  // Inserir novos fatores
+  if (fatores.length > 0) {
+    for (const fator of fatores) {
+      await db.execute(sql`
+        INSERT INTO pestel_fatores (empresaId, categoria, descricao, impacto, probabilidade)
+        VALUES (${empresaId}, ${fator.categoria}, ${fator.descricao}, ${fator.impacto}, ${fator.probabilidade})
+      `);
+    }
+  }
+  
+  return { success: true };
+}
+
+export async function getPestelFatoresByEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { sql } = await import("drizzle-orm");
+  
+  const result: any = await db.execute(sql`
+    SELECT id, empresaId, categoria, descricao, impacto, probabilidade, createdAt, updatedAt
+    FROM pestel_fatores
+    WHERE empresaId = ${empresaId}
+    ORDER BY createdAt ASC
+  `);
+  return result.rows || result;
+}

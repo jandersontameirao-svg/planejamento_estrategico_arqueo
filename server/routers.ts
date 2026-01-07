@@ -1031,15 +1031,23 @@ export const appRouter = router({
     savePestel: protectedProcedure
       .input(z.object({
         empresaId: z.number(),
-        politico: z.string().optional(),
-        economico: z.string().optional(),
-        social: z.string().optional(),
-        tecnologico: z.string().optional(),
-        ecologico: z.string().optional(),
-        legal: z.string().optional(),
+        fatores: z.array(z.object({
+          categoria: z.enum(["politico", "economico", "social", "tecnologico", "ambiental", "legal"]),
+          descricao: z.string(),
+          impacto: z.number().min(1).max(5),
+          probabilidade: z.number().min(1).max(5),
+        })),
       }))
       .mutation(async ({ input }) => {
-        return { success: true, message: "PESTEL salvo" };
+        const { savePestelFatores } = await import("./db");
+        return await savePestelFatores(input.empresaId, input.fatores);
+      }),
+
+    getPestel: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getPestelFatoresByEmpresa } = await import("./db");
+        return await getPestelFatoresByEmpresa(input.empresaId);
       }),
 
     saveForcas: protectedProcedure

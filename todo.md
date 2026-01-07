@@ -486,5 +486,14 @@
 - [x] Componente BscLite conectado ao banco de dados via tRPC
 - [x] Sistema carrega dados do banco automaticamente ao abrir BSC
 - [x] Botão "Salvar Balanced Scorecard" persiste dados no banco
-- [ ] Conectar outros componentes (PESTEL, SWOT, OKR, etc.) ao banco - padrão estabelecido com BSC
+- [ ] Verificar procedures tRPC existentes para cada componente
+- [ ] Criar procedures faltantes (save, getByEmpresa para cada análise)
+- [ ] Conectar AnalisePestelLite ao banco de dados
+- [ ] Conectar SwotLite ao banco de dados
+- [ ] Conectar OkrLite ao banco de dados
+- [ ] Conectar StakeholdersLite ao banco de dados
+- [ ] Conectar CincoForcasLite ao banco de dados
+- [ ] Conectar VrioLite ao banco de dados
+- [ ] Conectar IdentidadeOrganizacionalLite ao banco de dados
+- [ ] Testar persistência de todos os componentes
 - [ ] Adicionar indicadores de progresso (0-100%) em cada análise

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -23,7 +24,26 @@ const categorias = [
   { nome: "Legal", icone: Scale, cor: "#f59e0b", corBg: "#fef3c7" },
 ];
 
-export default function AnalisePestelLite() {
+interface AnalisePestelLiteProps {
+  empresaId: number;
+}
+
+export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps) {
+  const utils = trpc.useUtils();
+  
+  // Buscar fatores do banco
+  const { data: fatoresDb, isLoading } = trpc.analises.getPestel.useQuery({ empresaId });
+  
+  // Mutation para salvar fatores
+  const salvarMutation = trpc.analises.savePestel.useMutation({
+    onSuccess: () => {
+      alert("Análise PESTEL salva com sucesso!");
+      utils.analises.getPestel.invalidate({ empresaId });
+    },
+    onError: (error) => {
+      alert(`Erro ao salvar: ${error.message}`);
+    },
+  });
   const [fatores, setFatores] = useState<FatorPestel[]>([]);
   const [categoriaAtiva, setCategoriaAtiva] = useState<string | null>(null);
 

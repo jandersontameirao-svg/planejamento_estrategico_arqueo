@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS pestel_fatores (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  empresaId INT NOT NULL,\n  categoria ENUM('politico', 'economico', 'social', 'tecnologico', 'ambiental', 'legal') NOT NULL,\n  descricao TEXT NOT NULL,\n  impacto INT NOT NULL DEFAULT 3,\n  probabilidade INT NOT NULL DEFAULT 3,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX idx_empresaId (empresaId)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute CREATE TABLE IF NOT EXISTS pestel_fatores (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  empresaId INT NOT NULL,\n  categoria ENUM('politico', 'economico', 'social', 'tecnologico', 'ambiental', 'legal') NOT NULL,\n  descricao TEXT NOT NULL,\n  impacto INT NOT NULL DEFAULT 3,\n  probabilidade INT NOT NULL DEFAULT 3,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX idx_empresaId (empresaId)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 708
+}
