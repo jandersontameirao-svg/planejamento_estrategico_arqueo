@@ -45,6 +45,20 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
     },
   });
   const [fatores, setFatores] = useState<FatorPestel[]>([]);
+
+  // Carregar fatores do banco ao montar o componente
+  useEffect(() => {
+    if (fatoresDb && Array.isArray(fatoresDb)) {
+      const fatoresFormatados: FatorPestel[] = fatoresDb.map((f: any) => ({
+        id: f.id?.toString() || Date.now().toString(),
+        categoria: f.categoria.charAt(0).toUpperCase() + f.categoria.slice(1) as any,
+        impacto: f.impacto,
+        probabilidade: f.probabilidade,
+        descricao: f.descricao,
+      }));
+      setFatores(fatoresFormatados);
+    }
+  }, [fatoresDb]);
   const [categoriaAtiva, setCategoriaAtiva] = useState<string | null>(null);
 
   const [novoFator, setNovoFator] = useState<Partial<FatorPestel>>({
@@ -106,8 +120,18 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
   const fatoresFiltrados = categoriaAtiva ? fatores.filter((f) => f.categoria === categoriaAtiva) : fatores;
 
   const handleSave = () => {
-    console.log("PESTEL salva:", fatores);
-    alert("Análise PESTEL salva com sucesso!");
+    // Converter fatores para formato do banco
+    const fatoresParaSalvar = fatores.map((f) => ({
+      categoria: f.categoria.toLowerCase() as "politico" | "economico" | "social" | "tecnologico" | "ambiental" | "legal",
+      descricao: f.descricao,
+      impacto: f.impacto,
+      probabilidade: f.probabilidade,
+    }));
+
+    salvarMutation.mutate({
+      empresaId,
+      fatores: fatoresParaSalvar,
+    });
   };
 
   const getCorPorRisco = (risco: number) => {

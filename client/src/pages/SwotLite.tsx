@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Save, Plus, Trash2, Shield, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
@@ -9,11 +10,44 @@ interface ItemSwot {
   descricao: string;
 }
 
-export default function SwotLite() {
+interface SwotLiteProps {
+  empresaId: number;
+}
+
+export default function SwotLite({ empresaId }: SwotLiteProps) {
+  const utils = trpc.useUtils();
+  
+  // Buscar itens do banco
+  const { data: itemsDb, isLoading } = trpc.analises.getSwot.useQuery({ empresaId });
+  
+  // Mutation para salvar itens
+  const salvarMutation = trpc.analises.saveSwot.useMutation({
+    onSuccess: () => {
+      alert("Análise SWOT salva com sucesso!");
+      utils.analises.getSwot.invalidate({ empresaId });
+    },
+    onError: (error) => {
+      alert(`Erro ao salvar: ${error.message}`);
+    },
+  });
   const [forcas, setForcas] = useState<ItemSwot[]>([]);
   const [fraquezas, setFraquezas] = useState<ItemSwot[]>([]);
   const [oportunidades, setOportunidades] = useState<ItemSwot[]>([]);
   const [ameacas, setAmeacas] = useState<ItemSwot[]>([]);
+
+  // Carregar itens do banco ao montar o componente
+  useEffect(() => {
+    if (itemsDb && Array.isArray(itemsDb)) {
+      const forcasDb = itemsDb.filter((i: any) => i.tipo === "forca").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
+      const fraquezasDb = itemsDb.filter((i: any) => i.tipo === "fraqueza").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
+      const oportunidadesDb = itemsDb.filter((i: any) => i.tipo === "oportunidade").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
+      const ameacasDb = itemsDb.filter((i: any) => i.tipo === "ameaca").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
+      setForcas(forcasDb);
+      setFraquezas(fraquezasDb);
+      setOportunidades(oportunidadesDb);
+      setAmeacas(ameacasDb);
+    }
+  }, [itemsDb]);
 
   const [novoItem, setNovoItem] = useState("");
   const [tipoSelecionado, setTipoSelecionado] = useState<"forcas" | "fraquezas" | "oportunidades" | "ameacas">("forcas");
@@ -43,8 +77,18 @@ export default function SwotLite() {
   ];
 
   const handleSave = () => {
-    console.log("SWOT salva:", { forcas, fraquezas, oportunidades, ameacas });
-    alert("Análise SWOT salva com sucesso!");
+    // Converter todos os itens para formato do banco
+    const items = [
+      ...forcas.map(f => ({ tipo: "forca" as const, descricao: f.descricao })),
+      ...fraquezas.map(f => ({ tipo: "fraqueza" as const, descricao: f.descricao })),
+      ...oportunidades.map(o => ({ tipo: "oportunidade" as const, descricao: o.descricao })),
+      ...ameacas.map(a => ({ tipo: "ameaca" as const, descricao: a.descricao })),
+    ];
+
+    salvarMutation.mutate({
+      empresaId,
+      items,
+    });
   };
 
   const tipoConfig = {

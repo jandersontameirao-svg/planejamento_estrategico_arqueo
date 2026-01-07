@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -19,8 +20,45 @@ interface OKR {
   keyResults: KeyResult[];
 }
 
-export default function OkrLite() {
+interface OkrLiteProps {
+  empresaId: number;
+}
+
+export default function OkrLite({ empresaId }: OkrLiteProps) {
+  const utils = trpc.useUtils();
+  
+  // Buscar objetivos do banco
+  const { data: objectivesDb, isLoading } = trpc.analises.getOkr.useQuery({ empresaId });
+  
+  // Mutation para salvar objetivos
+  const salvarMutation = trpc.analises.saveOkr.useMutation({
+    onSuccess: () => {
+      alert("OKR salva com sucesso!");
+      utils.analises.getOkr.invalidate({ empresaId });
+    },
+    onError: (error) => {
+      alert(`Erro ao salvar: ${error.message}`);
+    },
+  });
   const [okrs, setOkrs] = useState<OKR[]>([]);
+
+  // Carregar objetivos do banco ao montar o componente
+  useEffect(() => {
+    if (objectivesDb && Array.isArray(objectivesDb)) {
+      const okrsFormatados: OKR[] = objectivesDb.map((obj: any) => {
+        const keyResults: KeyResult[] = [];
+        if (obj.resultado_chave_1) keyResults.push({ id: "kr1", descricao: obj.resultado_chave_1, meta: 100, atual: 0 });
+        if (obj.resultado_chave_2) keyResults.push({ id: "kr2", descricao: obj.resultado_chave_2, meta: 100, atual: 0 });
+        if (obj.resultado_chave_3) keyResults.push({ id: "kr3", descricao: obj.resultado_chave_3, meta: 100, atual: 0 });
+        return {
+          id: obj.id?.toString() || Date.now().toString(),
+          objetivo: obj.objetivo,
+          keyResults,
+        };
+      });
+      setOkrs(okrsFormatados);
+    }
+  }, [objectivesDb]);
   const [novoObjetivo, setNovoObjetivo] = useState("");
   const [novoKR, setNovoKR] = useState({ okrId: "", descricao: "", meta: 100 });
 
@@ -99,8 +137,22 @@ export default function OkrLite() {
   ];
 
   const handleSave = () => {
-    console.log("OKR salva:", okrs);
-    alert("OKR salva com sucesso!");
+    // Converter OKRs para formato do banco
+    const objectives = okrs.map(okr => ({
+      objetivo: okr.objetivo,
+      descricao: "",
+      resultadoChave1: okr.keyResults[0]?.descricao || undefined,
+      metaResultado1: okr.keyResults[0]?.meta.toString() || undefined,
+      resultadoChave2: okr.keyResults[1]?.descricao || undefined,
+      metaResultado2: okr.keyResults[1]?.meta.toString() || undefined,
+      resultadoChave3: okr.keyResults[2]?.descricao || undefined,
+      metaResultado3: okr.keyResults[2]?.meta.toString() || undefined,
+    }));
+
+    salvarMutation.mutate({
+      empresaId,
+      objectives,
+    });
   };
 
   const getCorProgresso = (progresso: number) => {

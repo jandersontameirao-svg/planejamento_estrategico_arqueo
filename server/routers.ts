@@ -1087,37 +1087,50 @@ export const appRouter = router({
         return { success: true, message: "RBV/VRIO salvo" };
       }),
 
-    saveSwoTtows: protectedProcedure
+    saveSwot: protectedProcedure
       .input(z.object({
         empresaId: z.number(),
-        forcas: z.string().optional(),
-        fraquezas: z.string().optional(),
-        oportunidades: z.string().optional(),
-        ameacas: z.string().optional(),
-        estrategias: z.string().optional(),
+        items: z.array(z.object({
+          tipo: z.enum(["forca", "fraqueza", "oportunidade", "ameaca"]),
+          descricao: z.string(),
+        })),
       }))
       .mutation(async ({ input }) => {
-        return { success: true, message: "SWOT/TOWS salvo" };
+        const { saveSwotItems } = await import("./db");
+        return await saveSwotItems(input.empresaId, input.items);
+      }),
+
+    getSwot: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getSwotItemsByEmpresa } = await import("./db");
+        return await getSwotItemsByEmpresa(input.empresaId);
       }),
 
     saveOkr: protectedProcedure
       .input(z.object({
         empresaId: z.number(),
-        objetivo1: z.string().optional(),
-        kr1_1: z.string().optional(),
-        kr1_2: z.string().optional(),
-        kr1_3: z.string().optional(),
-        objetivo2: z.string().optional(),
-        kr2_1: z.string().optional(),
-        kr2_2: z.string().optional(),
-        kr2_3: z.string().optional(),
-        objetivo3: z.string().optional(),
-        kr3_1: z.string().optional(),
-        kr3_2: z.string().optional(),
-        kr3_3: z.string().optional(),
+        objectives: z.array(z.object({
+          objetivo: z.string(),
+          descricao: z.string(),
+          resultadoChave1: z.string().optional(),
+          metaResultado1: z.string().optional(),
+          resultadoChave2: z.string().optional(),
+          metaResultado2: z.string().optional(),
+          resultadoChave3: z.string().optional(),
+          metaResultado3: z.string().optional(),
+        })),
       }))
       .mutation(async ({ input }) => {
-        return { success: true, message: "OKR salvo" };
+        const { saveOkrObjectives } = await import("./db");
+        return await saveOkrObjectives(input.empresaId, input.objectives);
+      }),
+
+    getOkr: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getOkrObjectivesByEmpresa } = await import("./db");
+        return await getOkrObjectivesByEmpresa(input.empresaId);
       }),
   }),
 

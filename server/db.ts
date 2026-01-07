@@ -1082,3 +1082,103 @@ export async function getPestelFatoresByEmpresa(empresaId: number) {
   `);
   return result.rows || result;
 }
+
+
+// ========== SWOT ==========
+export async function saveSwotItems(empresaId: number, items: Array<{
+  tipo: "forca" | "fraqueza" | "oportunidade" | "ameaca";
+  descricao: string;
+}>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { sql } = await import("drizzle-orm");
+  
+  // Deletar itens existentes
+  await db.execute(sql`DELETE FROM analise_swot_tows WHERE empresaId = ${empresaId}`);
+  
+  // Inserir novos itens
+  if (items.length > 0) {
+    for (const item of items) {
+      await db.execute(sql`
+        INSERT INTO analise_swot_tows (empresaId, tipo, descricao)
+        VALUES (${empresaId}, ${item.tipo}, ${item.descricao})
+      `);
+    }
+  }
+  
+  return { success: true };
+}
+
+export async function getSwotItemsByEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { sql } = await import("drizzle-orm");
+  
+  const result: any = await db.execute(sql`
+    SELECT id, empresaId, tipo, descricao, impacto, estrategia, observacoes, createdAt, updatedAt
+    FROM analise_swot_tows
+    WHERE empresaId = ${empresaId}
+    ORDER BY createdAt ASC
+  `);
+  return result.rows || result;
+}
+
+
+// ========== OKR ==========
+export async function saveOkrObjectives(empresaId: number, objectives: Array<{
+  objetivo: string;
+  descricao: string;
+  resultadoChave1?: string;
+  metaResultado1?: string;
+  resultadoChave2?: string;
+  metaResultado2?: string;
+  resultadoChave3?: string;
+  metaResultado3?: string;
+}>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { sql } = await import("drizzle-orm");
+  
+  // Deletar objetivos existentes
+  await db.execute(sql`DELETE FROM analise_okr WHERE empresaId = ${empresaId}`);
+  
+  // Inserir novos objetivos
+  if (objectives.length > 0) {
+    for (const obj of objectives) {
+      await db.execute(sql`
+        INSERT INTO analise_okr (
+          empresaId, objetivo, descricao,
+          resultado_chave_1, meta_resultado_1,
+          resultado_chave_2, meta_resultado_2,
+          resultado_chave_3, meta_resultado_3
+        )
+        VALUES (
+          ${empresaId}, ${obj.objetivo}, ${obj.descricao},
+          ${obj.resultadoChave1 || null}, ${obj.metaResultado1 || null},
+          ${obj.resultadoChave2 || null}, ${obj.metaResultado2 || null},
+          ${obj.resultadoChave3 || null}, ${obj.metaResultado3 || null}
+        )
+      `);
+    }
+  }
+  
+  return { success: true };
+}
+
+export async function getOkrObjectivesByEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { sql } = await import("drizzle-orm");
+  
+  const result: any = await db.execute(sql`
+    SELECT *
+    FROM analise_okr
+    WHERE empresaId = ${empresaId}
+    ORDER BY createdAt ASC
+  `);
+  return result.rows || result;
+}
