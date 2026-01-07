@@ -179,7 +179,31 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Card do Planejamento Estratégico do Grupo */}
+        {/* Card do Planejamento Estratégico do Grupo Arqueo Participações */}
+        <Card className="mb-6 border-2 border-purple-500/30 bg-gradient-to-br from-card to-purple-500/5 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100" onClick={() => setLocation("/planejamento-participacoes")}>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-purple-500/10 rounded-lg">
+                <Target className="h-8 w-8 text-purple-600" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Planejamento Estratégico – Grupo Arqueo Participações</CardTitle>
+                <CardDescription>Análises estratégicas completas do Grupo Arqueo Participações (PESTEL, SWOT, OKR, BSC e mais)</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="text-sm text-muted-foreground">Status: Operacional</span>
+            </div>
+            <Button variant="outline" className="w-full" onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-participacoes"); }}>
+              Acessar Planejamento Estratégico
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Card do Planejamento Estratégico do Grupo Arqueo */}
         <Card className="mb-10 border-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150" onClick={() => setLocation("/planejamento-grupo")}>
           <CardHeader>
             <div className="flex items-center gap-3">

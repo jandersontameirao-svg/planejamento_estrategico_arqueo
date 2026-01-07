@@ -35,6 +35,8 @@ import DashboardGrupo from "./pages/DashboardGrupo";
 import ConfigurarTemplate from "./pages/ConfigurarTemplate";
 import PlanejamentoEstrategicoGrupo from "./pages/PlanejamentoEstrategicoGrupo";
 import DashboardAnalisesGrupo from "./pages/DashboardAnalisesGrupo";
+import PlanejamentoEstrategicoParticipacoes from "./pages/PlanejamentoEstrategicoParticipacoes";
+import DashboardAnalisesParticipacoes from "./pages/DashboardAnalisesParticipacoes";
 
 
 function Router() {
@@ -89,6 +91,8 @@ function Router() {
       <Route path="/resumo-executivo" component={DashboardResumoExecutivo} />
       <Route path="/planejamento-grupo" component={PlanejamentoEstrategicoGrupo} />
       <Route path="/dashboard-analises-grupo" component={DashboardAnalisesGrupo} />
+      <Route path="/planejamento-participacoes" component={PlanejamentoEstrategicoParticipacoes} />
+      <Route path="/dashboard-analises-participacoes" component={DashboardAnalisesParticipacoes} />
       <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />

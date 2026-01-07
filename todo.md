@@ -619,3 +619,14 @@
 - [x] Ajustar cards para formato compacto com ícone, título, badge e descrição
 - [x] Manter funcionalidade de expansão ao clicar
 - [x] Testar responsividade em diferentes tamanhos de tela
+
+
+## Planejamento Estratégico - Grupo Arqueo Participações (Nível Acima)
+- [x] Criar página PlanejamentoEstrategicoParticipacoes.tsx com 8 cards em grade 4x2
+- [x] Usar empresaId=-1 para representar Grupo Arqueo Participações
+- [x] Criar DashboardAnalisesParticipacoes.tsx com gráficos consolidados
+- [x] Adicionar rota /planejamento-participacoes no App.tsx
+- [x] Adicionar botão "Planejamento - Grupo Arqueo Participações" na Home
+- [x] Testar todas as análises (salvar/carregar)
+- [x] Testar dashboard visual
+- [ ] Testar exportação de PDF
