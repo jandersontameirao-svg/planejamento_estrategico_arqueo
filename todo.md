@@ -613,3 +613,9 @@
 - [ ] Testar todas as análises do Grupo (salvar/carregar)
 - [ ] Testar dashboard visual do Grupo
 - [ ] Testar exportação de PDF consolidado do Grupo
+
+## Reorganização de Layout - Planejamento Estratégico do Grupo
+- [x] Reorganizar cards em layout de grade 4x2 (4 cards por linha)
+- [x] Ajustar cards para formato compacto com ícone, título, badge e descrição
+- [x] Manter funcionalidade de expansão ao clicar
+- [x] Testar responsividade em diferentes tamanhos de tela

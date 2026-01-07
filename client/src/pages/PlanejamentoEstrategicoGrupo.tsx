@@ -29,7 +29,7 @@ const analises: AnaliseCard[] = [
     id: "identidade",
     titulo: "Identidade Organizacional",
     descricao: "Missão, Visão, Valores",
-    icone: <Building2 className="h-8 w-8" />,
+    icone: <Building2 className="h-5 w-5" />,
     cor: "bg-orange-500",
     componente: IdentidadeOrganizacionalLite,
   },
@@ -37,7 +37,7 @@ const analises: AnaliseCard[] = [
     id: "bsc",
     titulo: "BSC",
     descricao: "Balanced Scorecard",
-    icone: <BarChart3 className="h-8 w-8" />,
+    icone: <BarChart3 className="h-5 w-5" />,
     cor: "bg-blue-600",
     componente: BscLite,
   },
@@ -45,7 +45,7 @@ const analises: AnaliseCard[] = [
     id: "pestel",
     titulo: "PESTEL",
     descricao: "Análise Ambiental",
-    icone: <Zap className="h-8 w-8" />,
+    icone: <Zap className="h-5 w-5" />,
     cor: "bg-orange-600",
     componente: AnalisePestelLite,
   },
@@ -53,7 +53,7 @@ const analises: AnaliseCard[] = [
     id: "5forcas",
     titulo: "5 Forças",
     descricao: "Porter",
-    icone: <TrendingUp className="h-8 w-8" />,
+    icone: <TrendingUp className="h-5 w-5" />,
     cor: "bg-blue-500",
     componente: CincoForcasLite,
   },
@@ -61,7 +61,7 @@ const analises: AnaliseCard[] = [
     id: "stakeholders",
     titulo: "Stakeholders",
     descricao: "Poder x Interesse",
-    icone: <Users className="h-8 w-8" />,
+    icone: <Users className="h-5 w-5" />,
     cor: "bg-purple-500",
     componente: StakeholdersLite,
   },
@@ -69,7 +69,7 @@ const analises: AnaliseCard[] = [
     id: "vrio",
     titulo: "RBV/VRIO",
     descricao: "Recursos e Capacidades",
-    icone: <Target className="h-8 w-8" />,
+    icone: <Target className="h-5 w-5" />,
     cor: "bg-blue-600",
     componente: VrioLite,
   },
@@ -77,7 +77,7 @@ const analises: AnaliseCard[] = [
     id: "swot",
     titulo: "SWOT/TOWS",
     descricao: "Forças e Oportunidades",
-    icone: <AlertCircle className="h-8 w-8" />,
+    icone: <AlertCircle className="h-5 w-5" />,
     cor: "bg-green-600",
     componente: SwotLite,
   },
@@ -85,7 +85,7 @@ const analises: AnaliseCard[] = [
     id: "okr",
     titulo: "OKR",
     descricao: "Objetivos e Resultados",
-    icone: <Lightbulb className="h-8 w-8" />,
+    icone: <Lightbulb className="h-5 w-5" />,
     cor: "bg-cyan-500",
     componente: OkrLite,
   },
@@ -129,10 +129,10 @@ export default function PlanejamentoEstrategicoGrupo() {
   };
 
   const getProgressoBadge = (progresso: number) => {
-    if (progresso === 0) return <Badge variant="secondary" className="ml-2">0%</Badge>;
-    if (progresso < 50) return <Badge variant="destructive" className="ml-2">{progresso}%</Badge>;
-    if (progresso < 100) return <Badge className="ml-2 bg-yellow-500">{progresso}%</Badge>;
-    return <Badge className="ml-2 bg-green-600">100%</Badge>;
+    if (progresso === 0) return <Badge variant="secondary" className="text-xs px-1.5 py-0.5">0%</Badge>;
+    if (progresso < 50) return <Badge variant="destructive" className="text-xs px-1.5 py-0.5">{progresso}%</Badge>;
+    if (progresso < 100) return <Badge className="text-xs px-1.5 py-0.5 bg-yellow-500">{progresso}%</Badge>;
+    return <Badge className="text-xs px-1.5 py-0.5 bg-green-600">100%</Badge>;
   };
 
   return (
@@ -163,52 +163,66 @@ export default function PlanejamentoEstrategicoGrupo() {
           </CardContent>
         </Card>
 
-        {/* Cards de análises */}
-        {analises.map((analise) => {
-          const progresso = calcularProgresso(analise.id);
-          const isExpanded = expandedCards[analise.id];
-          const Componente = analise.componente;
+        {/* Cards de análises em grade 4x2 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {analises.map((analise) => {
+            const progresso = calcularProgresso(analise.id);
+            const isExpanded = expandedCards[analise.id];
 
-          return (
-            <div key={analise.id}>
-              {/* Card Header (sempre visível) */}
+            return (
               <Card
-                className="cursor-pointer hover:shadow-lg transition-shadow border-l-4"
-                style={{ borderLeftColor: analise.cor.replace("bg-", "#") }}
+                key={analise.id}
+                className="cursor-pointer hover:shadow-lg hover:scale-105 transition-all duration-200 border-2"
                 onClick={() => toggleCard(analise.id)}
               >
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${analise.cor} text-white`}>
-                      {analise.icone}
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`p-2 rounded-lg ${analise.cor} text-white`}>
+                      <div className="w-6 h-6 flex items-center justify-center">
+                        {analise.icone}
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="flex items-center">
-                        {analise.titulo}
-                        {getProgressoBadge(progresso)}
-                      </CardTitle>
-                      <CardDescription>{analise.descricao}</CardDescription>
-                    </div>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    {isExpanded ? (
-                      <ChevronUp className="h-6 w-6 text-muted-foreground" />
-                    ) : (
-                      <ChevronDown className="h-6 w-6 text-muted-foreground" />
-                    )}
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                      <CardTitle className="text-sm font-semibold">{analise.titulo}</CardTitle>
+                      {getProgressoBadge(progresso)}
+                    </div>
+                    <CardDescription className="text-xs leading-tight">{analise.descricao}</CardDescription>
                   </div>
                 </CardHeader>
               </Card>
+            );
+          })}
+        </div>
 
-              {/* Card Content (expansível) */}
-              {isExpanded && Componente && (
-                <Card className="mt-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <CardContent className="pt-6">
-                    <Componente empresaId={GRUPO_ARQUEO_ID} />
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+        {/* Cards expandidos (renderizados abaixo da grade) */}
+        {analises.map((analise) => {
+          const isExpanded = expandedCards[analise.id];
+          const Componente = analise.componente;
+
+          if (!isExpanded || !Componente) return null;
+
+          return (
+            <Card key={`expanded-${analise.id}`} className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2.5 rounded-lg ${analise.cor} text-white`}>
+                      {analise.icone}
+                    </div>
+                    <CardTitle>{analise.titulo}</CardTitle>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => toggleCard(analise.id)}>
+                    <ChevronUp className="h-5 w-5" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Componente empresaId={GRUPO_ARQUEO_ID} />
+              </CardContent>
+            </Card>
           );
         })}
 
