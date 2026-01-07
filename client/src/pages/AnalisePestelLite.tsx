@@ -49,7 +49,8 @@ function convertTemplateConfig(config: any) {
 export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps) {
   const utils = trpc.useUtils();
   
-  // Buscar fatores do banco  const { data: pestelData, isLoading } = trpc.analises.getPestel.useQuery({ empresaId });
+  // Buscar fatores do banco
+  const { data: pestelData, isLoading } = trpc.analises.getPestel.useQuery({ empresaId });
   const { data: templateConfig } = trpc.templates.getConfig.useQuery({ empresaId });
   const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
   
@@ -67,8 +68,8 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
 
   // Carregar fatores do banco ao montar o componente
   useEffect(() => {
-    if (fatoresDb && Array.isArray(fatoresDb)) {
-      const fatoresFormatados: FatorPestel[] = fatoresDb.map((f: any) => ({
+    if (pestelData && Array.isArray(pestelData)) {
+      const fatoresFormatados: FatorPestel[] = pestelData.map((f: any) => ({
         id: f.id?.toString() || Date.now().toString(),
         categoria: f.categoria.charAt(0).toUpperCase() + f.categoria.slice(1) as any,
         impacto: f.impacto,
@@ -77,7 +78,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
       }));
       setFatores(fatoresFormatados);
     }
-  }, [fatoresDb]);
+  }, [pestelData]);
   const [categoriaAtiva, setCategoriaAtiva] = useState<string | null>(null);
 
   const [novoFator, setNovoFator] = useState<Partial<FatorPestel>>({

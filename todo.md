@@ -580,3 +580,7 @@
 - [x] Exibir lista de anexos com ícones e links para download
 - [ ] Testar menções e notificações automáticas
 - [ ] Testar upload e download de anexos
+
+
+## Correção de Bug - AnalisePestelLite
+- [x] Corrigir erro "fatoresDb is not defined" no AnalisePestelLite (linha 61)
