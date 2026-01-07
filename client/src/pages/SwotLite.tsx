@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Save, Plus, Trash2, Shield, AlertTriangle, TrendingUp, TrendingDown, FileDown } from "lucide-react";
 import { exportSwotPDF } from "@/lib/pdfExport";
+import CommentSection from "@/components/CommentSection";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 interface ItemSwot {
@@ -288,6 +289,9 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
           Exportar PDF
         </Button>
       </div>
+
+      {/* Comentários */}
+      <CommentSection empresaId={empresaId} tipoAnalise="swot" />
     </div>
   );
 }

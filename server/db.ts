@@ -1380,3 +1380,117 @@ export async function revertToTemplateVersion(empresaId: number, versionNumber: 
   
   return v;
 }
+
+
+// ===== COMENTÁRIOS EM ANÁLISES =====
+
+// Criar comentário
+export async function createComentario(data: {
+  empresaId: number;
+  tipoAnalise: "pestel" | "swot" | "okr" | "bsc";
+  autorId: string;
+  autorNome: string;
+  conteudo: string;
+}) {
+  const { analiseComentarios } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(analiseComentarios).values({
+    empresaId: data.empresaId,
+    tipoAnalise: data.tipoAnalise,
+    autorId: data.autorId,
+    autorNome: data.autorNome,
+    conteudo: data.conteudo,
+  });
+  
+  return result;
+}
+
+// Listar comentários de uma análise
+export async function listComentarios(empresaId: number, tipoAnalise: "pestel" | "swot" | "okr" | "bsc") {
+  const { analiseComentarios } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) return [];
+  const { eq, and, desc } = await import("drizzle-orm");
+  
+  return await db.select()
+    .from(analiseComentarios)
+    .where(and(
+      eq(analiseComentarios.empresaId, empresaId),
+      eq(analiseComentarios.tipoAnalise, tipoAnalise)
+    ))
+    .orderBy(desc(analiseComentarios.createdAt));
+}
+
+// Atualizar comentário
+export async function updateComentario(id: number, conteudo: string, autorId: string) {
+  const { analiseComentarios } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { eq, and } = await import("drizzle-orm");
+  
+  // Verificar se o autor é o dono do comentário
+  const comentario = await db.select()
+    .from(analiseComentarios)
+    .where(eq(analiseComentarios.id, id))
+    .limit(1);
+  
+  if (comentario.length === 0) {
+    throw new Error("Comentário não encontrado");
+  }
+  
+  if (comentario[0].autorId !== autorId) {
+    throw new Error("Você não tem permissão para editar este comentário");
+  }
+  
+  await db.update(analiseComentarios)
+    .set({ conteudo, updatedAt: new Date() })
+    .where(eq(analiseComentarios.id, id));
+  
+  return { success: true };
+}
+
+// Deletar comentário
+export async function deleteComentario(id: number, autorId: string) {
+  const { analiseComentarios } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { eq } = await import("drizzle-orm");
+  
+  // Verificar se o autor é o dono do comentário
+  const comentario = await db.select()
+    .from(analiseComentarios)
+    .where(eq(analiseComentarios.id, id))
+    .limit(1);
+  
+  if (comentario.length === 0) {
+    throw new Error("Comentário não encontrado");
+  }
+  
+  if (comentario[0].autorId !== autorId) {
+    throw new Error("Você não tem permissão para deletar este comentário");
+  }
+  
+  await db.delete(analiseComentarios)
+    .where(eq(analiseComentarios.id, id));
+  
+  return { success: true };
+}
+
+// Contar comentários por tipo de análise
+export async function countComentarios(empresaId: number, tipoAnalise: "pestel" | "swot" | "okr" | "bsc") {
+  const { analiseComentarios } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) return 0;
+  const { eq, and, count } = await import("drizzle-orm");
+  
+  const result = await db.select({ count: count() })
+    .from(analiseComentarios)
+    .where(and(
+      eq(analiseComentarios.empresaId, empresaId),
+      eq(analiseComentarios.tipoAnalise, tipoAnalise)
+    ));
+  
+  return result[0]?.count || 0;
+}

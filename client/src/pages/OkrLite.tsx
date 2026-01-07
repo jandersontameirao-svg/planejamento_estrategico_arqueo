@@ -6,6 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Save, Plus, Trash2, Target, CheckCircle2, FileDown } from "lucide-react";
 import { exportOkrPDF } from "@/lib/pdfExport";
+import CommentSection from "@/components/CommentSection";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from "recharts";
 
 interface KeyResult {
@@ -421,6 +422,9 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
           Exportar PDF
         </Button>
       </div>
+
+      {/* Comentários */}
+      <CommentSection empresaId={empresaId} tipoAnalise="okr" />
     </div>
   );
 }

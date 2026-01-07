@@ -1305,6 +1305,67 @@ export const appRouter = router({
       }),
   }),
 
+  comentarios: router({
+    // Criar comentário
+    create: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        tipoAnalise: z.enum(["pestel", "swot", "okr", "bsc"]),
+        conteudo: z.string().min(1),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { createComentario } = await import("./db");
+        return await createComentario({
+          empresaId: input.empresaId,
+          tipoAnalise: input.tipoAnalise,
+          autorId: ctx.user.openId,
+          autorNome: ctx.user.name || "Usuário",
+          conteudo: input.conteudo,
+        });
+      }),
+
+    // Listar comentários
+    list: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        tipoAnalise: z.enum(["pestel", "swot", "okr", "bsc"]),
+      }))
+      .query(async ({ input }) => {
+        const { listComentarios } = await import("./db");
+        return await listComentarios(input.empresaId, input.tipoAnalise);
+      }),
+
+    // Atualizar comentário
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        conteudo: z.string().min(1),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { updateComentario } = await import("./db");
+        return await updateComentario(input.id, input.conteudo, ctx.user.openId);
+      }),
+
+    // Deletar comentário
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const { deleteComentario } = await import("./db");
+        return await deleteComentario(input.id, ctx.user.openId);
+      }),
+
+    // Contar comentários
+    count: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        tipoAnalise: z.enum(["pestel", "swot", "okr", "bsc"]),
+      }))
+      .query(async ({ input }) => {
+        const { countComentarios } = await import("./db");
+        return await countComentarios(input.empresaId, input.tipoAnalise);
+      }),
+  }),
+
   notifications: router({
     // Verificar e notificar análises incompletas
     checkIncompleteAnalyses: protectedProcedure

@@ -675,3 +675,20 @@ export const templateVersions = mysqlTable("template_versions", {
 
 export type TemplateVersion = typeof templateVersions.$inferSelect;
 export type InsertTemplateVersion = typeof templateVersions.$inferInsert;
+
+/**
+ * Comentários colaborativos em análises estratégicas
+ */
+export const analiseComentarios = mysqlTable("analise_comentarios", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  tipoAnalise: mysqlEnum("tipoAnalise", ["pestel", "swot", "okr", "bsc"]).notNull(),
+  autorId: varchar("autorId", { length: 64 }).notNull(),
+  autorNome: varchar("autorNome", { length: 255 }).notNull(),
+  conteudo: text("conteudo").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AnaliseComentario = typeof analiseComentarios.$inferSelect;
+export type InsertAnaliseComentario = typeof analiseComentarios.$inferInsert;

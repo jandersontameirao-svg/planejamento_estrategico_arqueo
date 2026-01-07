@@ -6,6 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Save, Plus, Trash2, Building2, DollarSign, Users, Cpu, Leaf, Scale, AlertTriangle, FileDown } from "lucide-react";
 import { exportPestelPDF } from "@/lib/pdfExport";
+import CommentSection from "@/components/CommentSection";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Cell } from "recharts";
 
 interface FatorPestel {
@@ -459,6 +460,9 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
           Exportar PDF
         </Button>
       </div>
+
+      {/* Comentários */}
+      <CommentSection empresaId={empresaId} tipoAnalise="pestel" />
     </div>
   );
 }

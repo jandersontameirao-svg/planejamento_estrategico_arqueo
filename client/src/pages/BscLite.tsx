@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Save, Plus, Trash2, DollarSign, Users, Settings, GraduationCap, BarChart3, FileDown } from "lucide-react";
 import { exportBscPDF } from "@/lib/pdfExport";
+import CommentSection from "@/components/CommentSection";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
 import { trpc } from "@/lib/trpc";
 
@@ -359,6 +360,9 @@ export default function BscLite({ empresaId }: BscLiteProps) {
           Exportar PDF
         </Button>
       </div>
+
+      {/* Comentários */}
+      <CommentSection empresaId={empresaId} tipoAnalise="bsc" />
     </div>
   );
 }

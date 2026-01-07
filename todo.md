@@ -555,3 +555,14 @@
 - [x] Criar galeria de templates prontos (Executivo, Técnico, Minimalista)
 - [x] Implementar seleção de template pronto como ponto de partida
 - [x] Adicionar botão para aplicar template pronto
+
+
+## Sistema de Comentários Colaborativos
+- [x] Criar tabela analise_comentarios no banco de dados
+- [x] Adicionar schema no Drizzle para comentários
+- [x] Implementar procedures tRPC (criar, listar, editar, deletar comentários)
+- [x] Criar componente CommentSection para exibir comentários
+- [x] Adicionar formulário de novo comentário com validação
+- [x] Integrar CommentSection nos componentes PESTEL, SWOT, OKR e BSC
+- [ ] Adicionar indicador visual de quantidade de comentários em cada análise
+- [ ] Testar criação, edição e exclusão de comentários
