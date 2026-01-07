@@ -19,6 +19,7 @@ import DashboardEmpresa from "./pages/DashboardEmpresa";
 import AnalisePreditiva from "./pages/AnalisePreditiva";
 import PortalStakeholders from "./pages/PortalStakeholders";
 import DashboardComparativo from "./pages/DashboardComparativo";
+import DashboardAnalises from "./pages/DashboardAnalises";
 import GestaoUsuarios from "./pages/GestaoUsuarios";
 import AnalisePestel from "./pages/AnalisePestel";
 import CincoForcasPorter from "./pages/CincoForcasPorter";
@@ -68,6 +69,7 @@ function Router() {
       </Route>
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/dashboard-comparativo" component={DashboardComparativo} />
+      <Route path="/empresa/:id/dashboard-analises" component={DashboardAnalises} />
       <Route path="/gestao-usuarios" component={GestaoUsuarios} />
       <Route path="/analise-pestel/:id" component={AnalisePestel} />
       <Route path="/cinco-forcas-porter/:id" component={CincoForcasPorter} />

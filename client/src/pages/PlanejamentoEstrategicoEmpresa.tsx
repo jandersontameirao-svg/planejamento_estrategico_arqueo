@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
 import AnalisePestelLite from "./AnalisePestelLite";
 import CincoForcasLite from "./CincoForcasLite";
@@ -219,6 +219,32 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
           );
         })}
       </div>
+
+      {/* Dashboard Visual */}
+      <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                Dashboard Visual de Análises
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Visualize gráficos e métricas consolidadas de todas as análises estratégicas
+              </p>
+            </div>
+            <Link href={`/empresa/${empresaId}/dashboard-analises`}>
+              <Button 
+                size="lg" 
+                className="gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+              >
+                <BarChart3 className="w-5 h-5" />
+                Ver Dashboard
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
         <CardContent className="pt-6">

@@ -1533,7 +1533,7 @@ export function extractMentions(text: string): string[] {
     mentions.push(match[1]);
   }
   
-  return [...new Set(mentions)]; // Remove duplicatas
+  return Array.from(new Set(mentions)); // Remove duplicatas
 }
 
 /**

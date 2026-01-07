@@ -584,3 +584,12 @@
 
 ## Correção de Bug - AnalisePestelLite
 - [x] Corrigir erro "fatoresDb is not defined" no AnalisePestelLite (linha 61)
+
+
+## Dashboard Visual e Navegação
+- [x] Criar dashboard visual com gráficos das análises estratégicas (PESTEL, SWOT, OKR, BSC, Stakeholders)
+- [x] Adicionar cards com métricas de completude das análises
+- [x] Implementar gráficos de radar, barras e pizza para visualização consolidada
+- [x] Adicionar botão "Voltar" em todas as páginas do sistema
+- [x] Adicionar logo do Grupo Arqueo no header das páginas
+- [ ] Testar navegação e validar dashboard
