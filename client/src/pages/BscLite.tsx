@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Save, Plus, Trash2, DollarSign, Users, Settings, GraduationCap, BarChart3 } from "lucide-react";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
+import { trpc } from "@/lib/trpc";
 
 interface Indicador {
   id: string;
@@ -35,13 +36,50 @@ const cores: Record<string, string> = {
   aprendizado: "#8b5cf6",
 };
 
-export default function BscLite() {
+interface BscLiteProps {
+  empresaId: number;
+}
+
+export default function BscLite({ empresaId }: BscLiteProps) {
+  const utils = trpc.useUtils();
+  
+  // Buscar indicadores do banco
+  const { data: indicadoresDb, isLoading } = trpc.bsc.getByEmpresa.useQuery({ empresaId });
+  
+  // Mutation para salvar indicadores
+  const salvarMutation = trpc.bsc.saveIndicadores.useMutation({
+    onSuccess: () => {
+      alert("BSC salvo com sucesso!");
+      utils.bsc.getByEmpresa.invalidate({ empresaId });
+    },
+    onError: (error) => {
+      alert(`Erro ao salvar: ${error.message}`);
+    },
+  });
   const [perspectivas, setPerspectivas] = useState<Perspectiva[]>([
     { id: "financeira", nome: "Financeira", icone: "financeira", cor: "#22c55e", indicadores: [] },
     { id: "cliente", nome: "Cliente", icone: "cliente", cor: "#3b82f6", indicadores: [] },
     { id: "processos", nome: "Processos Internos", icone: "processos", cor: "#f97316", indicadores: [] },
     { id: "aprendizado", nome: "Aprendizado e Crescimento", icone: "aprendizado", cor: "#8b5cf6", indicadores: [] },
   ]);
+  
+  // Carregar dados do banco quando disponíveis
+  useEffect(() => {
+    if (indicadoresDb && indicadoresDb.length > 0) {
+      const novasPerspectivas = perspectivas.map(p => ({
+        ...p,
+        indicadores: indicadoresDb
+          .filter(ind => ind.perspectiva === p.id)
+          .map(ind => ({
+            id: ind.id.toString(),
+            nome: ind.nome,
+            meta: Number(ind.meta),
+            atual: Number(ind.valorAtual || 0),
+          })),
+      }));
+      setPerspectivas(novasPerspectivas);
+    }
+  }, [indicadoresDb]);
 
   const [novoIndicador, setNovoIndicador] = useState({ perspectivaId: "", nome: "", meta: 100 });
 
@@ -107,8 +145,18 @@ export default function BscLite() {
   );
 
   const handleSave = () => {
-    console.log("BSC salva:", perspectivas);
-    alert("Balanced Scorecard salva com sucesso!");
+    // Preparar dados para salvar
+    const indicadores = perspectivas.flatMap(p => 
+      p.indicadores.map(ind => ({
+        empresaId,
+        perspectiva: p.id as "financeira" | "cliente" | "processos" | "aprendizado",
+        nome: ind.nome,
+        meta: ind.meta,
+        valorAtual: ind.atual,
+      }))
+    );
+    
+    salvarMutation.mutate({ empresaId, indicadores });
   };
 
   const getCorDesempenho = (desempenho: number) => {

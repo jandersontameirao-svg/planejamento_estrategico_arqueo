@@ -154,7 +154,7 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
       case "okr":
         return <OkrLite />;
       case "bsc":
-        return <BscLite />;
+        return <BscLite empresaId={empresaId} />;
       default:
         return null;
     }

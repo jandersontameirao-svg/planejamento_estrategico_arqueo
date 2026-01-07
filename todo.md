@@ -478,3 +478,13 @@
 - [x] Verificar se session cookie está sendo salvo corretamente (cookie vazio)
 - [x] Verificar lógica de configuração de domínio do cookie
 - [x] Corrigir: Descomentada configuração de domínio em cookies.ts para funcionar com proxy Manus
+
+
+## Persistência de Análises no Banco de Dados
+- [x] Schemas já existem para todas as análises (PESTEL, SWOT, OKR, Stakeholders, 5 Forças, VRIO, Identidade, BSC)
+- [x] Procedures tRPC criadas para BSC (saveIndicadores, getByEmpresa, getAll)
+- [x] Componente BscLite conectado ao banco de dados via tRPC
+- [x] Sistema carrega dados do banco automaticamente ao abrir BSC
+- [x] Botão "Salvar Balanced Scorecard" persiste dados no banco
+- [ ] Conectar outros componentes (PESTEL, SWOT, OKR, etc.) ao banco - padrão estabelecido com BSC
+- [ ] Adicionar indicadores de progresso (0-100%) em cada análise
