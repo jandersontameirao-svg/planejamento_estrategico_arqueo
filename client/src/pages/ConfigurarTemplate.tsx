@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, FileText, Palette } from "lucide-react";
+import { ArrowLeft, Save, FileText, Palette, Upload, Image as ImageIcon } from "lucide-react";
 
 export default function ConfigurarTemplate() {
   const { empresaId } = useParams<{ empresaId: string }>();
@@ -26,6 +26,20 @@ export default function ConfigurarTemplate() {
   const [incluirGraficos, setIncluirGraficos] = useState(true);
   const [incluirRecomendacoes, setIncluirRecomendacoes] = useState(true);
   const [rodapePersonalizado, setRodapePersonalizado] = useState("");
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  const uploadLogoMutation = trpc.templates.uploadLogo.useMutation({
+    onSuccess: (data) => {
+      setLogoUrl(data.url);
+      setUploadingLogo(false);
+      alert("✅ Logo enviado com sucesso!");
+    },
+    onError: (error) => {
+      setUploadingLogo(false);
+      alert(`❌ Erro ao enviar logo: ${error.message}`);
+    },
+  });
 
   const saveConfigMutation = trpc.templates.saveConfig.useMutation({
     onSuccess: () => {
@@ -48,6 +62,7 @@ export default function ConfigurarTemplate() {
       setIncluirGraficos(!!config.incluirGraficos);
       setIncluirRecomendacoes(!!config.incluirRecomendacoes);
       setRodapePersonalizado(config.rodapePersonalizado || "");
+      setLogoUrl(config.logoUrl || null);
     }
   }, [config]);
 
@@ -99,6 +114,70 @@ export default function ConfigurarTemplate() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Configurações */}
           <div className="space-y-6">
+            {/* Logo */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ImageIcon className="h-5 w-5" />
+                  Logo da Empresa
+                </CardTitle>
+                <CardDescription>
+                  Adicione o logo que aparecerá no cabeçalho dos relatórios PDF
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {logoUrl && (
+                  <div className="border rounded-lg p-4 bg-muted/50">
+                    <img src={logoUrl} alt="Logo" className="max-h-32 mx-auto" />
+                  </div>
+                )}
+                <div>
+                  <Label htmlFor="logo-upload">Selecionar Logo</Label>
+                  <Input
+                    id="logo-upload"
+                    type="file"
+                    accept="image/*"
+                    disabled={uploadingLogo}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      
+                      // Validar tamanho (max 2MB)
+                      if (file.size > 2 * 1024 * 1024) {
+                        alert("❌ Arquivo muito grande. Máximo 2MB.");
+                        return;
+                      }
+                      
+                      setUploadingLogo(true);
+                      
+                      // Converter para base64
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const base64 = reader.result as string;
+                        uploadLogoMutation.mutate({
+                          empresaId: empresaIdNum,
+                          fileData: base64,
+                          fileName: file.name,
+                          mimeType: file.type,
+                        });
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    className="mt-2"
+                  />
+                  {uploadingLogo && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      <Upload className="h-4 w-4 inline animate-pulse mr-1" />
+                      Enviando logo...
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Formatos aceitos: PNG, JPG, SVG. Tamanho máximo: 2MB
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Cores */}
             <Card>
               <CardHeader>

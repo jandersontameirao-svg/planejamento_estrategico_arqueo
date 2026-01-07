@@ -1255,6 +1255,35 @@ export const appRouter = router({
         const { saveTemplateConfig } = await import("./db");
         return await saveTemplateConfig(input);
       }),
+
+    // Upload de logo para template
+    uploadLogo: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        fileData: z.string(), // base64
+        fileName: z.string(),
+        mimeType: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { storagePut } = await import("./storage");
+        
+        // Converter base64 para Buffer
+        const base64Data = input.fileData.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, "base64");
+        
+        // Gerar nome único para o arquivo
+        const timestamp = Date.now();
+        const fileKey = `logos/empresa-${input.empresaId}-${timestamp}-${input.fileName}`;
+        
+        // Upload para S3
+        const { url, key } = await storagePut(fileKey, buffer, input.mimeType);
+        
+        // Atualizar configuração do template com URL do logo
+        const { updateTemplateLogoUrl } = await import("./db");
+        await updateTemplateLogoUrl(input.empresaId, url, key);
+        
+        return { url, key };
+      }),
   }),
 
   notifications: router({

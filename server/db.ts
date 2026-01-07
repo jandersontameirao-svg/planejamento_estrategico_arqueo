@@ -1246,3 +1246,40 @@ export async function saveTemplateConfig(config: {
 
   return await getTemplateConfig(config.empresaId);
 }
+
+
+// Atualizar URL do logo no template
+export async function updateTemplateLogoUrl(empresaId: number, logoUrl: string, logoKey: string) {
+  const { templateConfigs } = await import("../drizzle/schema");
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { eq } = await import("drizzle-orm");
+  
+  // Verificar se já existe configuração
+  const existing = await db.select().from(templateConfigs).where(eq(templateConfigs.empresaId, empresaId)).limit(1);
+  
+  if (existing.length > 0) {
+    // Atualizar existente
+    await db.update(templateConfigs)
+      .set({ logoUrl, logoKey, updatedAt: new Date() })
+      .where(eq(templateConfigs.empresaId, empresaId));
+  } else {
+    // Criar nova configuração com valores padrão
+    await db.insert(templateConfigs).values({
+      empresaId,
+      logoUrl,
+      logoKey,
+      corPrimaria: "#8B1538",
+      corSecundaria: "#FF6B35",
+      incluirPestel: 1,
+      incluirSwot: 1,
+      incluirOkr: 1,
+      incluirBsc: 1,
+      incluirGraficos: 1,
+      incluirRecomendacoes: 1,
+      rodapePersonalizado: null,
+    });
+  }
+  
+  return { success: true };
+}

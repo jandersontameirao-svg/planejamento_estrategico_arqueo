@@ -43,19 +43,30 @@ function addHeader(doc: jsPDF, empresa: EmpresaInfo, titulo: string, config?: Te
   doc.setFillColor(r, g, b);
   doc.rect(0, 0, 210, 40, "F");
 
-  // Título
+  // Logo (se disponível)
+  if (empresa.logo) {
+    try {
+      // Adicionar logo no canto esquerdo do cabeçalho
+      doc.addImage(empresa.logo, "PNG", 10, 8, 25, 25);
+    } catch (error) {
+      console.warn("Erro ao adicionar logo:", error);
+    }
+  }
+
+  // Título (ajustar posição se houver logo)
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(20);
-  doc.text(titulo, 105, 15, { align: "center" });
+  const titleX = empresa.logo ? 120 : 105;
+  doc.text(titulo, titleX, 15, { align: empresa.logo ? "left" : "center" });
 
   // Nome da empresa
   doc.setFontSize(14);
-  doc.text(empresa.nome, 105, 28, { align: "center" });
+  doc.text(empresa.nome, titleX, 28, { align: empresa.logo ? "left" : "center" });
 
   // Data de geração
   doc.setFontSize(10);
   const dataAtual = new Date().toLocaleDateString("pt-BR");
-  doc.text(`Gerado em: ${dataAtual}`, 105, 35, { align: "center" });
+  doc.text(`Gerado em: ${dataAtual}`, titleX, 35, { align: empresa.logo ? "left" : "center" });
 
   // Reset cor do texto
   const [tr, tg, tb] = hexToRgb(DEFAULT_COLORS.text);

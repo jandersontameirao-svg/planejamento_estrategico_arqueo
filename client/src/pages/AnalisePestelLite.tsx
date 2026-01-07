@@ -443,7 +443,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         </Button>
         <Button 
           onClick={() => exportPestelPDF(
-            { nome: empresa?.nome || "Empresa" },
+            { nome: empresa?.nome || "Empresa", logo: templateConfig?.logoUrl || undefined },
             fatores.map(f => ({
               categoria: f.categoria.toLowerCase(),
               descricao: f.descricao,

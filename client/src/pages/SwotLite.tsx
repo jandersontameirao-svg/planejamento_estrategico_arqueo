@@ -272,7 +272,7 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
         </Button>
         <Button 
           onClick={() => exportSwotPDF(
-            { nome: empresa?.nome || "Empresa" },
+            { nome: empresa?.nome || "Empresa", logo: templateConfig?.logoUrl || undefined },
             [
               ...forcas.map(f => ({ tipo: "forca", descricao: f.descricao })),
               ...fraquezas.map(f => ({ tipo: "fraqueza", descricao: f.descricao })),

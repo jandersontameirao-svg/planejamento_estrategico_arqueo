@@ -401,7 +401,7 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
         </Button>
         <Button 
           onClick={() => exportOkrPDF(
-            { nome: empresa?.nome || "Empresa" },
+            { nome: empresa?.nome || "Empresa", logo: templateConfig?.logoUrl || undefined },
             okrs.map(okr => ({
               objetivo: okr.objetivo,
               descricao: okr.objetivo,

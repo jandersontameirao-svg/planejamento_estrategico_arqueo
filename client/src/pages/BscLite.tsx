@@ -347,7 +347,7 @@ export default function BscLite({ empresaId }: BscLiteProps) {
               }))
             );
             exportBscPDF(
-              { nome: empresa?.nome || "Empresa" },
+              { nome: empresa?.nome || "Empresa", logo: templateConfig?.logoUrl || undefined },
               todosIndicadores,
               convertTemplateConfig(templateConfig)
             );
