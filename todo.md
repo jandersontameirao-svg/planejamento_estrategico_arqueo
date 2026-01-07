@@ -454,3 +454,20 @@
 - [x] Adicionar navegação em PlanejamentoMacro
 - [x] Adicionar navegação em DashboardGrupo
 - [x] Padronizar header sticky com backdrop blur em todas as páginas
+
+
+## Padronização de Matriz de Risco
+- [ ] Verificar classificação de risco atual no componente PESTEL
+- [ ] Padronizar classificação de risco (Crítico, Alto, Médio, Baixo) em todas as análises
+- [ ] Garantir que empresas e grupo usem a mesma matriz de risco
+- [ ] Testar e validar classificação consistente
+
+
+## Modernização Completa do Layout
+- [x] Sistema usa autenticação OAuth do Manus (sem página de login personalizada)
+- [x] Modernizar página Home com gradientes vibrantes e hero section
+- [x] Adicionar animações de entrada (fade-in, slide-in-from-bottom com delays)
+- [x] Implementar hover effects nos cards (elevação, scale, shadow-xl)
+- [x] Adicionar transições suaves (duration-300, duration-700)
+- [x] Melhorar tipografia com gradientes de texto e hierarquia clara
+- [x] Implementar cards com glassmorphism (backdrop-blur-sm, gradientes)

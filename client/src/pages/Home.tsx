@@ -40,33 +40,49 @@ export default function Home() {
           </div>
         </header>
 
-        <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background to-muted">
-          <div className="container max-w-4xl text-center py-16">
-            <div className="mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
-                <img src="/logo-arqueo.svg" alt="Grupo Arqueo" className="h-12 w-12" />
+        <main className="flex-1 flex items-center justify-center relative overflow-hidden">
+          {/* Background com gradiente animado */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/10"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent"></div>
+          
+          <div className="container max-w-5xl text-center py-20 relative z-10">
+            <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 backdrop-blur-sm border border-primary/20 mb-8 shadow-2xl">
+                <img src="/logo-arqueo.svg" alt="Grupo Arqueo" className="h-14 w-14" />
               </div>
-              <h1 className="text-4xl font-bold mb-4">
-                Planejamento Estratégico Grupo Arqueo
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                Planejamento Estratégico
               </h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Planejamento estratégico corporativo para o Grupo Arqueo
+              <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Transforme a visão do <span className="font-semibold text-primary">Grupo Arqueo</span> em ações estratégicas mensuráveis
               </p>
+              <Button size="lg" asChild className="shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <a href={getLoginUrl()} className="gap-2">
+                  <LogOut className="h-5 w-5 rotate-180" />
+                  Acessar Plataforma
+                </a>
+              </Button>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
-              <Card>
+            <div className="grid md:grid-cols-3 gap-6 mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+              <Card className="border-primary/20 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <CardHeader>
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-3">
+                    <Building2 className="h-6 w-6 text-primary" />
+                  </div>
                   <CardTitle className="text-lg">Multiempresa</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Gerencie múltiplas empresas do grupo em uma única plataforma
+                    Gerencie múltiplas empresas do grupo em uma única plataforma integrada
                   </p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border-accent/20 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <CardHeader>
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center mb-3">
+                    <CheckCircle2 className="h-6 w-6 text-accent" />
+                  </div>
                   <CardTitle className="text-lg">KPIs e Metas</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -75,8 +91,11 @@ export default function Home() {
                   </p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border-primary/20 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <CardHeader>
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-3">
+                    <Users className="h-6 w-6 text-primary" />
+                  </div>
                   <CardTitle className="text-lg">Governança</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -140,16 +159,20 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1 container py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Bem-vindo ao Sistema de Gestão Estratégica</h1>
-          <p className="text-muted-foreground">
+      <main className="flex-1 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5"></div>
+        <div className="container py-12 relative z-10">
+        <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            Bem-vindo ao Sistema de Gestão Estratégica
+          </h1>
+          <p className="text-lg text-muted-foreground">
             Selecione uma empresa para visualizar o planejamento estratégico
           </p>
         </div>
 
         {/* Card do Planejamento Macro do Grupo */}
-        <Card className="mb-8 border-2 border-primary/20 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation("/planejamento-macro")}>
+        <Card className="mb-10 border-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150" onClick={() => setLocation("/planejamento-macro")}>
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="p-3 bg-primary/10 rounded-lg">
@@ -173,8 +196,8 @@ export default function Home() {
         </Card>
 
         {/* Cards de Empresas */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Empresas do Grupo</h2>
+        <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+          <h2 className="text-3xl font-bold mb-6">Empresas do Grupo</h2>
           {loadingEmpresas ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
@@ -249,6 +272,7 @@ export default function Home() {
               </CardContent>
             </Card>
           )}
+        </div>
         </div>
       </main>
     </div>
