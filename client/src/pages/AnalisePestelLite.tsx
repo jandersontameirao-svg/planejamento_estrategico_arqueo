@@ -96,8 +96,8 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
       alert("Por favor, preencha a descrição do fator antes de adicionar.");
       return;
     }
-    if (novoFator.descricao.length < 10) {
-      alert("A descrição deve ter pelo menos 10 caracteres.");
+    if (novoFator.descricao.trim().length < 5) {
+      alert("A descrição deve ter pelo menos 5 caracteres.");
       return;
     }
     setFatores([
