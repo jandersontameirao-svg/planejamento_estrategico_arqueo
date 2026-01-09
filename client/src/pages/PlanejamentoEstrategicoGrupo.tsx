@@ -146,7 +146,7 @@ export default function PlanejamentoEstrategicoGrupo() {
       <div className="max-w-7xl mx-auto mt-6 space-y-4">
         {/* Botões de ação */}
         <div className="flex gap-4 mb-6">
-          <Link href="/empresa/1/configurar-template">
+          <Link href="/configurar-template">
             <Button variant="outline" className="gap-2">
               <Settings className="h-4 w-4" />
               Configurar Template de Relatórios
