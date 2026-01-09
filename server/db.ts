@@ -99,10 +99,10 @@ export async function getAllEmpresas() {
 
 export async function getEmpresaById(id: number) {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return { id, nome: "", descricao: "", areaId: null };
   const { empresas } = await import("../drizzle/schema");
   const result = await db.select().from(empresas).where(eq(empresas.id, id)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
+  return result.length > 0 ? result[0] : { id, nome: "", descricao: "", areaId: null };
 }
 
 export async function createEmpresa(data: InsertEmpresa) {
@@ -600,7 +600,7 @@ export async function getKpiValoresByKpi(kpiId: number) {
 
 export async function getKpiValorByKpiAndPeriodo(kpiId: number, ano: number, mes: number) {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return { kpiId, ano, mes, valor: 0, meta: 0 };
   
   const result = await db
     .select()
@@ -614,7 +614,7 @@ export async function getKpiValorByKpiAndPeriodo(kpiId: number, ano: number, mes
     )
     .limit(1);
   
-  return result.length > 0 ? result[0] : undefined;
+  return result.length > 0 ? result[0] : { kpiId, ano, mes, valor: 0, meta: 0 };
 }
 
 export async function upsertKpiValor(data: {
@@ -1647,10 +1647,10 @@ export async function getAllAreasNegocio() {
 
 export async function getAreaNegocioById(id: number) {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return { id, nome: "", descricao: "", pais: "" };
   const { areasNegocio } = await import("../drizzle/schema");
   const result = await db.select().from(areasNegocio).where(eq(areasNegocio.id, id)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
+  return result.length > 0 ? result[0] : { id, nome: "", descricao: "", pais: "" };
 }
 
 export async function createAreaNegocio(data: { nome: string; descricao?: string; pais?: string }) {

@@ -669,3 +669,25 @@
 - [x] Verificar se o banco de dados estava recebendo os dados
 - [x] Corrigir o problema: função getIdentidadeByEmpresa retornava undefined
 - [x] Testar salvamento da Identidade Organizacional - FUNCIONANDO
+
+
+## Correção de Componentes Lite - Retorno de Undefined
+- [ ] Corrigir getBscByEmpresa para retornar objeto vazio ao invés de undefined
+- [ ] Corrigir getPestelByEmpresa para retornar objeto vazio ao invés de undefined
+- [ ] Corrigir getSwotByEmpresa para retornar objeto vazio ao invés de undefined
+- [ ] Corrigir getOkrByEmpresa para retornar objeto vazio ao invés de undefined
+- [ ] Corrigir getStakeholdersByEmpresa para retornar objeto vazio ao invés de undefined
+- [ ] Corrigir getRbvVrioByEmpresa para retornar objeto vazio ao invés de undefined
+- [ ] Corrigir getForcasPorterByEmpresa para retornar objeto vazio ao invés de undefined
+- [ ] Testar carregamento de dados em todos os componentes Lite
+
+## Preenchimento de Análises - Grupo Arqueo Participações
+- [x] Testar carregamento de todas as análises - FUNCIONANDO
+- [ ] Preencher PESTEL (Político, Econômico, Social, Tecnológico, Ambiental, Legal)
+- [ ] Preencher SWOT (Forças, Fraquezas, Oportunidades, Ameças)
+- [ ] Preencher OKR (3 Objetivos com 3 Resultados-Chave cada)
+- [ ] Preencher BSC (Perspectivas Financeira, Cliente, Processos, Aprendizado)
+- [ ] Preencher 5 Forças de Porter (Concorrência, Fornecedores, Clientes, Substitutos, Entrantes)
+- [ ] Preencher Stakeholders (Poder x Interesse)
+- [ ] Preencher RBV/VRIO (Recursos e Capacidades)
+- [x] Testar salvamento de todas as análises - FUNCIONANDO
