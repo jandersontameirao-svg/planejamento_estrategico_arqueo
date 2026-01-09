@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Save } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
 interface IdentidadeOrganizacionalLiteProps {
   empresaId?: number;
@@ -19,9 +21,41 @@ export default function IdentidadeOrganizacionalLite({ empresaId = 1 }: Identida
     valores: "",
   });
 
+  // Query para carregar dados existentes
+  const { data: identidadeData, isLoading: loadingIdentidade } = trpc.identidade.getByEmpresa.useQuery({ empresaId });
+  
+  // Mutation para salvar
+  const saveMutation = trpc.identidade.upsert.useMutation({
+    onSuccess: () => {
+      toast.success("Identidade Organizacional salva com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao salvar: " + error.message);
+    },
+  });
+
+  // Carregar dados quando disponíveis
+  useEffect(() => {
+    if (identidadeData) {
+      setFormData({
+        missao: identidadeData.missao || "",
+        visao: identidadeData.visao || "",
+        valores: identidadeData.valores || "",
+      });
+    }
+  }, [identidadeData]);
+
   const handleSave = () => {
-    console.log("Identidade Organizacional salva:", formData);
-    alert("Identidade Organizacional salva com sucesso!");
+    if (!formData.missao.trim() || !formData.visao.trim() || !formData.valores.trim()) {
+      toast.error("Preencha todos os campos (Missão, Visão e Valores)");
+      return;
+    }
+    saveMutation.mutate({
+      empresaId,
+      missao: formData.missao,
+      visao: formData.visao,
+      valores: formData.valores,
+    });
   };
 
   return (
@@ -72,9 +106,22 @@ export default function IdentidadeOrganizacionalLite({ empresaId = 1 }: Identida
           </div>
 
           {/* Botão Salvar */}
-          <Button onClick={handleSave} className="w-full gap-2 bg-orange-600 hover:bg-orange-700">
-            <Save className="h-4 w-4" />
-            Salvar Identidade
+          <Button 
+            onClick={handleSave} 
+            disabled={saveMutation.isPending}
+            className="w-full gap-2 bg-orange-600 hover:bg-orange-700"
+          >
+            {saveMutation.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Salvando...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4" />
+                Salvar Identidade
+              </>
+            )}
           </Button>
         </CardContent>
       </Card>

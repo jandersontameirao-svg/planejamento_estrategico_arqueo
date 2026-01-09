@@ -174,10 +174,10 @@ export async function updateUserRole(userId: number, role: "user" | "admin" | "g
 // Identidade Organizacional
 export async function getIdentidadeByEmpresa(empresaId: number) {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return { empresaId, missao: "", visao: "", valores: "", politica: "" };
   const { identidadeOrganizacional } = await import("../drizzle/schema");
   const result = await db.select().from(identidadeOrganizacional).where(eq(identidadeOrganizacional.empresaId, empresaId)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
+  return result.length > 0 ? result[0] : { empresaId, missao: "", visao: "", valores: "", politica: "" };
 }
 
 export async function upsertIdentidade(empresaId: number, data: { missao?: string; visao?: string; valores?: string; politica?: string }) {

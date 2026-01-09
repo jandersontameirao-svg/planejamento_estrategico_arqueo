@@ -661,3 +661,11 @@
 - [ ] Testar criação de nova área de negócio
 - [ ] Testar planejamento estratégico por área
 - [ ] Testar dashboard por área
+
+
+## BUG - Identidade Organizacional do Grupo Arqueo Participações
+- [x] Diagnosticar por que a Identidade Organizacional não estava sendo salva
+- [x] Verificar se o procedimento tRPC estava recebendo os dados
+- [x] Verificar se o banco de dados estava recebendo os dados
+- [x] Corrigir o problema: função getIdentidadeByEmpresa retornava undefined
+- [x] Testar salvamento da Identidade Organizacional - FUNCIONANDO
