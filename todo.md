@@ -691,3 +691,10 @@
 - [ ] Preencher Stakeholders (Poder x Interesse)
 - [ ] Preencher RBV/VRIO (Recursos e Capacidades)
 - [x] Testar salvamento de todas as análises - FUNCIONANDO
+
+
+## BUG - Botões de Adicionar Indicador (BSC)
+- [x] Investigar por que os botões de "+" não estão funcionando no BSC
+- [x] Verificar se há erro no console do navegador
+- [x] Corrigir funcionalidade dos botões de adicionar indicador
+- [x] Testar adição de indicadores em todas as perspectivas (Financeira, Cliente, Processos, Aprendizado) - FUNCIONANDO

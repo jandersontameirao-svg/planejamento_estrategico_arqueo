@@ -104,7 +104,9 @@ export default function BscLite({ empresaId }: BscLiteProps) {
   };
 
   const adicionarIndicador = (perspectivaId: string) => {
-    if (!novoIndicador.nome) return;
+    // Verificar se há nome preenchido para esta perspectiva
+    if (novoIndicador.perspectivaId !== perspectivaId || !novoIndicador.nome) return;
+    
     setPerspectivas(perspectivas.map((p) => {
       if (p.id === perspectivaId) {
         return {
@@ -119,6 +121,7 @@ export default function BscLite({ empresaId }: BscLiteProps) {
       }
       return p;
     }));
+    // Resetar apenas o indicador da perspectiva que foi adicionado
     setNovoIndicador({ perspectivaId: "", nome: "", meta: 100 });
   };
 
@@ -319,7 +322,16 @@ export default function BscLite({ empresaId }: BscLiteProps) {
                       placeholder="Meta"
                       className="w-20 border rounded px-2 py-1 text-sm"
                     />
-                    <Button size="sm" onClick={() => adicionarIndicador(p.id)} style={{ backgroundColor: p.cor }}>
+                    <Button 
+                      size="sm" 
+                      onClick={() => {
+                        if (novoIndicador.perspectivaId === p.id && novoIndicador.nome) {
+                          adicionarIndicador(p.id);
+                        }
+                      }}
+                      disabled={novoIndicador.perspectivaId !== p.id || !novoIndicador.nome}
+                      style={{ backgroundColor: p.cor, opacity: (novoIndicador.perspectivaId !== p.id || !novoIndicador.nome) ? 0.5 : 1 }}
+                    >
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
