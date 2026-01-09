@@ -48,6 +48,9 @@ function convertTemplateConfig(config: any) {
 
 export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps) {
   const utils = trpc.useUtils();
+  const [fatorEmEdicao, setFatorEmEdicao] = useState<FatorPestel | null>(null);
+  const [impactoEdicao, setImpactoEdicao] = useState(3);
+  const [probabilidadeEdicao, setProbabilidadeEdicao] = useState(3);
   
   // Buscar fatores do banco
   const { data: pestelData, isLoading } = trpc.analises.getPestel.useQuery({ empresaId });
@@ -112,6 +115,24 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
 
   const removerFator = (id: string) => {
     setFatores(fatores.filter((f) => f.id !== id));
+  };
+
+  const editarFator = () => {
+    if (!fatorEmEdicao) return;
+    setFatores(
+      fatores.map((f) =>
+        f.id === fatorEmEdicao.id
+          ? { ...f, impacto: impactoEdicao, probabilidade: probabilidadeEdicao }
+          : f
+      )
+    );
+    setFatorEmEdicao(null);
+  };
+
+  const deletarFatorEdicao = () => {
+    if (!fatorEmEdicao) return;
+    removerFator(fatorEmEdicao.id);
+    setFatorEmEdicao(null);
   };
 
   const calcularRisco = (impacto: number, probabilidade: number) => {
@@ -316,7 +337,11 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
               const catInfo = categorias.find((c) => c.nome === fator.categoria);
               const Icon = catInfo?.icone || AlertTriangle;
               return (
-                <div key={fator.id} className="border rounded-lg p-4" style={{ borderLeftColor: catInfo?.cor, borderLeftWidth: "4px" }}>
+                <div key={fator.id} className="border rounded-lg p-4 cursor-pointer hover:shadow-md transition-all" style={{ borderLeftColor: catInfo?.cor, borderLeftWidth: "4px" }} onClick={() => {
+                  setFatorEmEdicao(fator);
+                  setImpactoEdicao(fator.impacto);
+                  setProbabilidadeEdicao(fator.probabilidade);
+                }}>
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-2">
                       <div className="p-2 rounded-lg" style={{ backgroundColor: catInfo?.corBg }}>
@@ -329,7 +354,10 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className={`${risco.cor} text-white`}>{risco.label}</Badge>
-                      <button onClick={() => removerFator(fator.id)} className="text-red-600 hover:text-red-800">
+                      <button onClick={(e) => {
+                        e.stopPropagation();
+                        removerFator(fator.id);
+                      }} className="text-red-600 hover:text-red-800">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -456,6 +484,66 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
           Exportar PDF
         </Button>
       </div>
+
+      {/* Modal de Edição de Fator */}
+      {fatorEmEdicao && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-base">Editar Fator</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-semibold">Descrição</label>
+                <p className="text-sm text-gray-600 mt-1">{fatorEmEdicao.descricao}</p>
+              </div>
+              <div>
+                <label className="text-sm font-semibold">Categoria</label>
+                <p className="text-sm text-gray-600 mt-1">{fatorEmEdicao.categoria}</p>
+              </div>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <label className="text-sm font-semibold">Impacto</label>
+                  <span className="text-sm font-bold">{impactoEdicao}/5</span>
+                </div>
+                <Slider
+                  value={[impactoEdicao]}
+                  onValueChange={(value) => setImpactoEdicao(value[0])}
+                  min={1}
+                  max={5}
+                  step={1}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <label className="text-sm font-semibold">Probabilidade</label>
+                  <span className="text-sm font-bold">{probabilidadeEdicao}/5</span>
+                </div>
+                <Slider
+                  value={[probabilidadeEdicao]}
+                  onValueChange={(value) => setProbabilidadeEdicao(value[0])}
+                  min={1}
+                  max={5}
+                  step={1}
+                  className="mt-2"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={editarFator} className="flex-1 bg-blue-600 hover:bg-blue-700">
+                  Salvar
+                </Button>
+                <Button onClick={deletarFatorEdicao} className="flex-1 bg-red-600 hover:bg-red-700">
+                  Deletar
+                </Button>
+                <Button onClick={() => setFatorEmEdicao(null)} variant="outline" className="flex-1">
+                  Cancelar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Comentários */}
       <CommentSection entityType="pestel" entityId={empresaId.toString()} />

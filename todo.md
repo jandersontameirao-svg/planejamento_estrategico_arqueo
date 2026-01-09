@@ -728,3 +728,21 @@
 - [x] Verificar se há erro no console do navegador - import de useState faltava
 - [x] Corrigir funcionalidade de preenchimento do PESTEL - CORRIGIDO
 - [x] Testar adição de fatores em todas as categorias (Político, Econômico, Social, Tecnológico, Ambiental, Legal) - FUNCIONANDO
+
+
+## FEATURE - Modal de Edição de Fatores PESTEL
+- [ ] Criar componente Modal para editar fator
+- [ ] Implementar sliders de impacto e probabilidade no modal
+- [ ] Adicionar campo de descrição editável
+- [ ] Implementar botão de Salvar alterações
+- [ ] Implementar botão de Deletar fator
+- [ ] Testar modal ao clicar em fator existente
+- [ ] Testar atualização de valores após edição
+
+
+## FEATURE CONCLUÍDA - Modal de Edição de Fatores PESTEL
+- [x] Adicionar estado de fator em edição
+- [x] Criar modal com sliders de impacto e probabilidade
+- [x] Implementar função de salvar alterações
+- [x] Implementar função de deletar fator
+- [x] Testar modal de edição completo - FUNCIONANDO PERFEITAMENTE
