@@ -31,6 +31,10 @@ const icones: Record<string, any> = {
   aprendizado: GraduationCap,
 };
 
+const getIcon = (iconeName: string | undefined) => {
+  return icones[iconeName || 'financeira'] || BarChart3;
+};
+
 const cores: Record<string, string> = {
   financeira: "#22c55e",
   cliente: "#3b82f6",
@@ -96,6 +100,30 @@ export default function BscLite({ empresaId }: BscLiteProps) {
   }, [indicadoresDb]);
 
   const [novoIndicador, setNovoIndicador] = useState({ perspectivaId: "", nome: "", meta: 100 });
+  const [mostrarFormNovaPerspectiva, setMostrarFormNovaPerspectiva] = useState(false);
+  const [novaPerspectiva, setNovaPerspectiva] = useState({ nome: "", cor: "#6366f1", icone: "custom" });
+
+  const adicionarNovaPerspectiva = () => {
+    if (!novaPerspectiva.nome) return;
+    const novaPersp: Perspectiva = {
+      id: `custom-${Date.now()}`,
+      nome: novaPerspectiva.nome,
+      icone: novaPerspectiva.icone,
+      cor: novaPerspectiva.cor,
+      indicadores: [],
+    };
+    setPerspectivas([...perspectivas, novaPersp]);
+    setNovaPerspectiva({ nome: "", cor: "#6366f1", icone: "custom" });
+    setMostrarFormNovaPerspectiva(false);
+  };
+
+  const removerPerspectiva = (perspectivaId: string) => {
+    if (perspectivas.length <= 4) {
+      alert("Você deve manter pelo menos as 4 perspectivas padrão!");
+      return;
+    }
+    setPerspectivas(perspectivas.filter(p => p.id !== perspectivaId));
+  };
 
   const calcularDesempenho = (indicadores: Indicador[]) => {
     if (indicadores.length === 0) return 0;
@@ -166,7 +194,7 @@ export default function BscLite({ empresaId }: BscLiteProps) {
     const indicadores = perspectivas.flatMap(p => 
       p.indicadores.map(ind => ({
         empresaId,
-        perspectiva: p.id as "financeira" | "cliente" | "processos" | "aprendizado",
+        perspectiva: p.id as "financeira" | "cliente" | "processos" | "aprendizado" | string,
         nome: ind.nome,
         meta: ind.meta,
         valorAtual: ind.atual,
@@ -198,7 +226,7 @@ export default function BscLite({ empresaId }: BscLiteProps) {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {perspectivas.map((p) => {
-              const Icon = icones[p.icone];
+              const Icon = getIcon(p.icone);
               const desempenho = calcularDesempenho(p.indicadores);
               return (
                 <div key={p.id} className="p-3 rounded-lg text-center" style={{ backgroundColor: `${p.cor}20` }}>
@@ -263,7 +291,7 @@ export default function BscLite({ empresaId }: BscLiteProps) {
       {/* Perspectivas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {perspectivas.map((p) => {
-          const Icon = icones[p.icone];
+          const Icon = getIcon(p.icone);
           const desempenho = calcularDesempenho(p.indicadores);
           return (
             <Card key={p.id} className="border-l-4" style={{ borderLeftColor: p.cor }}>
@@ -324,13 +352,10 @@ export default function BscLite({ empresaId }: BscLiteProps) {
                     />
                     <Button 
                       size="sm" 
-                      onClick={() => {
-                        if (novoIndicador.perspectivaId === p.id && novoIndicador.nome) {
-                          adicionarIndicador(p.id);
-                        }
-                      }}
-                      disabled={novoIndicador.perspectivaId !== p.id || !novoIndicador.nome}
-                      style={{ backgroundColor: p.cor, opacity: (novoIndicador.perspectivaId !== p.id || !novoIndicador.nome) ? 0.5 : 1 }}
+                      onClick={() => adicionarIndicador(p.id)}
+                      disabled={!novoIndicador.nome || novoIndicador.perspectivaId !== p.id}
+                      style={{ backgroundColor: p.cor }}
+                      className="hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Plus className="h-4 w-4" />
                     </Button>
@@ -340,6 +365,64 @@ export default function BscLite({ empresaId }: BscLiteProps) {
             </Card>
           );
         })}
+      </div>
+
+      {/* Adicionar Nova Perspectiva */}
+      <div className="border-t pt-4">
+        {!mostrarFormNovaPerspectiva ? (
+          <Button 
+            onClick={() => setMostrarFormNovaPerspectiva(true)}
+            variant="outline"
+            className="w-full gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Adicionar Nova Perspectiva
+          </Button>
+        ) : (
+          <Card className="bg-gray-50">
+            <CardContent className="pt-6 space-y-3">
+              <div>
+                <label className="text-sm font-medium">Nome da Perspectiva</label>
+                <input
+                  type="text"
+                  value={novaPerspectiva.nome}
+                  onChange={(e) => setNovaPerspectiva({ ...novaPerspectiva, nome: e.target.value })}
+                  placeholder="Ex: Inovação, Sustentabilidade..."
+                  className="w-full border rounded px-3 py-2 mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Cor</label>
+                <div className="flex gap-2 mt-1">
+                  <input
+                    type="color"
+                    value={novaPerspectiva.cor}
+                    onChange={(e) => setNovaPerspectiva({ ...novaPerspectiva, cor: e.target.value })}
+                    className="w-12 h-10 border rounded cursor-pointer"
+                  />
+                  <span className="text-sm text-gray-600 self-center">{novaPerspectiva.cor}</span>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={adicionarNovaPerspectiva}
+                  className="flex-1 gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
+                  disabled={!novaPerspectiva.nome}
+                >
+                  <Plus className="h-4 w-4" />
+                  Criar Perspectiva
+                </Button>
+                <Button 
+                  onClick={() => setMostrarFormNovaPerspectiva(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Salvar e Exportar */}

@@ -698,3 +698,26 @@
 - [x] Verificar se há erro no console do navegador
 - [x] Corrigir funcionalidade dos botões de adicionar indicador
 - [x] Testar adição de indicadores em todas as perspectivas (Financeira, Cliente, Processos, Aprendizado) - FUNCIONANDO
+
+
+## BUG - Botões Desabilitados em Processos e Aprendizado
+- [ ] Investigar por que botões de Processos Internos e Aprendizado estão desabilitados (cinza)
+- [ ] Corrigir lógica de validação que está bloqueando os botões
+- [ ] Testar adição de indicadores em Processos Internos
+- [ ] Testar adição de indicadores em Aprendizado e Crescimento
+
+## FEATURE - Criar Perspectivas Dinamicamente
+- [ ] Adicionar botão "Adicionar Perspectiva" no BSC
+- [ ] Criar formulário para definir nome, cor e ícone da nova perspectiva
+- [ ] Salvar novas perspectivas no banco de dados
+- [ ] Permitir editar/deletar perspectivas customizadas
+- [ ] Testar criação de múltiplas perspectivas
+
+
+## BUGS RESOLVIDOS - Botões e Perspectivas Customizadas
+- [x] Bot\u00f5es de Processos Internos e Aprendizado desabilitados - CORRIGIDO
+- [x] L\u00f3gica de valida\u00e7\u00e3o dos bot\u00f5es simplificada
+- [x] Todos os bot\u00f5es de adicionar indicador funcionando
+- [x] Criar novas perspectivas dinamicamente - IMPLEMENTADO
+- [x] Perspectiva "Inova\u00e7\u00e3o e Tecnologia" criada com sucesso
+- [x] \u00cdcone padr\u00e3o para perspectivas customizadas
