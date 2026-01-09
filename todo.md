@@ -721,3 +721,10 @@
 - [x] Criar novas perspectivas dinamicamente - IMPLEMENTADO
 - [x] Perspectiva "Inova\u00e7\u00e3o e Tecnologia" criada com sucesso
 - [x] \u00cdcone padr\u00e3o para perspectivas customizadas
+
+
+## BUG - PESTEL não permite preencher informações
+- [x] Investigar por que não consegue adicionar fatores PESTEL - CORRIGIDO
+- [x] Verificar se há erro no console do navegador - import de useState faltava
+- [x] Corrigir funcionalidade de preenchimento do PESTEL - CORRIGIDO
+- [x] Testar adição de fatores em todas as categorias (Político, Econômico, Social, Tecnológico, Ambiental, Legal) - FUNCIONANDO

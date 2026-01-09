@@ -129,6 +129,13 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
     return (fatoresCat.reduce((a, f) => a + f.impacto * f.probabilidade, 0) / fatoresCat.length).toFixed(1);
   };
 
+  const getCorPorRisco = (risco: number) => {
+    if (risco >= 16) return "#ef4444";
+    if (risco >= 12) return "#f97316";
+    if (risco >= 8) return "#eab308";
+    return "#22c55e";
+  };
+
   const dadosScatter = fatores.map((f) => ({
     x: f.probabilidade,
     y: f.impacto,
@@ -149,10 +156,10 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
   const handleSave = () => {
     // Converter fatores para formato do banco
     const fatoresParaSalvar = fatores.map((f) => ({
-      categoria: f.categoria.toLowerCase() as "politico" | "economico" | "social" | "tecnologico" | "ambiental" | "legal",
-      descricao: f.descricao,
+      categoria: f.categoria.toLowerCase(),
       impacto: f.impacto,
       probabilidade: f.probabilidade,
+      descricao: f.descricao,
     }));
 
     salvarMutation.mutate({
@@ -161,43 +168,32 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
     });
   };
 
-  const getCorPorRisco = (risco: number) => {
-    if (risco >= 16) return "#ef4444";
-    if (risco >= 12) return "#f97316";
-    if (risco >= 8) return "#eab308";
-    return "#22c55e";
-  };
+  if (isLoading) return <div className="text-center py-8">Carregando...</div>;
 
   return (
-    <div className="space-y-6">
-      {/* Resumo */}
-      <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50 border-orange-200">
+    <div className="space-y-4">
+      {/* Métricas Resumidas */}
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white">
-              <AlertTriangle className="h-5 w-5" />
-            </div>
-            Análise PESTEL
-          </CardTitle>
-          <CardDescription>Fatores Políticos, Econômicos, Sociais, Tecnológicos, Ambientais e Legais</CardDescription>
+          <CardTitle className="text-base">Resumo da Análise PESTEL</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-orange-100 p-3 rounded-lg text-center">
-              <div className="text-2xl font-bold text-orange-700">{fatores.length}</div>
-              <div className="text-xs text-orange-600">Total de Fatores</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <div className="text-2xl font-bold text-blue-700">{fatores.length}</div>
+              <div className="text-xs text-blue-600">Total de Fatores</div>
+            </div>
+            <div className="bg-orange-100 p-3 rounded-lg">
+              <div className="text-2xl font-bold text-orange-700">
+                {(fatores.reduce((a, f) => a + f.impacto * f.probabilidade, 0) / (fatores.length || 1)).toFixed(1)}
+              </div>
+              <div className="text-xs text-orange-600">Risco Médio</div>
             </div>
             <div className="bg-red-100 p-3 rounded-lg text-center">
               <div className="text-2xl font-bold text-red-700">
-                {fatores.length > 0 ? (fatores.reduce((a, f) => a + f.impacto * f.probabilidade, 0) / fatores.length).toFixed(1) : "0"}
+                {fatores.filter((f) => f.impacto * f.probabilidade >= 12).length}
               </div>
-              <div className="text-xs text-red-600">Risco Médio</div>
-            </div>
-            <div className="bg-blue-100 p-3 rounded-lg text-center">
-              <div className="text-2xl font-bold text-blue-700">
-                {fatores.length > 0 ? (fatores.reduce((a, f) => a + f.impacto, 0) / fatores.length).toFixed(1) : "0"}/5
-              </div>
-              <div className="text-xs text-blue-600">Impacto Médio</div>
+              <div className="text-xs text-red-600">Alto Risco</div>
             </div>
             <div className="bg-purple-100 p-3 rounded-lg text-center">
               <div className="text-2xl font-bold text-purple-700">
@@ -285,16 +281,16 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Fatores por Categoria</CardTitle>
+              <CardTitle className="text-base">Risco por Categoria</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={dadosBarras}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="categoria" angle={-45} textAnchor="end" height={80} />
+                  <XAxis dataKey="categoria" angle={-45} textAnchor="end" height={80} interval={0} tick={{ fontSize: 12 }} />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="quantidade" name="Quantidade">
+                  <Bar dataKey="risco" radius={[8, 8, 0, 0]}>
                     {dadosBarras.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.cor} />
                     ))}
@@ -448,14 +444,13 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
             { nome: empresa?.nome || "Empresa", logo: templateConfig?.logoUrl || undefined },
             fatores.map(f => ({
               categoria: f.categoria.toLowerCase(),
-              descricao: f.descricao,
               impacto: f.impacto,
               probabilidade: f.probabilidade,
+              descricao: f.descricao,
             })),
             convertTemplateConfig(templateConfig)
           )}
-          variant="outline"
-          className="gap-2"
+          className="gap-2 bg-green-600 hover:bg-green-700 text-white"
         >
           <FileDown className="h-4 w-4" />
           Exportar PDF
@@ -463,7 +458,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
       </div>
 
       {/* Comentários */}
-      <CommentSection empresaId={empresaId} tipoAnalise="pestel" />
+      <CommentSection entityType="pestel" entityId={empresaId.toString()} />
     </div>
   );
 }
