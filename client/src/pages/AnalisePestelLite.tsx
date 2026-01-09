@@ -487,24 +487,33 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
 
       {/* Modal de Edição de Fator */}
       {fatorEmEdicao && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle className="text-base">Editar Fator</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6 space-y-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Editar Fator PESTEL</h2>
+                <button
+                  onClick={() => setFatorEmEdicao(null)}
+                  className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+              
               <div>
                 <label className="text-sm font-semibold">Descrição</label>
-                <p className="text-sm text-gray-600 mt-1">{fatorEmEdicao.descricao}</p>
+                <p className="text-sm text-gray-600 mt-1 bg-gray-50 p-2 rounded">{fatorEmEdicao.descricao}</p>
               </div>
+              
               <div>
                 <label className="text-sm font-semibold">Categoria</label>
-                <p className="text-sm text-gray-600 mt-1">{fatorEmEdicao.categoria}</p>
+                <p className="text-sm text-gray-600 mt-1 bg-gray-50 p-2 rounded">{fatorEmEdicao.categoria}</p>
               </div>
-              <div>
-                <div className="flex justify-between mb-2">
+              
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <div className="flex justify-between mb-3">
                   <label className="text-sm font-semibold">Impacto</label>
-                  <span className="text-sm font-bold">{impactoEdicao}/5</span>
+                  <span className="text-sm font-bold text-blue-600">{impactoEdicao}/5</span>
                 </div>
                 <Slider
                   value={[impactoEdicao]}
@@ -515,10 +524,11 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
                   className="mt-2"
                 />
               </div>
-              <div>
-                <div className="flex justify-between mb-2">
+              
+              <div className="bg-orange-50 p-3 rounded-lg">
+                <div className="flex justify-between mb-3">
                   <label className="text-sm font-semibold">Probabilidade</label>
-                  <span className="text-sm font-bold">{probabilidadeEdicao}/5</span>
+                  <span className="text-sm font-bold text-orange-600">{probabilidadeEdicao}/5</span>
                 </div>
                 <Slider
                   value={[probabilidadeEdicao]}
@@ -529,19 +539,30 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
                   className="mt-2"
                 />
               </div>
-              <div className="flex gap-2">
-                <Button onClick={editarFator} className="flex-1 bg-blue-600 hover:bg-blue-700">
-                  Salvar
+              
+              <div className="flex gap-2 pt-4 border-t">
+                <Button 
+                  onClick={editarFator} 
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Salvar Alterações
                 </Button>
-                <Button onClick={deletarFatorEdicao} className="flex-1 bg-red-600 hover:bg-red-700">
+                <Button 
+                  onClick={deletarFatorEdicao} 
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                >
                   Deletar
                 </Button>
-                <Button onClick={() => setFatorEmEdicao(null)} variant="outline" className="flex-1">
+                <Button 
+                  onClick={() => setFatorEmEdicao(null)} 
+                  variant="outline" 
+                  className="flex-1"
+                >
                   Cancelar
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
 
