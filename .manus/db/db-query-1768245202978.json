@@ -1,0 +1,124 @@
+{
+  "query": "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE';",
+  "rows": [
+    {
+      "TABLE_NAME": "pestel_fatores"
+    },
+    {
+      "TABLE_NAME": "template_configs"
+    },
+    {
+      "TABLE_NAME": "template_versions"
+    },
+    {
+      "TABLE_NAME": "analise_comentarios"
+    },
+    {
+      "TABLE_NAME": "comentario_mencoes"
+    },
+    {
+      "TABLE_NAME": "comentario_anexos"
+    },
+    {
+      "TABLE_NAME": "areas_negocio"
+    },
+    {
+      "TABLE_NAME": "__drizzle_migrations"
+    },
+    {
+      "TABLE_NAME": "users"
+    },
+    {
+      "TABLE_NAME": "acoes"
+    },
+    {
+      "TABLE_NAME": "auditoria"
+    },
+    {
+      "TABLE_NAME": "canais"
+    },
+    {
+      "TABLE_NAME": "ciclos"
+    },
+    {
+      "TABLE_NAME": "desdobramento_metas"
+    },
+    {
+      "TABLE_NAME": "empresas"
+    },
+    {
+      "TABLE_NAME": "historico_faturamento"
+    },
+    {
+      "TABLE_NAME": "identidade_organizacional"
+    },
+    {
+      "TABLE_NAME": "iniciativas"
+    },
+    {
+      "TABLE_NAME": "kpi_valores"
+    },
+    {
+      "TABLE_NAME": "kpis"
+    },
+    {
+      "TABLE_NAME": "metas"
+    },
+    {
+      "TABLE_NAME": "objetivos"
+    },
+    {
+      "TABLE_NAME": "produtos"
+    },
+    {
+      "TABLE_NAME": "projetos"
+    },
+    {
+      "TABLE_NAME": "usuario_empresas"
+    },
+    {
+      "TABLE_NAME": "identidade_grupo"
+    },
+    {
+      "TABLE_NAME": "objetivos_grupo"
+    },
+    {
+      "TABLE_NAME": "objetivo_grupo_kpis"
+    },
+    {
+      "TABLE_NAME": "projeto_grupo_kpis"
+    },
+    {
+      "TABLE_NAME": "projetos_grupo"
+    },
+    {
+      "TABLE_NAME": "acoes_grupo"
+    },
+    {
+      "TABLE_NAME": "analise_pestel"
+    },
+    {
+      "TABLE_NAME": "cinco_forcas_porter"
+    },
+    {
+      "TABLE_NAME": "analise_stakeholders"
+    },
+    {
+      "TABLE_NAME": "analise_rbv_vrio"
+    },
+    {
+      "TABLE_NAME": "analise_swot_tows"
+    },
+    {
+      "TABLE_NAME": "analise_okr"
+    },
+    {
+      "TABLE_NAME": "bsc_indicadores"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\npestel_fatores\ntemplate_configs\ntemplate_versions\nanalise_comentarios\ncomentario_mencoes\ncomentario_anexos\nareas_negocio\n__drizzle_migrations\nusers\nacoes\nauditoria\ncanais\nciclos\ndesdobramento_metas\nempresas\nhistorico_faturamento\nidentidade_organizacional\niniciativas\nkpi_valores\nkpis\nmetas\nobjetivos\nprodutos\nprojetos\nusuario_empresas\nidentidade_grupo\nobjetivos_grupo\nobjetivo_grupo_kpis\nprojeto_grupo_kpis\nprojetos_grupo\nacoes_grupo\nanalise_pestel\ncinco_forcas_porter\nanalise_stakeholders\nanalise_rbv_vrio\nanalise_swot_tows\nanalise_okr\nbsc_indicadores\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

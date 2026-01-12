@@ -746,3 +746,12 @@
 - [x] Implementar função de salvar alterações
 - [x] Implementar função de deletar fator
 - [x] Testar modal de edição completo - FUNCIONANDO PERFEITAMENTE
+
+## Correção de Banco de Dados e Novas Funcionalidades
+- [x] Fazer backup completo do banco de dados
+- [x] Remover todas as tabelas do banco
+- [x] Limpar histórico de migrações do Drizzle
+- [x] Regenerar e executar migrações do zero
+- [x] Restaurar dados do backup
+- [x] Testar persistência de configurações de template
+- [x] Implementar botão para excluir empresas do grupo
