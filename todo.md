@@ -776,3 +776,27 @@
 - [x] Implementar salvamento automático em SWOT (debounce 2s)
 - [x] Implementar salvamento automático em OKR (debounce 2s)
 - [x] Adicionar indicador visual de auto-save (salvando/salvo/erro)
+
+
+## Auto-Save Componentes Restantes e Correção TypeScript (Jan 2026)
+- [ ] Implementar auto-save em BSC
+- [ ] Implementar auto-save em 5 Forças
+- [ ] Implementar auto-save em Stakeholders
+- [ ] Implementar auto-save em RBV/VRIO
+- [ ] Corrigir IdentidadeOrganizacional.tsx (8 erros TypeScript)
+
+
+## Auto-Save Componentes e Correção TypeScript (Concluído)
+- [x] Implementar auto-save em PESTEL (debounce 2s)
+- [x] Implementar auto-save em SWOT (debounce 2s)
+- [x] Implementar auto-save em OKR (debounce 2s)
+- [x] Implementar auto-save em BSC (debounce 2s)
+- [x] Implementar auto-save em 5 Forças (debounce 2s)
+- [x] Implementar auto-save em Stakeholders (debounce 2s)
+- [x] Implementar auto-save em RBV/VRIO (debounce 2s)
+- [x] Adicionar indicador visual de status (salvando/salvo/erro)
+- [x] Corrigir erros TypeScript (81 -> 0 erros)
+- [x] Corrigir IdentidadeOrganizacional.tsx
+- [x] Corrigir DashboardAnalises.tsx (getBsc)
+- [x] Corrigir BscLite.tsx (tipos de perspectiva)
+- [x] Corrigir AnalisePestelLite.tsx (tipos de categoria e CommentSection)

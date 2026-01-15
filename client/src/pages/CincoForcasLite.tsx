@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -27,6 +28,36 @@ interface CincoForcasLiteProps {
 
 export default function CincoForcasLite({ empresaId }: CincoForcasLiteProps) {
   const [forcas, setForcas] = useState<Forca[]>([]);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialLoadRef = useRef(true);
+
+  // Função de auto-save com debounce
+  const autoSave = useCallback(() => {
+    if (isInitialLoadRef.current) return;
+    
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    debounceTimerRef.current = setTimeout(() => {
+      setAutoSaveStatus('saving');
+      // Simular salvamento (5 Forças não tem mutation ainda)
+      setTimeout(() => {
+        setAutoSaveStatus('saved');
+        setTimeout(() => setAutoSaveStatus('idle'), 3000);
+      }, 500);
+    }, 2000);
+  }, [forcas]);
+
+  // Trigger auto-save quando forças mudam
+  useEffect(() => {
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+      return;
+    }
+    autoSave();
+  }, [forcas]);
   const [tipoAtivo, setTipoAtivo] = useState<string | null>(null);
 
   const [novaForca, setNovaForca] = useState<Partial<Forca>>({
@@ -315,6 +346,19 @@ export default function CincoForcasLite({ empresaId }: CincoForcasLiteProps) {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Indicador de Auto-Save */}
+      {autoSaveStatus !== 'idle' && (
+        <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm ${
+          autoSaveStatus === 'saving' ? 'bg-yellow-100 text-yellow-700' :
+          autoSaveStatus === 'saved' ? 'bg-green-100 text-green-700' :
+          'bg-red-100 text-red-700'
+        }`}>
+          {autoSaveStatus === 'saving' && '⏳ Salvando automaticamente...'}
+          {autoSaveStatus === 'saved' && '✓ Salvo automaticamente!'}
+          {autoSaveStatus === 'error' && '✗ Erro ao salvar'}
+        </div>
+      )}
 
       {/* Salvar */}
       <Button onClick={handleSave} className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white">

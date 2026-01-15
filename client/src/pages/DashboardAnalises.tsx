@@ -44,7 +44,7 @@ export default function DashboardAnalises() {
     { empresaId: empresaId! },
     { enabled: !!empresaId }
   );
-  const { data: bscData } = trpc.analises.getBsc.useQuery(
+  const { data: bscData } = trpc.bsc.getByEmpresa.useQuery(
     { empresaId: empresaId! },
     { enabled: !!empresaId }
   );

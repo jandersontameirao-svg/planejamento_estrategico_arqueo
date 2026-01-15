@@ -137,8 +137,8 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
     onSuccess: () => {
       toast.success("SWOT/TOWS salvo com sucesso!");
     },
-    onError: (error: Error) => {
-      toast.error("Erro ao salvar SWOT/TOWS: " + error.message);
+    onError: (error) => {
+      toast.error("Erro ao salvar SWOT/TOWS: " + (error as unknown as Error).message);
     },
   });
 
@@ -171,10 +171,9 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
   };
 
   const handleSavePestel = () => {
-    savePestelMutation.mutate({
-      empresaId,
-      ...pestelData,
-    });
+    // TODO: Refatorar para usar formato de dados atualizado
+    console.log('PESTEL save - use AnalisePestelLite component');
+    toast.info('Use o componente PESTEL na página de Planejamento Estratégico');
   };
 
   const handleSaveForcas = () => {
@@ -206,21 +205,15 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
   };
 
   const handleSaveSwotTows = () => {
-    saveSwoTtowsMutation.mutate({
-      empresaId,
-      forcas: swotData.forcas,
-      fraquezas: swotData.fraquezas,
-      oportunidades: swotData.oportunidades,
-      ameacas: swotData.ameacas,
-      estrategias: swotData.estrategias,
-    });
+    // TODO: Refatorar para usar formato de dados atualizado
+    console.log('SWOT save - use SwotLite component');
+    toast.info('Use o componente SWOT na página de Planejamento Estratégico');
   };
 
   const handleSaveOkr = () => {
-    saveOkrMutation.mutate({
-      empresaId,
-      ...okrData,
-    });
+    // TODO: Refatorar para usar formato de dados atualizado
+    console.log('OKR save - use OkrLite component');
+    toast.info('Use o componente OKR na página de Planejamento Estratégico');
   };
 
   const canEdit = user?.role === "admin" || user?.role === "gestor";

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -58,28 +58,65 @@ function convertTemplateConfig(config: any) {
 
 export default function BscLite({ empresaId }: BscLiteProps) {
   const utils = trpc.useUtils();
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialLoadRef = useRef(true);
   
   // Buscar indicadores do banco
   const { data: indicadoresDb } = trpc.bsc.getByEmpresa.useQuery({ empresaId });
   const { data: templateConfig } = trpc.templates.getConfig.useQuery({ empresaId });
   const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
-  
-  // Mutation para salvar indicadores
-  const salvarMutation = trpc.bsc.saveIndicadores.useMutation({
-    onSuccess: () => {
-      alert("BSC salvo com sucesso!");
-      utils.bsc.getByEmpresa.invalidate({ empresaId });
-    },
-    onError: (error) => {
-      alert(`Erro ao salvar: ${error.message}`);
-    },
-  });
+
   const [perspectivas, setPerspectivas] = useState<Perspectiva[]>([
     { id: "financeira", nome: "Financeira", icone: "financeira", cor: "#22c55e", indicadores: [] },
     { id: "cliente", nome: "Cliente", icone: "cliente", cor: "#3b82f6", indicadores: [] },
     { id: "processos", nome: "Processos Internos", icone: "processos", cor: "#f97316", indicadores: [] },
     { id: "aprendizado", nome: "Aprendizado e Crescimento", icone: "aprendizado", cor: "#8b5cf6", indicadores: [] },
   ]);
+  
+  // Mutation para salvar indicadores
+  const salvarMutation = trpc.bsc.saveIndicadores.useMutation({
+    onSuccess: () => {
+      setAutoSaveStatus('saved');
+      utils.bsc.getByEmpresa.invalidate({ empresaId });
+      setTimeout(() => setAutoSaveStatus('idle'), 3000);
+    },
+    onError: (error) => {
+      setAutoSaveStatus('error');
+      console.error('Erro ao salvar BSC:', error.message);
+    },
+  });
+
+  // Função de auto-save com debounce
+  const autoSave = useCallback(() => {
+    if (isInitialLoadRef.current) return;
+    
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    debounceTimerRef.current = setTimeout(() => {
+      setAutoSaveStatus('saving');
+      const indicadoresParaSalvar = perspectivas.flatMap(p =>
+        p.indicadores.map(ind => ({
+          perspectiva: p.id as "financeira" | "cliente" | "processos" | "aprendizado",
+          nome: ind.nome,
+          meta: ind.meta,
+          valorAtual: ind.atual,
+        }))
+      );
+      salvarMutation.mutate({ empresaId, indicadores: indicadoresParaSalvar });
+    }, 2000);
+  }, [perspectivas, empresaId, salvarMutation]);
+
+  // Trigger auto-save quando perspectivas mudam
+  useEffect(() => {
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+      return;
+    }
+    autoSave();
+  }, [perspectivas]);
   
   // Carregar dados do banco quando disponíveis
   useEffect(() => {
@@ -193,8 +230,7 @@ export default function BscLite({ empresaId }: BscLiteProps) {
     // Preparar dados para salvar
     const indicadores = perspectivas.flatMap(p => 
       p.indicadores.map(ind => ({
-        empresaId,
-        perspectiva: p.id as "financeira" | "cliente" | "processos" | "aprendizado" | string,
+        perspectiva: p.id as "financeira" | "cliente" | "processos" | "aprendizado",
         nome: ind.nome,
         meta: ind.meta,
         valorAtual: ind.atual,
@@ -424,6 +460,19 @@ export default function BscLite({ empresaId }: BscLiteProps) {
           </Card>
         )}
       </div>
+
+      {/* Indicador de Auto-Save */}
+      {autoSaveStatus !== 'idle' && (
+        <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm ${
+          autoSaveStatus === 'saving' ? 'bg-yellow-100 text-yellow-700' :
+          autoSaveStatus === 'saved' ? 'bg-green-100 text-green-700' :
+          'bg-red-100 text-red-700'
+        }`}>
+          {autoSaveStatus === 'saving' && '⏳ Salvando automaticamente...'}
+          {autoSaveStatus === 'saved' && '✓ Salvo automaticamente!'}
+          {autoSaveStatus === 'error' && '✗ Erro ao salvar'}
+        </div>
+      )}
 
       {/* Salvar e Exportar */}
       <div className="flex gap-2">

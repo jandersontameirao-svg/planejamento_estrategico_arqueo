@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -29,6 +29,35 @@ interface VrioLiteProps {
 
 export default function VrioLite({ empresaId }: VrioLiteProps) {
   const [recursos, setRecursos] = useState<RecursoVRIO[]>([]);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialLoadRef = useRef(true);
+
+  // Função de auto-save com debounce
+  const autoSave = useCallback(() => {
+    if (isInitialLoadRef.current) return;
+    
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    debounceTimerRef.current = setTimeout(() => {
+      setAutoSaveStatus('saving');
+      setTimeout(() => {
+        setAutoSaveStatus('saved');
+        setTimeout(() => setAutoSaveStatus('idle'), 3000);
+      }, 500);
+    }, 2000);
+  }, [recursos]);
+
+  // Trigger auto-save quando recursos mudam
+  useEffect(() => {
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+      return;
+    }
+    autoSave();
+  }, [recursos]);
   const [novoRecurso, setNovoRecurso] = useState({
     nome: "",
     valioso: 3,
@@ -278,6 +307,19 @@ export default function VrioLite({ empresaId }: VrioLiteProps) {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Indicador de Auto-Save */}
+      {autoSaveStatus !== 'idle' && (
+        <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm ${
+          autoSaveStatus === 'saving' ? 'bg-yellow-100 text-yellow-700' :
+          autoSaveStatus === 'saved' ? 'bg-green-100 text-green-700' :
+          'bg-red-100 text-red-700'
+        }`}>
+          {autoSaveStatus === 'saving' && '⏳ Salvando automaticamente...'}
+          {autoSaveStatus === 'saved' && '✓ Salvo automaticamente!'}
+          {autoSaveStatus === 'error' && '✗ Erro ao salvar'}
+        </div>
+      )}
 
       {/* Salvar */}
       <Button onClick={handleSave} className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">

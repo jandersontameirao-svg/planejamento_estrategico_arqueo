@@ -230,7 +230,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
   const handleSave = () => {
     // Converter fatores para formato do banco
     const fatoresParaSalvar = fatores.map((f) => ({
-      categoria: f.categoria.toLowerCase(),
+      categoria: f.categoria.toLowerCase() as "politico" | "economico" | "social" | "tecnologico" | "ambiental" | "legal",
       impacto: f.impacto,
       probabilidade: f.probabilidade,
       descricao: f.descricao,
@@ -639,7 +639,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
       )}
 
       {/* Comentários */}
-      <CommentSection entityType="pestel" entityId={empresaId.toString()} />
+      <CommentSection empresaId={empresaId} tipoAnalise="pestel" />
     </div>
   );
 }
