@@ -61,7 +61,7 @@ export default function BscLite({ empresaId }: BscLiteProps) {
   
   // Buscar indicadores do banco
   const { data: indicadoresDb } = trpc.bsc.getByEmpresa.useQuery({ empresaId });
-  const { data: templateConfig } = trpc.template.getConfig.useQuery({ empresaId });
+  const { data: templateConfig } = trpc.templates.getConfig.useQuery({ empresaId });
   const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
   
   // Mutation para salvar indicadores

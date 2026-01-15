@@ -133,11 +133,11 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
     },
   });
 
-  const saveSwoTtowsMutation = trpc.analises.saveSwoTtows.useMutation({
+  const saveSwoTtowsMutation = trpc.analises.saveSwot.useMutation({
     onSuccess: () => {
       toast.success("SWOT/TOWS salvo com sucesso!");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error("Erro ao salvar SWOT/TOWS: " + error.message);
     },
   });

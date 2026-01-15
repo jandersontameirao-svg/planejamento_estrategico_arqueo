@@ -29,21 +29,21 @@ export default function DashboardGrupoAnalises() {
   // Calcular métricas consolidadas
   const totalEmpresas = empresas?.length || 0;
   const empresasComAnalises = progressoEmpresas?.filter(e => 
-    e.pestel > 0 || e.swot > 0 || e.okr > 0 || e.bsc > 0
+    e.progressoPestel > 0 || e.progressoSwot > 0 || e.progressoOkr > 0 || e.progressoBsc > 0
   ).length || 0;
 
   const progressoMedio = progressoEmpresas?.length
     ? Math.round(
         progressoEmpresas.reduce((acc, e) => 
-          acc + (e.pestel + e.swot + e.okr + e.bsc) / 4, 0
+          acc + (e.progressoPestel + e.progressoSwot + e.progressoOkr + e.progressoBsc) / 4, 0
         ) / progressoEmpresas.length
       )
     : 0;
 
   const analisesMaisCompletas = progressoEmpresas
     ?.sort((a, b) => {
-      const avgA = (a.pestel + a.swot + a.okr + a.bsc) / 4;
-      const avgB = (b.pestel + b.swot + b.okr + b.bsc) / 4;
+      const avgA = (a.progressoPestel + a.progressoSwot + a.progressoOkr + a.progressoBsc) / 4;
+      const avgB = (b.progressoPestel + b.progressoSwot + b.progressoOkr + b.progressoBsc) / 4;
       return avgB - avgA;
     })
     .slice(0, 3) || [];
@@ -53,46 +53,46 @@ export default function DashboardGrupoAnalises() {
     {
       analise: "PESTEL",
       progresso: progressoEmpresas?.length
-        ? Math.round(progressoEmpresas.reduce((acc, e) => acc + e.pestel, 0) / progressoEmpresas.length)
+        ? Math.round(progressoEmpresas.reduce((acc, e) => acc + e.progressoPestel, 0) / progressoEmpresas.length)
         : 0,
     },
     {
       analise: "SWOT",
       progresso: progressoEmpresas?.length
-        ? Math.round(progressoEmpresas.reduce((acc, e) => acc + e.swot, 0) / progressoEmpresas.length)
+        ? Math.round(progressoEmpresas.reduce((acc, e) => acc + e.progressoSwot, 0) / progressoEmpresas.length)
         : 0,
     },
     {
       analise: "OKR",
       progresso: progressoEmpresas?.length
-        ? Math.round(progressoEmpresas.reduce((acc, e) => acc + e.okr, 0) / progressoEmpresas.length)
+        ? Math.round(progressoEmpresas.reduce((acc, e) => acc + e.progressoOkr, 0) / progressoEmpresas.length)
         : 0,
     },
     {
       analise: "BSC",
       progresso: progressoEmpresas?.length
-        ? Math.round(progressoEmpresas.reduce((acc, e) => acc + e.bsc, 0) / progressoEmpresas.length)
+        ? Math.round(progressoEmpresas.reduce((acc, e) => acc + e.progressoBsc, 0) / progressoEmpresas.length)
         : 0,
     },
   ];
 
   // Dados para gráfico de barras (progresso por empresa)
   const barData = progressoEmpresas?.map(e => ({
-    nome: e.empresaNome.length > 15 ? e.empresaNome.substring(0, 15) + "..." : e.empresaNome,
-    PESTEL: e.pestel,
-    SWOT: e.swot,
-    OKR: e.okr,
-    BSC: e.bsc,
+    nome: e.nomeEmpresa.length > 15 ? e.nomeEmpresa.substring(0, 15) + "..." : e.nomeEmpresa,
+    PESTEL: e.progressoPestel,
+    SWOT: e.progressoSwot,
+    OKR: e.progressoOkr,
+    BSC: e.progressoBsc,
   })) || [];
 
   // Dados para gráfico de pizza (distribuição de completude)
   const pieData = [
-    { name: "Completo (>80%)", value: progressoEmpresas?.filter(e => (e.pestel + e.swot + e.okr + e.bsc) / 4 > 80).length || 0 },
+    { name: "Completo (>80%)", value: progressoEmpresas?.filter(e => (e.progressoPestel + e.progressoSwot + e.progressoOkr + e.progressoBsc) / 4 > 80).length || 0 },
     { name: "Em Andamento (50-80%)", value: progressoEmpresas?.filter(e => {
-      const avg = (e.pestel + e.swot + e.okr + e.bsc) / 4;
+      const avg = (e.progressoPestel + e.progressoSwot + e.progressoOkr + e.progressoBsc) / 4;
       return avg >= 50 && avg <= 80;
     }).length || 0 },
-    { name: "Inicial (<50%)", value: progressoEmpresas?.filter(e => (e.pestel + e.swot + e.okr + e.bsc) / 4 < 50).length || 0 },
+    { name: "Inicial (<50%)", value: progressoEmpresas?.filter(e => (e.progressoPestel + e.progressoSwot + e.progressoOkr + e.progressoBsc) / 4 < 50).length || 0 },
   ];
 
   const COLORS = ["#22c55e", "#eab308", "#ef4444"];
@@ -258,7 +258,7 @@ export default function DashboardGrupoAnalises() {
           <CardContent>
             <div className="space-y-4">
               {analisesMaisCompletas.map((empresa, index) => {
-                const progressoGeral = Math.round((empresa.pestel + empresa.swot + empresa.okr + empresa.bsc) / 4);
+                const progressoGeral = Math.round((empresa.progressoPestel + empresa.progressoSwot + empresa.progressoOkr + empresa.progressoBsc) / 4);
                 return (
                   <div key={empresa.empresaId} className="flex items-center gap-4">
                     <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold text-white ${
@@ -267,12 +267,12 @@ export default function DashboardGrupoAnalises() {
                       {index + 1}
                     </div>
                     <div className="flex-1">
-                      <div className="font-semibold">{empresa.empresaNome}</div>
+                      <div className="font-semibold">{empresa.nomeEmpresa}</div>
                       <div className="flex gap-2 mt-1">
-                        <span className="text-xs px-2 py-1 bg-orange-100 text-orange-800 rounded">PESTEL: {empresa.pestel}%</span>
-                        <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">SWOT: {empresa.swot}%</span>
-                        <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">OKR: {empresa.okr}%</span>
-                        <span className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded">BSC: {empresa.bsc}%</span>
+                        <span className="text-xs px-2 py-1 bg-orange-100 text-orange-800 rounded">PESTEL: {empresa.progressoPestel}%</span>
+                        <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">SWOT: {empresa.progressoSwot}%</span>
+                        <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">OKR: {empresa.progressoOkr}%</span>
+                        <span className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded">BSC: {empresa.progressoBsc}%</span>
                       </div>
                     </div>
                     <div className="text-right">

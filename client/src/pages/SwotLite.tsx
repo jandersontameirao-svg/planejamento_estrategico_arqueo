@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,6 +54,11 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
   const [oportunidades, setOportunidades] = useState<ItemSwot[]>([]);
   const [ameacas, setAmeacas] = useState<ItemSwot[]>([]);
 
+  // Flag para evitar auto-save no carregamento inicial
+  const isInitialLoad = useRef(true);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
   // Carregar itens do banco ao montar o componente
   useEffect(() => {
     if (swotData && Array.isArray(swotData)) {
@@ -65,8 +70,44 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
       setFraquezas(fraquezasDb);
       setOportunidades(oportunidadesDb);
       setAmeacas(ameacasDb);
+      setTimeout(() => { isInitialLoad.current = false; }, 500);
     }
   }, [swotData]);
+
+  // Função de auto-save com debounce
+  const triggerAutoSave = useCallback(() => {
+    const totalItems = forcas.length + fraquezas.length + oportunidades.length + ameacas.length;
+    if (isInitialLoad.current || totalItems === 0) return;
+    
+    if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
+    
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      const items = [
+        ...forcas.map(f => ({ tipo: 'forca' as const, descricao: f.descricao })),
+        ...fraquezas.map(f => ({ tipo: 'fraqueza' as const, descricao: f.descricao })),
+        ...oportunidades.map(f => ({ tipo: 'oportunidade' as const, descricao: f.descricao })),
+        ...ameacas.map(f => ({ tipo: 'ameaca' as const, descricao: f.descricao })),
+      ];
+      
+      setAutoSaveStatus('saving');
+      salvarMutation.mutate(
+        { empresaId, items },
+        {
+          onSuccess: () => {
+            setAutoSaveStatus('saved');
+            setTimeout(() => setAutoSaveStatus('idle'), 2000);
+          },
+          onError: () => setAutoSaveStatus('error'),
+        }
+      );
+    }, 2000);
+  }, [forcas, fraquezas, oportunidades, ameacas, empresaId, salvarMutation]);
+
+  // Disparar auto-save quando itens mudam
+  useEffect(() => {
+    triggerAutoSave();
+    return () => { if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current); };
+  }, [forcas, fraquezas, oportunidades, ameacas, triggerAutoSave]);
 
   const [novoItem, setNovoItem] = useState("");
   const [tipoSelecionado, setTipoSelecionado] = useState<"forcas" | "fraquezas" | "oportunidades" | "ameacas">("forcas");
@@ -265,11 +306,24 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
         </CardContent>
       </Card>
 
+      {/* Indicador de Auto-Save */}
+      {autoSaveStatus !== 'idle' && (
+        <div className={`text-sm px-3 py-2 rounded-lg flex items-center gap-2 ${
+          autoSaveStatus === 'saving' ? 'bg-blue-100 text-blue-700' :
+          autoSaveStatus === 'saved' ? 'bg-green-100 text-green-700' :
+          'bg-red-100 text-red-700'
+        }`}>
+          {autoSaveStatus === 'saving' && <><span className="animate-spin">⏳</span> Salvando automaticamente...</>}
+          {autoSaveStatus === 'saved' && <><span>✓</span> Salvo automaticamente!</>}
+          {autoSaveStatus === 'error' && <><span>✕</span> Erro ao salvar. Tente manualmente.</>}
+        </div>
+      )}
+
       {/* Salvar e Exportar */}
       <div className="flex gap-2">
-        <Button onClick={handleSave} className="flex-1 gap-2 bg-green-600 hover:bg-green-700 text-white">
+        <Button onClick={handleSave} className="flex-1 gap-2 bg-green-600 hover:bg-green-700 text-white" disabled={salvarMutation.isPending}>
           <Save className="h-4 w-4" />
-          Salvar Análise SWOT
+          {salvarMutation.isPending ? 'Salvando...' : 'Salvar Análise SWOT'}
         </Button>
         <Button 
           onClick={() => exportSwotPDF(

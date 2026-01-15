@@ -23,7 +23,11 @@ const calcularClassificacao = (v: number, r: number, i: number, o: number) => {
   return { label: "Desvantagem", cor: "bg-red-500", desc: "Recurso não estratégico" };
 };
 
-export default function VrioLite() {
+interface VrioLiteProps {
+  empresaId: number;
+}
+
+export default function VrioLite({ empresaId }: VrioLiteProps) {
   const [recursos, setRecursos] = useState<RecursoVRIO[]>([]);
   const [novoRecurso, setNovoRecurso] = useState({
     nome: "",

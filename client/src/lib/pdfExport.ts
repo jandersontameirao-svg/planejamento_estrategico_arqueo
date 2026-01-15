@@ -133,14 +133,14 @@ export function exportPestelPDF(
 
     if (fatoresCategoria.length > 0) {
       // Título da categoria
-      doc.setFillColor(COLORS.secondary);
+      doc.setFillColor(DEFAULT_COLORS.secondary);
       doc.rect(14, yPos - 5, 182, 8, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(11);
       doc.text(nomesCategorias[cat], 16, yPos);
       yPos += 10;
 
-      doc.setTextColor(COLORS.text);
+      doc.setTextColor(DEFAULT_COLORS.text);
       doc.setFontSize(10);
 
       // Tabela de fatores
@@ -198,10 +198,10 @@ export function exportSwotPDF(
   const ameacas = items.filter((i) => i.tipo === "ameaca");
 
   const quadrantes = [
-    { titulo: "Forças", items: forcas, cor: [76, 175, 80] },
-    { titulo: "Fraquezas", items: fraquezas, cor: [244, 67, 54] },
-    { titulo: "Oportunidades", items: oportunidades, cor: [33, 150, 243] },
-    { titulo: "Ameaças", items: ameacas, cor: [255, 152, 0] },
+    { titulo: "Forças", items: forcas, cor: [76, 175, 80] as [number, number, number] },
+    { titulo: "Fraquezas", items: fraquezas, cor: [244, 67, 54] as [number, number, number] },
+    { titulo: "Oportunidades", items: oportunidades, cor: [33, 150, 243] as [number, number, number] },
+    { titulo: "Ameaças", items: ameacas, cor: [255, 152, 0] as [number, number, number] },
   ];
 
   quadrantes.forEach((quadrante, index) => {
@@ -213,7 +213,7 @@ export function exportSwotPDF(
     doc.text(quadrante.titulo, 16, yPos);
     yPos += 10;
 
-    doc.setTextColor(COLORS.text);
+    doc.setTextColor(DEFAULT_COLORS.text);
     doc.setFontSize(10);
 
     // Lista de itens
@@ -231,7 +231,7 @@ export function exportSwotPDF(
       doc.setTextColor(128, 128, 128);
       doc.text("Nenhum item cadastrado", 16, yPos);
       yPos += 7;
-      doc.setTextColor(COLORS.text);
+      doc.setTextColor(DEFAULT_COLORS.text);
     }
 
     yPos += 5;
@@ -264,14 +264,14 @@ export function exportOkrPDF(
 
   objectives.forEach((obj, index) => {
     // Objetivo
-    doc.setFillColor(COLORS.blue);
+    doc.setFillColor(DEFAULT_COLORS.blue);
     doc.rect(14, yPos - 5, 182, 8, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(12);
     doc.text(`Objetivo ${index + 1}: ${obj.objetivo}`, 16, yPos);
     yPos += 10;
 
-    doc.setTextColor(COLORS.text);
+    doc.setTextColor(DEFAULT_COLORS.text);
     doc.setFontSize(10);
 
     if (obj.descricao) {
@@ -281,10 +281,10 @@ export function exportOkrPDF(
 
     // Key Results
     doc.setFontSize(11);
-    doc.setFont(undefined, "bold");
+    doc.setFont("helvetica", "bold");
     doc.text("Key Results:", 16, yPos);
     yPos += 7;
-    doc.setFont(undefined, "normal");
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
 
     const keyResults = [
@@ -301,7 +301,7 @@ export function exportOkrPDF(
           doc.setTextColor(128, 128, 128);
           doc.text(`     Meta: ${kr.meta}`, 18, yPos);
           yPos += 6;
-          doc.setTextColor(COLORS.text);
+          doc.setTextColor(DEFAULT_COLORS.text);
         }
       }
     });
@@ -337,10 +337,10 @@ export function exportBscPDF(
   let yPos = 50;
 
   const perspectivas = [
-    { id: "financeira", nome: "Financeira", cor: [76, 175, 80] },
-    { id: "clientes", nome: "Clientes", cor: [33, 150, 243] },
-    { id: "processos", nome: "Processos Internos", cor: [255, 152, 0] },
-    { id: "aprendizado", nome: "Aprendizado e Crescimento", cor: [156, 39, 176] },
+    { id: "financeira", nome: "Financeira", cor: [76, 175, 80] as [number, number, number] },
+    { id: "clientes", nome: "Clientes", cor: [33, 150, 243] as [number, number, number] },
+    { id: "processos", nome: "Processos Internos", cor: [255, 152, 0] as [number, number, number] },
+    { id: "aprendizado", nome: "Aprendizado e Crescimento", cor: [156, 39, 176] as [number, number, number] },
   ];
 
   perspectivas.forEach((persp) => {
@@ -355,7 +355,7 @@ export function exportBscPDF(
       doc.text(persp.nome, 16, yPos);
       yPos += 10;
 
-      doc.setTextColor(COLORS.text);
+      doc.setTextColor(DEFAULT_COLORS.text);
 
       // Tabela de indicadores
       const tableData = indsPerspectiva.map((ind) => {

@@ -21,7 +21,11 @@ const classificarQuadrante = (poder: number, interesse: number) => {
   return { label: "Monitorar", cor: "#22c55e", bg: "#dcfce7", icone: Users };
 };
 
-export default function StakeholdersLite() {
+interface StakeholdersLiteProps {
+  empresaId: number;
+}
+
+export default function StakeholdersLite({ empresaId }: StakeholdersLiteProps) {
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
   const [quadranteAtivo, setQuadranteAtivo] = useState<string | null>(null);
 

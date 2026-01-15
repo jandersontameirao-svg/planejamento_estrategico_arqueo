@@ -82,9 +82,9 @@ export default function KpiValoresDialog({
   });
 
   useEffect(() => {
-    if (valorAtual) {
-      setMeta(valorAtual.meta ? parseFloat(valorAtual.meta).toString() : "");
-      setRealizado(valorAtual.realizado ? parseFloat(valorAtual.realizado).toString() : "");
+    if (valorAtual && 'meta' in valorAtual) {
+      setMeta(valorAtual.meta ? parseFloat(String(valorAtual.meta)).toString() : "");
+      setRealizado('realizado' in valorAtual && valorAtual.realizado ? parseFloat(String(valorAtual.realizado)).toString() : "");
     } else {
       setMeta("");
       setRealizado("");
@@ -189,19 +189,19 @@ export default function KpiValoresDialog({
                 />
               </div>
 
-              {valorAtual && valorAtual.percentualAtingimento && (
+              {valorAtual && 'percentualAtingimento' in valorAtual && valorAtual.percentualAtingimento && (
                 <Card className="bg-muted/30">
                   <CardContent className="pt-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-muted-foreground">Percentual de Atingimento</p>
                         <p className="text-2xl font-bold">
-                          {parseFloat(valorAtual.percentualAtingimento).toFixed(1)}%
+                          {parseFloat(String(valorAtual.percentualAtingimento)).toFixed(1)}%
                         </p>
                       </div>
                       <div
-                        className={`w-4 h-4 rounded-full ${getStatusRagColor(valorAtual.statusRag)}`}
-                        title={`Status: ${valorAtual.statusRag}`}
+                        className={`w-4 h-4 rounded-full ${getStatusRagColor('statusRag' in valorAtual ? valorAtual.statusRag : null)}`}
+                        title={`Status: ${'statusRag' in valorAtual ? valorAtual.statusRag : 'N/A'}`}
                       />
                     </div>
                   </CardContent>

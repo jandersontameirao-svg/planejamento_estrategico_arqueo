@@ -21,7 +21,11 @@ const tiposForca = [
   { nome: "Substitutos", icone: Repeat, cor: "#10b981", corBg: "#d1fae5", descricao: "Ameaça de produtos substitutos" },
 ];
 
-export default function CincoForcasLite() {
+interface CincoForcasLiteProps {
+  empresaId: number;
+}
+
+export default function CincoForcasLite({ empresaId }: CincoForcasLiteProps) {
   const [forcas, setForcas] = useState<Forca[]>([]);
   const [tipoAtivo, setTipoAtivo] = useState<string | null>(null);
 

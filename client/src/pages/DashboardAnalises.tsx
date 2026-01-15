@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ const COLORS = ["#8b1538", "#f97316", "#eab308", "#3b82f6", "#10b981"];
 
 export default function DashboardAnalises() {
   const params = useParams();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const empresaId = params.id ? parseInt(params.id) : null;
 
   // Queries para buscar dados das análises

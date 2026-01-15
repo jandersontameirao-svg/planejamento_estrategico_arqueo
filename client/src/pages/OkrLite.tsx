@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,6 +56,11 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
   });
   const [okrs, setOkrs] = useState<OKR[]>([]);
 
+  // Flag para evitar auto-save no carregamento inicial
+  const isInitialLoad = useRef(true);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
   // Carregar objetivos do banco ao montar o componente
   useEffect(() => {
     if (objectivesDb && Array.isArray(objectivesDb)) {
@@ -71,8 +76,47 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
         };
       });
       setOkrs(okrsFormatados);
+      setTimeout(() => { isInitialLoad.current = false; }, 500);
     }
   }, [objectivesDb]);
+
+  // Função de auto-save com debounce
+  const triggerAutoSave = useCallback(() => {
+    if (isInitialLoad.current || okrs.length === 0) return;
+    
+    if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
+    
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      const objectives = okrs.map(okr => ({
+        objetivo: okr.objetivo,
+        descricao: okr.objetivo,
+        resultadoChave1: okr.keyResults[0]?.descricao,
+        metaResultado1: okr.keyResults[0]?.meta?.toString(),
+        resultadoChave2: okr.keyResults[1]?.descricao,
+        metaResultado2: okr.keyResults[1]?.meta?.toString(),
+        resultadoChave3: okr.keyResults[2]?.descricao,
+        metaResultado3: okr.keyResults[2]?.meta?.toString(),
+      }));
+      
+      setAutoSaveStatus('saving');
+      salvarMutation.mutate(
+        { empresaId, objectives },
+        {
+          onSuccess: () => {
+            setAutoSaveStatus('saved');
+            setTimeout(() => setAutoSaveStatus('idle'), 2000);
+          },
+          onError: () => setAutoSaveStatus('error'),
+        }
+      );
+    }, 2000);
+  }, [okrs, empresaId, salvarMutation]);
+
+  // Disparar auto-save quando okrs mudam
+  useEffect(() => {
+    triggerAutoSave();
+    return () => { if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current); };
+  }, [okrs, triggerAutoSave]);
   const [novoObjetivo, setNovoObjetivo] = useState("");
   const [novoKR, setNovoKR] = useState({ okrId: "", descricao: "", meta: 100 });
 
@@ -394,11 +438,24 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
         </CardContent>
       </Card>
 
+      {/* Indicador de Auto-Save */}
+      {autoSaveStatus !== 'idle' && (
+        <div className={`text-sm px-3 py-2 rounded-lg flex items-center gap-2 ${
+          autoSaveStatus === 'saving' ? 'bg-blue-100 text-blue-700' :
+          autoSaveStatus === 'saved' ? 'bg-green-100 text-green-700' :
+          'bg-red-100 text-red-700'
+        }`}>
+          {autoSaveStatus === 'saving' && <><span className="animate-spin">⏳</span> Salvando automaticamente...</>}
+          {autoSaveStatus === 'saved' && <><span>✓</span> Salvo automaticamente!</>}
+          {autoSaveStatus === 'error' && <><span>✕</span> Erro ao salvar. Tente manualmente.</>}
+        </div>
+      )}
+
       {/* Salvar e Exportar */}
       <div className="flex gap-2">
-        <Button onClick={handleSave} className="flex-1 gap-2 bg-cyan-600 hover:bg-cyan-700 text-white">
+        <Button onClick={handleSave} className="flex-1 gap-2 bg-cyan-600 hover:bg-cyan-700 text-white" disabled={salvarMutation.isPending}>
           <Save className="h-4 w-4" />
-          Salvar OKRs
+          {salvarMutation.isPending ? 'Salvando...' : 'Salvar OKRs'}
         </Button>
         <Button 
           onClick={() => exportOkrPDF(

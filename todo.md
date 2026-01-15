@@ -755,3 +755,24 @@
 - [x] Restaurar dados do backup
 - [x] Testar persistência de configurações de template
 - [x] Implementar botão para excluir empresas do grupo
+
+## Correção de Erros TypeScript e Salvamento Automático
+- [ ] Corrigir erros TypeScript em PlanejamentoEstrategico.tsx
+- [ ] Corrigir erros TypeScript em OkrLite.tsx
+- [ ] Corrigir erros TypeScript em componentes Lite
+- [ ] Implementar salvamento automático nas análises PESTEL
+- [ ] Implementar salvamento automático nas análises SWOT
+- [ ] Implementar salvamento automático nas análises OKR
+- [ ] Testar funcionalidades de auto-save
+
+
+## Correção de Erros TypeScript e Auto-Save (Jan 2026)
+- [x] Corrigir erros TypeScript principais (81 -> 8 erros)
+- [x] Corrigir pdfExport.ts - COLORS não definido
+- [x] Corrigir BscLite.tsx - template vs templates
+- [x] Corrigir DashboardGrupoAnalises.tsx - propriedades incorretas
+- [x] Corrigir KpiValoresDialog.tsx - tipos de união
+- [x] Implementar salvamento automático em PESTEL (debounce 2s)
+- [x] Implementar salvamento automático em SWOT (debounce 2s)
+- [x] Implementar salvamento automático em OKR (debounce 2s)
+- [x] Adicionar indicador visual de auto-save (salvando/salvo/erro)

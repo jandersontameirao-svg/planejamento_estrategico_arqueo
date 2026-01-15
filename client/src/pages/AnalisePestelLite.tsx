@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -69,6 +69,11 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
   });
   const [fatores, setFatores] = useState<FatorPestel[]>([]);
 
+  // Flag para evitar auto-save no carregamento inicial
+  const isInitialLoad = useRef(true);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
   // Carregar fatores do banco ao montar o componente
   useEffect(() => {
     if (pestelData && Array.isArray(pestelData)) {
@@ -80,8 +85,56 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         descricao: f.descricao,
       }));
       setFatores(fatoresFormatados);
+      // Marcar que carregamento inicial foi concluído após um breve delay
+      setTimeout(() => {
+        isInitialLoad.current = false;
+      }, 500);
     }
   }, [pestelData]);
+
+  // Função de auto-save com debounce
+  const triggerAutoSave = useCallback(() => {
+    if (isInitialLoad.current || fatores.length === 0) return;
+    
+    // Limpar timeout anterior
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    
+    // Agendar novo save após 2 segundos de inatividade
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      const fatoresParaSalvar = fatores.map((f) => ({
+        categoria: f.categoria.toLowerCase() as any,
+        impacto: f.impacto,
+        probabilidade: f.probabilidade,
+        descricao: f.descricao,
+      }));
+      
+      setAutoSaveStatus('saving');
+      salvarMutation.mutate(
+        { empresaId, fatores: fatoresParaSalvar },
+        {
+          onSuccess: () => {
+            setAutoSaveStatus('saved');
+            setTimeout(() => setAutoSaveStatus('idle'), 2000);
+          },
+          onError: () => {
+            setAutoSaveStatus('error');
+          },
+        }
+      );
+    }, 2000);
+  }, [fatores, empresaId, salvarMutation]);
+
+  // Disparar auto-save quando fatores mudam
+  useEffect(() => {
+    triggerAutoSave();
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [fatores, triggerAutoSave]);
   const [categoriaAtiva, setCategoriaAtiva] = useState<string | null>(null);
 
   const [novoFator, setNovoFator] = useState<Partial<FatorPestel>>({
@@ -461,11 +514,30 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         </CardContent>
       </Card>
 
+      {/* Indicador de Auto-Save */}
+      {autoSaveStatus !== 'idle' && (
+        <div className={`text-sm px-3 py-2 rounded-lg flex items-center gap-2 ${
+          autoSaveStatus === 'saving' ? 'bg-blue-100 text-blue-700' :
+          autoSaveStatus === 'saved' ? 'bg-green-100 text-green-700' :
+          'bg-red-100 text-red-700'
+        }`}>
+          {autoSaveStatus === 'saving' && (
+            <><span className="animate-spin">⏳</span> Salvando automaticamente...</>
+          )}
+          {autoSaveStatus === 'saved' && (
+            <><span>✓</span> Salvo automaticamente!</>
+          )}
+          {autoSaveStatus === 'error' && (
+            <><span>✕</span> Erro ao salvar. Tente manualmente.</>
+          )}
+        </div>
+      )}
+
       {/* Salvar e Exportar */}
       <div className="flex gap-2">
-        <Button onClick={handleSave} className="flex-1 gap-2 bg-orange-600 hover:bg-orange-700 text-white">
+        <Button onClick={handleSave} className="flex-1 gap-2 bg-orange-600 hover:bg-orange-700 text-white" disabled={salvarMutation.isPending}>
           <Save className="h-4 w-4" />
-          Salvar Análise PESTEL
+          {salvarMutation.isPending ? 'Salvando...' : 'Salvar Análise PESTEL'}
         </Button>
         <Button 
           onClick={() => exportPestelPDF(
