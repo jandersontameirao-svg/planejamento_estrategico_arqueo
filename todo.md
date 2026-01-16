@@ -945,3 +945,11 @@
 - [x] Adicionar PlanoDeAcaoPestelIntegrado em DashboardAnalisesArea.tsx se necessário - Não necessário
 - [x] Testar Plano de Ação em Áreas de Negócio - CONFIRMADO em PESTEL, SWOT e BSC
 - [x] Validar persistência de ações em banco de dados por área - Testado com sucesso
+
+
+## Plano de Ação em Empresas do Grupo - 16/01/2026
+- [x] Identificar páginas de planejamento de empresas (PlanejamentoEstrategicoEmpresa.tsx)
+- [x] Verificar se PlanoDeAcaoPestelIntegrado já está integrado nas análises de empresas - JÁ INTEGRADO
+- [x] Adicionar PlanoDeAcaoPestelIntegrado se necessário - Não necessário, já integrado
+- [x] Testar Plano de Ação em empresas do grupo - Testado em PESTEL, SWOT e BSC
+- [x] Validar funcionamento em todas as empresas cadastradas - Testado em Arqueoproject e arqueogis
