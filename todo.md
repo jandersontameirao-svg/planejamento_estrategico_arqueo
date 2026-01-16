@@ -847,3 +847,14 @@
 - [x] Remover notificações de salvamento em AnalisesRestantes.tsx (4 notificações)
 - [x] Remover notificações de salvamento em CincoForcasCompleta.tsx
 - [x] Testar sistema sem notificações de salvamento
+
+
+## Sistema de Desfazer/Refazer (Undo/Redo) - 16/01/2026
+- [x] Criar hook customizado useUndoRedo para gerenciar histórico de estados
+- [x] Integrar Undo/Redo em AnalisePestelLite.tsx
+- [x] Integrar Undo/Redo em AnalisePestelCompleta.tsx
+- [x] Integrar Undo/Redo em CincoForcasCompleta.tsx
+- [x] Integrar Undo/Redo em AnalisesRestantes.tsx (Stakeholders, SWOT, OKR, BSC)
+- [x] Criar componente UndoRedoToolbar com botões Desfazer/Refazer
+- [x] Adicionar atalhos de teclado (Ctrl+Z, Ctrl+Y) no hook
+- [x] Testar funcionalidade Undo/Redo em todos os componentes (Testado em PESTEL)

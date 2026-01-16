@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNotification } from "@/hooks/useNotification";
+import { useUndoRedo } from "@/hooks/useUndoRedo";
+import { UndoRedoToolbar } from "@/components/UndoRedoToolbar";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -68,7 +70,8 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
       console.error("Erro ao salvar PESTEL:", error.message);
     },
   });
-  const [fatores, setFatores] = useState<FatorPestel[]>([]);
+  // Undo/Redo para fatores
+  const { state: fatores, setState: setFatores, undo, redo, canUndo, canRedo } = useUndoRedo<FatorPestel[]>([]);
 
   // Flag para evitar auto-save no carregamento inicial
   const isInitialLoad = useRef(true);
@@ -247,6 +250,11 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
 
   return (
     <div className="space-y-4">
+      {/* Toolbar Undo/Redo */}
+      <div className="flex justify-end">
+        <UndoRedoToolbar onUndo={undo} onRedo={redo} canUndo={canUndo} canRedo={canRedo} />
+      </div>
+      
       {/* Métricas Resumidas */}
       <Card>
         <CardHeader>

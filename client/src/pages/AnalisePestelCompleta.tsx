@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNotification } from "@/hooks/useNotification";
+import { useUndoRedo } from "@/hooks/useUndoRedo";
+import { UndoRedoToolbar } from "@/components/UndoRedoToolbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -22,14 +24,17 @@ interface AnalisePestelCompletaProps {
 
 export default function AnalisePestelCompleta({ empresaId = 1 }: AnalisePestelCompletaProps) {
   const notification = useNotification();
-  const [data, setData] = useState<PestelData>({
+  
+  const initialData: PestelData = {
     politico: "",
     economico: "",
     social: "",
     tecnologico: "",
     ecologico: "",
     legal: "",
-  });
+  };
+
+  const { state: data, setState: setData, undo, redo, canUndo, canRedo } = useUndoRedo<PestelData>(initialData);
 
   const [scores, setScores] = useState({
     politico: 3,
@@ -55,6 +60,10 @@ export default function AnalisePestelCompleta({ empresaId = 1 }: AnalisePestelCo
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Análise PESTEL</h2>
+        <UndoRedoToolbar onUndo={undo} onRedo={redo} canUndo={canUndo} canRedo={canRedo} />
+      </div>
       <Card className="bg-muted/30">
         <CardHeader>
           <CardTitle>Análise PESTEL</CardTitle>

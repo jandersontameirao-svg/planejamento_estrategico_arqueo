@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNotification } from "@/hooks/useNotification";
+import { useUndoRedo } from "@/hooks/useUndoRedo";
+import { UndoRedoToolbar } from "@/components/UndoRedoToolbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -10,7 +12,7 @@ import { Save } from "lucide-react";
 // ============ STAKEHOLDERS ============
 export function AnalisesStakeholdersCompleta() {
   const notification = useNotification();
-  const [data, setData] = useState({
+  const { state: data, setState: setData, undo, redo, canUndo, canRedo } = useUndoRedo({
     altoPoder: "",
     altoInteresse: "",
     baixoPoder: "",
@@ -23,6 +25,10 @@ export function AnalisesStakeholdersCompleta() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Análise de Stakeholders</h2>
+        <UndoRedoToolbar onUndo={undo} onRedo={redo} canUndo={canUndo} canRedo={canRedo} />
+      </div>
       <Card className="bg-muted/30">
         <CardHeader>
           <CardTitle>Análise de Stakeholders</CardTitle>
@@ -70,7 +76,7 @@ export function AnalisesStakeholdersCompleta() {
 // ============ SWOT/TOWS ============
 export function AnaliseSwoTtowsCompleta() {
   const notification = useNotification();
-  const [data, setData] = useState({
+  const { state: data, setState: setData, undo, redo, canUndo, canRedo } = useUndoRedo({
     forcas: "",
     fraquezas: "",
     oportunidades: "",
@@ -84,10 +90,13 @@ export function AnaliseSwoTtowsCompleta() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Análise SWOT/TOWS</h2>
+        <UndoRedoToolbar onUndo={undo} onRedo={redo} canUndo={canUndo} canRedo={canRedo} />
+      </div>
       <Card className="bg-muted/30">
         <CardHeader>
-          <CardTitle>SWOT/TOWS</CardTitle>
-          <CardDescription>Análise de Forças, Fraquezas, Oportunidades e Ameaças</CardDescription>
+          <CardTitle>Análise SWOT/TOWS</CardTitle>     <CardDescription>Análise de Forças, Fraquezas, Oportunidades e Ameaças</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
@@ -132,7 +141,7 @@ export function AnaliseSwoTtowsCompleta() {
 // ============ OKR ============
 export function AnalisesOkrCompleta() {
   const notification = useNotification();
-  const [data, setData] = useState({
+  const { state: data, setState: setData, undo, redo, canUndo, canRedo } = useUndoRedo({
     objetivo1: "",
     kr1_1: "",
     kr1_2: "",
@@ -196,7 +205,7 @@ export function AnalisesOkrCompleta() {
 // ============ BSC ============
 export function AnaliseBscCompleta() {
   const notification = useNotification();
-  const [data, setData] = useState({
+  const { state: data, setState: setData, undo, redo, canUndo, canRedo } = useUndoRedo({
     financeira: "",
     clientes: "",
     processos: "",

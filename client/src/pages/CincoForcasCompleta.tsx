@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNotification } from "@/hooks/useNotification";
+import { useUndoRedo } from "@/hooks/useUndoRedo";
+import { UndoRedoToolbar } from "@/components/UndoRedoToolbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -21,13 +23,16 @@ interface CincoForcasCompletaProps {
 
 export default function CincoForcasCompleta({ empresaId = 1 }: CincoForcasCompletaProps) {
   const notification = useNotification();
-  const [data, setData] = useState<ForcasData>({
+  
+  const initialData: ForcasData = {
     ameacaNovosConcorrentes: "",
     poderFornecedores: "",
     poderClientes: "",
     ameacaProdutosSubstitutos: "",
     rivalidadeExistente: "",
-  });
+  };
+
+  const { state: data, setState: setData, undo, redo, canUndo, canRedo } = useUndoRedo<ForcasData>(initialData);
 
   const [scores, setScores] = useState({
     ameacaNovosConcorrentes: 3,
@@ -51,6 +56,10 @@ export default function CincoForcasCompleta({ empresaId = 1 }: CincoForcasComple
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">5 Forças de Porter</h2>
+        <UndoRedoToolbar onUndo={undo} onRedo={redo} canUndo={canUndo} canRedo={canRedo} />
+      </div>
       <Card className="bg-muted/30">
         <CardHeader>
           <CardTitle>5 Forças de Porter</CardTitle>
