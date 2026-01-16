@@ -1786,3 +1786,90 @@ export async function getPestelPlanoAcaoById(id: number): Promise<PestelPlanoAca
   const result = await db.select().from(pestelPlanoAcao).where(eq(pestelPlanoAcao.id, id));
   return result[0];
 }
+
+
+// ============================================
+// Vinculação Empresa-Área de Negócio (muitos-para-muitos)
+// ============================================
+
+export async function getEmpresasVinculadasArea(areaId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const { empresaAreaVinculo, empresas } = await import("../drizzle/schema");
+  
+  const result = await db
+    .select({ empresa: empresas })
+    .from(empresaAreaVinculo)
+    .innerJoin(empresas, eq(empresaAreaVinculo.empresaId, empresas.id))
+    .where(eq(empresaAreaVinculo.areaId, areaId));
+  
+  return result.map(r => r.empresa);
+}
+
+export async function getAreasVinculadasEmpresa(empresaId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const { empresaAreaVinculo, areasNegocio } = await import("../drizzle/schema");
+  
+  const result = await db
+    .select({ area: areasNegocio })
+    .from(empresaAreaVinculo)
+    .innerJoin(areasNegocio, eq(empresaAreaVinculo.areaId, areasNegocio.id))
+    .where(eq(empresaAreaVinculo.empresaId, empresaId));
+  
+  return result.map(r => r.area);
+}
+
+export async function vincularEmpresaAreaNegocio(empresaId: number, areaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { empresaAreaVinculo } = await import("../drizzle/schema");
+  
+  // Verificar se já existe vinculação
+  const existing = await db.select().from(empresaAreaVinculo)
+    .where(and(
+      eq(empresaAreaVinculo.empresaId, empresaId),
+      eq(empresaAreaVinculo.areaId, areaId)
+    ))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    return existing[0].id; // Já vinculado
+  }
+  
+  const result = await db.insert(empresaAreaVinculo).values({ empresaId, areaId });
+  return Number(result[0].insertId);
+}
+
+export async function desvincularEmpresaAreaNegocio(empresaId: number, areaId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { empresaAreaVinculo } = await import("../drizzle/schema");
+  
+  await db.delete(empresaAreaVinculo)
+    .where(and(
+      eq(empresaAreaVinculo.empresaId, empresaId),
+      eq(empresaAreaVinculo.areaId, areaId)
+    ));
+}
+
+export async function getEmpresasNaoVinculadasArea(areaId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const { empresas, empresaAreaVinculo } = await import("../drizzle/schema");
+  const { notInArray } = await import("drizzle-orm");
+  
+  // Buscar IDs de empresas já vinculadas a esta área
+  const vinculadas = await db.select({ empresaId: empresaAreaVinculo.empresaId })
+    .from(empresaAreaVinculo)
+    .where(eq(empresaAreaVinculo.areaId, areaId));
+  
+  const idsVinculados = vinculadas.map(v => v.empresaId);
+  
+  // Buscar todas as empresas que NÃO estão vinculadas
+  if (idsVinculados.length > 0) {
+    return await db.select().from(empresas).where(notInArray(empresas.id, idsVinculados));
+  }
+  
+  return await db.select().from(empresas);
+}

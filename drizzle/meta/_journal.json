@@ -15,6 +15,13 @@
       "when": 1768574140349,
       "tag": "0001_colorful_iron_monger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1768594675926,
+      "tag": "0002_quiet_photon",
+      "breakpoints": true
     }
   ]
 }

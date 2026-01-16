@@ -163,6 +163,45 @@ export const appRouter = router({
         await desvincularEmpresaArea(input.empresaId);
         return { success: true };
       }),
+    // Vinculação muitos-para-muitos (empresa pode estar em múltiplas áreas)
+    getEmpresasVinculadas: protectedProcedure
+      .input(z.object({ areaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getEmpresasVinculadasArea } = await import("./db");
+        return await getEmpresasVinculadasArea(input.areaId);
+      }),
+    getEmpresasDisponiveis: protectedProcedure
+      .input(z.object({ areaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getEmpresasNaoVinculadasArea } = await import("./db");
+        return await getEmpresasNaoVinculadasArea(input.areaId);
+      }),
+    vincularEmpresaArea: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        areaId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Apenas administradores podem vincular empresas" });
+        }
+        const { vincularEmpresaAreaNegocio } = await import("./db");
+        const id = await vincularEmpresaAreaNegocio(input.empresaId, input.areaId);
+        return { success: true, id };
+      }),
+    desvincularEmpresaArea: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        areaId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Apenas administradores podem desvincular empresas" });
+        }
+        const { desvincularEmpresaAreaNegocio } = await import("./db");
+        await desvincularEmpresaAreaNegocio(input.empresaId, input.areaId);
+        return { success: true };
+      }),
   }),
 
   usuarios: router({

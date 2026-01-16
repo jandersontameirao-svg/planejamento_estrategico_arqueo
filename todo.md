@@ -953,3 +953,13 @@
 - [x] Adicionar PlanoDeAcaoPestelIntegrado se necessário - Não necessário, já integrado
 - [x] Testar Plano de Ação em empresas do grupo - Testado em PESTEL, SWOT e BSC
 - [x] Validar funcionamento em todas as empresas cadastradas - Testado em Arqueoproject e arqueogis
+
+
+## Vinculação Empresas às Áreas de Negócio - 16/01/2026
+- [x] Analisar estrutura atual de empresas e áreas de negócio
+- [x] Criar tabela de vinculação empresa_area_vinculo no banco de dados
+- [x] Implementar procedures tRPC para vincular/desvincular empresas (getEmpresasVinculadas, getEmpresasDisponiveis, vincularEmpresaArea, desvincularEmpresaArea)
+- [x] Adicionar botão "Vincular Empresas" na página de Área de Negócio
+- [x] Criar modal para selecionar empresas do repositório
+- [x] Exibir empresas vinculadas na área de negócio (card com badges)
+- [x] Testar funcionalidade completa (Testado - Vinculou Arqueoproject e arqueogis ao Grupo Arqueo Brasil)

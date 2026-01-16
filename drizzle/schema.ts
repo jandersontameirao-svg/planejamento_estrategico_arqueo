@@ -777,3 +777,18 @@ export const pestelPlanoAcao = mysqlTable("pestel_plano_acao", {
 
 export type PestelPlanoAcao = typeof pestelPlanoAcao.$inferSelect;
 export type InsertPestelPlanoAcao = typeof pestelPlanoAcao.$inferInsert;
+
+
+/**
+ * Vinculação de Empresas às Áreas de Negócio (muitos-para-muitos)
+ * Permite que empresas do repositório sejam vinculadas a múltiplas áreas de negócio
+ */
+export const empresaAreaVinculo = mysqlTable("empresa_area_vinculo", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  areaId: int("areaId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type EmpresaAreaVinculo = typeof empresaAreaVinculo.$inferSelect;
+export type InsertEmpresaAreaVinculo = typeof empresaAreaVinculo.$inferInsert;

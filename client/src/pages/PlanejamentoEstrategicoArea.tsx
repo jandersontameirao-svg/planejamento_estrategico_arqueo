@@ -3,7 +3,9 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, Link2, Plus, X } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
 import PageHeaderWithBack from "@/components/PageHeaderWithBack";
 import { Link, useRoute } from "wouter";
 import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
@@ -110,8 +112,45 @@ export default function PlanejamentoEstrategicoArea() {
   const { data: okrData } = trpc.analises.getOkr.useQuery({ empresaId: AREA_EMPRESA_ID });
   const { data: bscData } = trpc.bsc.getByEmpresa.useQuery({ empresaId: AREA_EMPRESA_ID });
 
+  const [showVincularModal, setShowVincularModal] = useState(false);
+  
+  // Queries para empresas vinculadas e disponíveis
+  const { data: empresasVinculadas, refetch: refetchVinculadas } = trpc.areasNegocio.getEmpresasVinculadas.useQuery({ areaId });
+  const { data: empresasDisponiveis, refetch: refetchDisponiveis } = trpc.areasNegocio.getEmpresasDisponiveis.useQuery({ areaId });
+  
+  // Mutations para vincular/desvincular
+  const vincularMutation = trpc.areasNegocio.vincularEmpresaArea.useMutation({
+    onSuccess: () => {
+      toast.success("Empresa vinculada com sucesso!");
+      refetchVinculadas();
+      refetchDisponiveis();
+    },
+    onError: (error) => {
+      toast.error(`Erro ao vincular empresa: ${error.message}`);
+    },
+  });
+  
+  const desvincularMutation = trpc.areasNegocio.desvincularEmpresaArea.useMutation({
+    onSuccess: () => {
+      toast.success("Empresa desvinculada com sucesso!");
+      refetchVinculadas();
+      refetchDisponiveis();
+    },
+    onError: (error) => {
+      toast.error(`Erro ao desvincular empresa: ${error.message}`);
+    },
+  });
+
   const toggleCard = (cardId: string) => {
     setExpandedCards(prev => ({ ...prev, [cardId]: !prev[cardId] }));
+  };
+  
+  const handleVincular = (empresaId: number) => {
+    vincularMutation.mutate({ empresaId, areaId });
+  };
+  
+  const handleDesvincular = (empresaId: number) => {
+    desvincularMutation.mutate({ empresaId, areaId });
   };
 
   const calcularProgresso = (analiseId: string): number => {
@@ -172,7 +211,110 @@ export default function PlanejamentoEstrategicoArea() {
               Configurar Template de Relatórios
             </Button>
           </Link>
+          
+          <Dialog open={showVincularModal} onOpenChange={setShowVincularModal}>
+            <DialogTrigger asChild>
+              <Button className="gap-2 bg-purple-600 hover:bg-purple-700">
+                <Link2 className="h-4 w-4" />
+                Vincular Empresas
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Vincular Empresas à {areaNome}</DialogTitle>
+                <DialogDescription>
+                  Selecione empresas do repositório para vincular a esta área de negócio
+                </DialogDescription>
+              </DialogHeader>
+              
+              {/* Empresas já vinculadas */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-sm text-purple-700 mb-2">Empresas Vinculadas ({empresasVinculadas?.length || 0})</h4>
+                  {empresasVinculadas && empresasVinculadas.length > 0 ? (
+                    <div className="space-y-2">
+                      {empresasVinculadas.map((empresa) => (
+                        <div key={empresa.id} className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
+                          <div className="flex items-center gap-3">
+                            <Building2 className="h-5 w-5 text-purple-600" />
+                            <div>
+                              <p className="font-medium text-sm">{empresa.nome}</p>
+                              <p className="text-xs text-muted-foreground capitalize">{empresa.tipoAtuacao?.replace("_", " ")}</p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => handleDesvincular(empresa.id)}
+                            disabled={desvincularMutation.isPending}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">Nenhuma empresa vinculada a esta área</p>
+                  )}
+                </div>
+                
+                {/* Empresas disponíveis */}
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-700 mb-2">Empresas Disponíveis ({empresasDisponiveis?.length || 0})</h4>
+                  {empresasDisponiveis && empresasDisponiveis.length > 0 ? (
+                    <div className="space-y-2">
+                      {empresasDisponiveis.map((empresa) => (
+                        <div key={empresa.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <Building2 className="h-5 w-5 text-gray-500" />
+                            <div>
+                              <p className="font-medium text-sm">{empresa.nome}</p>
+                              <p className="text-xs text-muted-foreground capitalize">{empresa.tipoAtuacao?.replace("_", " ")}</p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-purple-600 border-purple-300 hover:bg-purple-50"
+                            onClick={() => handleVincular(empresa.id)}
+                            disabled={vincularMutation.isPending}
+                          >
+                            <Plus className="h-4 w-4 mr-1" />
+                            Vincular
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">Todas as empresas já estão vinculadas</p>
+                  )}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
+        
+        {/* Empresas vinculadas - visão rápida */}
+        {empresasVinculadas && empresasVinculadas.length > 0 && (
+          <Card className="bg-white border-purple-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-purple-600" />
+                Empresas Vinculadas ({empresasVinculadas.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {empresasVinculadas.map((empresa) => (
+                  <Badge key={empresa.id} variant="secondary" className="bg-purple-100 text-purple-700">
+                    {empresa.nome}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Aviso informativo */}
         <Card className="bg-purple-50 border-purple-200">
