@@ -22,11 +22,7 @@ import DashboardComparativo from "./pages/DashboardComparativo";
 import DashboardAnalises from "./pages/DashboardAnalises";
 import GestaoUsuarios from "./pages/GestaoUsuarios";
 import AnalisePestel from "./pages/AnalisePestel";
-import CincoForcasPorter from "./pages/CincoForcasPorter";
-import AnaliseStakeholders from "./pages/AnaliseStakeholders";
-import AnaliseRbvVrio from "./pages/AnaliseRbvVrio";
 import AnaliseSwoTtows from "./pages/AnaliseSwoTtows";
-import AnalisesVRIO from "./pages/AnalisesVRIO";
 import PlanejamentoEstrategico from "./pages/PlanejamentoEstrategico";
 import DashboardResumoExecutivo from "./pages/DashboardResumoExecutivo";
 import PlanejamentoEstrategicoEmpresa from "./pages/PlanejamentoEstrategicoEmpresa";
@@ -79,11 +75,7 @@ function Router() {
       <Route path="/empresa/:id/dashboard-analises" component={DashboardAnalises} />
       <Route path="/gestao-usuarios" component={GestaoUsuarios} />
       <Route path="/analise-pestel/:id" component={AnalisePestel} />
-      <Route path="/cinco-forcas-porter/:id" component={CincoForcasPorter} />
-      <Route path="/analise-stakeholders/:id" component={AnaliseStakeholders} />
-      <Route path="/analise-rbv-vrio/:id" component={AnaliseRbvVrio} />
       <Route path="/analise-swot-tows/:id" component={AnaliseSwoTtows} />
-      <Route path="/analises-vrio" component={AnalisesVRIO} />
       <Route path="/empresa/:id/planejamento">
         {(params) => <PlanejamentoEstrategicoEmpresa empresaId={Number(params.id)} empresaNome="Empresa" />}
       </Route>

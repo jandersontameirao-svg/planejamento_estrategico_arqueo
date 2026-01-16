@@ -912,3 +912,12 @@
 - [x] Conectar PlanoDeAcaoPestelIntegrado com tRPC (imports adicionados)
 - [ ] Testar persistência de ações em banco de dados
 - [ ] Validar dados salvos entre sessões
+
+
+## Remoção de Análises - Grupo Arqueo Participações - 16/01/2026
+- [x] Remover análise de 5 Forças do Planejamento
+- [x] Remover análise de Stakeholders do Planejamento
+- [x] Remover análise de VRIO do Planejamento
+- [x] Remover análise de OKRs do Planejamento
+- [x] Atualizar navegação para mostrar apenas PESTEL, SWOT e BSC
+- [x] Testar remoção das análises (Confirmado - apenas PESTEL, SWOT e BSC aparecem)

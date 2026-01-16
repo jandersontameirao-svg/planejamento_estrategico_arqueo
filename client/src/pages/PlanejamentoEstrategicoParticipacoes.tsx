@@ -8,11 +8,7 @@ import PageHeaderWithBack from "@/components/PageHeaderWithBack";
 import { Link } from "wouter";
 import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
 import AnalisePestelLite from "./AnalisePestelLite";
-import CincoForcasLite from "./CincoForcasLite";
-import StakeholdersLite from "./StakeholdersLite";
-import VrioLite from "./VrioLite";
 import SwotLite from "./SwotLite";
-import OkrLite from "./OkrLite";
 import BscLite from "./BscLite";
 
 interface AnaliseCard {
@@ -50,44 +46,12 @@ const analises: AnaliseCard[] = [
     componente: AnalisePestelLite,
   },
   {
-    id: "5forcas",
-    titulo: "5 Forças",
-    descricao: "Porter",
-    icone: <TrendingUp className="h-5 w-5" />,
-    cor: "bg-blue-500",
-    componente: CincoForcasLite,
-  },
-  {
-    id: "stakeholders",
-    titulo: "Stakeholders",
-    descricao: "Poder x Interesse",
-    icone: <Users className="h-5 w-5" />,
-    cor: "bg-purple-500",
-    componente: StakeholdersLite,
-  },
-  {
-    id: "vrio",
-    titulo: "RBV/VRIO",
-    descricao: "Recursos e Capacidades",
-    icone: <Target className="h-5 w-5" />,
-    cor: "bg-blue-600",
-    componente: VrioLite,
-  },
-  {
     id: "swot",
     titulo: "SWOT/TOWS",
     descricao: "Forças e Oportunidades",
     icone: <AlertCircle className="h-5 w-5" />,
     cor: "bg-green-600",
     componente: SwotLite,
-  },
-  {
-    id: "okr",
-    titulo: "OKR",
-    descricao: "Objetivos e Resultados",
-    icone: <Lightbulb className="h-5 w-5" />,
-    cor: "bg-cyan-500",
-    componente: OkrLite,
   },
 ];
 

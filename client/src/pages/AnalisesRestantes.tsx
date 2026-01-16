@@ -8,82 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Save } from "lucide-react";
-import PlanoDeAcaoPestel from "@/components/PlanoDeAcaoPestel";
 import PlanoDeAcaoPestelIntegrado from "@/components/PlanoDeAcaoPestelIntegrado";
-
-// ============ STAKEHOLDERS ============
-export function AnalisesStakeholdersCompleta() {
-  const notification = useNotification();
-  const { state: data, setState: setData, undo, redo, canUndo, canRedo } = useUndoRedo({
-    altoPoder: "",
-    altoInteresse: "",
-    baixoPoder: "",
-    baixoInteresse: "",
-  });
-
-  const handleSave = () => {
-    console.log("Análise Stakeholders salva:", data);
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Análise de Stakeholders</h2>
-        <UndoRedoToolbar onUndo={undo} onRedo={redo} canUndo={canUndo} canRedo={canRedo} />
-      </div>
-      <Card className="bg-muted/30">
-        <CardHeader>
-          <CardTitle>Análise de Stakeholders</CardTitle>
-          <CardDescription>Matriz Poder x Interesse</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="border-2 border-red-300 bg-red-50 rounded-lg p-4">
-              <h4 className="font-semibold text-red-900 mb-2">Alto Poder / Alto Interesse</h4>
-              <p className="text-sm text-red-800 mb-2">Gerenciar Ativamente</p>
-              <Textarea placeholder="Ex: Diretores, Acionistas" rows={3} value={data.altoPoder} onChange={(e) => setData({ ...data, altoPoder: e.target.value })} />
-            </div>
-
-            <div className="border-2 border-blue-300 bg-blue-50 rounded-lg p-4">
-              <h4 className="font-semibold text-blue-900 mb-2">Baixo Poder / Alto Interesse</h4>
-              <p className="text-sm text-blue-800 mb-2">Manter Informado</p>
-              <Textarea placeholder="Ex: Funcionários, Clientes" rows={3} value={data.altoInteresse} onChange={(e) => setData({ ...data, altoInteresse: e.target.value })} />
-            </div>
-
-            <div className="border-2 border-yellow-300 bg-yellow-50 rounded-lg p-4">
-              <h4 className="font-semibold text-yellow-900 mb-2">Alto Poder / Baixo Interesse</h4>
-              <p className="text-sm text-yellow-800 mb-2">Manter Satisfeito</p>
-              <Textarea placeholder="Ex: Governo, Reguladores" rows={3} value={data.baixoPoder} onChange={(e) => setData({ ...data, baixoPoder: e.target.value })} />
-            </div>
-
-            <div className="border-2 border-green-300 bg-green-50 rounded-lg p-4">
-              <h4 className="font-semibold text-green-900 mb-2">Baixo Poder / Baixo Interesse</h4>
-              <p className="text-sm text-green-800 mb-2">Monitorar</p>
-              <Textarea placeholder="Ex: Público geral" rows={3} value={data.baixoInteresse} onChange={(e) => setData({ ...data, baixoInteresse: e.target.value })} />
-            </div>
-          </div>
-
-          {/* Plano de Ação */}
-          <div className="mt-8 pt-8 border-t space-y-4">
-            <h3 className="text-lg font-semibold">Plano de Ação - Stakeholders</h3>
-            <PlanoDeAcaoPestelIntegrado 
-              fatorId="stakeholders-completa"
-              fatorDescricao="Análise de Stakeholders Completa"
-              fatorCategoria="Stakeholders"
-            />
-          </div>
-
-          <div className="flex justify-end mt-6">
-            <Button onClick={handleSave} size="lg">
-              <Save className="mr-2 h-4 w-4" />
-              Salvar Análise Stakeholders
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
 // ============ SWOT/TOWS ============
 export function AnaliseSwoTtowsCompleta() {
@@ -108,7 +33,8 @@ export function AnaliseSwoTtowsCompleta() {
       </div>
       <Card className="bg-muted/30">
         <CardHeader>
-          <CardTitle>Análise SWOT/TOWS</CardTitle>     <CardDescription>Análise de Forças, Fraquezas, Oportunidades e Ameaças</CardDescription>
+          <CardTitle>Análise SWOT/TOWS</CardTitle>
+          <CardDescription>Análise de Forças, Fraquezas, Oportunidades e Ameaças</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
@@ -160,80 +86,6 @@ export function AnaliseSwoTtowsCompleta() {
   );
 }
 
-// ============ OKR ============
-export function AnalisesOkrCompleta() {
-  const notification = useNotification();
-  const { state: data, setState: setData, undo, redo, canUndo, canRedo } = useUndoRedo({
-    objetivo1: "",
-    kr1_1: "",
-    kr1_2: "",
-    kr1_3: "",
-    objetivo2: "",
-    kr2_1: "",
-    kr2_2: "",
-    kr2_3: "",
-  });
-
-  const handleSave = () => {
-    console.log("Análise OKR salva:", data);
-  };
-
-  return (
-    <div className="space-y-6">
-      <Card className="bg-muted/30">
-        <CardHeader>
-          <CardTitle>OKR (Objectives and Key Results)</CardTitle>
-          <CardDescription>Metodologia de definição de objetivos e resultados-chave mensuráveis</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-6">
-            {/* Objetivo 1 */}
-            <div className="border rounded-lg p-4">
-              <Label className="text-base font-semibold mb-2 block">Objetivo 1</Label>
-              <Input placeholder="Ex: Aumentar participação de mercado" value={data.objetivo1} onChange={(e) => setData({ ...data, objetivo1: e.target.value })} />
-              <div className="mt-3 space-y-2">
-                <p className="text-sm font-semibold">Key Results:</p>
-                <Input placeholder="KR1: Aumentar vendas em 30%" value={data.kr1_1} onChange={(e) => setData({ ...data, kr1_1: e.target.value })} />
-                <Input placeholder="KR2: Conquistar 5 novos clientes" value={data.kr1_2} onChange={(e) => setData({ ...data, kr1_2: e.target.value })} />
-                <Input placeholder="KR3: Reduzir churn em 20%" value={data.kr1_3} onChange={(e) => setData({ ...data, kr1_3: e.target.value })} />
-              </div>
-            </div>
-
-            {/* Objetivo 2 */}
-            <div className="border rounded-lg p-4">
-              <Label className="text-base font-semibold mb-2 block">Objetivo 2</Label>
-              <Input placeholder="Ex: Melhorar eficiência operacional" value={data.objetivo2} onChange={(e) => setData({ ...data, objetivo2: e.target.value })} />
-              <div className="mt-3 space-y-2">
-                <p className="text-sm font-semibold">Key Results:</p>
-                <Input placeholder="KR1: Reduzir custos em 15%" value={data.kr2_1} onChange={(e) => setData({ ...data, kr2_1: e.target.value })} />
-                <Input placeholder="KR2: Aumentar produtividade em 25%" value={data.kr2_2} onChange={(e) => setData({ ...data, kr2_2: e.target.value })} />
-                <Input placeholder="KR3: Implementar 3 processos de automação" value={data.kr2_3} onChange={(e) => setData({ ...data, kr2_3: e.target.value })} />
-              </div>
-            </div>
-          </div>
-
-          {/* Plano de Ação */}
-          <div className="mt-8 pt-8 border-t space-y-4">
-            <h3 className="text-lg font-semibold">Plano de Ação - OKR</h3>
-            <PlanoDeAcaoPestelIntegrado 
-              fatorId="okr-completa"
-              fatorDescricao="Análise OKR Completa"
-              fatorCategoria="OKR"
-            />
-          </div>
-
-          <div className="flex justify-end mt-6">
-            <Button onClick={handleSave} size="lg">
-              <Save className="mr-2 h-4 w-4" />
-              Salvar Análise OKR
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
 // ============ BSC ============
 export function AnaliseBscCompleta() {
   const notification = useNotification();
@@ -250,6 +102,10 @@ export function AnaliseBscCompleta() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">BSC (Balanced Scorecard)</h2>
+        <UndoRedoToolbar onUndo={undo} onRedo={redo} canUndo={canUndo} canRedo={canRedo} />
+      </div>
       <Card className="bg-muted/30">
         <CardHeader>
           <CardTitle>BSC (Balanced Scorecard)</CardTitle>
@@ -259,50 +115,60 @@ export function AnaliseBscCompleta() {
           <div className="grid grid-cols-2 gap-4">
             <div className="border-2 border-green-300 bg-green-50 rounded-lg p-4">
               <h4 className="font-semibold text-green-900 mb-2">Perspectiva Financeira</h4>
-              <Textarea placeholder="Rentabilidade, crescimento, fluxo de caixa..." rows={4} value={data.financeira} onChange={(e) => setData({ ...data, financeira: e.target.value })} />
+              <Textarea placeholder="Objetivos financeiros, ROI, crescimento de receita..." rows={4} value={data.financeira} onChange={(e) => setData({ ...data, financeira: e.target.value })} />
             </div>
 
             <div className="border-2 border-blue-300 bg-blue-50 rounded-lg p-4">
-              <h4 className="font-semibold text-blue-900 mb-2">Perspectiva do Cliente</h4>
-              <Textarea placeholder="Satisfação, retenção, participação de mercado..." rows={4} value={data.clientes} onChange={(e) => setData({ ...data, clientes: e.target.value })} />
+              <h4 className="font-semibold text-blue-900 mb-2">Perspectiva de Clientes</h4>
+              <Textarea placeholder="Satisfação, retenção, aquisição de clientes..." rows={4} value={data.clientes} onChange={(e) => setData({ ...data, clientes: e.target.value })} />
             </div>
 
             <div className="border-2 border-purple-300 bg-purple-50 rounded-lg p-4">
-              <h4 className="font-semibold text-purple-900 mb-2">Processos Internos</h4>
-              <Textarea placeholder="Qualidade, eficiência, inovação..." rows={4} value={data.processos} onChange={(e) => setData({ ...data, processos: e.target.value })} />
+              <h4 className="font-semibold text-purple-900 mb-2">Perspectiva de Processos Internos</h4>
+              <Textarea placeholder="Eficiência, qualidade, inovação de processos..." rows={4} value={data.processos} onChange={(e) => setData({ ...data, processos: e.target.value })} />
             </div>
 
             <div className="border-2 border-orange-300 bg-orange-50 rounded-lg p-4">
-              <h4 className="font-semibold text-orange-900 mb-2">Aprendizado e Crescimento</h4>
-              <Textarea placeholder="Desenvolvimento de pessoas, cultura, tecnologia..." rows={4} value={data.aprendizado} onChange={(e) => setData({ ...data, aprendizado: e.target.value })} />
+              <h4 className="font-semibold text-orange-900 mb-2">Perspectiva de Aprendizado e Crescimento</h4>
+              <Textarea placeholder="Desenvolvimento de pessoas, inovação, cultura..." rows={4} value={data.aprendizado} onChange={(e) => setData({ ...data, aprendizado: e.target.value })} />
             </div>
           </div>
 
           {/* Plano de Ação */}
           <div className="mt-8 pt-8 border-t space-y-4">
-            <h3 className="text-lg font-semibold">Plano de Ação - BSC</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <PlanoDeAcaoPestelIntegrado 
-                fatorId="bsc-financeira"
-                fatorDescricao="Perspectiva Financeira"
-                fatorCategoria="Financeira"
-              />
-              <PlanoDeAcaoPestelIntegrado 
-                fatorId="bsc-clientes"
-                fatorDescricao="Perspectiva do Cliente"
-                fatorCategoria="Clientes"
-              />
-              <PlanoDeAcaoPestelIntegrado 
-                fatorId="bsc-processos"
-                fatorDescricao="Processos Internos"
-                fatorCategoria="Processos"
-              />
-              <PlanoDeAcaoPestelIntegrado 
-                fatorId="bsc-aprendizado"
-                fatorDescricao="Aprendizado e Crescimento"
-                fatorCategoria="Aprendizado"
-              />
-            </div>
+            <h3 className="text-lg font-semibold">Plano de Ação - BSC Financeira</h3>
+            <PlanoDeAcaoPestelIntegrado 
+              fatorId="bsc-financeira"
+              fatorDescricao="Perspectiva Financeira"
+              fatorCategoria="BSC"
+            />
+          </div>
+
+          <div className="mt-8 pt-8 border-t space-y-4">
+            <h3 className="text-lg font-semibold">Plano de Ação - BSC Clientes</h3>
+            <PlanoDeAcaoPestelIntegrado 
+              fatorId="bsc-clientes"
+              fatorDescricao="Perspectiva de Clientes"
+              fatorCategoria="BSC"
+            />
+          </div>
+
+          <div className="mt-8 pt-8 border-t space-y-4">
+            <h3 className="text-lg font-semibold">Plano de Ação - BSC Processos</h3>
+            <PlanoDeAcaoPestelIntegrado 
+              fatorId="bsc-processos"
+              fatorDescricao="Perspectiva de Processos Internos"
+              fatorCategoria="BSC"
+            />
+          </div>
+
+          <div className="mt-8 pt-8 border-t space-y-4">
+            <h3 className="text-lg font-semibold">Plano de Ação - BSC Aprendizado</h3>
+            <PlanoDeAcaoPestelIntegrado 
+              fatorId="bsc-aprendizado"
+              fatorDescricao="Perspectiva de Aprendizado e Crescimento"
+              fatorCategoria="BSC"
+            />
           </div>
 
           <div className="flex justify-end mt-6">
