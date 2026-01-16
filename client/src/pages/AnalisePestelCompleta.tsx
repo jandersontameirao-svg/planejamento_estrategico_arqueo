@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Save } from "lucide-react";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import PlanoDeAcaoPestel from "@/components/PlanoDeAcaoPestel";
+import PlanoDeAcaoPestelIntegrado from "@/components/PlanoDeAcaoPestelIntegrado";
 
 interface PestelData {
   politico: string;
@@ -219,11 +220,40 @@ export default function AnalisePestelCompleta({ empresaId = 1 }: AnalisePestelCo
           </div>
 
           {/* Plano de Ação */}
-          <div className="mt-8 pt-8 border-t">
-            <PlanoDeAcaoPestel 
-              fatorId="pestel-completa"
-              categoria="PESTEL Completa"
-            />
+          <div className="mt-8 pt-8 border-t space-y-4">
+            <h3 className="text-lg font-semibold">Plano de Ação - PESTEL Completa</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <PlanoDeAcaoPestelIntegrado 
+                fatorId="pestel-politico"
+                fatorDescricao="Análise Política Completa"
+                fatorCategoria="Político"
+              />
+              <PlanoDeAcaoPestelIntegrado 
+                fatorId="pestel-economico"
+                fatorDescricao="Análise Econômica Completa"
+                fatorCategoria="Econômico"
+              />
+              <PlanoDeAcaoPestelIntegrado 
+                fatorId="pestel-social"
+                fatorDescricao="Análise Social Completa"
+                fatorCategoria="Social"
+              />
+              <PlanoDeAcaoPestelIntegrado 
+                fatorId="pestel-tecnologico"
+                fatorDescricao="Análise Tecnológica Completa"
+                fatorCategoria="Tecnológico"
+              />
+              <PlanoDeAcaoPestelIntegrado 
+                fatorId="pestel-ambiental"
+                fatorDescricao="Análise Ambiental Completa"
+                fatorCategoria="Ambiental"
+              />
+              <PlanoDeAcaoPestelIntegrado 
+                fatorId="pestel-legal"
+                fatorDescricao="Análise Legal Completa"
+                fatorCategoria="Legal"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end mt-6">

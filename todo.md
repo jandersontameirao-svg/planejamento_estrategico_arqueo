@@ -884,3 +884,12 @@
 - [x] Remover toasts "Salvo com sucesso" de todos os componentes (5 toasts removidos)
 - [x] Remover toasts "Salvo automaticamente" de AnalisePestelLite
 - [x] Testar sistema sem mensagens de salvamento (Testado com sucesso em PESTEL)
+
+
+## Correção - Plano de Ação Integrado em PESTEL - 16/01/2026
+- [x] Refazer PlanoDeAcaoPestel para aparecer DENTRO do modal de PESTEL (após fatores identificados)
+- [x] Implementar matriz de priorização com estratégias (Prevenção, Proteção, Mitigação) para cada fator
+- [x] Integrar em AnalisePestelLite.tsx corretamente
+- [x] Integrar em AnalisePestelCompleta.tsx corretamente
+- [ ] Integrar em todos os modais PESTEL de AnalisesRestantes.tsx
+- [ ] Testar funcionalidade completa em todos os modais

@@ -11,6 +11,7 @@ import { Save, Plus, Trash2, Building2, DollarSign, Users, Cpu, Leaf, Scale, Ale
 import { exportPestelPDF } from "@/lib/pdfExport";
 import CommentSection from "@/components/CommentSection";
 import PlanoDeAcaoPestel from "@/components/PlanoDeAcaoPestel";
+import PlanoDeAcaoPestelIntegrado from "@/components/PlanoDeAcaoPestelIntegrado";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Cell } from "recharts";
 
 interface FatorPestel {
@@ -400,51 +401,60 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
               const catInfo = categorias.find((c) => c.nome === fator.categoria);
               const Icon = catInfo?.icone || AlertTriangle;
               return (
-                <div key={fator.id} className="border rounded-lg p-4 cursor-pointer hover:shadow-md transition-all" style={{ borderLeftColor: catInfo?.cor, borderLeftWidth: "4px" }} onClick={() => {
-                  setFatorEmEdicao(fator);
-                  setImpactoEdicao(fator.impacto);
-                  setProbabilidadeEdicao(fator.probabilidade);
-                }}>
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-lg" style={{ backgroundColor: catInfo?.corBg }}>
-                        <Icon className="h-4 w-4" style={{ color: catInfo?.cor }} />
+                <div key={fator.id} className="space-y-3">
+                  <div className="border rounded-lg p-4 cursor-pointer hover:shadow-md transition-all" style={{ borderLeftColor: catInfo?.cor, borderLeftWidth: "4px" }} onClick={() => {
+                    setFatorEmEdicao(fator);
+                    setImpactoEdicao(fator.impacto);
+                    setProbabilidadeEdicao(fator.probabilidade);
+                  }}>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-lg" style={{ backgroundColor: catInfo?.corBg }}>
+                          <Icon className="h-4 w-4" style={{ color: catInfo?.cor }} />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">{fator.categoria}</div>
+                          <div className="text-xs text-gray-600">{fator.descricao}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={`${risco.cor} text-white`}>{risco.label}</Badge>
+                        <button onClick={(e) => {
+                          e.stopPropagation();
+                          removerFator(fator.id);
+                        }} className="text-red-600 hover:text-red-800">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="font-semibold">Impacto</span>
+                          <span>{fator.impacto}/5</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full">
+                          <div className="h-2 bg-blue-500 rounded-full" style={{ width: `${(fator.impacto / 5) * 100}%` }}></div>
+                        </div>
                       </div>
                       <div>
-                        <div className="font-semibold text-sm">{fator.categoria}</div>
-                        <div className="text-xs text-gray-600">{fator.descricao}</div>
+                        <div className="flex justify-between mb-1">
+                          <span className="font-semibold">Probabilidade</span>
+                          <span>{fator.probabilidade}/5</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full">
+                          <div className="h-2 bg-orange-500 rounded-full" style={{ width: `${(fator.probabilidade / 5) * 100}%` }}></div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className={`${risco.cor} text-white`}>{risco.label}</Badge>
-                      <button onClick={(e) => {
-                        e.stopPropagation();
-                        removerFator(fator.id);
-                      }} className="text-red-600 hover:text-red-800">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="font-semibold">Impacto</span>
-                        <span>{fator.impacto}/5</span>
-                      </div>
-                      <div className="h-2 bg-gray-200 rounded-full">
-                        <div className="h-2 bg-blue-500 rounded-full" style={{ width: `${(fator.impacto / 5) * 100}%` }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="font-semibold">Probabilidade</span>
-                        <span>{fator.probabilidade}/5</span>
-                      </div>
-                      <div className="h-2 bg-gray-200 rounded-full">
-                        <div className="h-2 bg-orange-500 rounded-full" style={{ width: `${(fator.probabilidade / 5) * 100}%` }}></div>
-                      </div>
-                    </div>
+                  <div className="bg-white border rounded-lg p-4 ml-4">
+                    <PlanoDeAcaoPestelIntegrado
+                      fatorId={fator.id}
+                      fatorDescricao={fator.descricao}
+                      fatorCategoria={fator.categoria}
+                    />
                   </div>
                 </div>
               );
