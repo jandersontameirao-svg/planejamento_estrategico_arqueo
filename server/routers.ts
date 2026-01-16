@@ -1583,8 +1583,96 @@ export const appRouter = router({
       }),
   }),
 
+  planoAcao: router({
+    save: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        fatorId: z.number(),
+        categoria: z.enum(["politico", "economico", "social", "tecnologico", "ambiental", "legal"]),
+        estrategia: z.enum(["prevencao", "protecao", "mitigacao"]),
+        descricaoEstrategia: z.string().min(1),
+        urgencia: z.number().min(1).max(5),
+        importancia: z.number().min(1).max(5),
+        responsavel: z.string().optional(),
+        dataInicio: z.string().optional(),
+        dataFim: z.string().optional(),
+        status: z.enum(["planejado", "em_progresso", "concluido", "cancelado"]).default("planejado"),
+        percentualConclusao: z.number().min(0).max(100).default(0),
+        observacoes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { savePestelPlanoAcao } = await import("./db");
+        const dataToSave = {
+          ...input,
+          dataInicio: input.dataInicio ? new Date(input.dataInicio) : null,
+          dataFim: input.dataFim ? new Date(input.dataFim) : null,
+        };
+        return await savePestelPlanoAcao(dataToSave as any);
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        data: z.object({
+          estrategia: z.enum(["prevencao", "protecao", "mitigacao"]).optional(),
+          descricaoEstrategia: z.string().optional(),
+          urgencia: z.number().min(1).max(5).optional(),
+          importancia: z.number().min(1).max(5).optional(),
+          responsavel: z.string().optional(),
+          dataInicio: z.string().optional(),
+          dataFim: z.string().optional(),
+          status: z.enum(["planejado", "em_progresso", "concluido", "cancelado"]).optional(),
+          percentualConclusao: z.number().min(0).max(100).optional(),
+          observacoes: z.string().optional(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        const { updatePestelPlanoAcao } = await import("./db");
+        const dataToUpdate = {
+          ...input.data,
+          dataInicio: input.data.dataInicio ? new Date(input.data.dataInicio) : undefined,
+          dataFim: input.data.dataFim ? new Date(input.data.dataFim) : undefined,
+        };
+        return await updatePestelPlanoAcao(input.id, dataToUpdate as any);
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deletePestelPlanoAcao } = await import("./db");
+        await deletePestelPlanoAcao(input.id);
+        return { success: true };
+      }),
+
+    getByEmpresa: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getPestelPlanoAcaoByEmpresa } = await import("./db");
+        return await getPestelPlanoAcaoByEmpresa(input.empresaId);
+      }),
+
+    getByFator: protectedProcedure
+      .input(z.object({ fatorId: z.number() }))
+      .query(async ({ input }) => {
+        const { getPestelPlanoAcaoByFator } = await import("./db");
+        return await getPestelPlanoAcaoByFator(input.fatorId);
+      }),
+
+    getByCategoria: protectedProcedure
+      .input(z.object({ empresaId: z.number(), categoria: z.string() }))
+      .query(async ({ input }) => {
+        const { getPestelPlanoAcaoByCategoria } = await import("./db");
+        return await getPestelPlanoAcaoByCategoria(input.empresaId, input.categoria);
+      }),
+
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const { getPestelPlanoAcaoById } = await import("./db");
+        return await getPestelPlanoAcaoById(input.id);
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;
-
-

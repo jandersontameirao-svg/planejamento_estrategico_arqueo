@@ -902,3 +902,13 @@
 - [x] Integrar PlanoDeAcaoPestelIntegrado em BSC (4 perspectivas)
 - [x] Corrigir erro de JSX em AnalisePestelLite.tsx
 - [ ] Testar funcionalidade em todos os modais
+
+
+## Persistência do Plano de Ação - 16/01/2026
+- [x] Criar procedures tRPC para salvar ações do Plano
+- [x] Criar procedures tRPC para atualizar ações do Plano
+- [x] Criar procedures tRPC para deletar ações do Plano
+- [x] Criar procedures tRPC para recuperar ações do Plano
+- [x] Conectar PlanoDeAcaoPestelIntegrado com tRPC (imports adicionados)
+- [ ] Testar persistência de ações em banco de dados
+- [ ] Validar dados salvos entre sessões

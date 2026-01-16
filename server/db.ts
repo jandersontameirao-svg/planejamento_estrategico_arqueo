@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, type InsertEmpresa, kpiValores, kpis, objetivosGrupo, type InsertObjetivoGrupo, objetivoGrupoKpis, projetosGrupo, type InsertProjetoGrupo, projetoGrupoKpis, acoesGrupo, type InsertAcaoGrupo } from "../drizzle/schema";
+import { InsertUser, users, type InsertEmpresa, kpiValores, kpis, objetivosGrupo, type InsertObjetivoGrupo, objetivoGrupoKpis, projetosGrupo, type InsertProjetoGrupo, projetoGrupoKpis, acoesGrupo, type InsertAcaoGrupo, pestelPlanoAcao, type InsertPestelPlanoAcao, type PestelPlanoAcao } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -1718,4 +1718,71 @@ export async function desvincularEmpresaArea(empresaId: number) {
   if (!db) throw new Error("Database not available");
   const { empresas } = await import("../drizzle/schema");
   await db.update(empresas).set({ areaId: null }).where(eq(empresas.id, empresaId));
+}
+
+
+// ============================================
+// Plano de Ação PESTEL
+// ============================================
+
+export async function savePestelPlanoAcao(data: InsertPestelPlanoAcao): Promise<PestelPlanoAcao> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(pestelPlanoAcao).values(data);
+  const id = (result as any).insertId;
+  
+  const saved = await db.select().from(pestelPlanoAcao).where(eq(pestelPlanoAcao.id, id));
+  return saved[0];
+}
+
+export async function updatePestelPlanoAcao(id: number, data: Partial<InsertPestelPlanoAcao>): Promise<PestelPlanoAcao> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(pestelPlanoAcao).set(data).where(eq(pestelPlanoAcao.id, id));
+  
+  const updated = await db.select().from(pestelPlanoAcao).where(eq(pestelPlanoAcao.id, id));
+  return updated[0];
+}
+
+export async function deletePestelPlanoAcao(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(pestelPlanoAcao).where(eq(pestelPlanoAcao.id, id));
+}
+
+export async function getPestelPlanoAcaoByEmpresa(empresaId: number): Promise<PestelPlanoAcao[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(pestelPlanoAcao).where(eq(pestelPlanoAcao.empresaId, empresaId));
+}
+
+export async function getPestelPlanoAcaoByFator(fatorId: number): Promise<PestelPlanoAcao[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(pestelPlanoAcao).where(eq(pestelPlanoAcao.fatorId, fatorId));
+}
+
+export async function getPestelPlanoAcaoByCategoria(empresaId: number, categoria: string): Promise<PestelPlanoAcao[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(pestelPlanoAcao).where(
+    and(
+      eq(pestelPlanoAcao.empresaId, empresaId),
+      eq(pestelPlanoAcao.categoria, categoria as any)
+    )
+  );
+}
+
+export async function getPestelPlanoAcaoById(id: number): Promise<PestelPlanoAcao | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(pestelPlanoAcao).where(eq(pestelPlanoAcao.id, id));
+  return result[0];
 }
