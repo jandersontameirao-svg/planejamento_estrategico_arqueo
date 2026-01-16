@@ -741,3 +741,39 @@ export const comentarioAnexos = mysqlTable("comentario_anexos", {
 
 export type ComentarioAnexo = typeof comentarioAnexos.$inferSelect;
 export type InsertComentarioAnexo = typeof comentarioAnexos.$inferInsert;
+
+/**
+ * Plano de Ação para PESTEL - Prevenção, Proteção e Mitigação de Riscos
+ */
+export const pestelPlanoAcao = mysqlTable("pestel_plano_acao", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  fatorId: int("fatorId").notNull(), // Referência ao fator PESTEL
+  categoria: mysqlEnum("categoria", ["politico", "economico", "social", "tecnologico", "ambiental", "legal"]).notNull(),
+  
+  // Estratégia de resposta
+  estrategia: mysqlEnum("estrategia", ["prevencao", "protecao", "mitigacao"]).notNull(),
+  descricaoEstrategia: text("descricaoEstrategia").notNull(),
+  
+  // Priorização
+  urgencia: int("urgencia").notNull(), // 1-5
+  importancia: int("importancia").notNull(), // 1-5
+  
+  // Responsável e Cronograma
+  responsavel: varchar("responsavel", { length: 255 }),
+  dataInicio: date("dataInicio"),
+  dataFim: date("dataFim"),
+  
+  // Status
+  status: mysqlEnum("status", ["planejado", "em_progresso", "concluido", "cancelado"]).default("planejado").notNull(),
+  percentualConclusao: int("percentualConclusao").default(0).notNull(),
+  
+  // Observações
+  observacoes: text("observacoes"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PestelPlanoAcao = typeof pestelPlanoAcao.$inferSelect;
+export type InsertPestelPlanoAcao = typeof pestelPlanoAcao.$inferInsert;

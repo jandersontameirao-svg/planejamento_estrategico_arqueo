@@ -858,3 +858,14 @@
 - [x] Criar componente UndoRedoToolbar com botões Desfazer/Refazer
 - [x] Adicionar atalhos de teclado (Ctrl+Z, Ctrl+Y) no hook
 - [x] Testar funcionalidade Undo/Redo em todos os componentes (Testado em PESTEL)
+
+
+## Plano de Ação com Matriz de Priorização para PESTEL - 16/01/2026
+- [x] Criar schema de banco de dados para planos de ação (pestel_plano_acao)
+- [x] Criar componente PlanoDeAcaoPestel com matriz de priorização
+- [x] Implementar estratégias de prevenção, proteção e mitigação
+- [x] Integrar em AnalisePestelLite.tsx
+- [x] Integrar em AnalisePestelCompleta.tsx
+- [ ] Integrar em todos os modais PESTEL do sistema (AnalisesRestantes.tsx)
+- [x] Testar funcionalidade de plano de ação (Testado com sucesso)
+- [x] Testar matriz de priorização (Testado com sucesso)

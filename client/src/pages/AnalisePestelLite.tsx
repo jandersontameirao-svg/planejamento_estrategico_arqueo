@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Save, Plus, Trash2, Building2, DollarSign, Users, Cpu, Leaf, Scale, AlertTriangle, FileDown } from "lucide-react";
 import { exportPestelPDF } from "@/lib/pdfExport";
 import CommentSection from "@/components/CommentSection";
+import PlanoDeAcaoPestel from "@/components/PlanoDeAcaoPestel";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Cell } from "recharts";
 
 interface FatorPestel {
@@ -645,6 +646,14 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
             </div>
           </div>
         </div>
+      )}
+
+      {/* Plano de Ação */}
+      {categoriaAtiva && (
+        <PlanoDeAcaoPestel 
+          fatorId={fatorEmEdicao?.id || ""}
+          categoria={categoriaAtiva}
+        />
       )}
 
       {/* Comentários */}

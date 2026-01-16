@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Save } from "lucide-react";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, Tooltip, ResponsiveContainer } from "recharts";
+import PlanoDeAcaoPestel from "@/components/PlanoDeAcaoPestel";
 
 interface PestelData {
   politico: string;
@@ -217,7 +218,15 @@ export default function AnalisePestelCompleta({ empresaId = 1 }: AnalisePestelCo
             </div>
           </div>
 
-          <div className="flex justify-end">
+          {/* Plano de Ação */}
+          <div className="mt-8 pt-8 border-t">
+            <PlanoDeAcaoPestel 
+              fatorId="pestel-completa"
+              categoria="PESTEL Completa"
+            />
+          </div>
+
+          <div className="flex justify-end mt-6">
             <Button onClick={handleSave} size="lg">
               <Save className="mr-2 h-4 w-4" />
               Salvar Análise PESTEL
