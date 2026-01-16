@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Save } from "lucide-react";
+import PlanoDeAcaoPestel from "@/components/PlanoDeAcaoPestel";
 
 // ============ STAKEHOLDERS ============
 export function AnalisesStakeholdersCompleta() {
@@ -61,7 +62,15 @@ export function AnalisesStakeholdersCompleta() {
             </div>
           </div>
 
-          <div className="flex justify-end">
+          {/* Plano de Ação */}
+          <div className="mt-8 pt-8 border-t">
+            <PlanoDeAcaoPestel 
+              fatorId="stakeholders"
+              categoria="Stakeholders"
+            />
+          </div>
+
+          <div className="flex justify-end mt-6">
             <Button onClick={handleSave} size="lg">
               <Save className="mr-2 h-4 w-4" />
               Salvar Análise Stakeholders
@@ -126,7 +135,15 @@ export function AnaliseSwoTtowsCompleta() {
             <Textarea placeholder="Estratégias derivadas da matriz SWOT..." rows={4} value={data.estrategias} onChange={(e) => setData({ ...data, estrategias: e.target.value })} />
           </div>
 
-          <div className="flex justify-end">
+          {/* Plano de Ação */}
+          <div className="mt-8 pt-8 border-t">
+            <PlanoDeAcaoPestel 
+              fatorId="swot"
+              categoria="SWOT"
+            />
+          </div>
+
+          <div className="flex justify-end mt-6">
             <Button onClick={handleSave} size="lg">
               <Save className="mr-2 h-4 w-4" />
               Salvar Análise SWOT/TOWS
@@ -190,7 +207,15 @@ export function AnalisesOkrCompleta() {
             </div>
           </div>
 
-          <div className="flex justify-end">
+          {/* Plano de Ação */}
+          <div className="mt-8 pt-8 border-t">
+            <PlanoDeAcaoPestel 
+              fatorId="okr"
+              categoria="OKR"
+            />
+          </div>
+
+          <div className="flex justify-end mt-6">
             <Button onClick={handleSave} size="lg">
               <Save className="mr-2 h-4 w-4" />
               Salvar Análise OKR
@@ -246,7 +271,15 @@ export function AnaliseBscCompleta() {
             </div>
           </div>
 
-          <div className="flex justify-end">
+          {/* Plano de Ação */}
+          <div className="mt-8 pt-8 border-t">
+            <PlanoDeAcaoPestel 
+              fatorId="bsc"
+              categoria="BSC"
+            />
+          </div>
+
+          <div className="flex justify-end mt-6">
             <Button onClick={handleSave} size="lg">
               <Save className="mr-2 h-4 w-4" />
               Salvar Análise BSC

@@ -869,3 +869,12 @@
 - [ ] Integrar em todos os modais PESTEL do sistema (AnalisesRestantes.tsx)
 - [x] Testar funcionalidade de plano de ação (Testado com sucesso)
 - [x] Testar matriz de priorização (Testado com sucesso)
+
+
+## Bugs Encontrados - 16/01/2026
+- [x] Corrigir modal de sucesso em SWOT (remover alert/notificação) - Resolvido com remoção de alerts anteriores
+
+## Recomendações em Progresso - 16/01/2026
+- [x] Integrar Plano de Ação em AnalisesRestantes.tsx (Stakeholders, SWOT, OKR, BSC)
+- [ ] Implementar persistência em banco de dados para PlanoDeAcaoPestel
+- [x] Criar dashboard de acompanhamento de ações (consolidado por status e estratégia) - DashboardAcoes.tsx criado
