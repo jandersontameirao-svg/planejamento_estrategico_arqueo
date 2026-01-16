@@ -4,17 +4,23 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Users, Shield, Edit2, Trash2, Plus } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function GestaoUsuarios() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [selectedRole, setSelectedRole] = useState<"user" | "admin" | "gestor">("user");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newUserName, setNewUserName] = useState("");
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserRole, setNewUserRole] = useState<"user" | "admin" | "gestor">("user");
 
   const { data: usuarios, isLoading, refetch } = trpc.usuarios.list.useQuery();
   const { data: empresas } = trpc.empresas.list.useQuery();
@@ -23,6 +29,34 @@ export default function GestaoUsuarios() {
     onSuccess: () => {
       refetch();
       setSelectedUserId(null);
+      toast.success("Role atualizado com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao atualizar role: " + error.message);
+    },
+  });
+
+  const createUserMutation = trpc.usuarios.create.useMutation({
+    onSuccess: () => {
+      refetch();
+      setIsCreateDialogOpen(false);
+      setNewUserName("");
+      setNewUserEmail("");
+      setNewUserRole("user");
+      toast.success("Usuário criado com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao criar usuário: " + error.message);
+    },
+  });
+
+  const deleteUserMutation = trpc.usuarios.delete.useMutation({
+    onSuccess: () => {
+      refetch();
+      toast.success("Usuário excluído com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao excluir usuário: " + error.message);
     },
   });
 
@@ -65,6 +99,28 @@ export default function GestaoUsuarios() {
         return "Gestor";
       default:
         return "Usuário";
+    }
+  };
+
+  const handleCreateUser = () => {
+    if (!newUserName.trim()) {
+      toast.error("Nome é obrigatório");
+      return;
+    }
+    if (!newUserEmail.trim()) {
+      toast.error("Email é obrigatório");
+      return;
+    }
+    createUserMutation.mutate({
+      name: newUserName,
+      email: newUserEmail,
+      role: newUserRole,
+    });
+  };
+
+  const handleDeleteUser = (userId: number, userName: string) => {
+    if (confirm(`Tem certeza que deseja excluir o usuário "${userName}"?`)) {
+      deleteUserMutation.mutate({ userId });
     }
   };
 
@@ -128,10 +184,67 @@ export default function GestaoUsuarios() {
                 <CardTitle>Lista de Usuários</CardTitle>
                 <CardDescription>Gerenciar roles e permissões dos usuários</CardDescription>
               </div>
-              <Button size="sm" className="gap-2">
-                <Plus className="h-4 w-4" />
-                Novo Usuário
-              </Button>
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Novo Usuário
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Criar Novo Usuário</DialogTitle>
+                    <DialogDescription>
+                      Preencha os dados do novo usuário
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nome</Label>
+                      <Input
+                        id="name"
+                        placeholder="Nome completo"
+                        value={newUserName}
+                        onChange={(e) => setNewUserName(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="email@exemplo.com"
+                        value={newUserEmail}
+                        onChange={(e) => setNewUserEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="role">Perfil de Acesso</Label>
+                      <Select value={newUserRole} onValueChange={(value: "user" | "admin" | "gestor") => setNewUserRole(value)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="user">Usuário</SelectItem>
+                          <SelectItem value="gestor">Gestor</SelectItem>
+                          <SelectItem value="admin">Administrador</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex justify-end gap-2 pt-4">
+                      <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                        Cancelar
+                      </Button>
+                      <Button
+                        onClick={handleCreateUser}
+                        disabled={createUserMutation.isPending}
+                      >
+                        {createUserMutation.isPending ? "Criando..." : "Criar Usuário"}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </CardHeader>
           <CardContent>
@@ -167,7 +280,10 @@ export default function GestaoUsuarios() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => setSelectedUserId(usr.id)}
+                                  onClick={() => {
+                                    setSelectedUserId(usr.id);
+                                    setSelectedRole(usr.role as "user" | "admin" | "gestor");
+                                  }}
                                 >
                                   <Edit2 className="h-4 w-4" />
                                 </Button>
@@ -182,7 +298,7 @@ export default function GestaoUsuarios() {
                                 <div className="space-y-4">
                                   <div>
                                     <label className="text-sm font-medium">Novo Role</label>
-                                    <Select value={selectedRole} onValueChange={(value: any) => setSelectedRole(value)}>
+                                    <Select value={selectedRole} onValueChange={(value: "user" | "admin" | "gestor") => setSelectedRole(value)}>
                                       <SelectTrigger>
                                         <SelectValue />
                                       </SelectTrigger>
@@ -207,7 +323,13 @@ export default function GestaoUsuarios() {
                                 </div>
                               </DialogContent>
                             </Dialog>
-                            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() => handleDeleteUser(usr.id, usr.name || "Sem nome")}
+                              disabled={deleteUserMutation.isPending}
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>

@@ -171,6 +171,30 @@ export async function updateUserRole(userId: number, role: "user" | "admin" | "g
   await db.update(users).set({ role }).where(eq(users.id, userId));
 }
 
+export async function createUser(data: { name: string; email: string; role: "user" | "admin" | "gestor" }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Gerar um openId único para usuários criados manualmente
+  const openId = `manual_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+  
+  const result = await db.insert(users).values({
+    openId,
+    name: data.name,
+    email: data.email,
+    role: data.role,
+    loginMethod: "manual",
+  });
+  
+  return { id: result[0].insertId };
+}
+
+export async function deleteUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(users).where(eq(users.id, userId));
+}
+
 // Identidade Organizacional
 export async function getIdentidadeByEmpresa(empresaId: number) {
   const db = await getDb();

@@ -800,3 +800,22 @@
 - [x] Corrigir DashboardAnalises.tsx (getBsc)
 - [x] Corrigir BscLite.tsx (tipos de perspectiva)
 - [x] Corrigir AnalisePestelLite.tsx (tipos de categoria e CommentSection)
+
+
+## Bug Report - Botão Novo Usuário
+- [ ] Corrigir botão "Novo Usuário" que não está funcionando
+
+
+## Botão Novo Usuário - Corrigido
+- [x] Corrigir botão "Novo Usuário" que não estava funcionando
+- [x] Implementar modal de criação de usuário com campos Nome, Email, Perfil
+- [x] Adicionar procedure usuarios.create no backend
+- [x] Adicionar procedure usuarios.delete no backend
+- [x] Testar criação de usuário com sucesso
+
+
+## Correções TypeScript e Funcionalidades de Usuário - 16/01/2026
+- [x] Corrigir erros TypeScript relacionados a createUser e deleteUser
+- [x] Implementar import dinâmico para funções de usuário no routers.ts
+- [x] Testar criação de usuário via modal - funcionando
+- [x] Verificar que todos os erros TypeScript foram resolvidos (0 erros)

@@ -212,6 +212,30 @@ export const appRouter = router({
         await desvincularUsuarioEmpresa(input.usuarioId, input.empresaId);
         return { success: true };
       }),
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1, "Nome é obrigatório"),
+        email: z.string().email("Email inválido"),
+        role: z.enum(["user", "admin", "gestor"]),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Apenas administradores podem criar usuários");
+        }
+        const dbModule = await import("./db") as any;
+        const result = await dbModule.createUser(input);
+        return result;
+      }),
+    delete: protectedProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Apenas administradores podem deletar usuários");
+        }
+        const dbModule = await import("./db") as any;
+        await dbModule.deleteUser(input.userId);
+        return { success: true };
+      }),
   }),
 
   identidade: router({
