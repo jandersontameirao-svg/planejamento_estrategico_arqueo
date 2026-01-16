@@ -78,11 +78,9 @@ export default function PlanoDeAcaoPestel({ fatorId, categoria, onAcaoAdicionada
 
     if (edicao) {
       setAcoes(acoes.map((a) => (a.id === edicao.id ? novaAcao : a)));
-      notification.success("Ação atualizada com sucesso!");
       setEdicao(null);
     } else {
       setAcoes([...acoes, novaAcao]);
-      notification.success("Ação adicionada com sucesso!");
       onAcaoAdicionada?.(novaAcao);
     }
 
@@ -104,7 +102,6 @@ export default function PlanoDeAcaoPestel({ fatorId, categoria, onAcaoAdicionada
 
   const handleDeletarAcao = (id: string) => {
     setAcoes(acoes.filter((a) => a.id !== id));
-    notification.success("Ação removida com sucesso!");
   };
 
   const handleCancelarEdicao = () => {

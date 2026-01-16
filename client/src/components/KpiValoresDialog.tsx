@@ -70,7 +70,6 @@ export default function KpiValoresDialog({
 
   const upsertValor = trpc.kpiValores.upsert.useMutation({
     onSuccess: () => {
-      toast.success("Valor registrado com sucesso!");
       refetchValores();
       refetchValorAtual();
       setMeta("");

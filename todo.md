@@ -878,3 +878,9 @@
 - [x] Integrar Plano de Ação em AnalisesRestantes.tsx (Stakeholders, SWOT, OKR, BSC)
 - [ ] Implementar persistência em banco de dados para PlanoDeAcaoPestel
 - [x] Criar dashboard de acompanhamento de ações (consolidado por status e estratégia) - DashboardAcoes.tsx criado
+
+
+## Remoção de Mensagens de Salvamento - 16/01/2026
+- [x] Remover toasts "Salvo com sucesso" de todos os componentes (5 toasts removidos)
+- [x] Remover toasts "Salvo automaticamente" de AnalisePestelLite
+- [x] Testar sistema sem mensagens de salvamento (Testado com sucesso em PESTEL)

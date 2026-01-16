@@ -524,24 +524,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         </CardContent>
       </Card>
 
-      {/* Indicador de Auto-Save */}
-      {autoSaveStatus !== 'idle' && (
-        <div className={`text-sm px-3 py-2 rounded-lg flex items-center gap-2 ${
-          autoSaveStatus === 'saving' ? 'bg-blue-100 text-blue-700' :
-          autoSaveStatus === 'saved' ? 'bg-green-100 text-green-700' :
-          'bg-red-100 text-red-700'
-        }`}>
-          {autoSaveStatus === 'saving' && (
-            <><span className="animate-spin">⏳</span> Salvando automaticamente...</>
-          )}
-          {autoSaveStatus === 'saved' && (
-            <><span>✓</span> Salvo automaticamente!</>
-          )}
-          {autoSaveStatus === 'error' && (
-            <><span>✕</span> Erro ao salvar. Tente manualmente.</>
-          )}
-        </div>
-      )}
+      {/* Indicador de salvamento automático removido */}
 
       {/* Salvar e Exportar */}
       <div className="flex gap-2">

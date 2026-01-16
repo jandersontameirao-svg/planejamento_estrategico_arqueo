@@ -16,7 +16,6 @@ export default function VersionHistory({ empresaId }: VersionHistoryProps) {
   
   const revertMutation = trpc.templates.revertToVersion.useMutation({
     onSuccess: () => {
-      notification.success("Configuração revertida com sucesso!");
       utils.templates.getConfig.invalidate({ empresaId });
       utils.templates.listVersions.invalidate({ empresaId });
     },
