@@ -933,3 +933,8 @@
 - [x] Implementar Plano de Ação em BscLite.tsx
 - [x] Garantir inclusão automática em futuras áreas de negócios (Componente PlanoDeAcaoPestelIntegrado reusável)
 - [x] Testar Planos de Ação em Grupo Arqueo Brasil (Confirmado - Plano de Ação aparece em BSC com 3 estratégias)
+
+
+## Melhorias de Navegação - 16/01/2026
+- [x] Adicionar botão de voltar em Gestão de Empresas
+- [x] Testar navegação de volta
