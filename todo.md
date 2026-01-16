@@ -921,3 +921,8 @@
 - [x] Remover análise de OKRs do Planejamento
 - [x] Atualizar navegação para mostrar apenas PESTEL, SWOT e BSC
 - [x] Testar remoção das análises (Confirmado - apenas PESTEL, SWOT e BSC aparecem)
+
+
+## Plano de Ação em SwotLite - 16/01/2026
+- [x] Adicionar PlanoDeAcaoPestelIntegrado em SwotLite.tsx
+- [x] Testar Plano de Ação em SWOT expandida (Confirmado - Plano de Ação aparece com 3 estratégias)

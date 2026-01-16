@@ -6,6 +6,7 @@ import { Save, Plus, Trash2, Shield, AlertTriangle, TrendingUp, TrendingDown, Fi
 import { exportSwotPDF } from "@/lib/pdfExport";
 import CommentSection from "@/components/CommentSection";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import PlanoDeAcaoPestelIntegrado from "@/components/PlanoDeAcaoPestelIntegrado";
 
 interface ItemSwot {
   id: string;
@@ -343,6 +344,13 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
           Exportar PDF
         </Button>
       </div>
+
+      {/* Plano de Ação */}
+      <PlanoDeAcaoPestelIntegrado 
+        fatorId="swot-geral" 
+        fatorDescricao="Análise SWOT" 
+        fatorCategoria="Geral"
+      />
 
       {/* Comentários */}
       <CommentSection empresaId={empresaId} tipoAnalise="swot" />
