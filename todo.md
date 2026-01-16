@@ -945,6 +945,7 @@
 - [x] Adicionar PlanoDeAcaoPestelIntegrado em DashboardAnalisesArea.tsx se necessário - Não necessário
 - [x] Testar Plano de Ação em Áreas de Negócio - CONFIRMADO em PESTEL, SWOT e BSC
 - [x] Validar persistência de ações em banco de dados por área - Testado com sucesso
+- [x] Implementar Plano de Ação do PESTEL do Arqueo Participações nas Áreas de Negócio - CONFIRMADO FUNCIONANDO
 
 
 ## Plano de Ação em Empresas do Grupo - 16/01/2026
@@ -963,3 +964,8 @@
 - [x] Criar modal para selecionar empresas do repositório
 - [x] Exibir empresas vinculadas na área de negócio (card com badges)
 - [x] Testar funcionalidade completa (Testado - Vinculou Arqueoproject e arqueogis ao Grupo Arqueo Brasil)
+
+
+## Bug Fix - Botões Desvincular Empresas - 16/01/2026
+- [x] Corrigir botões de desvincular (X) que não funcionam no modal de vinculação - FUNCIONANDO CORRETAMENTE
+- [x] Testar desvinculação de empresas - Testado com sucesso (desvinculou e revinculou Arqueoproject)
