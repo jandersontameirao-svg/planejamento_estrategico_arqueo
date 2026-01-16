@@ -47,7 +47,6 @@ export default function CincoForcasCompleta({ empresaId = 1 }: CincoForcasComple
 
   const handleSave = () => {
     console.log("Análise 5 Forças salva:", { data, scores });
-    notification.success("Análise 5 Forças de Porter salva com sucesso!");
   };
 
   return (

@@ -19,7 +19,6 @@ export function AnalisesStakeholdersCompleta() {
 
   const handleSave = () => {
     console.log("Análise Stakeholders salva:", data);
-    notification.success("Análise de Stakeholders salva com sucesso!");
   };
 
   return (
@@ -81,7 +80,6 @@ export function AnaliseSwoTtowsCompleta() {
 
   const handleSave = () => {
     console.log("Análise SWOT/TOWS salva:", data);
-    notification.success("Análise SWOT/TOWS salva com sucesso!");
   };
 
   return (
@@ -147,7 +145,6 @@ export function AnalisesOkrCompleta() {
 
   const handleSave = () => {
     console.log("Análise OKR salva:", data);
-    notification.success("Análise OKR salva com sucesso!");
   };
 
   return (
@@ -208,7 +205,6 @@ export function AnaliseBscCompleta() {
 
   const handleSave = () => {
     console.log("Análise BSC salva:", data);
-    notification.success("Análise BSC salva com sucesso!");
   };
 
   return (

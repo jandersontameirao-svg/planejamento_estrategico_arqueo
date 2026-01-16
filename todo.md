@@ -840,3 +840,10 @@
 - [x] Substituir alerts em BscLite.tsx (1 alert)
 - [x] Substituir alerts em CincoForcasCompleta.tsx (1 alert)
 - [x] Testar todas as notificações Toast
+
+
+## Remoção de Notificações de Salvamento - 16/01/2026
+- [x] Remover notificações de salvamento em AnalisePestelCompleta.tsx
+- [x] Remover notificações de salvamento em AnalisesRestantes.tsx (4 notificações)
+- [x] Remover notificações de salvamento em CincoForcasCompleta.tsx
+- [x] Testar sistema sem notificações de salvamento

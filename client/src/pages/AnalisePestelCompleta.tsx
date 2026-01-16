@@ -51,7 +51,6 @@ export default function AnalisePestelCompleta({ empresaId = 1 }: AnalisePestelCo
 
   const handleSave = () => {
     console.log("Análise PESTEL salva:", { data, scores });
-    notification.success("Análise PESTEL salva com sucesso!");
   };
 
   return (
