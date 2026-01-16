@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Save } from "lucide-react";
 import PlanoDeAcaoPestel from "@/components/PlanoDeAcaoPestel";
+import PlanoDeAcaoPestelIntegrado from "@/components/PlanoDeAcaoPestelIntegrado";
 
 // ============ STAKEHOLDERS ============
 export function AnalisesStakeholdersCompleta() {
@@ -63,10 +64,12 @@ export function AnalisesStakeholdersCompleta() {
           </div>
 
           {/* Plano de Ação */}
-          <div className="mt-8 pt-8 border-t">
-            <PlanoDeAcaoPestel 
-              fatorId="stakeholders"
-              categoria="Stakeholders"
+          <div className="mt-8 pt-8 border-t space-y-4">
+            <h3 className="text-lg font-semibold">Plano de Ação - Stakeholders</h3>
+            <PlanoDeAcaoPestelIntegrado 
+              fatorId="stakeholders-completa"
+              fatorDescricao="Análise de Stakeholders Completa"
+              fatorCategoria="Stakeholders"
             />
           </div>
 
@@ -136,10 +139,12 @@ export function AnaliseSwoTtowsCompleta() {
           </div>
 
           {/* Plano de Ação */}
-          <div className="mt-8 pt-8 border-t">
-            <PlanoDeAcaoPestel 
-              fatorId="swot"
-              categoria="SWOT"
+          <div className="mt-8 pt-8 border-t space-y-4">
+            <h3 className="text-lg font-semibold">Plano de Ação - SWOT</h3>
+            <PlanoDeAcaoPestelIntegrado 
+              fatorId="swot-completa"
+              fatorDescricao="Análise SWOT/TOWS Completa"
+              fatorCategoria="SWOT"
             />
           </div>
 
@@ -208,10 +213,12 @@ export function AnalisesOkrCompleta() {
           </div>
 
           {/* Plano de Ação */}
-          <div className="mt-8 pt-8 border-t">
-            <PlanoDeAcaoPestel 
-              fatorId="okr"
-              categoria="OKR"
+          <div className="mt-8 pt-8 border-t space-y-4">
+            <h3 className="text-lg font-semibold">Plano de Ação - OKR</h3>
+            <PlanoDeAcaoPestelIntegrado 
+              fatorId="okr-completa"
+              fatorDescricao="Análise OKR Completa"
+              fatorCategoria="OKR"
             />
           </div>
 
@@ -272,11 +279,30 @@ export function AnaliseBscCompleta() {
           </div>
 
           {/* Plano de Ação */}
-          <div className="mt-8 pt-8 border-t">
-            <PlanoDeAcaoPestel 
-              fatorId="bsc"
-              categoria="BSC"
-            />
+          <div className="mt-8 pt-8 border-t space-y-4">
+            <h3 className="text-lg font-semibold">Plano de Ação - BSC</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <PlanoDeAcaoPestelIntegrado 
+                fatorId="bsc-financeira"
+                fatorDescricao="Perspectiva Financeira"
+                fatorCategoria="Financeira"
+              />
+              <PlanoDeAcaoPestelIntegrado 
+                fatorId="bsc-clientes"
+                fatorDescricao="Perspectiva do Cliente"
+                fatorCategoria="Clientes"
+              />
+              <PlanoDeAcaoPestelIntegrado 
+                fatorId="bsc-processos"
+                fatorDescricao="Processos Internos"
+                fatorCategoria="Processos"
+              />
+              <PlanoDeAcaoPestelIntegrado 
+                fatorId="bsc-aprendizado"
+                fatorDescricao="Aprendizado e Crescimento"
+                fatorCategoria="Aprendizado"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end mt-6">

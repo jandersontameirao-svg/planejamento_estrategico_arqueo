@@ -401,7 +401,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
               const catInfo = categorias.find((c) => c.nome === fator.categoria);
               const Icon = catInfo?.icone || AlertTriangle;
               return (
-                <div key={fator.id} className="space-y-3">
+                <>
                   <div className="border rounded-lg p-4 cursor-pointer hover:shadow-md transition-all" style={{ borderLeftColor: catInfo?.cor, borderLeftWidth: "4px" }} onClick={() => {
                     setFatorEmEdicao(fator);
                     setImpactoEdicao(fator.impacto);
@@ -449,14 +449,14 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
                       </div>
                     </div>
                   </div>
-                  <div className="bg-white border rounded-lg p-4 ml-4">
-                    <PlanoDeAcaoPestelIntegrado
-                      fatorId={fator.id}
-                      fatorDescricao={fator.descricao}
-                      fatorCategoria={fator.categoria}
-                    />
-                  </div>
+                <div className="bg-white border rounded-lg p-4 mt-4">
+                  <PlanoDeAcaoPestelIntegrado
+                    fatorId={fator.id}
+                    fatorDescricao={fator.descricao}
+                    fatorCategoria={fator.categoria}
+                  />
                 </div>
+                </>
               );
             })
           )}

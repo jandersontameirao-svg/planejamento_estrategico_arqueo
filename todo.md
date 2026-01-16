@@ -893,3 +893,12 @@
 - [x] Integrar em AnalisePestelCompleta.tsx corretamente
 - [ ] Integrar em todos os modais PESTEL de AnalisesRestantes.tsx
 - [ ] Testar funcionalidade completa em todos os modais
+
+
+## Integração de Plano de Ação em Outros Modais - 16/01/2026
+- [x] Integrar PlanoDeAcaoPestelIntegrado em Stakeholders
+- [x] Integrar PlanoDeAcaoPestelIntegrado em SWOT
+- [x] Integrar PlanoDeAcaoPestelIntegrado em OKR
+- [x] Integrar PlanoDeAcaoPestelIntegrado em BSC (4 perspectivas)
+- [x] Corrigir erro de JSX em AnalisePestelLite.tsx
+- [ ] Testar funcionalidade em todos os modais
