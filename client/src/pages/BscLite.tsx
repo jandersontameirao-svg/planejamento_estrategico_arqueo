@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Save, Plus, Trash2, DollarSign, Users, Settings, GraduationCap, BarChart3, FileDown } from "lucide-react";
 import { exportBscPDF } from "@/lib/pdfExport";
 import CommentSection from "@/components/CommentSection";
+import PlanoDeAcaoPestelIntegrado from "@/components/PlanoDeAcaoPestelIntegrado";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
 import { trpc } from "@/lib/trpc";
 import { useNotification } from "@/hooks/useNotification";
@@ -506,6 +507,13 @@ export default function BscLite({ empresaId }: BscLiteProps) {
           Exportar PDF
         </Button>
       </div>
+
+      {/* Plano de Ação */}
+      <PlanoDeAcaoPestelIntegrado 
+        fatorId="bsc-geral" 
+        fatorDescricao="Balanced Scorecard" 
+        fatorCategoria="Geral"
+      />
 
       {/* Comentários */}
       <CommentSection empresaId={empresaId} tipoAnalise="bsc" />

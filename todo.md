@@ -926,3 +926,10 @@
 ## Plano de Ação em SwotLite - 16/01/2026
 - [x] Adicionar PlanoDeAcaoPestelIntegrado em SwotLite.tsx
 - [x] Testar Plano de Ação em SWOT expandida (Confirmado - Plano de Ação aparece com 3 estratégias)
+
+
+## Plano de Ação em Todas as Empresas - 16/01/2026
+- [x] Verificar estrutura de dados para Grupo Arqueo Brasil
+- [x] Implementar Plano de Ação em BscLite.tsx
+- [x] Garantir inclusão automática em futuras áreas de negócios (Componente PlanoDeAcaoPestelIntegrado reusável)
+- [x] Testar Planos de Ação em Grupo Arqueo Brasil (Confirmado - Plano de Ação aparece em BSC com 3 estratégias)
