@@ -819,3 +819,9 @@
 - [x] Implementar import dinâmico para funções de usuário no routers.ts
 - [x] Testar criação de usuário via modal - funcionando
 - [x] Verificar que todos os erros TypeScript foram resolvidos (0 erros)
+
+
+## Bug Fix - Loop de Notificações em PESTEL - 16/01/2026
+- [x] Corrigir loop infinito de toasts de sucesso em PESTEL
+- [x] Verificar lógica de auto-save e debounce
+- [x] Remover notificações duplicadas ou redundantes

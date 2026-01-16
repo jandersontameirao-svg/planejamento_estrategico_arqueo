@@ -60,11 +60,10 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
   // Mutation para salvar fatores
   const salvarMutation = trpc.analises.savePestel.useMutation({
     onSuccess: () => {
-      alert("Análise PESTEL salva com sucesso!");
       utils.analises.getPestel.invalidate({ empresaId });
     },
     onError: (error) => {
-      alert(`Erro ao salvar: ${error.message}`);
+      console.error("Erro ao salvar PESTEL:", error.message);
     },
   });
   const [fatores, setFatores] = useState<FatorPestel[]>([]);
