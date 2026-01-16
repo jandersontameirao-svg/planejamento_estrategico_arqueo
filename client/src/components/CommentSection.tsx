@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useNotification } from "@/hooks/useNotification";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +14,7 @@ interface CommentSectionProps {
 }
 
 export default function CommentSection({ empresaId, tipoAnalise }: CommentSectionProps) {
+  const notification = useNotification();
   const { user } = useAuth();
   const utils = trpc.useUtils();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,7 +57,7 @@ export default function CommentSection({ empresaId, tipoAnalise }: CommentSectio
       utils.comentarios.count.invalidate({ empresaId, tipoAnalise });
     },
     onError: (error) => {
-      alert(`Erro ao criar comentário: ${error.message}`);
+      notification.error(`Erro ao criar comentário: ${error.message}`);
     },
   });
 
@@ -72,7 +74,7 @@ export default function CommentSection({ empresaId, tipoAnalise }: CommentSectio
       utils.comentarios.list.invalidate({ empresaId, tipoAnalise });
     },
     onError: (error) => {
-      alert(`Erro ao atualizar comentário: ${error.message}`);
+      notification.error(`Erro ao atualizar comentário: ${error.message}`);
     },
   });
 
@@ -82,7 +84,7 @@ export default function CommentSection({ empresaId, tipoAnalise }: CommentSectio
       utils.comentarios.count.invalidate({ empresaId, tipoAnalise });
     },
     onError: (error) => {
-      alert(`Erro ao deletar comentário: ${error.message}`);
+      notification.error(`Erro ao deletar comentário: ${error.message}`);
     },
   });
 
@@ -94,7 +96,7 @@ export default function CommentSection({ empresaId, tipoAnalise }: CommentSectio
 
   const handleCreate = () => {
     if (novoComentario.trim().length < 3) {
-      alert("O comentário deve ter pelo menos 3 caracteres");
+      notification.warning("O comentário deve ter pelo menos 3 caracteres");
       return;
     }
 
@@ -107,7 +109,7 @@ export default function CommentSection({ empresaId, tipoAnalise }: CommentSectio
 
   const handleUpdate = (id: number) => {
     if (conteudoEditado.trim().length < 3) {
-      alert("O comentário deve ter pelo menos 3 caracteres");
+      notification.warning("O comentário deve ter pelo menos 3 caracteres");
       return;
     }
 
@@ -145,7 +147,7 @@ export default function CommentSection({ empresaId, tipoAnalise }: CommentSectio
     // Validar tamanho total (máximo 10MB por arquivo)
     const invalidFiles = files.filter(f => f.size > 10 * 1024 * 1024);
     if (invalidFiles.length > 0) {
-      alert("Alguns arquivos excedem o tamanho máximo de 10MB e foram removidos");
+      notification.warning("Alguns arquivos excedem o tamanho máximo de 10MB e foram removidos");
     }
     
     const validFiles = files.filter(f => f.size <= 10 * 1024 * 1024);

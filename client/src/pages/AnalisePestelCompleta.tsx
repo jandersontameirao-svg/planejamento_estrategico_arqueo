@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNotification } from "@/hooks/useNotification";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface AnalisePestelCompletaProps {
 }
 
 export default function AnalisePestelCompleta({ empresaId = 1 }: AnalisePestelCompletaProps) {
+  const notification = useNotification();
   const [data, setData] = useState<PestelData>({
     politico: "",
     economico: "",
@@ -49,7 +51,7 @@ export default function AnalisePestelCompleta({ empresaId = 1 }: AnalisePestelCo
 
   const handleSave = () => {
     console.log("Análise PESTEL salva:", { data, scores });
-    alert("Análise PESTEL salva com sucesso!");
+    notification.success("Análise PESTEL salva com sucesso!");
   };
 
   return (

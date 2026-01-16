@@ -825,3 +825,18 @@
 - [x] Corrigir loop infinito de toasts de sucesso em PESTEL
 - [x] Verificar lógica de auto-save e debounce
 - [x] Remover notificações duplicadas ou redundantes
+
+
+## Substituição de Alerts por Toast - 16/01/2026
+- [x] Identificar todos os arquivos com alerts (22 alerts em 9 arquivos)
+- [x] Criar hook customizado useNotification para padronizar notificações
+- [x] Substituir alerts em AnalisePestelLite.tsx (2 alerts)
+- [x] Substituir alerts em CommentSection.tsx (6 alerts)
+- [x] Substituir alerts em ExportarPDF.tsx (2 alerts)
+- [x] Substituir alerts em NotificationButton.tsx (3 alerts)
+- [x] Substituir alerts em VersionHistory.tsx (2 alerts)
+- [x] Substituir alerts em AnalisePestelCompleta.tsx (1 alert)
+- [x] Substituir alerts em AnalisesRestantes.tsx (4 alerts)
+- [x] Substituir alerts em BscLite.tsx (1 alert)
+- [x] Substituir alerts em CincoForcasCompleta.tsx (1 alert)
+- [x] Testar todas as notificações Toast

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
 import html2pdf from "html2pdf.js";
+import { useNotification } from "@/hooks/useNotification";
 
 interface ExportarPDFProps {
   titulo: string;
@@ -9,9 +10,10 @@ interface ExportarPDFProps {
 }
 
 export function ExportarPDF({ titulo, conteudoRef, nomeArquivo = "analise" }: ExportarPDFProps) {
+  const notification = useNotification();
   const handleExport = () => {
     if (!conteudoRef.current) {
-      alert("Conteúdo não encontrado para exportação");
+      notification.error("Conteúdo não encontrado para exportação");
       return;
     }
 
@@ -39,13 +41,14 @@ export function ExportarPDF({ titulo, conteudoRef, nomeArquivo = "analise" }: Ex
  * Exporta múltiplas análises em um único PDF consolidado
  */
 export function ExportarPDFConsolidado(analises: Record<string, React.RefObject<HTMLDivElement>>) {
+  const notification = useNotification();
   const handleExport = () => {
     const conteudosCombinados = Object.entries(analises)
       .map(([nome, ref]) => ref.current?.innerHTML || "")
       .join("<div style='page-break-after: always;'></div>");
 
     if (!conteudosCombinados) {
-      alert("Nenhuma análise para exportar");
+      notification.error("Nenhuma análise para exportar");
       return;
     }
 

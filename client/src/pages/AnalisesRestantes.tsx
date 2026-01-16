@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNotification } from "@/hooks/useNotification";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { Save } from "lucide-react";
 
 // ============ STAKEHOLDERS ============
 export function AnalisesStakeholdersCompleta() {
+  const notification = useNotification();
   const [data, setData] = useState({
     altoPoder: "",
     altoInteresse: "",
@@ -17,7 +19,7 @@ export function AnalisesStakeholdersCompleta() {
 
   const handleSave = () => {
     console.log("Análise Stakeholders salva:", data);
-    alert("Análise de Stakeholders salva com sucesso!");
+    notification.success("Análise de Stakeholders salva com sucesso!");
   };
 
   return (
@@ -68,6 +70,7 @@ export function AnalisesStakeholdersCompleta() {
 
 // ============ SWOT/TOWS ============
 export function AnaliseSwoTtowsCompleta() {
+  const notification = useNotification();
   const [data, setData] = useState({
     forcas: "",
     fraquezas: "",
@@ -78,7 +81,7 @@ export function AnaliseSwoTtowsCompleta() {
 
   const handleSave = () => {
     console.log("Análise SWOT/TOWS salva:", data);
-    alert("Análise SWOT/TOWS salva com sucesso!");
+    notification.success("Análise SWOT/TOWS salva com sucesso!");
   };
 
   return (
@@ -129,7 +132,8 @@ export function AnaliseSwoTtowsCompleta() {
 }
 
 // ============ OKR ============
-export function AnaliseOkrCompleta() {
+export function AnalisesOkrCompleta() {
+  const notification = useNotification();
   const [data, setData] = useState({
     objetivo1: "",
     kr1_1: "",
@@ -143,7 +147,7 @@ export function AnaliseOkrCompleta() {
 
   const handleSave = () => {
     console.log("Análise OKR salva:", data);
-    alert("Análise OKR salva com sucesso!");
+    notification.success("Análise OKR salva com sucesso!");
   };
 
   return (
@@ -194,6 +198,7 @@ export function AnaliseOkrCompleta() {
 
 // ============ BSC ============
 export function AnaliseBscCompleta() {
+  const notification = useNotification();
   const [data, setData] = useState({
     financeira: "",
     clientes: "",
@@ -203,7 +208,7 @@ export function AnaliseBscCompleta() {
 
   const handleSave = () => {
     console.log("Análise BSC salva:", data);
-    alert("Análise BSC salva com sucesso!");
+    notification.success("Análise BSC salva com sucesso!");
   };
 
   return (

@@ -8,6 +8,7 @@ import { exportBscPDF } from "@/lib/pdfExport";
 import CommentSection from "@/components/CommentSection";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
 import { trpc } from "@/lib/trpc";
+import { useNotification } from "@/hooks/useNotification";
 
 interface Indicador {
   id: string;
@@ -57,6 +58,7 @@ function convertTemplateConfig(config: any) {
 }
 
 export default function BscLite({ empresaId }: BscLiteProps) {
+  const notification = useNotification();
   const utils = trpc.useUtils();
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -156,7 +158,7 @@ export default function BscLite({ empresaId }: BscLiteProps) {
 
   const removerPerspectiva = (perspectivaId: string) => {
     if (perspectivas.length <= 4) {
-      alert("Você deve manter pelo menos as 4 perspectivas padrão!");
+      notification.warning("Você deve manter pelo menos as 4 perspectivas padrão!");
       return;
     }
     setPerspectivas(perspectivas.filter(p => p.id !== perspectivaId));

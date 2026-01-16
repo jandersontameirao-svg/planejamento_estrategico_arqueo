@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useNotification } from "@/hooks/useNotification";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,6 +48,7 @@ function convertTemplateConfig(config: any) {
 }
 
 export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps) {
+  const notification = useNotification();
   const utils = trpc.useUtils();
   const [fatorEmEdicao, setFatorEmEdicao] = useState<FatorPestel | null>(null);
   const [impactoEdicao, setImpactoEdicao] = useState(3);
@@ -145,11 +147,11 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
 
   const adicionarFator = () => {
     if (!novoFator.descricao || novoFator.descricao.trim() === "") {
-      alert("Por favor, preencha a descrição do fator antes de adicionar.");
+      notification.warning("Por favor, preencha a descrição do fator antes de adicionar.");
       return;
     }
     if (novoFator.descricao.trim().length < 5) {
-      alert("A descrição deve ter pelo menos 5 caracteres.");
+      notification.warning("A descrição deve ter pelo menos 5 caracteres.");
       return;
     }
     setFatores([

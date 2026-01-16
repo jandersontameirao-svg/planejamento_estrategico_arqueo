@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNotification } from "@/hooks/useNotification";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ interface CincoForcasCompletaProps {
 }
 
 export default function CincoForcasCompleta({ empresaId = 1 }: CincoForcasCompletaProps) {
+  const notification = useNotification();
   const [data, setData] = useState<ForcasData>({
     ameacaNovosConcorrentes: "",
     poderFornecedores: "",
@@ -45,7 +47,7 @@ export default function CincoForcasCompleta({ empresaId = 1 }: CincoForcasComple
 
   const handleSave = () => {
     console.log("Análise 5 Forças salva:", { data, scores });
-    alert("Análise 5 Forças de Porter salva com sucesso!");
+    notification.success("Análise 5 Forças de Porter salva com sucesso!");
   };
 
   return (

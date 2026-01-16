@@ -1,5 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
+import { useNotification } from "@/hooks/useNotification";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { History, RotateCcw, Clock } from "lucide-react";
@@ -9,17 +10,18 @@ interface VersionHistoryProps {
 }
 
 export default function VersionHistory({ empresaId }: VersionHistoryProps) {
+  const notification = useNotification();
   const utils = trpc.useUtils();
   const { data: versions, isLoading } = trpc.templates.listVersions.useQuery({ empresaId });
   
   const revertMutation = trpc.templates.revertToVersion.useMutation({
     onSuccess: () => {
-      alert("Configuração revertida com sucesso!");
+      notification.success("Configuração revertida com sucesso!");
       utils.templates.getConfig.invalidate({ empresaId });
       utils.templates.listVersions.invalidate({ empresaId });
     },
     onError: (error) => {
-      alert(`Erro ao reverter: ${error.message}`);
+      notification.error(`Erro ao reverter: ${error.message}`);
     },
   });
 

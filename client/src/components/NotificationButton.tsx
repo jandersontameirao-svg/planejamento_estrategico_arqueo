@@ -2,26 +2,24 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { useNotification } from "@/hooks/useNotification";
 
 export function NotificationButton() {
+  const notification = useNotification();
   const [checking, setChecking] = useState(false);
 
   const checkAllMutation = trpc.notifications.checkAll.useMutation({
     onSuccess: (result) => {
       if (result.total === 0) {
-        alert("✅ Tudo em ordem! Nenhuma notificação pendente.");
+        notification.success("Tudo em ordem! Nenhuma notificação pendente.");
       } else {
-        alert(
-          `🔔 ${result.total} notificação(ões) enviada(s):\n\n` +
-          `• ${result.incompleteAnalyses} análise(s) incompleta(s)\n` +
-          `• ${result.okrsAtRisk} OKR(s) em risco\n\n` +
-          `Verifique suas notificações do sistema.`
-        );
+        const msg = `${result.total} notificação(ões): ${result.incompleteAnalyses} análise(s) incompleta(s), ${result.okrsAtRisk} OKR(s) em risco`;
+        notification.info(msg);
       }
       setChecking(false);
     },
     onError: (error) => {
-      alert(`❌ Erro ao verificar notificações: ${error.message}`);
+      notification.error(`Erro ao verificar notificações: ${error.message}`);
       setChecking(false);
     },
   });
