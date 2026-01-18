@@ -107,11 +107,11 @@ export default function Home() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex flex-col">
-        <header className="border-b bg-card">
+        <header className="border-b bg-gradient-to-r from-card to-card/80 backdrop-blur-sm">
           <div className="container flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <img src="/logo-arqueo.svg" alt="Grupo Arqueo" className="h-8 w-8" />
-              <span className="text-xl font-bold">Grupo Arqueo</span>
+            <div className="flex items-center gap-3">
+              <img src="/logo-arqueo.png" alt="Grupo Arqueo" className="h-10 w-10" />
+              <span className="text-xl font-bold bg-gradient-to-r from-primary via-orange-500 to-orange-600 bg-clip-text text-transparent">Grupo Arqueo</span>
             </div>
             <Button asChild>
               <a href={getLoginUrl()}>Entrar</a>
@@ -126,8 +126,8 @@ export default function Home() {
           
           <div className="container max-w-5xl text-center py-20 relative z-10">
             <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-              <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 backdrop-blur-sm border border-primary/20 mb-8 shadow-2xl">
-                <img src="/logo-arqueo.svg" alt="Grupo Arqueo" className="h-14 w-14" />
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/30 via-orange-500/20 to-blue-500/10 backdrop-blur-sm border border-primary/30 mb-8 shadow-2xl hover:shadow-3xl transition-all duration-300">
+                <img src="/logo-arqueo.png" alt="Grupo Arqueo" className="h-16 w-16" />
               </div>
               <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                 Planejamento Estratégico
@@ -196,11 +196,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <header className="border-b bg-card sticky top-0 z-10">
+      <header className="border-b bg-gradient-to-r from-card via-card to-card/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
         <div className="container flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <Building2 className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">Grupo Arqueo</span>
+          <div className="flex items-center gap-3">
+            <img src="/logo-arqueo.png" alt="Grupo Arqueo" className="h-10 w-10" />
+            <span className="text-xl font-bold bg-gradient-to-r from-primary via-orange-500 to-orange-600 bg-clip-text text-transparent">Grupo Arqueo</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">
@@ -258,14 +258,14 @@ export default function Home() {
         </div>
 
         {/* Card do Planejamento Estratégico do Grupo Arqueo Participações */}
-        <Card className="mb-6 border-2 border-purple-500/30 bg-gradient-to-br from-card to-purple-500/5 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100" onClick={() => setLocation("/planejamento-participacoes")}>
+        <Card className="mb-6 border-2 border-primary/40 bg-gradient-to-br from-primary/5 via-card to-blue-500/5 hover:shadow-2xl hover:scale-[1.02] hover:border-primary/60 transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100" onClick={() => setLocation("/planejamento-participacoes")}>
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-purple-500/10 rounded-lg">
-                <Target className="h-8 w-8 text-purple-600" />
+              <div className="p-3 bg-gradient-to-br from-primary/20 to-orange-500/10 rounded-lg">
+                <Target className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-xl">Planejamento Estratégico – Grupo Arqueo Participações</CardTitle>
+                <CardTitle className="text-xl bg-gradient-to-r from-primary to-orange-600 bg-clip-text text-transparent">Planejamento Estratégico – Grupo Arqueo Participações</CardTitle>
                 <CardDescription>Análises estratégicas completas do Grupo Arqueo Participações (PESTEL, SWOT, OKR, BSC e mais)</CardDescription>
               </div>
             </div>
@@ -275,7 +275,7 @@ export default function Home() {
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
               <span className="text-sm text-muted-foreground">Status: Operacional</span>
             </div>
-            <Button variant="outline" className="w-full" onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-participacoes"); }}>
+            <Button className="w-full bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-700 text-white" onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-participacoes"); }}>
               Acessar Planejamento Estratégico
             </Button>
           </CardContent>
@@ -285,10 +285,10 @@ export default function Home() {
         <div className="mb-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Building2 className="h-6 w-6 text-purple-600" />
+              <Building2 className="h-6 w-6 text-primary" />
               Áreas de Negócio
             </h2>
-            <Button variant="outline" onClick={() => setLocation("/areas-negocio")} className="border-purple-300 text-purple-700 hover:bg-purple-50">
+            <Button variant="outline" onClick={() => setLocation("/areas-negocio")} className="border-primary/30 text-primary hover:bg-primary/5">
               Gerenciar Áreas
             </Button>
           </div>
@@ -306,14 +306,14 @@ export default function Home() {
           ) : empresas && empresas.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {empresas.map((empresa) => (
-                <Card key={empresa.id} className="hover:shadow-lg transition-shadow h-full">
+                <Card key={empresa.id} className="border-primary/20 bg-gradient-to-br from-card to-primary/5 hover:shadow-xl hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 h-full">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 rounded-lg">
+                        <div className="p-2 bg-gradient-to-br from-primary/20 to-orange-500/10 rounded-lg">
                           <Building2 className="h-6 w-6 text-primary" />
                         </div>
                         <div>
-                          <CardTitle className="text-lg">{empresa.nome}</CardTitle>
+                          <CardTitle className="text-lg text-primary">{empresa.nome}</CardTitle>
                           <CardDescription>
                             {empresa.tipoAtuacao === "servicos"
                               ? "Serviços"
@@ -348,13 +348,13 @@ export default function Home() {
                         {/* Botões de ação */}
                         <div className="flex gap-2 mt-4">
                           <Link href={`/empresa/${empresa.id}/planejamento`} className="flex-1">
-                            <Button variant="outline" size="sm" className="w-full">
+                            <Button size="sm" className="w-full bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-700 text-white">
                               <Target className="h-4 w-4 mr-2" />
                               Planejamento
                             </Button>
                           </Link>
                           <Link href={`/empresa/${empresa.id}/dashboard-analises`} className="flex-1">
-                            <Button variant="outline" size="sm" className="w-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30 hover:from-blue-500/20 hover:to-purple-500/20">
+                            <Button variant="outline" size="sm" className="w-full border-primary/30 text-primary hover:bg-primary/5">
                               <BarChart3 className="h-4 w-4 mr-2" />
                               Dashboard
                             </Button>

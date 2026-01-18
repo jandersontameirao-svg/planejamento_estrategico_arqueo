@@ -44,16 +44,16 @@
 
 :root {
   /* Cores Grupo Arqueo - Laranja primário */
-  --primary: oklch(0.65 0.18 45);
+  --primary: oklch(0.65 0.18 45);  /* Laranja */
   --primary-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.65 0.18 45);
+  --sidebar-primary: oklch(0.65 0.18 45);  /* Laranja */
   --sidebar-primary-foreground: oklch(1 0 0);
   /* Charts com cores do Grupo Arqueo */
-  --chart-1: oklch(0.65 0.18 45);
-  --chart-2: oklch(0.45 0.15 220);
-  --chart-3: oklch(0.50 0.12 350);
-  --chart-4: oklch(0.75 0.15 85);
-  --chart-5: oklch(0.55 0.10 25);
+  --chart-1: oklch(0.65 0.18 45);  /* Laranja */
+  --chart-2: oklch(0.45 0.15 220);  /* Azul */
+  --chart-3: oklch(0.50 0.12 350);  /* Bordo */
+  --chart-4: oklch(0.75 0.15 85);   /* Amarelo */
+  --chart-5: oklch(0.55 0.10 25);   /* Marrom/Terracota */
   --radius: 0.65rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.235 0.015 65);

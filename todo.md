@@ -975,3 +975,18 @@
 - [x] Verificar PESTEL das empresas - Testado em Arqueoproject
 - [x] Testar Plano de Ação no PESTEL das empresas - CONFIRMADO FUNCIONANDO com 3 estratégias
 - [x] Validar funcionamento em todas as empresas do grupo - Plano de Ação integrado automaticamente
+
+
+## Bug Fix - Mensagem de Erro "Uma página incorporada em 3000-..." - 16/01/2026
+- [ ] Localizar origem da mensagem de erro
+- [ ] Remover mensagem de erro do app
+- [ ] Testar remoção
+
+
+## Melhoria de Layout e Design - 16/01/2026
+- [x] Preparar logo do Grupo Arqueo - Logo PNG adicionada
+- [x] Definir paleta de cores (bordo, laranja, azul, amarelo) - Cores OKLCH configuradas
+- [x] Atualizar tema global e CSS - index.css atualizado com cores do Grupo Arqueo
+- [x] Melhorar layout da página inicial - Home.tsx com gradientes e efeitos modernos
+- [x] Melhorar layout dos cards e componentes - Cards com hover effects e gradientes
+- [x] Testar layout e fazer ajustes finais - Testado e funcionando
