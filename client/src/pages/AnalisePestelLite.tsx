@@ -402,12 +402,12 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
               const Icon = catInfo?.icone || AlertTriangle;
               return (
                 <>
-                  <div key={fator.id} className="border rounded-lg p-4 cursor-pointer hover:shadow-md transition-all" style={{ borderLeftColor: catInfo?.cor, borderLeftWidth: "4px" }} onClick={() => {
-                    setFatorEmEdicao(fator);
-                    setImpactoEdicao(fator.impacto);
-                    setProbabilidadeEdicao(fator.probabilidade);
-                  }}>
-                    <div className="flex justify-between items-start mb-3">
+                  <div key={fator.id} className="border rounded-lg p-4 hover:shadow-md transition-all" style={{ borderLeftColor: catInfo?.cor, borderLeftWidth: "4px" }}>
+                    <div className="flex justify-between items-start mb-3 cursor-pointer" onClick={() => {
+                      setFatorEmEdicao(fator);
+                      setImpactoEdicao(fator.impacto);
+                      setProbabilidadeEdicao(fator.probabilidade);
+                    }}>
                       <div className="flex items-center gap-2">
                         <div className="p-2 rounded-lg" style={{ backgroundColor: catInfo?.corBg }}>
                           <Icon className="h-4 w-4" style={{ color: catInfo?.cor }} />

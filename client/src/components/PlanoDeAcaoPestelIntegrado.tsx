@@ -158,7 +158,8 @@ export default function PlanoDeAcaoPestelIntegrado({
       {/* Botão Gerar com IA */}
       <div className="flex gap-2 mb-4">
         <Button
-          onClick={async () => {
+          onClick={async (e: any) => {
+            e.stopPropagation();
             setCarregandoIA(true);
             try {
               const resultado = await gerarComIAMutation.mutateAsync({
@@ -260,13 +261,19 @@ export default function PlanoDeAcaoPestelIntegrado({
                             </p>
                             <div className="flex gap-1">
                               <button
-                                onClick={() => handleEditarAcao(acao)}
+                                onClick={(e: any) => {
+                                  e.stopPropagation();
+                                  handleEditarAcao(acao);
+                                }}
                                 className="p-1 hover:bg-gray-100 rounded"
                               >
                                 <Edit2 className="h-3 w-3" />
                               </button>
                               <button
-                                onClick={() => handleDeletarAcao(acao.id)}
+                                onClick={(e: any) => {
+                                  e.stopPropagation();
+                                  handleDeletarAcao(acao.id);
+                                }}
                                 className="p-1 hover:bg-red-100 rounded"
                               >
                                 <Trash2 className="h-3 w-3 text-red-600" />
@@ -291,7 +298,8 @@ export default function PlanoDeAcaoPestelIntegrado({
                 )}
 
                 <Button
-                  onClick={() => {
+                  onClick={(e: any) => {
+                    e.stopPropagation();
                     setFormulario((prev) => ({
                       ...prev,
                       estrategia: estrategia.id as any,

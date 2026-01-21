@@ -1014,3 +1014,10 @@
 - [x] Verificar se é problema de estado local (useState) - NÃO, era problema de validação no banco
 - [x] Corrigir bug - CORRIGIDO em server/db.ts linhas 1080-1121
 - [x] Testar e validar - TESTES PASSARAM, fatores persistem corretamente
+
+
+## BUG - Botões e IA PESTEL Não Funcionam - Modo Release
+- [x] Diagnosticar por que botões não estão funcionando - CAUSA: evento borbulhando do div pai
+- [x] Diagnosticar por que IA não está funcionando - RESOLVIDO com stopPropagation
+- [x] Corrigir botões e IA - CORRIGIDO em AnalisePestelLite.tsx e PlanoDeAcaoPestelIntegrado.tsx
+- [x] Testar e validar - BOTÕES FUNCIONANDO PERFEITAMENTE
