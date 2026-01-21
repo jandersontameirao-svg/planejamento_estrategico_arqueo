@@ -1077,12 +1077,30 @@ export async function savePestelFatores(empresaId: number, fatores: Array<{
   const { pestelFatores } = await import("../drizzle/schema");
   const { eq } = await import("drizzle-orm");
   
-  // Deletar fatores existentes
-  await db.delete(pestelFatores).where(eq(pestelFatores.empresaId, empresaId));
-  
-  // Inserir novos fatores
-  if (fatores.length > 0) {
-    await db.insert(pestelFatores).values(
+  try {
+    // Validar que temos fatores antes de deletar
+    if (fatores.length === 0) {
+      throw new Error("Nenhum fator fornecido para salvar");
+    }
+    
+    // Validar cada fator
+    for (const fator of fatores) {
+      if (!fator.descricao || fator.descricao.trim().length === 0) {
+        throw new Error("Descrição do fator não pode estar vazia");
+      }
+      if (fator.impacto < 1 || fator.impacto > 5) {
+        throw new Error("Impacto deve estar entre 1 e 5");
+      }
+      if (fator.probabilidade < 1 || fator.probabilidade > 5) {
+        throw new Error("Probabilidade deve estar entre 1 e 5");
+      }
+    }
+    
+    // Deletar fatores existentes
+    await db.delete(pestelFatores).where(eq(pestelFatores.empresaId, empresaId));
+    
+    // Inserir novos fatores
+    const result = await db.insert(pestelFatores).values(
       fatores.map(fator => ({
         empresaId,
         categoria: fator.categoria,
@@ -1091,9 +1109,16 @@ export async function savePestelFatores(empresaId: number, fatores: Array<{
         probabilidade: fator.probabilidade,
       }))
     );
+    
+    if (!result) {
+      throw new Error("Falha ao inserir fatores no banco de dados");
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao salvar fatores PESTEL:", error);
+    throw error;
   }
-  
-  return { success: true };
 }
 
 export async function getPestelFatoresByEmpresa(empresaId: number) {

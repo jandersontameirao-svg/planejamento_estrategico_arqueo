@@ -1006,3 +1006,11 @@
 - [ ] Implementar loading e exibição das ações geradas
 - [ ] Testar geração de plano de ação com IA
 - [ ] Criar testes vitest para procedure de IA
+
+
+## BUG - Riscos PESTEL Sumiram - Modo Release
+- [x] Investigar causa do desaparecimento de riscos/fatores PESTEL - CAUSA RAIZ ENCONTRADA
+- [x] Verificar se é problema de persistência no banco de dados - SIM, problema em savePestelFatores
+- [x] Verificar se é problema de estado local (useState) - NÃO, era problema de validação no banco
+- [x] Corrigir bug - CORRIGIDO em server/db.ts linhas 1080-1121
+- [x] Testar e validar - TESTES PASSARAM, fatores persistem corretamente
