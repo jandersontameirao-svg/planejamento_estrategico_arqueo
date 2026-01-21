@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, categoria, descricao, impacto, probabilidade FROM pestel_fatores WHERE empresaId = 1 ORDER BY id DESC LIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, categoria, descricao, impacto, probabilidade FROM pestel_fatores WHERE empresaId = 1 ORDER BY id DESC LIMIT 3;",
+  "rows": [
+    {
+      "id": "210011",
+      "categoria": "politico",
+      "descricao": "TESTE DEFINITIVO - Salvamento com acentos corrigidos",
+      "impacto": "3",
+      "probabilidade": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcategoria\tdescricao\timpacto\tprobabilidade\n210011\tpolitico\tTESTE DEFINITIVO - Salvamento com acentos corrigidos\t3\t3\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

@@ -1021,3 +1021,6 @@
 - [x] Diagnosticar por que IA não está funcionando - RESOLVIDO com stopPropagation
 - [x] Corrigir botões e IA - CORRIGIDO em AnalisePestelLite.tsx e PlanoDeAcaoPestelIntegrado.tsx
 - [x] Testar e validar - BOTÕES FUNCIONANDO PERFEITAMENTE
+
+## Nova Feature - Botão Salvar Individual PESTEL
+- [x] Corrigir salvamento de fatores PESTEL (problema de acentos resolvido)

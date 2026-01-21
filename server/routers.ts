@@ -1185,8 +1185,11 @@ export const appRouter = router({
         })),
       }))
       .mutation(async ({ input }) => {
+        console.log("[savePestel] Recebido:", input);
         const { savePestelFatores } = await import("./db");
-        return await savePestelFatores(input.empresaId, input.fatores);
+        const result = await savePestelFatores(input.empresaId, input.fatores);
+        console.log("[savePestel] Resultado:", result);
+        return result;
       }),
 
     getPestel: protectedProcedure
@@ -1194,6 +1197,28 @@ export const appRouter = router({
       .query(async ({ input }) => {
         const { getPestelFatoresByEmpresa } = await import("./db");
         return await getPestelFatoresByEmpresa(input.empresaId);
+      }),
+
+    savePestelFatorIndividual: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        fatorId: z.string(),
+        categoria: z.enum(["politico", "economico", "social", "tecnologico", "ambiental", "legal"]),
+        descricao: z.string(),
+        impacto: z.number().min(1).max(5),
+        probabilidade: z.number().min(1).max(5),
+      }))
+      .mutation(async ({ input }) => {
+        console.log("[savePestelFatorIndividual] Recebido:", input);
+        const { savePestelFatorIndividual } = await import("./db");
+        const result = await savePestelFatorIndividual(input.empresaId, input.fatorId, {
+          categoria: input.categoria,
+          descricao: input.descricao,
+          impacto: input.impacto,
+          probabilidade: input.probabilidade,
+        });
+        console.log("[savePestelFatorIndividual] Resultado:", result);
+        return result;
       }),
 
     saveForcas: protectedProcedure

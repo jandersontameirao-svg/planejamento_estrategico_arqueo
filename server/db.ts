@@ -1131,6 +1131,80 @@ export async function getPestelFatoresByEmpresa(empresaId: number) {
   return await db.select().from(pestelFatores).where(eq(pestelFatores.empresaId, empresaId)).orderBy(asc(pestelFatores.createdAt));
 }
 
+export async function savePestelFatorIndividual(
+  empresaId: number,
+  fatorId: string,
+  fator: {
+    categoria: "politico" | "economico" | "social" | "tecnologico" | "ambiental" | "legal";
+    descricao: string;
+    impacto: number;
+    probabilidade: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { pestelFatores } = await import("../drizzle/schema");
+  const { eq, and } = await import("drizzle-orm");
+  
+  try {
+    // Validar fator
+    if (!fator.descricao || fator.descricao.trim().length === 0) {
+      throw new Error("Descrição do fator não pode estar vazia");
+    }
+    if (fator.impacto < 1 || fator.impacto > 5) {
+      throw new Error("Impacto deve estar entre 1 e 5");
+    }
+    if (fator.probabilidade < 1 || fator.probabilidade > 5) {
+      throw new Error("Probabilidade deve estar entre 1 e 5");
+    }
+    
+    // Verificar se fator já existe (por id numérico)
+    const fatorIdNumerico = parseInt(fatorId);
+    
+    // Se ID é numérico e maior que 0, tentar atualizar
+    if (!isNaN(fatorIdNumerico) && fatorIdNumerico > 0) {
+      const fatorExistente = await db.select().from(pestelFatores)
+        .where(and(
+          eq(pestelFatores.id, fatorIdNumerico),
+          eq(pestelFatores.empresaId, empresaId)
+        ))
+        .limit(1);
+      
+      if (fatorExistente.length > 0) {
+        // Atualizar fator existente
+        await db.update(pestelFatores)
+          .set({
+            categoria: fator.categoria,
+            descricao: fator.descricao,
+            impacto: fator.impacto,
+            probabilidade: fator.probabilidade,
+          })
+          .where(and(
+            eq(pestelFatores.id, fatorIdNumerico),
+            eq(pestelFatores.empresaId, empresaId)
+          ));
+        
+        return { success: true, action: "updated" };
+      }
+    }
+    
+    // Inserir novo fator (ID é string ou fator não existe)
+    await db.insert(pestelFatores).values({
+      empresaId,
+      categoria: fator.categoria,
+      descricao: fator.descricao,
+      impacto: fator.impacto,
+      probabilidade: fator.probabilidade,
+    });
+    
+    return { success: true, action: "created" };
+  } catch (error) {
+    console.error("Erro ao salvar fator PESTEL individual:", error);
+    throw error;
+  }
+}
+
 
 // ========== SWOT ==========
 export async function saveSwotItems(empresaId: number, items: Array<{

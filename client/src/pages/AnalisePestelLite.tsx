@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNotification } from "@/hooks/useNotification";
+import { toast } from "sonner";
 import { useUndoRedo } from "@/hooks/useUndoRedo";
 import { UndoRedoToolbar } from "@/components/UndoRedoToolbar";
 import { trpc } from "@/lib/trpc";
@@ -7,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Save, Plus, Trash2, Building2, DollarSign, Users, Cpu, Leaf, Scale, AlertTriangle, FileDown } from "lucide-react";
+import { Save, Plus, Trash2, Building2, DollarSign, Users, Cpu, Leaf, Scale, AlertTriangle, FileDown, Check } from "lucide-react";
 import { exportPestelPDF } from "@/lib/pdfExport";
 import CommentSection from "@/components/CommentSection";
 import PlanoDeAcaoPestel from "@/components/PlanoDeAcaoPestel";
@@ -66,12 +67,30 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
   // Mutation para salvar fatores
   const salvarMutation = trpc.analises.savePestel.useMutation({
     onSuccess: () => {
+      console.log("[salvarMutation onSuccess] Salvamento bem-sucedido!");
+      toast.success("Análise PESTEL salva com sucesso!");
       utils.analises.getPestel.invalidate({ empresaId });
     },
     onError: (error) => {
-      console.error("Erro ao salvar PESTEL:", error.message);
+      console.error("[salvarMutation onError] Erro ao salvar PESTEL:", error.message);
+      toast.error(`Erro ao salvar: ${error.message}`);
     },
   });
+  
+  // Mutation para salvar fator individual
+  const salvarFatorIndividualMutation = trpc.analises.savePestelFatorIndividual.useMutation({
+    onSuccess: (data, variables) => {
+      utils.analises.getPestel.invalidate({ empresaId });
+      notification.success(`Fator ${data.action === 'updated' ? 'atualizado' : 'salvo'} com sucesso!`);
+      setSalvandoFatorId(null);
+    },
+    onError: (error) => {
+      notification.error(`Erro ao salvar fator: ${error.message}`);
+      setSalvandoFatorId(null);
+    },
+  });
+  
+  const [salvandoFatorId, setSalvandoFatorId] = useState<string | null>(null);
   // Undo/Redo para fatores
   const { state: fatores, setState: setFatores, undo, redo, canUndo, canRedo } = useUndoRedo<FatorPestel[]>([]);
 
@@ -109,8 +128,13 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
     
     // Agendar novo save após 2 segundos de inatividade
     autoSaveTimeoutRef.current = setTimeout(() => {
+      // Função para remover acentos
+      const removerAcentos = (str: string) => {
+        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      };
+      
       const fatoresParaSalvar = fatores.map((f) => ({
-        categoria: f.categoria.toLowerCase() as any,
+        categoria: removerAcentos(f.categoria).toLowerCase() as any,
         impacto: f.impacto,
         probabilidade: f.probabilidade,
         descricao: f.descricao,
@@ -234,14 +258,24 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
   const fatoresFiltrados = categoriaAtiva ? fatores.filter((f) => f.categoria === categoriaAtiva) : fatores;
 
   const handleSave = () => {
-    // Converter fatores para formato do banco
+    console.log("[FRONTEND handleSave] Iniciando salvamento...");
+    console.log("[FRONTEND handleSave] Fatores atuais:", fatores);
+    
+    // Converter fatores para formato do banco (remover acentos)
+    const removerAcentos = (str: string) => {
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    };
+    
     const fatoresParaSalvar = fatores.map((f) => ({
-      categoria: f.categoria.toLowerCase() as "politico" | "economico" | "social" | "tecnologico" | "ambiental" | "legal",
+      categoria: removerAcentos(f.categoria).toLowerCase() as "politico" | "economico" | "social" | "tecnologico" | "ambiental" | "legal",
       impacto: f.impacto,
       probabilidade: f.probabilidade,
       descricao: f.descricao,
     }));
 
+    console.log("[FRONTEND handleSave] Fatores formatados:", fatoresParaSalvar);
+    console.log("[FRONTEND handleSave] empresaId:", empresaId);
+    
     salvarMutation.mutate({
       empresaId,
       fatores: fatoresParaSalvar,
@@ -403,11 +437,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
               return (
                 <>
                   <div key={fator.id} className="border rounded-lg p-4 hover:shadow-md transition-all" style={{ borderLeftColor: catInfo?.cor, borderLeftWidth: "4px" }}>
-                    <div className="flex justify-between items-start mb-3 cursor-pointer" onClick={() => {
-                      setFatorEmEdicao(fator);
-                      setImpactoEdicao(fator.impacto);
-                      setProbabilidadeEdicao(fator.probabilidade);
-                    }}>
+                    <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-2">
                         <div className="p-2 rounded-lg" style={{ backgroundColor: catInfo?.corBg }}>
                           <Icon className="h-4 w-4" style={{ color: catInfo?.cor }} />
@@ -419,6 +449,38 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge className={`${risco.cor} text-white`}>{risco.label}</Badge>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            console.log("[FRONTEND] Botão Salvar clicado para fator:", fator.id);
+                            console.log("[FRONTEND] Dados do fator:", {
+                              empresaId,
+                              fatorId: fator.id,
+                              categoria: fator.categoria.toLowerCase(),
+                              descricao: fator.descricao,
+                              impacto: fator.impacto,
+                              probabilidade: fator.probabilidade,
+                            });
+                            setSalvandoFatorId(fator.id);
+                            salvarFatorIndividualMutation.mutate({
+                              empresaId,
+                              fatorId: fator.id,
+                              categoria: fator.categoria.toLowerCase() as any,
+                              descricao: fator.descricao,
+                              impacto: fator.impacto,
+                              probabilidade: fator.probabilidade,
+                            });
+                          }} 
+                          className="text-green-600 hover:text-green-800 disabled:opacity-50"
+                          disabled={salvandoFatorId === fator.id}
+                          title="Salvar fator"
+                        >
+                          {salvandoFatorId === fator.id ? (
+                            <div className="h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Save className="h-4 w-4" />
+                          )}
+                        </button>
                         <button onClick={(e) => {
                           e.stopPropagation();
                           removerFator(fator.id);
