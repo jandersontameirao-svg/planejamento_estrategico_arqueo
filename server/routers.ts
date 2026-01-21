@@ -1710,6 +1710,35 @@ export const appRouter = router({
         const { getPestelPlanoAcaoById } = await import("./db");
         return await getPestelPlanoAcaoById(input.id);
       }),
+
+    gerarComIA: protectedProcedure
+      .input(z.object({
+        fator: z.string().min(1),
+        categoria: z.string().min(1),
+      }))
+      .mutation(async ({ input }) => {
+        const { invokeLLM } = await import("./_core/llm");
+        
+        const prompt = `Especialista em planejamento estrategico e gestao de riscos. Para o fator PESTEL (${input.categoria}: ${input.fator}), gere um plano de acao com 3 estrategias: Prevencao (evitar), Protecao (reduzir impacto), Mitigacao (minimizar efeitos). Para cada estrategia, 2-3 acoes especificas, mensuraveis e realistas. Retorne JSON com estrutura: {prevencao: [{titulo, descricao, responsavel, prazo}], protecao: [...], mitigacao: [...]}`;
+        
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: "system",
+              content: "Voce eh um especialista em planejamento estrategico. Responda sempre em JSON valido."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ]
+        });
+
+        const content = response.choices[0].message.content;
+        const planoAcao = typeof content === "string" ? JSON.parse(content) : content;
+        
+        return planoAcao;
+      }),
   }),
 
 });

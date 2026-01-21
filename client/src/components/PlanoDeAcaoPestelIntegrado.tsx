@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Edit2, AlertTriangle, Shield, Zap } from "lucide-react";
+import { Plus, Trash2, Edit2, AlertTriangle, Shield, Zap, Sparkles } from "lucide-react";
 import { useNotification } from "@/hooks/useNotification";
 import { trpc } from "@/lib/trpc";
 
@@ -38,6 +38,8 @@ export default function PlanoDeAcaoPestelIntegrado({
   const [acoes, setAcoes] = useState<AcaoPestel[]>([]);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [edicao, setEdicao] = useState<AcaoPestel | null>(null);
+  const [carregandoIA, setCarregandoIA] = useState(false);
+  const gerarComIAMutation = trpc.planoAcao.gerarComIA.useMutation();
   const [formulario, setFormulario] = useState<Omit<AcaoPestel, 'id' | 'fatorId'>>({
     estrategia: "prevencao",
     descricao: "",
@@ -151,6 +153,75 @@ export default function PlanoDeAcaoPestelIntegrado({
         <p className="text-sm text-blue-700">
           Fator: <strong>{fatorDescricao}</strong>
         </p>
+      </div>
+
+      {/* Botão Gerar com IA */}
+      <div className="flex gap-2 mb-4">
+        <Button
+          onClick={async () => {
+            setCarregandoIA(true);
+            try {
+              const resultado = await gerarComIAMutation.mutateAsync({
+                fator: fatorDescricao,
+                categoria: fatorCategoria,
+              });
+              const novasAcoes: AcaoPestel[] = [];
+              if (resultado.prevencao) {
+                novasAcoes.push(...resultado.prevencao.map((a: any) => ({
+                  id: `acao-${Date.now()}-${Math.random()}`,
+                  fatorId,
+                  estrategia: "prevencao" as const,
+                  descricao: a.titulo,
+                  responsavel: a.responsavel || "A definir",
+                  prazo: a.prazo || "",
+                  status: "planejado" as const,
+                  urgencia: 3,
+                  importancia: 3,
+                  observacoes: a.descricao,
+                })));
+              }
+              if (resultado.protecao) {
+                novasAcoes.push(...resultado.protecao.map((a: any) => ({
+                  id: `acao-${Date.now()}-${Math.random()}`,
+                  fatorId,
+                  estrategia: "protecao" as const,
+                  descricao: a.titulo,
+                  responsavel: a.responsavel || "A definir",
+                  prazo: a.prazo || "",
+                  status: "planejado" as const,
+                  urgencia: 3,
+                  importancia: 3,
+                  observacoes: a.descricao,
+                })));
+              }
+              if (resultado.mitigacao) {
+                novasAcoes.push(...resultado.mitigacao.map((a: any) => ({
+                  id: `acao-${Date.now()}-${Math.random()}`,
+                  fatorId,
+                  estrategia: "mitigacao" as const,
+                  descricao: a.titulo,
+                  responsavel: a.responsavel || "A definir",
+                  prazo: a.prazo || "",
+                  status: "planejado" as const,
+                  urgencia: 3,
+                  importancia: 3,
+                  observacoes: a.descricao,
+                })));
+              }
+              setAcoes([...acoes, ...novasAcoes]);
+              notification.success(`${novasAcoes.length} acoes geradas!`);
+            } catch (erro) {
+              notification.error("Erro ao gerar plano com IA");
+            } finally {
+              setCarregandoIA(false);
+            }
+          }}
+          disabled={carregandoIA}
+          className="bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-700 text-white"
+        >
+          <Sparkles className="h-4 w-4 mr-2" />
+          {carregandoIA ? "Gerando..." : "Gerar com IA"}
+        </Button>
       </div>
 
       {/* Estratégias com Ações */}

@@ -990,3 +990,19 @@
 - [x] Melhorar layout da página inicial - Home.tsx com gradientes e efeitos modernos
 - [x] Melhorar layout dos cards e componentes - Cards com hover effects e gradientes
 - [x] Testar layout e fazer ajustes finais - Testado e funcionando
+
+
+## MODO RELEASE - IA Generativa em PESTEL
+- [x] Criar procedure tRPC planoAcao.gerarComIA - server/routers.ts linha 1714-1741
+- [x] Adicionar botão "Gerar com IA" com Sparkles icon - PlanoDeAcaoPestelIntegrado.tsx linha 160-224
+- [x] Implementar loading state e notificações - setCarregandoIA + notification.success/error
+- [x] Criar testes vitest - server/planoAcao.test.ts (2 testes passando)
+- [x] Botão visível e funcional na UI - Testado em empresa Arqueoproject
+
+
+## IA Generativa - Plano de Ação PESTEL - Modo Release
+- [ ] Criar procedure tRPC para gerar plano de ação com IA (Prevenção, Proteção, Mitigação)
+- [ ] Adicionar botão "Gerar com IA" no PlanoDeAcaoPestelIntegrado
+- [ ] Implementar loading e exibição das ações geradas
+- [ ] Testar geração de plano de ação com IA
+- [ ] Criar testes vitest para procedure de IA
