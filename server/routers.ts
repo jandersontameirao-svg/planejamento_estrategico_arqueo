@@ -1734,10 +1734,33 @@ export const appRouter = router({
           ]
         });
 
-        const content = response.choices[0].message.content;
-        const planoAcao = typeof content === "string" ? JSON.parse(content) : content;
-        
-        return planoAcao;
+        try {
+          let content = response.choices[0].message.content;
+          if (typeof content !== "string") {
+            throw new Error("Resposta da IA nao eh string");
+          }
+          
+          // Remover markdown code blocks se existirem
+          content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+          
+          // Tentar extrair JSON se estiver envolvido em texto
+          const jsonMatch = content.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            content = jsonMatch[0];
+          }
+          
+          const planoAcao = JSON.parse(content);
+          
+          // Validar estrutura
+          if (!planoAcao.prevencao || !planoAcao.protecao || !planoAcao.mitigacao) {
+            throw new Error("Estrutura JSON invalida");
+          }
+          
+          return planoAcao;
+        } catch (error) {
+          console.error("Erro ao gerar plano com IA:", error);
+          throw new Error("Falha ao gerar plano com IA: " + (error instanceof Error ? error.message : "Erro desconhecido"));
+        }
       }),
   }),
 

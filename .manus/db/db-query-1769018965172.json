@@ -1,0 +1,290 @@
+{
+  "query": "SELECT id, categoria, descricao, impacto, probabilidade FROM pestel_fatores WHERE empresaId = 1 ORDER BY categoria, id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, categoria, descricao, impacto, probabilidade FROM pestel_fatores WHERE empresaId = 1 ORDER BY categoria, id;",
+  "rows": [
+    {
+      "id": "184450",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184451",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184452",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184453",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184454",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184455",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184456",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184457",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184458",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184459",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184460",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184461",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184462",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184463",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184464",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184465",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184466",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184467",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184468",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184469",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184470",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184471",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184472",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184473",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184474",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184475",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184476",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184477",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184478",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184479",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184480",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184481",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184482",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184483",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184484",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184485",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184486",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184487",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184488",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    },
+    {
+      "id": "184489",
+      "categoria": "social",
+      "descricao": "Crescimento da demanda por serviços de arqueologia",
+      "impacto": "3",
+      "probabilidade": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcategoria\tdescricao\timpacto\tprobabilidade\n184450\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184451\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184452\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184453\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184454\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184455\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184456\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184457\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184458\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184459\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184460\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184461\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184462\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184463\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184464\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184465\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184466\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184467\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184468\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184469\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184470\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184471\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184472\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184473\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184474\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184475\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184476\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184477\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184478\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184479\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184480\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184481\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184482\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184483\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184484\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184485\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184486\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184487\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184488\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n184489\tsocial\tCrescimento da demanda por serviços de arqueologia\t3\t3\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

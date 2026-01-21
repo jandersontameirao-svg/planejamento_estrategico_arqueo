@@ -1,0 +1,15 @@
+{
+  "query": "SELECT COUNT(*) as total, categoria, COUNT(DISTINCT descricao) as descricoes_unicas FROM pestel_fatores WHERE empresaId = 1 GROUP BY categoria;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT COUNT(*) as total, categoria, COUNT(DISTINCT descricao) as descricoes_unicas FROM pestel_fatores WHERE empresaId = 1 GROUP BY categoria;",
+  "rows": [
+    {
+      "total": "40",
+      "categoria": "social",
+      "descricoes_unicas": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tcategoria\tdescricoes_unicas\n40\tsocial\t1\n",
+  "stderr": "",
+  "execution_time_ms": 139
+}
