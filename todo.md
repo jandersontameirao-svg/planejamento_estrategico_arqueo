@@ -1024,3 +1024,11 @@
 
 ## Nova Feature - Botão Salvar Individual PESTEL
 - [x] Corrigir salvamento de fatores PESTEL (problema de acentos resolvido)
+
+## Bugs Reportados pelo Usuário
+- [ ] Deletar 6 fatores sociais duplicados (testes)
+- [x] Botão de edição adicionado com modal contendo sliders funcionais
+
+## Problemas Reais Reportados
+- [x] Botão de edição adicionado com modal contendo sliders funcionais
+- [x] Botão de edição (ícone lápis) adicionado em cada card de fator

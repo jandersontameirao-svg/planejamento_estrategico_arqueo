@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Save, Plus, Trash2, Building2, DollarSign, Users, Cpu, Leaf, Scale, AlertTriangle, FileDown, Check } from "lucide-react";
+import { Save, Plus, Trash2, Building2, DollarSign, Users, Cpu, Leaf, Scale, AlertTriangle, FileDown, Check, Pencil } from "lucide-react";
 import { exportPestelPDF } from "@/lib/pdfExport";
 import CommentSection from "@/components/CommentSection";
 import PlanoDeAcaoPestel from "@/components/PlanoDeAcaoPestel";
@@ -452,39 +452,19 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log("[FRONTEND] Botão Salvar clicado para fator:", fator.id);
-                            console.log("[FRONTEND] Dados do fator:", {
-                              empresaId,
-                              fatorId: fator.id,
-                              categoria: fator.categoria.toLowerCase(),
-                              descricao: fator.descricao,
-                              impacto: fator.impacto,
-                              probabilidade: fator.probabilidade,
-                            });
-                            setSalvandoFatorId(fator.id);
-                            salvarFatorIndividualMutation.mutate({
-                              empresaId,
-                              fatorId: fator.id,
-                              categoria: fator.categoria.toLowerCase() as any,
-                              descricao: fator.descricao,
-                              impacto: fator.impacto,
-                              probabilidade: fator.probabilidade,
-                            });
+                            setFatorEmEdicao(fator);
+                            setImpactoEdicao(fator.impacto);
+                            setProbabilidadeEdicao(fator.probabilidade);
                           }} 
-                          className="text-green-600 hover:text-green-800 disabled:opacity-50"
-                          disabled={salvandoFatorId === fator.id}
-                          title="Salvar fator"
+                          className="text-blue-600 hover:text-blue-800"
+                          title="Editar fator"
                         >
-                          {salvandoFatorId === fator.id ? (
-                            <div className="h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Save className="h-4 w-4" />
-                          )}
+                          <Pencil className="h-4 w-4" />
                         </button>
                         <button onClick={(e) => {
                           e.stopPropagation();
                           removerFator(fator.id);
-                        }} className="text-red-600 hover:text-red-800">
+                        }} className="text-red-600 hover:text-red-800" title="Deletar fator">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>

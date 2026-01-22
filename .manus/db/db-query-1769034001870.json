@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, categoria, descricao, impacto, probabilidade, createdAt FROM pestel_fatores WHERE empresaId = 1 AND categoria = 'social' ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, categoria, descricao, impacto, probabilidade, createdAt FROM pestel_fatores WHERE empresaId = 1 AND categoria = 'social' ORDER BY id;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 57
+}
