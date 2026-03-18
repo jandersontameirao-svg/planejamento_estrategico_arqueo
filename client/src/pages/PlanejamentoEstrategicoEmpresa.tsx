@@ -208,21 +208,23 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
               )}
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
+          <DialogContent className="max-w-5xl w-[92vw] max-h-[90vh] flex flex-col gap-0 p-0 overflow-hidden">
+            <DialogHeader className="px-6 pt-6 pb-0 flex-shrink-0">
+              <DialogTitle className="flex items-center gap-2 text-lg">
                 <SlidersHorizontal className="w-5 h-5 text-orange-500" />
                 Configurar Metodologias — {empresaNome}
               </DialogTitle>
             </DialogHeader>
-            <SeletorMetodologias
-              empresaId={empresaId}
-              compact={false}
-              onSalvo={() => {
-                setDialogMetodologias(false);
-                refetchMetodologias();
-              }}
-            />
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <SeletorMetodologias
+                empresaId={empresaId}
+                compact={false}
+                onSalvo={() => {
+                  setDialogMetodologias(false);
+                  refetchMetodologias();
+                }}
+              />
+            </div>
           </DialogContent>
         </Dialog>
       </div>
