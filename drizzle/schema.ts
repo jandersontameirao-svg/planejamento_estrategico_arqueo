@@ -792,3 +792,175 @@ export const empresaAreaVinculo = mysqlTable("empresa_area_vinculo", {
 
 export type EmpresaAreaVinculo = typeof empresaAreaVinculo.$inferSelect;
 export type InsertEmpresaAreaVinculo = typeof empresaAreaVinculo.$inferInsert;
+
+// ============================================================
+// MÓDULO DE GESTÃO ORÇAMENTÁRIA EMPRESARIAL
+// ============================================================
+
+/**
+ * Configurações globais do módulo orçamentário
+ */
+export const orcamentoConfiguracoes = mysqlTable("orcamento_configuracoes", {
+  id: int("id").autoincrement().primaryKey(),
+  moedaConsolidacaoGlobal: varchar("moedaConsolidacaoGlobal", { length: 10 }).default("BRL").notNull(),
+  permitirEdicaoPosCongelamento: tinyint("permitirEdicaoPosCongelamento").default(0).notNull(),
+  toleranciaAlertaPercentual: decimal("toleranciaAlertaPercentual", { precision: 5, scale: 2 }).default("10.00").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type OrcamentoConfiguracao = typeof orcamentoConfiguracoes.$inferSelect;
+export type InsertOrcamentoConfiguracao = typeof orcamentoConfiguracoes.$inferInsert;
+
+/**
+ * Categorias orçamentárias (ex: Receita Operacional, Custos Diretos)
+ */
+export const orcamentoCategorias = mysqlTable("orcamento_categorias", {
+  id: int("id").autoincrement().primaryKey(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  tipo: mysqlEnum("tipo", ["receita", "custo", "despesa", "investimento", "outro"]).default("outro").notNull(),
+  ativo: tinyint("ativo").default(1).notNull(),
+  ordem: int("ordem").default(0).notNull(),
+  escopoTipo: mysqlEnum("escopoTipo", ["global", "empresa"]).default("global").notNull(),
+  observacao: text("observacao"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type OrcamentoCategoria = typeof orcamentoCategorias.$inferSelect;
+export type InsertOrcamentoCategoria = typeof orcamentoCategorias.$inferInsert;
+
+/**
+ * Subcategorias orçamentárias vinculadas a categorias
+ */
+export const orcamentoSubcategorias = mysqlTable("orcamento_subcategorias", {
+  id: int("id").autoincrement().primaryKey(),
+  categoriaId: int("categoriaId").notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  ativo: tinyint("ativo").default(1).notNull(),
+  ordem: int("ordem").default(0).notNull(),
+  observacao: text("observacao"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type OrcamentoSubcategoria = typeof orcamentoSubcategorias.$inferSelect;
+export type InsertOrcamentoSubcategoria = typeof orcamentoSubcategorias.$inferInsert;
+
+/**
+ * Versões orçamentárias por empresa e ano
+ */
+export const orcamentoVersoes = mysqlTable("orcamento_versoes", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  ano: int("ano").notNull(),
+  nomeVersao: varchar("nomeVersao", { length: 255 }).notNull(),
+  numeroVersao: int("numeroVersao").default(1).notNull(),
+  status: mysqlEnum("status", ["rascunho", "em_revisao", "aprovado", "congelado"]).default("rascunho").notNull(),
+  moedaBase: varchar("moedaBase", { length: 10 }).default("BRL").notNull(),
+  observacoes: text("observacoes"),
+  criadoPor: int("criadoPor"),
+  aprovadoPor: int("aprovadoPor"),
+  dataAprovacao: timestamp("dataAprovacao"),
+  versaoOrigemId: int("versaoOrigemId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type OrcamentoVersao = typeof orcamentoVersoes.$inferSelect;
+export type InsertOrcamentoVersao = typeof orcamentoVersoes.$inferInsert;
+
+/**
+ * Linhas do orçamento planejado (grade mensal por categoria/subcategoria)
+ */
+export const orcamentoPlanejadoLinhas = mysqlTable("orcamento_planejado_linhas", {
+  id: int("id").autoincrement().primaryKey(),
+  versaoId: int("versaoId").notNull(),
+  categoriaId: int("categoriaId").notNull(),
+  subcategoriaId: int("subcategoriaId"),
+  descricao: text("descricao"),
+  janeiro: decimal("janeiro", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  fevereiro: decimal("fevereiro", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  marco: decimal("marco", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  abril: decimal("abril", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  maio: decimal("maio", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  junho: decimal("junho", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  julho: decimal("julho", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  agosto: decimal("agosto", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  setembro: decimal("setembro", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  outubro: decimal("outubro", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  novembro: decimal("novembro", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  dezembro: decimal("dezembro", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  totalAnual: decimal("totalAnual", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type OrcamentoPlanejadoLinha = typeof orcamentoPlanejadoLinhas.$inferSelect;
+export type InsertOrcamentoPlanejadoLinha = typeof orcamentoPlanejadoLinhas.$inferInsert;
+
+/**
+ * Lotes de importação do executado (via planilha ERP)
+ */
+export const orcamentoImportacoes = mysqlTable("orcamento_importacoes", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresaId").notNull(),
+  ano: int("ano").notNull(),
+  mesReferencia: int("mesReferencia"),
+  arquivoNome: varchar("arquivoNome", { length: 500 }),
+  arquivoKey: text("arquivoKey"),
+  status: mysqlEnum("status", ["processando", "concluido", "erro", "revertido"]).default("processando").notNull(),
+  totalLinhas: int("totalLinhas").default(0).notNull(),
+  totalImportado: int("totalImportado").default(0).notNull(),
+  totalErros: int("totalErros").default(0).notNull(),
+  moedaLote: varchar("moedaLote", { length: 10 }).default("BRL").notNull(),
+  taxaCambioPadrao: decimal("taxaCambioPadrao", { precision: 18, scale: 6 }).default("1.000000").notNull(),
+  importadoPor: int("importadoPor"),
+  observacoes: text("observacoes"),
+  errosDetalhes: text("errosDetalhes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type OrcamentoImportacao = typeof orcamentoImportacoes.$inferSelect;
+export type InsertOrcamentoImportacao = typeof orcamentoImportacoes.$inferInsert;
+
+/**
+ * Linhas do executado importadas do ERP
+ */
+export const orcamentoExecutadoLinhas = mysqlTable("orcamento_executado_linhas", {
+  id: int("id").autoincrement().primaryKey(),
+  importacaoId: int("importacaoId").notNull(),
+  empresaId: int("empresaId").notNull(),
+  categoriaId: int("categoriaId"),
+  subcategoriaId: int("subcategoriaId"),
+  dataLancamento: date("dataLancamento"),
+  competencia: varchar("competencia", { length: 7 }),
+  descricao: text("descricao"),
+  valorOriginal: decimal("valorOriginal", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  moedaOriginal: varchar("moedaOriginal", { length: 10 }).default("BRL").notNull(),
+  taxaCambio: decimal("taxaCambio", { precision: 18, scale: 6 }).default("1.000000").notNull(),
+  dataTaxaCambio: date("dataTaxaCambio"),
+  valorConvertidoBase: decimal("valorConvertidoBase", { precision: 18, scale: 2 }).default("0.00").notNull(),
+  referenciaExterna: varchar("referenciaExterna", { length: 500 }),
+  documentoReferencia: varchar("documentoReferencia", { length: 500 }),
+  hashLinha: varchar("hashLinha", { length: 64 }),
+  ativo: tinyint("ativo").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type OrcamentoExecutadoLinha = typeof orcamentoExecutadoLinhas.$inferSelect;
+export type InsertOrcamentoExecutadoLinha = typeof orcamentoExecutadoLinhas.$inferInsert;
+
+/**
+ * Histórico de revisões e aprovações orçamentárias
+ */
+export const orcamentoRevisoes = mysqlTable("orcamento_revisoes", {
+  id: int("id").autoincrement().primaryKey(),
+  versaoId: int("versaoId").notNull(),
+  acao: mysqlEnum("acao", ["criacao", "edicao", "envio_revisao", "aprovacao", "rejeicao", "congelamento", "duplicacao"]).notNull(),
+  motivo: text("motivo"),
+  usuarioId: int("usuarioId"),
+  payloadAnterior: text("payloadAnterior"),
+  payloadNovo: text("payloadNovo"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type OrcamentoRevisao = typeof orcamentoRevisoes.$inferSelect;
+export type InsertOrcamentoRevisao = typeof orcamentoRevisoes.$inferInsert;

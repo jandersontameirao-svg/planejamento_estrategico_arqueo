@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, DollarSign } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { Link, useLocation } from "wouter";
 import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
@@ -27,6 +27,7 @@ interface AnaliseCard {
   icone: React.ReactNode;
   cor: string;
   componente?: React.ComponentType<any>;
+  href?: boolean;
 }
 
 const analises: AnaliseCard[] = [
@@ -94,6 +95,14 @@ const analises: AnaliseCard[] = [
     cor: "bg-cyan-500",
     componente: OkrLite,
   },
+  {
+    id: "orcamento",
+    titulo: "Gestão Orçamentária",
+    descricao: "Planejado vs Executado",
+    icone: <DollarSign className="h-8 w-8" />,
+    cor: "bg-emerald-600",
+    href: true,
+  },
 ];
 
 export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome }: PlanejamentoEstrategicoEmpresaProps) {
@@ -158,6 +167,8 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
     return <Componente empresaId={empresaId} />;
   };
 
+  const [, navigate] = useLocation();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/10">
       <PageHeader 
@@ -191,7 +202,7 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
               key={analise.id}
               className={`cursor-pointer transition-all hover:shadow-lg ${isExpanded ? "col-span-full" : ""}`}
             >
-              <CardHeader onClick={() => toggleCard(analise.id)} className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader onClick={() => analise.href ? navigate(`/empresa/${empresaId}/orcamento`) : toggleCard(analise.id)} className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div className="flex items-center gap-3">
                   <div className={`${analise.cor} text-white p-3 rounded-lg`}>
                     {analise.icone}
