@@ -1046,3 +1046,10 @@
 - [x] Confirmar que botão Configurar Metodologias já está presente na Área de Negócio
 - [x] Adicionar card de Gestão Orçamentária no hub do Grupo (empresaId=0)
 - [x] Adicionar card de Gestão Orçamentária no hub de Participações (empresaId=-1)
+
+## Gestão Orçamentária - Categorias e Subcategorias
+- [x] Criar tabelas no banco: orcamento_categorias e orcamento_subcategorias (já existiam)
+- [x] Implementar procedures tRPC CRUD para categorias e subcategorias (adicionado updateSubcategoria)
+- [x] Implementar UI na aba Categorias com árvore hierárquica, edição inline e filtros
+- [x] Suporte a tipos: Custo, Despesa, Receita, Investimento e Outro
+- [x] Integrar categorias/subcategorias no lançamento orçamentário (já integrado)

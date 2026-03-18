@@ -99,6 +99,12 @@ export async function createSubcategoria(data: {
   return { id: (result as any).insertId };
 }
 
+export async function updateSubcategoria(id: number, data: { nome?: string; descricao?: string; observacao?: string }) {
+  const d = await db();
+  await d.update(orcamentoSubcategorias).set(data).where(eq(orcamentoSubcategorias.id, id));
+  return { success: true };
+}
+
 export async function deleteSubcategoria(id: number) {
   const d = await db();
   await d.update(orcamentoSubcategorias).set({ ativo: 0 }).where(eq(orcamentoSubcategorias.id, id));

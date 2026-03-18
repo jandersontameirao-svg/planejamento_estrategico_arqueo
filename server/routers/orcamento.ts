@@ -7,6 +7,7 @@ import {
   deleteCategoria,
   getSubcategorias,
   createSubcategoria,
+  updateSubcategoria,
   deleteSubcategoria,
   getVersoesByEmpresa,
   getVersaoById,
@@ -78,6 +79,18 @@ export const orcamentoRouter = router({
     }))
     .mutation(async ({ input }) => {
       return createSubcategoria(input);
+    }),
+
+  updateSubcategoria: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      nome: z.string().optional(),
+      descricao: z.string().optional(),
+      observacao: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      return updateSubcategoria(id, data);
     }),
 
   deleteSubcategoria: protectedProcedure
