@@ -1035,3 +1035,8 @@
 - [x] Implementar módulo de Gestão Orçamentária Empresarial (8 tabelas, 5 abas, dashboard, importação CSV/ERP, categorias, 14 categorias padrão, 52 testes passando)
 - [x] Seleção de metodologias por empresa com filtro no Hub de Planejamento
 - [ ] Redesenhar dialog de Configurar Metodologias: mais amplo, cards horizontais, texto completo
+- [x] Redesenhar dialog de Configurar Metodologias: mais amplo, cards horizontais, texto completo (já feito)
+- [x] Integrar SeletorMetodologias no Hub de Área de Negócio (empresaId = -100 - areaId)
+- [x] Integrar SeletorMetodologias no Hub do Grupo (empresaId = 0)
+- [x] Integrar SeletorMetodologias no Hub de Participações (empresaId = -1)
+- [x] Corrigir segundo analises.map para usar analisesFiltradas em todos os hubs

@@ -3,9 +3,11 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, SlidersHorizontal } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import PageHeaderWithBack from "@/components/PageHeaderWithBack";
 import { Link } from "wouter";
+import SeletorMetodologias from "@/components/SeletorMetodologias";
 import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
 import AnalisePestelLite from "./AnalisePestelLite";
 import CincoForcasLite from "./CincoForcasLite";
@@ -93,9 +95,19 @@ const analises: AnaliseCard[] = [
 
 export default function PlanejamentoEstrategicoGrupo() {
   const [expandedCards, setExpandedCards] = useState<{ [key: string]: boolean }>({});
-  
+  const [dialogMetodologias, setDialogMetodologias] = useState(false);
+
   // Usar empresaId = 0 para representar o Grupo Arqueo
   const GRUPO_ARQUEO_ID = 0;
+
+  // Metodologias ativas para o Grupo
+  const { data: metodologiasAtivas, refetch: refetchMetodologias } = trpc.metodologias.getByEmpresa.useQuery(
+    { empresaId: GRUPO_ARQUEO_ID }
+  );
+
+  const analisesFiltradas = metodologiasAtivas && metodologiasAtivas.length > 0
+    ? analises.filter((a) => metodologiasAtivas.includes(a.id))
+    : analises;
   
   // Queries para progresso das análises
   const { data: pestelData } = trpc.analises.getPestel.useQuery({ empresaId: GRUPO_ARQUEO_ID });
@@ -152,6 +164,38 @@ export default function PlanejamentoEstrategicoGrupo() {
               Configurar Template de Relatórios
             </Button>
           </Link>
+
+          {/* Botão para configurar metodologias */}
+          <Dialog open={dialogMetodologias} onOpenChange={setDialogMetodologias}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50 gap-2">
+                <SlidersHorizontal className="h-4 w-4" />
+                Configurar Metodologias
+                {metodologiasAtivas && (
+                  <span className="bg-orange-100 text-orange-700 text-xs px-1.5 py-0.5 rounded-full font-medium">
+                    {metodologiasAtivas.length}
+                  </span>
+                )}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-5xl w-[92vw] max-h-[90vh] flex flex-col gap-0 p-0 overflow-hidden">
+              <DialogHeader className="px-6 pt-6 pb-0 flex-shrink-0">
+                <DialogTitle className="flex items-center gap-2 text-lg">
+                  <SlidersHorizontal className="w-5 h-5 text-orange-500" />
+                  Configurar Metodologias — Grupo Arqueo
+                </DialogTitle>
+              </DialogHeader>
+              <div className="flex-1 overflow-y-auto px-6 py-4">
+                <SeletorMetodologias
+                  empresaId={GRUPO_ARQUEO_ID}
+                  onSalvo={() => {
+                    setDialogMetodologias(false);
+                    refetchMetodologias();
+                  }}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Aviso informativo */}
@@ -165,7 +209,7 @@ export default function PlanejamentoEstrategicoGrupo() {
 
         {/* Cards de análises em grade 4x2 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {analises.map((analise) => {
+          {analisesFiltradas.map((analise) => {
             const progresso = calcularProgresso(analise.id);
             const isExpanded = expandedCards[analise.id];
 
@@ -198,7 +242,7 @@ export default function PlanejamentoEstrategicoGrupo() {
         </div>
 
         {/* Cards expandidos (renderizados abaixo da grade) */}
-        {analises.map((analise) => {
+        {analisesFiltradas.map((analise) => {
           const isExpanded = expandedCards[analise.id];
           const Componente = analise.componente;
 

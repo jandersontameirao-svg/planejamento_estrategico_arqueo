@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, Link2, Plus, X } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, Link2, Plus, X, SlidersHorizontal } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import PageHeaderWithBack from "@/components/PageHeaderWithBack";
@@ -16,6 +16,7 @@ import VrioLite from "./VrioLite";
 import SwotLite from "./SwotLite";
 import OkrLite from "./OkrLite";
 import BscLite from "./BscLite";
+import SeletorMetodologias from "@/components/SeletorMetodologias";
 
 interface AnaliseCard {
   id: string;
@@ -113,6 +114,16 @@ export default function PlanejamentoEstrategicoArea() {
   const { data: bscData } = trpc.bsc.getByEmpresa.useQuery({ empresaId: AREA_EMPRESA_ID });
 
   const [showVincularModal, setShowVincularModal] = useState(false);
+  const [dialogMetodologias, setDialogMetodologias] = useState(false);
+
+  // Metodologias ativas para esta área
+  const { data: metodologiasAtivas, refetch: refetchMetodologias } = trpc.metodologias.getByEmpresa.useQuery(
+    { empresaId: AREA_EMPRESA_ID }
+  );
+
+  const analisesFiltradas = metodologiasAtivas && metodologiasAtivas.length > 0
+    ? analises.filter((a) => metodologiasAtivas.includes(a.id))
+    : analises;
   
   // Queries para empresas vinculadas e disponíveis
   const { data: empresasVinculadas, refetch: refetchVinculadas } = trpc.areasNegocio.getEmpresasVinculadas.useQuery({ areaId });
@@ -211,6 +222,38 @@ export default function PlanejamentoEstrategicoArea() {
               Configurar Template de Relatórios
             </Button>
           </Link>
+
+          {/* Botão para configurar metodologias */}
+          <Dialog open={dialogMetodologias} onOpenChange={setDialogMetodologias}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="border-purple-300 text-purple-600 hover:bg-purple-50 gap-2">
+                <SlidersHorizontal className="h-4 w-4" />
+                Configurar Metodologias
+                {metodologiasAtivas && (
+                  <span className="bg-purple-100 text-purple-700 text-xs px-1.5 py-0.5 rounded-full font-medium">
+                    {metodologiasAtivas.length}
+                  </span>
+                )}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-5xl w-[92vw] max-h-[90vh] flex flex-col gap-0 p-0 overflow-hidden">
+              <DialogHeader className="px-6 pt-6 pb-0 flex-shrink-0">
+                <DialogTitle className="flex items-center gap-2 text-lg">
+                  <SlidersHorizontal className="w-5 h-5 text-purple-500" />
+                  Configurar Metodologias — {areaNome}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="flex-1 overflow-y-auto px-6 py-4">
+                <SeletorMetodologias
+                  empresaId={AREA_EMPRESA_ID}
+                  onSalvo={() => {
+                    setDialogMetodologias(false);
+                    refetchMetodologias();
+                  }}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
           
           <Dialog open={showVincularModal} onOpenChange={setShowVincularModal}>
             <DialogTrigger asChild>
@@ -327,7 +370,7 @@ export default function PlanejamentoEstrategicoArea() {
 
         {/* Grid de cards 4x2 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {analises.map((analise) => {
+          {analisesFiltradas.map((analise) => {
             const progresso = calcularProgresso(analise.id);
             const isExpanded = expandedCards[analise.id];
             
@@ -364,7 +407,7 @@ export default function PlanejamentoEstrategicoArea() {
         </div>
 
         {/* Conteúdo expandido */}
-        {analises.map((analise) => {
+        {analisesFiltradas.map((analise) => {
           const isExpanded = expandedCards[analise.id];
           const Componente = analise.componente;
           
