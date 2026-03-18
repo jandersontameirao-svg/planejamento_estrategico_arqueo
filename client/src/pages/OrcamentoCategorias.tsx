@@ -44,8 +44,8 @@ export default function OrcamentoCategorias() {
   const [filtroTipo, setFiltroTipo] = useState<string>("todos");
   const [expandidas, setExpandidas] = useState<Set<number>>(new Set());
   const [showNova, setShowNova] = useState(false);
-  const [showNovaSubcat, setShowNovaSubcat] = useState(false);
-  const [subcatParentId, setSubcatParentId] = useState<number | null>(null);
+  // inline subcat form: key = categoriaId, null = fechado
+  const [addingSubcatFor, setAddingSubcatFor] = useState<number | null>(null);
   const [editandoCat, setEditandoCat] = useState<number | null>(null);
   const [editandoSubcat, setEditandoSubcat] = useState<number | null>(null);
 
@@ -70,7 +70,7 @@ export default function OrcamentoCategorias() {
     onError: (e) => toast.error("Erro: " + e.message),
   });
   const createSubcatMutation = trpc.orcamento.createSubcategoria.useMutation({
-    onSuccess: () => { toast.success("Subcategoria criada!"); refetchSub(); setShowNovaSubcat(false); setFormSubcat({ nome: "", descricao: "" }); },
+    onSuccess: () => { toast.success("Subcategoria criada!"); refetchSub(); setAddingSubcatFor(null); setFormSubcat({ nome: "", descricao: "" }); },
     onError: (e) => toast.error("Erro: " + e.message),
   });
   const updateSubcatMutation = trpc.orcamento.updateSubcategoria.useMutation({
@@ -301,10 +301,55 @@ export default function OrcamentoCategorias() {
                           </div>
                         ))
                       )}
-                      <Button size="sm" variant="outline" className="w-full mt-2 h-8 text-xs border-dashed"
-                        onClick={() => { setSubcatParentId(cat.id); setShowNovaSubcat(true); }}>
-                        <Plus className="h-3 w-3 mr-1" /> Adicionar Subcategoria
-                      </Button>
+                      {/* ── Formulário inline de nova subcategoria ── */}
+                      {addingSubcatFor === cat.id ? (
+                        <div className="mt-2 rounded-md border border-primary/30 bg-primary/5 p-3 space-y-2">
+                          <p className="text-xs font-medium text-primary">Nova subcategoria em <strong>{cat.nome}</strong></p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <Label className="text-xs">Nome <span className="text-red-500">*</span></Label>
+                              <Input
+                                autoFocus
+                                placeholder="Ex: Salários, Aluguel..."
+                                value={formSubcat.nome}
+                                onChange={(e) => setFormSubcat((p) => ({ ...p, nome: e.target.value }))}
+                                className="h-8 text-sm mt-1"
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" && formSubcat.nome.trim()) {
+                                    createSubcatMutation.mutate({ categoriaId: cat.id, ...formSubcat });
+                                  }
+                                  if (e.key === "Escape") { setAddingSubcatFor(null); setFormSubcat({ nome: "", descricao: "" }); }
+                                }}
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs">Descrição <span className="text-muted-foreground">(opcional)</span></Label>
+                              <Input
+                                placeholder="Breve descrição..."
+                                value={formSubcat.descricao}
+                                onChange={(e) => setFormSubcat((p) => ({ ...p, descricao: e.target.value }))}
+                                className="h-8 text-sm mt-1"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 justify-end">
+                            <Button size="sm" variant="outline" className="h-7 text-xs"
+                              onClick={() => { setAddingSubcatFor(null); setFormSubcat({ nome: "", descricao: "" }); }}>
+                              <X className="h-3 w-3 mr-1" /> Cancelar
+                            </Button>
+                            <Button size="sm" className="h-7 text-xs"
+                              disabled={!formSubcat.nome.trim() || createSubcatMutation.isPending}
+                              onClick={() => createSubcatMutation.mutate({ categoriaId: cat.id, ...formSubcat })}>
+                              {createSubcatMutation.isPending ? "Salvando..." : <><Check className="h-3 w-3 mr-1" /> Salvar</>}
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="outline" className="w-full mt-2 h-8 text-xs border-dashed"
+                          onClick={() => { setAddingSubcatFor(cat.id); setFormSubcat({ nome: "", descricao: "" }); }}>
+                          <Plus className="h-3 w-3 mr-1" /> Adicionar Subcategoria
+                        </Button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -364,40 +409,6 @@ export default function OrcamentoCategorias() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal Nova Subcategoria */}
-      <Dialog open={showNovaSubcat} onOpenChange={setShowNovaSubcat}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Layers className="h-5 w-5 text-primary" /> Nova Subcategoria
-            </DialogTitle>
-            {subcatParentId && (
-              <p className="text-sm text-muted-foreground">
-                Categoria: <strong>{(categorias ?? []).find((c: any) => c.id === subcatParentId)?.nome}</strong>
-              </p>
-            )}
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
-              <Label>Nome <span className="text-red-500">*</span></Label>
-              <Input placeholder="Ex: Salários, Encargos, Aluguel..." value={formSubcat.nome}
-                onChange={(e) => setFormSubcat((p) => ({ ...p, nome: e.target.value }))} className="mt-1" />
-            </div>
-            <div>
-              <Label>Descrição <span className="text-muted-foreground text-xs">(opcional)</span></Label>
-              <Input placeholder="Breve descrição..." value={formSubcat.descricao}
-                onChange={(e) => setFormSubcat((p) => ({ ...p, descricao: e.target.value }))} className="mt-1" />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowNovaSubcat(false)}>Cancelar</Button>
-            <Button disabled={!formSubcat.nome.trim() || createSubcatMutation.isPending}
-              onClick={() => { if (subcatParentId) createSubcatMutation.mutate({ categoriaId: subcatParentId, ...formSubcat }); }}>
-              {createSubcatMutation.isPending ? "Criando..." : "Criar Subcategoria"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

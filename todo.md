@@ -1053,3 +1053,6 @@
 - [x] Implementar UI na aba Categorias com árvore hierárquica, edição inline e filtros
 - [x] Suporte a tipos: Custo, Despesa, Receita, Investimento e Outro
 - [x] Integrar categorias/subcategorias no lançamento orçamentário (já integrado)
+
+## Gestão Orçamentária - Subcategorias inline
+- [x] Adicionar formulário inline de nova subcategoria diretamente dentro do card da categoria (sem modal separado)
