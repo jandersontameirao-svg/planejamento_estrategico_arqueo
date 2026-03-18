@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { orcamentoRouter } from "./routers/orcamento";
+import { getMetodologiasEmpresa, saveMetodologiasEmpresa, METODOLOGIAS_DISPONIVEIS } from "./metodologias";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
@@ -1791,5 +1792,21 @@ export const appRouter = router({
   }),
 
   orcamento: orcamentoRouter,
+  metodologias: router({
+    listar: publicProcedure.query(() => METODOLOGIAS_DISPONIVEIS),
+    getByEmpresa: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        return getMetodologiasEmpresa(input.empresaId);
+      }),
+    salvar: protectedProcedure
+      .input(z.object({
+        empresaId: z.number(),
+        metodologias: z.array(z.string()),
+      }))
+      .mutation(async ({ input }) => {
+        return saveMetodologiasEmpresa(input.empresaId, input.metodologias);
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

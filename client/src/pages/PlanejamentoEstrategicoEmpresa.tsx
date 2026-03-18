@@ -3,9 +3,11 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, DollarSign } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, DollarSign, SlidersHorizontal, X } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { Link, useLocation } from "wouter";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import SeletorMetodologias from "@/components/SeletorMetodologias";
 import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
 import AnalisePestelLite from "./AnalisePestelLite";
 import CincoForcasLite from "./CincoForcasLite";
@@ -107,8 +109,21 @@ const analises: AnaliseCard[] = [
 
 export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome }: PlanejamentoEstrategicoEmpresaProps) {
   const [expandedCards, setExpandedCards] = useState<{ [key: string]: boolean }>({});
+  const [dialogMetodologias, setDialogMetodologias] = useState(false);
+
+  // Buscar metodologias ativas para filtrar cards
+  const { data: metodologiasAtivas, refetch: refetchMetodologias } = trpc.metodologias.getByEmpresa.useQuery(
+    { empresaId },
+    { staleTime: 30_000 }
+  );
+
+  // Filtrar cards com base nas metodologias ativas (se não há config, mostra todos)
+  const analisesFiltradas = metodologiasAtivas && metodologiasAtivas.length > 0
+    ? analises.filter((a) => metodologiasAtivas.includes(a.id))
+    : analises;
 
   // Buscar dados para calcular progresso
+  const [, navigate] = useLocation();
   const { data: pestelData } = trpc.analises.getPestel.useQuery({ empresaId });
   const { data: swotData } = trpc.analises.getSwot.useQuery({ empresaId });
   const { data: okrData } = trpc.analises.getOkr.useQuery({ empresaId });
@@ -167,21 +182,49 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
     return <Componente empresaId={empresaId} />;
   };
 
-  const [, navigate] = useLocation();
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/10">
       <PageHeader 
         title={`Planejamento Estratégico - ${empresaNome}`}
         description="Defina e acompanhe as análises estratégicas da empresa"
       />
-      <div className="container mx-auto pt-4">
+      <div className="container mx-auto pt-4 flex items-center gap-2 flex-wrap">
         <Button variant="outline" size="sm" asChild>
           <Link href={`/empresa/${empresaId}/configurar-template`}>
             <Settings className="mr-2 h-4 w-4" />
             Configurar Template de Relatórios
           </Link>
         </Button>
+        {/* Botão para configurar metodologias */}
+        <Dialog open={dialogMetodologias} onOpenChange={setDialogMetodologias}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">
+              <SlidersHorizontal className="mr-2 h-4 w-4" />
+              Configurar Metodologias
+              {metodologiasAtivas && (
+                <span className="ml-2 bg-orange-100 text-orange-700 text-xs px-1.5 py-0.5 rounded-full font-medium">
+                  {metodologiasAtivas.length}
+                </span>
+              )}
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <SlidersHorizontal className="w-5 h-5 text-orange-500" />
+                Configurar Metodologias — {empresaNome}
+              </DialogTitle>
+            </DialogHeader>
+            <SeletorMetodologias
+              empresaId={empresaId}
+              compact={false}
+              onSalvo={() => {
+                setDialogMetodologias(false);
+                refetchMetodologias();
+              }}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
       <div className="container mx-auto py-8 space-y-6">
       <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
@@ -193,7 +236,7 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {analises.map((analise) => {
+        {analisesFiltradas.map((analise) => {
           const isExpanded = expandedCards[analise.id];
           const progresso = calcularProgresso(analise.id);
           const corProgresso = getCorProgresso(progresso);

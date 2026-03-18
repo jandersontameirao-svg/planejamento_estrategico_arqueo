@@ -1033,3 +1033,4 @@
 - [x] Botão de edição adicionado com modal contendo sliders funcionais
 - [x] Botão de edição (ícone lápis) adicionado em cada card de fator
 - [x] Implementar módulo de Gestão Orçamentária Empresarial (8 tabelas, 5 abas, dashboard, importação CSV/ERP, categorias, 14 categorias padrão, 52 testes passando)
+- [x] Seleção de metodologias por empresa com filtro no Hub de Planejamento

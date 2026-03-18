@@ -1,0 +1,9 @@
+{
+  "query": "\nCREATE TABLE IF NOT EXISTS empresa_metodologias (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  empresa_id INT NOT NULL,\n  metodologia VARCHAR(50) NOT NULL,\n  ativa BOOLEAN DEFAULT TRUE,\n  created_at BIGINT NOT NULL,\n  updated_at BIGINT NOT NULL,\n  UNIQUE KEY uk_empresa_metodologia (empresa_id, metodologia),\n  INDEX idx_empresa (empresa_id)\n);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute \nCREATE TABLE IF NOT EXISTS empresa_metodologias (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  empresa_id INT NOT NULL,\n  metodologia VARCHAR(50) NOT NULL,\n  ativa BOOLEAN DEFAULT TRUE,\n  created_at BIGINT NOT NULL,\n  updated_at BIGINT NOT NULL,\n  UNIQUE KEY uk_empresa_metodologia (empresa_id, metodologia),\n  INDEX idx_empresa (empresa_id)\n);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 504
+}

@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, date, tinyint } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, date, tinyint, bigint } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -964,3 +964,16 @@ export const orcamentoRevisoes = mysqlTable("orcamento_revisoes", {
 });
 export type OrcamentoRevisao = typeof orcamentoRevisoes.$inferSelect;
 export type InsertOrcamentoRevisao = typeof orcamentoRevisoes.$inferInsert;
+
+// ============================================================
+// MÓDULO: Configuração de Metodologias por Empresa
+// ============================================================
+
+export const empresaMetodologias = mysqlTable("empresa_metodologias", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresa_id").notNull(),
+  metodologia: varchar("metodologia", { length: 50 }).notNull(),
+  ativa: boolean("ativa").default(true),
+  createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+});
