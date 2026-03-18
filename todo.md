@@ -1040,3 +1040,9 @@
 - [x] Integrar SeletorMetodologias no Hub do Grupo (empresaId = 0)
 - [x] Integrar SeletorMetodologias no Hub de Participações (empresaId = -1)
 - [x] Corrigir segundo analises.map para usar analisesFiltradas em todos os hubs
+
+## Área de Negócio - Ajustes de Feature
+- [x] Adicionar card de Gestão Orçamentária na lista de análises da Área de Negócio
+- [x] Confirmar que botão Configurar Metodologias já está presente na Área de Negócio
+- [x] Adicionar card de Gestão Orçamentária no hub do Grupo (empresaId=0)
+- [x] Adicionar card de Gestão Orçamentária no hub de Participações (empresaId=-1)

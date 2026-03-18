@@ -3,11 +3,12 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, SlidersHorizontal } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, SlidersHorizontal, DollarSign } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import PageHeaderWithBack from "@/components/PageHeaderWithBack";
 import { Link } from "wouter";
 import SeletorMetodologias from "@/components/SeletorMetodologias";
+import GestaoOrcamentaria from "./GestaoOrcamentaria";
 import IdentidadeOrganizacionalLite from "./IdentidadeOrganizacionalLite";
 import AnalisePestelLite from "./AnalisePestelLite";
 import SwotLite from "./SwotLite";
@@ -54,6 +55,14 @@ const analises: AnaliseCard[] = [
     icone: <AlertCircle className="h-5 w-5" />,
     cor: "bg-green-600",
     componente: SwotLite,
+  },
+  {
+    id: "orcamento",
+    titulo: "Gestão Orçamentária",
+    descricao: "Orçamento e Execução",
+    icone: <DollarSign className="h-5 w-5" />,
+    cor: "bg-emerald-600",
+    componente: GestaoOrcamentaria,
   },
 ];
 

@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, Link2, Plus, X, SlidersHorizontal } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, Link2, Plus, X, SlidersHorizontal, DollarSign } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import PageHeaderWithBack from "@/components/PageHeaderWithBack";
@@ -17,6 +17,7 @@ import SwotLite from "./SwotLite";
 import OkrLite from "./OkrLite";
 import BscLite from "./BscLite";
 import SeletorMetodologias from "@/components/SeletorMetodologias";
+import GestaoOrcamentaria from "./GestaoOrcamentaria";
 
 interface AnaliseCard {
   id: string;
@@ -91,6 +92,14 @@ const analises: AnaliseCard[] = [
     icone: <Lightbulb className="h-5 w-5" />,
     cor: "bg-cyan-500",
     componente: OkrLite,
+  },
+  {
+    id: "orcamento",
+    titulo: "Gestão Orçamentária",
+    descricao: "Orçamento e Execução",
+    icone: <DollarSign className="h-5 w-5" />,
+    cor: "bg-emerald-600",
+    componente: GestaoOrcamentaria,
   },
 ];
 
