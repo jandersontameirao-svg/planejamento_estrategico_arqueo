@@ -435,7 +435,6 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
               const catInfo = categorias.find((c) => c.nome === fator.categoria);
               const Icon = catInfo?.icone || AlertTriangle;
               return (
-                <>
                   <div key={fator.id} className="border rounded-lg p-4 hover:shadow-md transition-all" style={{ borderLeftColor: catInfo?.cor, borderLeftWidth: "4px" }}>
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-2">
@@ -497,8 +496,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
                         fatorCategoria={fator.categoria}
                       />
                     </div>
-                  </div>
-                </>
+                </div>
               );
             })
           )}
