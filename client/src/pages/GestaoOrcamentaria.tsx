@@ -15,7 +15,7 @@ import PageHeader from "@/components/PageHeader";
 import {
   DollarSign, TrendingUp, TrendingDown, BarChart3, Upload,
   Plus, Settings, Copy, Lock, CheckCircle, FileText, AlertTriangle,
-  ChevronRight, RefreshCw
+  ChevronRight, RefreshCw, Brain
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -24,6 +24,7 @@ import {
 import OrcamentoPlanejado from "./OrcamentoPlanejado";
 import OrcamentoCategorias from "./OrcamentoCategorias";
 import OrcamentoImportacao from "./OrcamentoImportacao";
+import OrcamentoAnaliseIA from "./OrcamentoAnaliseIA";
 
 interface GestaoOrcamentariaProps {
   empresaId: number;
@@ -272,7 +273,7 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
 
         {/* Tabs principais */}
         <Tabs value={abaAtiva} onValueChange={setAbaAtiva}>
-          <TabsList className="grid grid-cols-5 w-full">
+          <TabsList className="grid grid-cols-6 w-full">
             <TabsTrigger value="dashboard">
               <BarChart3 className="h-4 w-4 mr-1" /> Dashboard
             </TabsTrigger>
@@ -287,6 +288,9 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
             </TabsTrigger>
             <TabsTrigger value="categorias">
               <Settings className="h-4 w-4 mr-1" /> Categorias
+            </TabsTrigger>
+            <TabsTrigger value="analise-ia">
+              <Brain className="h-4 w-4 mr-1" /> Análise IA
             </TabsTrigger>
           </TabsList>
 
@@ -405,6 +409,11 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
           {/* Categorias */}
           <TabsContent value="categorias" className="mt-6">
             <OrcamentoCategorias />
+          </TabsContent>
+
+          {/* Análise IA */}
+          <TabsContent value="analise-ia" className="mt-6">
+            <OrcamentoAnaliseIA empresaId={empresaId} ano={anoSelecionado} />
           </TabsContent>
         </Tabs>
       </div>

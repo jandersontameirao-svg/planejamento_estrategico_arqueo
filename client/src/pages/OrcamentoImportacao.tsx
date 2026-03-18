@@ -3,282 +3,394 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Upload, FileText, CheckCircle, AlertTriangle, Download } from "lucide-react";
+import {
+  Upload, FileText, CheckCircle, Download, Sparkles,
+  Brain, FileSpreadsheet, FileSearch, ChevronDown, ChevronUp,
+  Loader2, Info, RefreshCw, Check
+} from "lucide-react";
 
 const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+const CONFIANCA_CONFIG: Record<string, { label: string; cor: string }> = {
+  alta:  { label: "Alta",  cor: "bg-green-100 text-green-700 border-green-200" },
+  media: { label: "Média", cor: "bg-yellow-100 text-yellow-700 border-yellow-200" },
+  baixa: { label: "Baixa", cor: "bg-red-100 text-red-700 border-red-200" },
+};
+
+const TIPO_CONFIG: Record<string, { label: string; cor: string }> = {
+  receita:      { label: "Receita",      cor: "bg-green-100 text-green-700" },
+  custo:        { label: "Custo",        cor: "bg-red-100 text-red-700" },
+  despesa:      { label: "Despesa",      cor: "bg-orange-100 text-orange-700" },
+  investimento: { label: "Investimento", cor: "bg-blue-100 text-blue-700" },
+  outro:        { label: "Outro",        cor: "bg-gray-100 text-gray-600" },
+};
+
+interface LancamentoIA {
+  descricao: string;
+  valor: number;
+  competencia: string;
+  tipo: string;
+  categoriaId: number | null;
+  categoriaNome: string;
+  subcategoriaId: number | null;
+  subcategoriaNome: string;
+  confianca: "alta" | "media" | "baixa";
+  observacao: string;
+  selecionado?: boolean;
+}
 
 interface Props {
   empresaId: number;
   ano: number;
 }
 
-interface LinhaPreview {
-  descricao: string;
-  valor: number;
-  competencia: string;
-  moeda: string;
-}
-
 export default function OrcamentoImportacao({ empresaId, ano }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
-  const [preview, setPreview] = useState<LinhaPreview[]>([]);
+  const [step, setStep] = useState<"upload" | "processando" | "preview" | "importando" | "done">("upload");
   const [arquivoNome, setArquivoNome] = useState("");
+  const [arquivoTipo, setArquivoTipo] = useState("");
+  const [resumoIA, setResumoIA] = useState("");
+  const [lancamentosIA, setLancamentosIA] = useState<LancamentoIA[]>([]);
+  const [expandidos, setExpandidos] = useState<Set<number>>(new Set());
   const [mesReferencia, setMesReferencia] = useState<string>("");
   const [moedaLote, setMoedaLote] = useState("BRL");
-  const [step, setStep] = useState<"upload" | "preview" | "done">("upload");
 
   const { data: importacoes, refetch } = trpc.orcamento.getImportacoesByEmpresa.useQuery({ empresaId });
-  const { data: categorias } = trpc.orcamento.getCategorias.useQuery();
+
+  const importarIAMutation = trpc.orcamento.importarOrcamentoIA.useMutation({
+    onSuccess: (data) => {
+      const lancamentos = (data.lancamentos as LancamentoIA[]).map((l) => ({ ...l, selecionado: true }));
+      setLancamentosIA(lancamentos);
+      setResumoIA(data.resumo);
+      setStep("preview");
+      toast.success(`IA identificou ${data.totalItens} lançamentos no arquivo!`);
+    },
+    onError: (e) => {
+      toast.error("Erro ao processar com IA: " + e.message);
+      setStep("upload");
+    },
+  });
 
   const importarMutation = trpc.orcamento.importarExecutado.useMutation({
     onSuccess: (data) => {
       toast.success(`${data.totalImportado} lançamentos importados com sucesso!`);
       setStep("done");
-      setPreview([]);
       refetch();
     },
     onError: (e) => toast.error("Erro na importação: " + e.message),
   });
 
-  const parseCSV = (text: string): LinhaPreview[] => {
-    const lines = text.trim().split("\n");
-    if (lines.length < 2) return [];
-    const headers = lines[0].split(";").map((h) => h.trim().toLowerCase().replace(/"/g, ""));
-    return lines.slice(1).filter((l) => l.trim()).map((line) => {
-      const cols = line.split(";").map((c) => c.trim().replace(/"/g, ""));
-      const obj: any = {};
-      headers.forEach((h, i) => { obj[h] = cols[i] ?? ""; });
-      return {
-        descricao: obj["descricao"] || obj["historico"] || obj["description"] || "Lançamento",
-        valor: parseFloat((obj["valor"] || obj["value"] || obj["amount"] || "0").replace(",", ".")),
-        competencia: obj["competencia"] || obj["data"] || obj["date"] || "",
-        moeda: obj["moeda"] || obj["currency"] || moedaLote,
-      };
-    }).filter((l) => l.valor > 0);
+  const getFileType = (nome: string): string => {
+    const ext = nome.split(".").pop()?.toLowerCase() ?? "";
+    if (ext === "pdf") return "pdf";
+    if (ext === "xlsx" || ext === "xls") return ext;
+    return "csv";
   };
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     if (!file) return;
+    const tipo = getFileType(file.name);
     setArquivoNome(file.name);
+    setArquivoTipo(tipo);
+    setStep("processando");
+
     const reader = new FileReader();
     reader.onload = (e) => {
-      const text = e.target?.result as string;
-      const linhas = parseCSV(text);
-      if (linhas.length === 0) {
-        toast.error("Nenhuma linha válida encontrada no arquivo. Verifique o formato CSV.");
-        return;
-      }
-      setPreview(linhas);
-      setStep("preview");
+      const base64 = (e.target?.result as string).split(",")[1];
+      importarIAMutation.mutate({
+        empresaId,
+        ano,
+        arquivoBase64: base64,
+        arquivoNome: file.name,
+        arquivoTipo: tipo,
+      });
     };
-    reader.readAsText(file, "UTF-8");
+    reader.readAsDataURL(file);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
+  const toggleExpandido = (idx: number) => {
+    setExpandidos((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx); else next.add(idx);
+      return next;
+    });
   };
 
-  const handleConfirmar = () => {
+  const toggleSelecionado = (idx: number) => {
+    setLancamentosIA((prev) => prev.map((l, i) => i === idx ? { ...l, selecionado: !l.selecionado } : l));
+  };
+
+  const selecionarTodos = (valor: boolean) => {
+    setLancamentosIA((prev) => prev.map((l) => ({ ...l, selecionado: valor })));
+  };
+
+  const confirmarImportacao = () => {
+    const selecionados = lancamentosIA.filter((l) => l.selecionado);
+    if (selecionados.length === 0) {
+      toast.error("Selecione ao menos um lançamento para importar.");
+      return;
+    }
+    setStep("importando");
     importarMutation.mutate({
       empresaId,
       ano,
-      mesReferencia: mesReferencia ? Number(mesReferencia) : undefined,
       arquivoNome,
       moedaLote,
-      linhas: preview.map((l) => ({
+      mesReferencia: mesReferencia ? parseInt(mesReferencia) : undefined,
+      linhas: selecionados.map((l) => ({
         descricao: l.descricao,
         valorOriginal: l.valor,
-        moedaOriginal: l.moeda || moedaLote,
-        competencia: l.competencia || undefined,
+        competencia: l.competencia || `${ano}-01`,
+        categoriaId: l.categoriaId ?? undefined,
+        subcategoriaId: l.subcategoriaId ?? undefined,
+        moedaOriginal: moedaLote,
       })),
     });
   };
 
-  const downloadModelo = () => {
-    const csv = `descricao;valor;competencia;moeda\nFornecedor ABC;15000,00;2025-01;BRL\nAluguel Escritório;8500,00;2025-01;BRL\nFolha Pessoal;42000,00;2025-01;BRL`;
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "modelo_importacao_orcamento.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const selecionadosCount = lancamentosIA.filter((l) => l.selecionado).length;
+  const totalSelecionado = lancamentosIA.filter((l) => l.selecionado).reduce((a, l) => a + l.valor, 0);
+  const formatCurrency = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
   return (
     <div className="space-y-6">
-      {/* Upload */}
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <Brain className="h-5 w-5 text-primary" />
+            Importação Inteligente com IA
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Envie um PDF, planilha Excel ou CSV — a IA identifica e categoriza os lançamentos automaticamente
+          </p>
+        </div>
+        {step !== "upload" && step !== "processando" && (
+          <Button variant="outline" size="sm" onClick={() => { setStep("upload"); setLancamentosIA([]); setArquivoNome(""); }}>
+            <RefreshCw className="h-4 w-4 mr-2" /> Nova Importação
+          </Button>
+        )}
+      </div>
+
+      {/* Step: Upload */}
       {step === "upload" && (
         <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Importar Executado do ERP</CardTitle>
-                <CardDescription>
-                  Importe um arquivo CSV com os lançamentos executados. Colunas esperadas: descricao, valor, competencia, moeda.
-                </CardDescription>
+          <CardContent className="pt-6">
+            <div
+              className={`border-2 border-dashed rounded-xl p-10 text-center transition-all cursor-pointer ${
+                dragging ? "border-primary bg-primary/5 scale-[1.01]" : "border-border hover:border-primary/50 hover:bg-muted/30"
+              }`}
+              onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(e) => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
+              onClick={() => fileRef.current?.click()}
+            >
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex gap-3">
+                  <div className="p-3 rounded-xl bg-red-100 text-red-600"><FileText className="h-6 w-6" /></div>
+                  <div className="p-3 rounded-xl bg-green-100 text-green-600"><FileSpreadsheet className="h-6 w-6" /></div>
+                  <div className="p-3 rounded-xl bg-blue-100 text-blue-600"><FileSearch className="h-6 w-6" /></div>
+                </div>
+                <div>
+                  <p className="font-semibold text-base">Arraste o arquivo aqui ou clique para selecionar</p>
+                  <p className="text-sm text-muted-foreground mt-1">Suporta PDF, Excel (.xlsx/.xls) e CSV</p>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-4 py-2 rounded-full">
+                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  A IA analisa o conteúdo e sugere categorias e subcategorias automaticamente
+                </div>
               </div>
-              <Button variant="outline" size="sm" onClick={downloadModelo}>
-                <Download className="h-4 w-4 mr-1" /> Baixar Modelo CSV
-              </Button>
+              <input ref={fileRef} type="file" className="hidden" accept=".pdf,.xlsx,.xls,.csv,.txt"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label>Mês de Referência (opcional)</Label>
+                <Label className="text-xs">Mês de referência (opcional)</Label>
                 <Select value={mesReferencia} onValueChange={setMesReferencia}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todos os meses" />
-                  </SelectTrigger>
+                  <SelectTrigger className="mt-1 h-9 text-sm"><SelectValue placeholder="Detectar automaticamente" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos os meses</SelectItem>
-                    {MESES.map((m, i) => (
-                      <SelectItem key={i + 1} value={String(i + 1)}>{m}</SelectItem>
-                    ))}
+                    <SelectItem value="auto">Detectar automaticamente</SelectItem>
+                    {MESES.map((m, i) => <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Moeda do Lote</Label>
+                <Label className="text-xs">Moeda</Label>
                 <Select value={moedaLote} onValueChange={setMoedaLote}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="mt-1 h-9 text-sm"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="BRL">BRL — Real</SelectItem>
-                    <SelectItem value="USD">USD — Dólar</SelectItem>
+                    <SelectItem value="BRL">BRL — Real Brasileiro</SelectItem>
+                    <SelectItem value="USD">USD — Dólar Americano</SelectItem>
                     <SelectItem value="EUR">EUR — Euro</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      )}
 
-            {/* Dropzone */}
-            <div
-              className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer ${dragging ? "border-primary bg-primary/5" : "border-muted-foreground/30 hover:border-primary/50"}`}
-              onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={handleDrop}
-              onClick={() => fileRef.current?.click()}
-            >
-              <Upload className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
-              <p className="font-medium">Arraste o arquivo CSV aqui</p>
-              <p className="text-sm text-muted-foreground mt-1">ou clique para selecionar</p>
-              <p className="text-xs text-muted-foreground mt-2">Formatos suportados: .csv (separado por ponto e vírgula)</p>
-              <input
-                ref={fileRef}
-                type="file"
-                accept=".csv,.txt"
-                className="hidden"
-                onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-              />
+      {/* Step: Processando */}
+      {step === "processando" && (
+        <Card>
+          <CardContent className="py-16 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <div className="p-4 rounded-full bg-primary/10">
+                  <Brain className="h-10 w-10 text-primary" />
+                </div>
+                <div className="absolute -top-1 -right-1 p-1 rounded-full bg-primary">
+                  <Loader2 className="h-4 w-4 text-white animate-spin" />
+                </div>
+              </div>
+              <div>
+                <p className="font-semibold text-base">IA analisando o arquivo...</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Extraindo dados de <strong>{arquivoNome}</strong> e identificando categorias
+                </p>
+              </div>
+              <div className="flex gap-2 text-xs text-muted-foreground flex-wrap justify-center">
+                <span className="px-3 py-1 rounded-full bg-muted">Lendo estrutura</span>
+                <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">Classificando lançamentos</span>
+                <span className="px-3 py-1 rounded-full bg-muted">Sugerindo categorias</span>
+              </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Preview */}
+      {/* Step: Preview */}
       {step === "preview" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Prévia da Importação — {preview.length} lançamentos
-            </CardTitle>
-            <CardDescription>
-              Arquivo: <strong>{arquivoNome}</strong>. Revise os dados antes de confirmar.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto max-h-80 overflow-y-auto border rounded-lg">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-muted">
-                  <tr>
-                    <th className="text-left py-2 px-3">Descrição</th>
-                    <th className="text-left py-2 px-3">Competência</th>
-                    <th className="text-right py-2 px-3">Valor</th>
-                    <th className="text-left py-2 px-3">Moeda</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {preview.slice(0, 50).map((l, i) => (
-                    <tr key={i} className="border-t hover:bg-muted/20">
-                      <td className="py-2 px-3">{l.descricao}</td>
-                      <td className="py-2 px-3 text-muted-foreground">{l.competencia || "—"}</td>
-                      <td className="py-2 px-3 text-right font-medium">
-                        {l.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                      </td>
-                      <td className="py-2 px-3">{l.moeda}</td>
-                    </tr>
-                  ))}
-                  {preview.length > 50 && (
-                    <tr>
-                      <td colSpan={4} className="text-center py-2 text-muted-foreground text-xs">
-                        ... e mais {preview.length - 50} lançamentos
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+        <div className="space-y-4">
+          {resumoIA && (
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="py-3 px-4">
+                <div className="flex gap-2 items-start">
+                  <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <p className="text-sm text-foreground">{resumoIA}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-            <div className="flex gap-3 mt-4">
-              <Button variant="outline" onClick={() => { setStep("upload"); setPreview([]); }}>
-                Voltar
-              </Button>
-              <Button
-                className="bg-green-600 hover:bg-green-700"
-                disabled={importarMutation.isPending}
-                onClick={handleConfirmar}
-              >
-                {importarMutation.isPending ? "Importando..." : `Confirmar Importação (${preview.length} lançamentos)`}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium">{selecionadosCount} de {lancamentosIA.length} selecionados</span>
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => selecionarTodos(true)}>Todos</Button>
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => selecionarTodos(false)}>Nenhum</Button>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">Total: <strong>{formatCurrency(totalSelecionado)}</strong></span>
+              <Button onClick={confirmarImportacao} disabled={selecionadosCount === 0}>
+                <Check className="h-4 w-4 mr-2" /> Importar {selecionadosCount} lançamentos
               </Button>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            {lancamentosIA.map((l, idx) => {
+              const expanded = expandidos.has(idx);
+              const confCfg = CONFIANCA_CONFIG[l.confianca] ?? CONFIANCA_CONFIG.media;
+              const tipoCfg = TIPO_CONFIG[l.tipo] ?? TIPO_CONFIG.outro;
+              return (
+                <Card key={idx} className={`transition-all ${l.selecionado ? "border-primary/30" : "opacity-60"}`}>
+                  <div className="p-3">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={l.selecionado ?? true}
+                        onChange={() => toggleSelecionado(idx)}
+                        className="h-4 w-4 rounded accent-primary shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-medium text-sm truncate max-w-[200px]">{l.descricao}</span>
+                          <Badge variant="outline" className={`text-xs ${tipoCfg.cor}`}>{tipoCfg.label}</Badge>
+                          <Badge variant="outline" className={`text-xs ${confCfg.cor}`}>
+                            <Sparkles className="h-2.5 w-2.5 mr-1" /> {confCfg.label}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground flex-wrap">
+                          <span>{l.categoriaNome || "Sem categoria"}</span>
+                          {l.subcategoriaNome && <span>› {l.subcategoriaNome}</span>}
+                          {l.competencia && <span>📅 {l.competencia}</span>}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="font-semibold text-sm">{formatCurrency(l.valor)}</span>
+                        <button onClick={() => toggleExpandido(idx)} className="text-muted-foreground hover:text-foreground">
+                          {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    {expanded && l.observacao && (
+                      <div className="mt-2 ml-7 p-2 rounded bg-muted/40 text-xs text-muted-foreground flex gap-2">
+                        <Info className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                        <span>{l.observacao}</span>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Step: Importando */}
+      {step === "importando" && (
+        <Card>
+          <CardContent className="py-16 text-center">
+            <Loader2 className="h-10 w-10 mx-auto text-primary animate-spin mb-4" />
+            <p className="font-semibold">Importando lançamentos...</p>
+            <p className="text-sm text-muted-foreground mt-1">Salvando {selecionadosCount} lançamentos no banco de dados</p>
           </CardContent>
         </Card>
       )}
 
-      {/* Sucesso */}
+      {/* Step: Done */}
       {step === "done" && (
-        <Card>
-          <CardContent className="pt-12 pb-12 text-center">
-            <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Importação Concluída!</h3>
-            <p className="text-muted-foreground mb-4">Os lançamentos foram importados e estão disponíveis na aba "Executado".</p>
-            <Button onClick={() => setStep("upload")}>
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="py-10 text-center">
+            <CheckCircle className="h-12 w-12 mx-auto text-green-600 mb-3" />
+            <p className="font-semibold text-green-800 text-lg">Importação concluída!</p>
+            <p className="text-sm text-green-700 mt-1">Os lançamentos foram importados e estão disponíveis no Dashboard e na aba Executado.</p>
+            <Button className="mt-4" onClick={() => { setStep("upload"); setLancamentosIA([]); setArquivoNome(""); }}>
               <Upload className="h-4 w-4 mr-2" /> Nova Importação
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Histórico de importações */}
+      {/* Histórico */}
       {importacoes && importacoes.length > 0 && (
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Histórico de Importações</CardTitle>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <Download className="h-4 w-4" /> Histórico de Importações
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {(importacoes as any[]).map((imp) => (
-                <div key={imp.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                  <FileText className="h-5 w-5 text-muted-foreground" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{imp.arquivoNome ?? "Importação manual"}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {imp.totalLinhas} lançamentos — {new Date(imp.createdAt).toLocaleDateString("pt-BR")}
-                    </p>
+              {(importacoes as any[]).map((imp: any) => (
+                <div key={imp.id} className="flex items-center justify-between p-2 rounded border text-sm">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{imp.arquivoNome || "Importação manual"}</span>
+                    {imp.mesReferencia && <Badge variant="outline" className="text-xs">{MESES[imp.mesReferencia - 1]}</Badge>}
                   </div>
-                  <Badge className={imp.status === "concluido" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>
-                    {imp.status === "concluido" ? "Concluído" : imp.status}
-                  </Badge>
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                    <span>{imp.totalLinhas ?? 0} lançamentos</span>
+                    <span>{new Date(imp.criadoEm ?? imp.createdAt).toLocaleDateString("pt-BR")}</span>
+                    <Badge variant="outline" className={imp.status === "concluido" ? "text-green-700 border-green-200" : ""}>
+                      {imp.status}
+                    </Badge>
+                  </div>
                 </div>
               ))}
             </div>

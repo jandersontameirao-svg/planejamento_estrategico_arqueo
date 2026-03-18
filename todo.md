@@ -1056,3 +1056,19 @@
 
 ## Gestão Orçamentária - Subcategorias inline
 - [x] Adicionar formulário inline de nova subcategoria diretamente dentro do card da categoria (sem modal separado)
+
+## Gestão Orçamentária - IA + Dashboard
+- [ ] Backend: procedure importarOrcamentoIA (upload PDF/planilha → extração e categorização automática via IA)
+- [ ] Backend: procedure analisarOrcamentoIA (riscos, projeções, recomendações via IA)
+- [ ] Aba Importação: upload drag-and-drop PDF/XLSX, preview dos itens extraídos, confirmação e importação
+- [ ] Dashboard orçamentário: gráficos planejado vs executado, breakdown por categoria, tendência mensal
+- [ ] Painel Análise IA: riscos identificados, projeções de desvio, recomendações de otimização
+
+## Gestão Orçamentária - IA + Dashboard + Análise
+- [x] Importação inteligente com IA (PDF/XLSX/CSV) com categorização automática
+- [x] Dashboard orçamentário com gráficos de planejado vs executado e evolução acumulada
+- [x] Painel de Análise IA com riscos, projeções e recomendações (aba Análise IA)
+- [x] Procedure analisarOrcamentoIA no backend (riscos + projeções + recomendações + score)
+- [x] Procedure importarOrcamentoIA no backend (extração de dados de PDF/XLSX/CSV via IA)
+- [x] Componente OrcamentoAnaliseIA com ScoreGauge, alertas, riscos, projeções e recomendações
+- [x] Componente OrcamentoImportacao reescrito com upload drag-and-drop e preview de lançamentos IA
