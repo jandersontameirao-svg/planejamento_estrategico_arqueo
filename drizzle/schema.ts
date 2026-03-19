@@ -1006,6 +1006,16 @@ export const contratosClientes = mysqlTable("contratos_clientes", {
   status: mysqlEnum("status", ["ativo", "inativo", "prospecto"]).default("ativo").notNull(),
   observacoes: text("observacoes"),
   logoUrl: text("logo_url"),
+  // Dados enriquecidos da Receita Federal / BrasilAPI
+  porte: varchar("porte", { length: 50 }),
+  naturezaJuridica: varchar("natureza_juridica", { length: 100 }),
+  cnaePrincipal: varchar("cnae_principal", { length: 10 }),
+  cnaeDescricao: varchar("cnae_descricao", { length: 255 }),
+  situacaoCadastral: varchar("situacao_cadastral", { length: 20 }),
+  dataAbertura: varchar("data_abertura", { length: 10 }),
+  capitalSocial: varchar("capital_social", { length: 30 }),
+  socios: text("socios"), // JSON array de sócios
+  dadosReceita: text("dados_receita"), // JSON completo da API
   // Vínculo com empresa do app principal (fonte mestra)
   empresaId: int("empresa_id"),
   createdByUserId: int("created_by_user_id"),

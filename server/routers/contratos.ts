@@ -63,6 +63,16 @@ const clienteSchema = z.object({
   observacoes: z.string().optional(),
   logoUrl: z.string().optional(),
   empresaId: z.number().optional(),
+  // Campos enriquecidos da Receita Federal
+  porte: z.string().optional(),
+  naturezaJuridica: z.string().optional(),
+  cnaePrincipal: z.string().optional(),
+  cnaeDescricao: z.string().optional(),
+  situacaoCadastral: z.string().optional(),
+  dataAbertura: z.string().optional(),
+  capitalSocial: z.string().optional(),
+  socios: z.string().optional(), // JSON string
+  dadosReceita: z.string().optional(), // JSON string completo
 });
 
 const contratoSchema = z.object({
@@ -163,27 +173,176 @@ export const contratosRouter = router({
         await deleteContratosCliente(input.id, ctx.user.id);
       }),
 
-    // Extração de dados do cartão CNPJ via IA
-    extrairCnpj: protectedProcedure
-      .input(z.object({ cnpj: z.string(), imageUrl: z.string().optional() }))
+    // Busca CNPJ via BrasilAPI (API pública) com fallback para IA
+    buscarCNPJ: protectedProcedure
+      .input(z.object({ cnpj: z.string() }))
       .mutation(async ({ input }) => {
-        const prompt = input.imageUrl
-          ? `Analise este cartão CNPJ e extraia os dados da empresa: CNPJ, Razão Social, Nome Fantasia, Endereço, Cidade, Estado, CEP, Telefone, Email. Retorne em JSON.`
-          : `Para o CNPJ ${input.cnpj}, formate os dados básicos de uma empresa brasileira em JSON com os campos: cnpj, razaoSocial, nomeFantasia, endereco, cidade, estado, cep.`;
+        // Limpa o CNPJ para apenas dígitos
+        const cnpjLimpo = input.cnpj.replace(/\D/g, "");
+        if (cnpjLimpo.length !== 14) throw new Error("CNPJ inválido");
 
-        const userContent: MessageContent | MessageContent[] = input.imageUrl
-          ? ([
-              { type: "text" as const, text: prompt },
-              { type: "image_url" as const, image_url: { url: input.imageUrl } },
-            ] as MessageContent[])
-          : prompt;
+        // 1º Tentativa: BrasilAPI (gratuita, sem chave)
+        try {
+          const resp = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`, {
+            headers: { "Accept": "application/json" },
+            signal: AbortSignal.timeout(8000),
+          });
+          if (resp.ok) {
+            const data = await resp.json() as any;
+            const socios = (data.qsa ?? []).map((s: any) => ({
+              nome: s.nome_socio,
+              qualificacao: s.qualificacao_socio,
+              cpfCnpj: s.cnpj_cpf_do_socio,
+            }));
+            return {
+              fonte: "brasilapi" as const,
+              cnpj: data.cnpj,
+              razaoSocial: data.razao_social,
+              nomeFantasia: data.nome_fantasia || "",
+              email: data.email || "",
+              telefone: data.ddd_telefone_1 ? `(${data.ddd_telefone_1}) ${data.telefone_1 ?? ""}`.trim() : "",
+              endereco: [
+                data.logradouro,
+                data.numero,
+                data.complemento,
+                data.bairro,
+              ].filter(Boolean).join(", "),
+              cidade: data.municipio || "",
+              estado: data.uf || "",
+              cep: data.cep ? data.cep.replace(/\D/g, "").replace(/(\d{5})(\d{3})/, "$1-$2") : "",
+              porte: data.porte || "",
+              naturezaJuridica: data.natureza_juridica || "",
+              cnaePrincipal: data.cnae_fiscal ? String(data.cnae_fiscal) : "",
+              cnaeDescricao: data.cnae_fiscal_descricao || "",
+              situacaoCadastral: data.descricao_situacao_cadastral || "",
+              dataAbertura: data.data_inicio_atividade || "",
+              capitalSocial: data.capital_social ? `R$ ${Number(data.capital_social).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "",
+              socios: JSON.stringify(socios),
+              dadosReceita: JSON.stringify(data),
+            };
+          }
+        } catch {
+          // Falhou na BrasilAPI, tenta ReceitaWS
+        }
 
+        // 2º Tentativa: ReceitaWS (gratuita, sem chave)
+        try {
+          const resp2 = await fetch(`https://receitaws.com.br/v1/cnpj/${cnpjLimpo}`, {
+            headers: { "Accept": "application/json" },
+            signal: AbortSignal.timeout(8000),
+          });
+          if (resp2.ok) {
+            const data = await resp2.json() as any;
+            if (data.status !== "ERROR") {
+              const socios = (data.qsa ?? []).map((s: any) => ({
+                nome: s.nome,
+                qualificacao: s.qual,
+              }));
+              return {
+                fonte: "receitaws" as const,
+                cnpj: data.cnpj,
+                razaoSocial: data.nome,
+                nomeFantasia: data.fantasia || "",
+                email: data.email || "",
+                telefone: data.telefone || "",
+                endereco: [
+                  data.logradouro,
+                  data.numero,
+                  data.complemento,
+                  data.bairro,
+                ].filter(Boolean).join(", "),
+                cidade: data.municipio || "",
+                estado: data.uf || "",
+                cep: data.cep || "",
+                porte: data.porte || "",
+                naturezaJuridica: data.natureza_juridica || "",
+                cnaePrincipal: data.atividade_principal?.[0]?.code || "",
+                cnaeDescricao: data.atividade_principal?.[0]?.text || "",
+                situacaoCadastral: data.situacao || "",
+                dataAbertura: data.abertura || "",
+                capitalSocial: data.capital_social || "",
+                socios: JSON.stringify(socios),
+                dadosReceita: JSON.stringify(data),
+              };
+            }
+          }
+        } catch {
+          // Falhou na ReceitaWS, usa IA como último recurso
+        }
+
+        // 3º Fallback: IA (LLM) para formatar dados mínimos
         const response = await invokeLLM({
           messages: [
             {
               role: "system",
-              content: "Você é um assistente especializado em extração de dados de documentos empresariais brasileiros. Retorne apenas JSON válido.",
+              content: "Você é um assistente especializado em dados empresariais brasileiros. Retorne apenas JSON válido com os dados que conhece sobre o CNPJ informado.",
             },
+            {
+              role: "user",
+              content: `Formate os dados da empresa com CNPJ ${cnpjLimpo} em JSON com os campos: cnpj, razaoSocial, nomeFantasia, email, telefone, endereco, cidade, estado, cep, porte, naturezaJuridica, cnaePrincipal, cnaeDescricao, situacaoCadastral, dataAbertura, capitalSocial.`,
+            },
+          ],
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "dados_cnpj",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  cnpj: { type: "string" },
+                  razaoSocial: { type: "string" },
+                  nomeFantasia: { type: "string" },
+                  email: { type: "string" },
+                  telefone: { type: "string" },
+                  endereco: { type: "string" },
+                  cidade: { type: "string" },
+                  estado: { type: "string" },
+                  cep: { type: "string" },
+                  porte: { type: "string" },
+                  naturezaJuridica: { type: "string" },
+                  cnaePrincipal: { type: "string" },
+                  cnaeDescricao: { type: "string" },
+                  situacaoCadastral: { type: "string" },
+                  dataAbertura: { type: "string" },
+                  capitalSocial: { type: "string" },
+                },
+                required: ["cnpj", "razaoSocial"],
+                additionalProperties: false,
+              },
+            },
+          },
+        });
+        const content = response.choices?.[0]?.message?.content;
+        const parsed = content ? parseContent(content) as any : null;
+        if (parsed) return { ...parsed, fonte: "ia" as const, socios: "[]", dadosReceita: JSON.stringify(parsed) };
+        return null;
+      }),
+
+    // Verifica se CNPJ já está cadastrado (evita duplicatas)
+    verificarCNPJ: protectedProcedure
+      .input(z.object({ cnpj: z.string() }))
+      .query(async ({ input }) => {
+        const cnpjLimpo = input.cnpj.replace(/\D/g, "");
+        const cnpjFormatado = cnpjLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+        const clientes = await getAllContratosClientes();
+        const existente = clientes.find((c: any) =>
+          c.cnpj?.replace(/\D/g, "") === cnpjLimpo
+        );
+        return { existe: !!existente, cliente: existente ?? null, cnpjFormatado };
+      }),
+
+    // Extração de dados do cartão CNPJ via IA (imagem/PDF)
+    extrairCartaoCNPJ: protectedProcedure
+      .input(z.object({ imageUrl: z.string() }))
+      .mutation(async ({ input }) => {
+        const userContent: MessageContent[] = [
+          { type: "text" as const, text: "Analise este cartão CNPJ e extraia todos os dados da empresa: CNPJ, Razão Social, Nome Fantasia, Endereço completo (logradouro, número, complemento, bairro), Cidade, Estado, CEP, Telefone, Email, Porte, Natureza Jurídica, CNAE principal e descrição. Retorne em JSON." },
+          { type: "image_url" as const, image_url: { url: input.imageUrl } },
+        ];
+        const response = await invokeLLM({
+          messages: [
+            { role: "system", content: "Você é um especialista em extração de dados de documentos empresariais brasileiros. Retorne apenas JSON válido." },
             { role: "user", content: userContent },
           ],
           response_format: {
@@ -203,6 +362,13 @@ export const contratosRouter = router({
                   cidade: { type: "string" },
                   estado: { type: "string" },
                   cep: { type: "string" },
+                  porte: { type: "string" },
+                  naturezaJuridica: { type: "string" },
+                  cnaePrincipal: { type: "string" },
+                  cnaeDescricao: { type: "string" },
+                  situacaoCadastral: { type: "string" },
+                  dataAbertura: { type: "string" },
+                  capitalSocial: { type: "string" },
                 },
                 required: ["cnpj", "razaoSocial"],
                 additionalProperties: false,
@@ -211,7 +377,9 @@ export const contratosRouter = router({
           },
         });
         const content = response.choices?.[0]?.message?.content;
-        return content ? parseContent(content) : null;
+        const parsed = content ? parseContent(content) as any : null;
+        if (parsed) return { ...parsed, fonte: "cartao_ia" as const, socios: "[]", dadosReceita: JSON.stringify(parsed) };
+        return null;
       }),
   }),
 

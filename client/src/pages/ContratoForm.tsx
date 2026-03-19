@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { ArrowLeft, FileText, Save } from "lucide-react";
+import { ArrowLeft, FileText, Save, Search, Building2, ExternalLink } from "lucide-react";
 
 interface ContratoFormProps {
   empresaId: number;
@@ -44,9 +44,20 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
     },
   });
 
-  const clientesFiltrados = form.empresaId
-    ? clientes.filter((c: any) => !c.empresaId || c.empresaId === parseInt(form.empresaId))
-    : clientes;
+  const [buscaCliente, setBuscaCliente] = useState("");
+
+  const clientesFiltrados = useMemo(() => {
+    const base = form.empresaId
+      ? clientes.filter((c: any) => !c.empresaId || c.empresaId === parseInt(form.empresaId))
+      : clientes;
+    if (!buscaCliente) return base;
+    const q = buscaCliente.toLowerCase();
+    return base.filter((c: any) =>
+      c.razaoSocial?.toLowerCase().includes(q) ||
+      (c.nomeFantasia ?? "").toLowerCase().includes(q) ||
+      c.cnpj?.includes(buscaCliente)
+    );
+  }, [clientes, form.empresaId, buscaCliente]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -147,26 +158,53 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
               </div>
               <div>
                 <Label>Cliente / Contratado *</Label>
+                {/* Busca rápida por CNPJ ou nome */}
+                <div className="relative mt-1 mb-2">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                  <Input
+                    placeholder="Filtrar por CNPJ, razão social ou nome fantasia..."
+                    value={buscaCliente}
+                    onChange={(e) => setBuscaCliente(e.target.value)}
+                    className="pl-8 text-sm h-8"
+                  />
+                </div>
                 <Select value={form.clienteId} onValueChange={(v) => setForm(f => ({ ...f, clienteId: v }))}>
                   <SelectTrigger><SelectValue placeholder="Selecione o cliente" /></SelectTrigger>
                   <SelectContent>
                     {clientesFiltrados.map((c: any) => (
-                      <SelectItem key={c.id} value={String(c.id)}>{c.razaoSocial}</SelectItem>
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        <span className="flex items-center gap-2">
+                          <Building2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                          <span>{c.nomeFantasia || c.razaoSocial}</span>
+                          <span className="text-xs text-gray-400 font-mono ml-1">{c.cnpj}</span>
+                        </span>
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {clientesFiltrados.length === 0 && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Nenhum cliente cadastrado.{" "}
-                    <button
-                      type="button"
-                      className="text-blue-600 underline"
-                      onClick={() => navigate(`/empresa/${empresaId}/contratos/clientes`)}
-                    >
-                      Cadastrar cliente
-                    </button>
-                  </p>
-                )}
+                <div className="flex items-center justify-between mt-1">
+                  {clientesFiltrados.length === 0 ? (
+                    <p className="text-xs text-gray-500">
+                      Nenhum cliente encontrado.{" "}
+                      <button
+                        type="button"
+                        className="text-blue-600 underline"
+                        onClick={() => navigate(`/empresa/${empresaId}/contratos/clientes`)}
+                      >
+                        Cadastrar cliente
+                      </button>
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-400">{clientesFiltrados.length} cliente(s) disponível(is)</p>
+                  )}
+                  <button
+                    type="button"
+                    className="text-xs text-indigo-600 flex items-center gap-1 hover:underline"
+                    onClick={() => navigate(`/empresa/${empresaId}/contratos/clientes`)}
+                  >
+                    <ExternalLink className="w-3 h-3" /> Gerenciar clientes
+                  </button>
+                </div>
               </div>
             </CardContent>
           </Card>

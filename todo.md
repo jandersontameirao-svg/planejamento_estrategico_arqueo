@@ -1117,7 +1117,7 @@
 - [x] Implementar auditoria e logs de contratos (registrarAuditoriaContrato em todas as operações)
 - [x] Gerar documentação da Fase 2 (docs/SGC_Fase2_Plano_Consolidacao.md)
 - [x] Fase 2: Extração IA de PDF (contratos + aditivos) com revisão obrigatória
-- [ ] Fase 2: Cadastro de clientes via CNPJ + leitura de cartão CNPJ com IA
+- [x] Fase 2: Cadastro de clientes via CNPJ + leitura de cartão CNPJ com IA
 - [x] Fase 2: Workflow de Boletim de Medição com aprovação por e-mail
 - [x] Fase 2: Metodologias de avaliação customizáveis (clouds + critérios + pesos)
 - [x] Fase 2: Avaliação de desempenho contratual com trigger de Plano de Ação (score < 7)
@@ -1139,3 +1139,12 @@
 - [x] Adicionar card de Gestão de Contratos no hub de planejamento da empresa
 - [x] Remover card global de Contratos da Home
 - [x] Remover rotas globais de contratos do App.tsx
+
+## Cadastro de Clientes via CNPJ com IA
+- [x] Enriquecer tabela contratos_clientes com campos de endereço, contatos e dados da Receita Federal
+- [x] Criar procedure tRPC buscarCNPJ que consulta API pública (ReceitaWS/BrasilAPI) e retorna dados
+- [x] Criar procedure tRPC de busca de cliente por CNPJ no banco (evitar duplicatas)
+- [x] Implementar UI de busca CNPJ com preenchimento automático no formulário de clientes
+- [x] Adicionar upload de cartão CNPJ (PDF/imagem) com extração IA via LLM
+- [x] Integrar busca CNPJ no ContratoForm (campo cliente com autocomplete por CNPJ)
+- [x] Exibir dados completos do cliente (endereço, sócios, atividade) na página ContratosClientes
