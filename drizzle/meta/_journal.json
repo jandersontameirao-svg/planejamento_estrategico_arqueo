@@ -50,6 +50,13 @@
       "when": 1773939791121,
       "tag": "0006_fresh_wolfpack",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1773946646925,
+      "tag": "0007_hesitant_vindicator",
+      "breakpoints": true
     }
   ]
 }

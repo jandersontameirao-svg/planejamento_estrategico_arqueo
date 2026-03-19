@@ -14,8 +14,9 @@ import { toast } from "sonner";
 import {
   ArrowLeft, FileText, DollarSign, AlertTriangle, CheckCircle2,
   Clock, Plus, Upload, Brain, Shield, FileCheck, Edit2, Trash2,
-  Download, Eye, Loader2, CheckSquare, Send, History, ClipboardList,
+  Download, Eye, Loader2, CheckSquare, Send, History, ClipboardList, BarChart3,
 } from "lucide-react";
+import AvaliacaoContratos from "./AvaliacaoContratos";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   rascunho: { label: "Rascunho", color: "bg-gray-100 text-gray-700" },
@@ -327,6 +328,9 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
             </TabsTrigger>
             <TabsTrigger value="auditoria">
               <History className="w-4 h-4 mr-1" /> Auditoria ({auditoria.length})
+            </TabsTrigger>
+            <TabsTrigger value="avaliacao">
+              <BarChart3 className="w-4 h-4 mr-1" /> Avaliação
             </TabsTrigger>
           </TabsList>
 
@@ -653,6 +657,10 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
               </div>
             )}
           </TabsContent>
+
+          <TabsContent value="avaliacao" className="mt-4">
+            <AvaliacaoContratos contratoId={contratoId} empresaId={empresaId} />
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -826,49 +834,212 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
 
       {/* Dialog: Revisão IA */}
       <Dialog open={showRevisaoIA} onOpenChange={setShowRevisaoIA}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Brain className="w-5 h-5 text-blue-600" />
-              Revisão dos Dados Extraídos pela IA
+              Revisão Obrigatória dos Dados Extraídos pela IA
             </DialogTitle>
           </DialogHeader>
           {dadosIA && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
                 <AlertTriangle className="w-4 h-4 inline mr-1" />
-                Revise os dados antes de confirmar. Após confirmação, marcos e riscos serão criados automaticamente.
+                Revise e edite os dados abaixo antes de confirmar. Marcos e riscos serão criados automaticamente com os valores que você definir.
               </div>
-              {dadosIA.resumo && (
+
+              {/* Resumo editável */}
+              <div>
+                <Label className="text-sm font-medium text-gray-700">Resumo do Contrato</Label>
+                <Textarea
+                  className="mt-1"
+                  rows={3}
+                  value={dadosIA.resumo ?? ""}
+                  onChange={e => setDadosIA((d: any) => ({ ...d, resumo: e.target.value }))}
+                  placeholder="Resumo gerado pela IA..."
+                />
+              </div>
+
+              {/* Dados principais editáveis */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-1">Resumo</p>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded">{dadosIA.resumo}</p>
+                  <Label className="text-xs text-gray-500">Número do Contrato</Label>
+                  <Input
+                    value={dadosIA.numero ?? ""}
+                    onChange={e => setDadosIA((d: any) => ({ ...d, numero: e.target.value }))}
+                    placeholder="Número"
+                  />
                 </div>
-              )}
+                <div>
+                  <Label className="text-xs text-gray-500">Valor Total</Label>
+                  <Input
+                    type="number"
+                    value={dadosIA.valorTotal ?? ""}
+                    onChange={e => setDadosIA((d: any) => ({ ...d, valorTotal: e.target.value }))}
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-500">Data de Início</Label>
+                  <Input
+                    type="date"
+                    value={dadosIA.dataInicio ?? ""}
+                    onChange={e => setDadosIA((d: any) => ({ ...d, dataInicio: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-500">Data de Término</Label>
+                  <Input
+                    type="date"
+                    value={dadosIA.dataFim ?? ""}
+                    onChange={e => setDadosIA((d: any) => ({ ...d, dataFim: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              {/* Marcos editáveis */}
               {dadosIA.marcos?.length > 0 && (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Marcos Identificados ({dadosIA.marcos.length})</p>
-                  <div className="space-y-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-medium text-gray-700">Marcos Financeiros ({dadosIA.marcos.length})</p>
+                    <Button
+                      size="sm" variant="outline"
+                      onClick={() => setDadosIA((d: any) => ({
+                        ...d,
+                        marcos: [...(d.marcos ?? []), { titulo: "", valor: "", dataPrevista: "", descricao: "" }],
+                      }))}
+                    >
+                      <Plus className="w-3 h-3 mr-1" />Adicionar
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
                     {dadosIA.marcos.map((m: any, i: number) => (
-                      <div key={i} className="flex items-center justify-between text-sm bg-gray-50 p-2 rounded">
-                        <span>{m.titulo}</span>
-                        <div className="flex items-center gap-3 text-gray-500">
-                          <span>{formatCurrency(m.valor)}</span>
-                          <span>{m.dataPrevista}</span>
+                      <div key={i} className="grid grid-cols-12 gap-2 items-start p-2 bg-gray-50 rounded-lg">
+                        <div className="col-span-4">
+                          <Input
+                            placeholder="Título *"
+                            value={m.titulo ?? ""}
+                            onChange={e => setDadosIA((d: any) => {
+                              const marcos = [...d.marcos];
+                              marcos[i] = { ...marcos[i], titulo: e.target.value };
+                              return { ...d, marcos };
+                            })}
+                          />
+                        </div>
+                        <div className="col-span-3">
+                          <Input
+                            type="number"
+                            placeholder="Valor"
+                            value={m.valor ?? ""}
+                            onChange={e => setDadosIA((d: any) => {
+                              const marcos = [...d.marcos];
+                              marcos[i] = { ...marcos[i], valor: e.target.value };
+                              return { ...d, marcos };
+                            })}
+                          />
+                        </div>
+                        <div className="col-span-4">
+                          <Input
+                            type="date"
+                            value={m.dataPrevista ?? ""}
+                            onChange={e => setDadosIA((d: any) => {
+                              const marcos = [...d.marcos];
+                              marcos[i] = { ...marcos[i], dataPrevista: e.target.value };
+                              return { ...d, marcos };
+                            })}
+                          />
+                        </div>
+                        <div className="col-span-1 flex justify-end">
+                          <Button
+                            size="icon" variant="ghost" className="h-8 w-8 text-red-400"
+                            onClick={() => setDadosIA((d: any) => ({
+                              ...d,
+                              marcos: d.marcos.filter((_: any, idx: number) => idx !== i),
+                            }))}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
+
+              {/* Riscos editáveis */}
               {dadosIA.riscos?.length > 0 && (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Riscos Identificados ({dadosIA.riscos.length})</p>
-                  <div className="space-y-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-medium text-gray-700">Riscos Identificados ({dadosIA.riscos.length})</p>
+                    <Button
+                      size="sm" variant="outline"
+                      onClick={() => setDadosIA((d: any) => ({
+                        ...d,
+                        riscos: [...(d.riscos ?? []), { titulo: "", categoria: "outro", probabilidade: "media", impacto: "medio" }],
+                      }))}
+                    >
+                      <Plus className="w-3 h-3 mr-1" />Adicionar
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
                     {dadosIA.riscos.map((r: any, i: number) => (
-                      <div key={i} className="text-sm bg-gray-50 p-2 rounded">
-                        <span className="font-medium">{r.titulo}</span>
-                        <span className="text-gray-500 ml-2">({r.categoria} / {r.probabilidade} prob.)</span>
+                      <div key={i} className="grid grid-cols-12 gap-2 items-start p-2 bg-gray-50 rounded-lg">
+                        <div className="col-span-5">
+                          <Input
+                            placeholder="Título do risco *"
+                            value={r.titulo ?? ""}
+                            onChange={e => setDadosIA((d: any) => {
+                              const riscos = [...d.riscos];
+                              riscos[i] = { ...riscos[i], titulo: e.target.value };
+                              return { ...d, riscos };
+                            })}
+                          />
+                        </div>
+                        <div className="col-span-3">
+                          <Select
+                            value={r.categoria ?? "outro"}
+                            onValueChange={v => setDadosIA((d: any) => {
+                              const riscos = [...d.riscos];
+                              riscos[i] = { ...riscos[i], categoria: v };
+                              return { ...d, riscos };
+                            })}
+                          >
+                            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              {["financeiro","juridico","operacional","prazo","escopo","outro"].map(c => (
+                                <SelectItem key={c} value={c}>{c}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="col-span-3">
+                          <Select
+                            value={r.probabilidade ?? "media"}
+                            onValueChange={v => setDadosIA((d: any) => {
+                              const riscos = [...d.riscos];
+                              riscos[i] = { ...riscos[i], probabilidade: v };
+                              return { ...d, riscos };
+                            })}
+                          >
+                            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="baixa">Baixa</SelectItem>
+                              <SelectItem value="media">Média</SelectItem>
+                              <SelectItem value="alta">Alta</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="col-span-1 flex justify-end">
+                          <Button
+                            size="icon" variant="ghost" className="h-8 w-8 text-red-400"
+                            onClick={() => setDadosIA((d: any) => ({
+                              ...d,
+                              riscos: d.riscos.filter((_: any, idx: number) => idx !== i),
+                            }))}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -878,7 +1049,7 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRevisaoIA(false)}>Cancelar</Button>
-            <Button onClick={handleConfirmarIA} disabled={confirmarExtracao.isPending}>
+            <Button onClick={handleConfirmarIA} disabled={confirmarExtracao.isPending} className="bg-blue-600 hover:bg-blue-700 text-white">
               {confirmarExtracao.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <CheckSquare className="w-4 h-4 mr-1" />}
               Confirmar e Salvar
             </Button>

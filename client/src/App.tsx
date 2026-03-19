@@ -41,6 +41,7 @@ import ContratoForm from "./pages/ContratoForm";
 import ContratosClientes from "./pages/ContratosClientes";
 import PlanejamentoEstrategicoArea from "./pages/PlanejamentoEstrategicoArea";
 import DashboardAnalisesArea from "./pages/DashboardAnalisesArea";
+import AprovacaoBoletim from "./pages/AprovacaoBoletim";
 
 
 function Router() {
@@ -113,6 +114,7 @@ function Router() {
       </Route>
       <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
+      <Route path="/aprovacao/:token" component={AprovacaoBoletim} />
       <Route path={"/ 404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -6,7 +6,7 @@
  */
 
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import { invokeLLM, type MessageContent } from "../_core/llm";
 import {
   getAllContratosClientes,
@@ -667,6 +667,45 @@ export const contratosRouter = router({
         });
         const content = response.choices?.[0]?.message?.content;
         return content ? parseContent(content) : null;
+      }),
+  }),
+
+  // ── APROVAÇÃO PÚBLICA (sem autenticação) ──────────────────────────────
+  aprovacaoPublica: router({
+    getByToken: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .query(async ({ input }) => {
+        const { getDb } = await import("../db");
+        const { contratosBoletins } = await import("../../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        const db = await getDb();
+        if (!db) return null;
+        const [boletim] = await db.select().from(contratosBoletins)
+          .where(eq(contratosBoletins.aprovadorToken, input.token));
+        return boletim ?? null;
+      }),
+    aprovarPorToken: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        aprovado: z.boolean(),
+        observacoes: z.string().default(""),
+      }))
+      .mutation(async ({ input }) => {
+        const { getDb } = await import("../db");
+        const { contratosBoletins } = await import("../../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        const [boletim] = await db.select().from(contratosBoletins)
+          .where(eq(contratosBoletins.aprovadorToken, input.token));
+        if (!boletim) throw new Error("Token inválido ou boletim não encontrado");
+        const novoStatus = input.aprovado ? "aprovado" : "rejeitado";
+        await db.update(contratosBoletins).set({
+          status: novoStatus as any,
+          observacoesAprovador: input.observacoes,
+          dataAprovacao: new Date(),
+        }).where(eq(contratosBoletins.id, boletim.id));
+        return { success: true, status: novoStatus };
       }),
   }),
 

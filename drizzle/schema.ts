@@ -1558,3 +1558,151 @@ export const sequencias = mysqlTable("sequencias", {
 });
 
 export type Sequencia = typeof sequencias.$inferSelect;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MÓDULO DE AVALIAÇÃO DE CONTRATOS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Metodologias de avaliação (360°, NPS, CSAT, customizada)
+ */
+export const avaliacaoMetodologias = mysqlTable("avaliacao_metodologias", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresa_id").notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  tipo: mysqlEnum("tipo_metodologia", ["360", "nps", "csat", "customizada"]).default("customizada").notNull(),
+  descricao: text("descricao"),
+  escalaMin: int("escala_min").default(0).notNull(),
+  escalaMax: int("escala_max").default(10).notNull(),
+  notaMinima: decimal("nota_minima", { precision: 5, scale: 2 }).default("7.00").notNull(),
+  ativa: boolean("ativa").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type AvaliacaoMetodologia = typeof avaliacaoMetodologias.$inferSelect;
+export type InsertAvaliacaoMetodologia = typeof avaliacaoMetodologias.$inferInsert;
+
+/**
+ * Grupos (nuvens) de critérios dentro de uma metodologia
+ */
+export const avaliacaoCriteriosGrupos = mysqlTable("avaliacao_criterios_grupos", {
+  id: int("id").autoincrement().primaryKey(),
+  metodologiaId: int("metodologia_id").notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  peso: decimal("peso", { precision: 5, scale: 2 }).default("1.00").notNull(),
+  cor: varchar("cor", { length: 20 }).default("#3B82F6"),
+  ordem: int("ordem").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type AvaliacaoCriteriosGrupo = typeof avaliacaoCriteriosGrupos.$inferSelect;
+export type InsertAvaliacaoCriteriosGrupo = typeof avaliacaoCriteriosGrupos.$inferInsert;
+
+/**
+ * Critérios individuais dentro de um grupo
+ */
+export const avaliacaoCriterios = mysqlTable("avaliacao_criterios", {
+  id: int("id").autoincrement().primaryKey(),
+  metodologiaId: int("metodologia_id").notNull(),
+  grupoId: int("grupo_id").notNull(),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  peso: decimal("peso", { precision: 5, scale: 2 }).default("1.00").notNull(),
+  ordem: int("ordem").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type AvaliacaoCriterio = typeof avaliacaoCriterios.$inferSelect;
+export type InsertAvaliacaoCriterio = typeof avaliacaoCriterios.$inferInsert;
+
+/**
+ * Avaliações de Contratos (instância de avaliação)
+ */
+export const contratosAvaliacoes = mysqlTable("contratos_avaliacoes", {
+  id: int("id").autoincrement().primaryKey(),
+  contratoId: int("contrato_id").notNull(),
+  empresaId: int("empresa_id").notNull(),
+  metodologiaId: int("metodologia_id").notNull(),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  periodo: varchar("periodo", { length: 50 }),
+  status: mysqlEnum("status_avaliacao", ["rascunho", "em_andamento", "finalizada", "cancelada"]).default("rascunho").notNull(),
+  notaFinal: decimal("nota_final", { precision: 5, scale: 2 }),
+  planoAcaoTriggered: boolean("plano_acao_triggered").default(false).notNull(),
+  planoAcaoId: int("plano_acao_id"),
+  gestorUserId: int("gestor_user_id"),
+  observacoes: text("observacoes"),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContratoAvaliacao = typeof contratosAvaliacoes.$inferSelect;
+export type InsertContratoAvaliacao = typeof contratosAvaliacoes.$inferInsert;
+
+/**
+ * Avaliadores (múltiplos por avaliação)
+ */
+export const avaliacaoAvaliadores = mysqlTable("avaliacao_avaliadores", {
+  id: int("id").autoincrement().primaryKey(),
+  avaliacaoId: int("avaliacao_id").notNull(),
+  userId: int("user_id"),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }),
+  cargo: varchar("cargo", { length: 255 }),
+  tipo: mysqlEnum("tipo_avaliador", ["interno", "externo", "gestor", "cliente"]).default("interno").notNull(),
+  status: mysqlEnum("status_avaliador", ["pendente", "em_andamento", "concluido"]).default("pendente").notNull(),
+  notaCalculada: decimal("nota_calculada", { precision: 5, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type AvaliacaoAvaliador = typeof avaliacaoAvaliadores.$inferSelect;
+export type InsertAvaliacaoAvaliador = typeof avaliacaoAvaliadores.$inferInsert;
+
+/**
+ * Respostas dos avaliadores por critério
+ */
+export const avaliacaoRespostas = mysqlTable("avaliacao_respostas", {
+  id: int("id").autoincrement().primaryKey(),
+  avaliacaoId: int("avaliacao_id").notNull(),
+  avaliadorId: int("avaliador_id").notNull(),
+  criterioId: int("criterio_id").notNull(),
+  nota: decimal("nota", { precision: 5, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type AvaliacaoResposta = typeof avaliacaoRespostas.$inferSelect;
+export type InsertAvaliacaoResposta = typeof avaliacaoRespostas.$inferInsert;
+
+/**
+ * Planos de Ação gerados automaticamente por avaliação < 7
+ */
+export const avaliacaoPlanos = mysqlTable("avaliacao_planos", {
+  id: int("id").autoincrement().primaryKey(),
+  avaliacaoId: int("avaliacao_id").notNull(),
+  contratoId: int("contrato_id").notNull(),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  status: mysqlEnum("status_plano", ["aberto", "em_andamento", "concluido", "cancelado"]).default("aberto").notNull(),
+  prazo: date("prazo"),
+  responsavel: varchar("responsavel", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type AvaliacaoPlano = typeof avaliacaoPlanos.$inferSelect;
+export type InsertAvaliacaoPlano = typeof avaliacaoPlanos.$inferInsert;
+
+/**
+ * Itens do Plano de Ação
+ */
+export const avaliacaoPlanoItens = mysqlTable("avaliacao_plano_itens", {
+  id: int("id").autoincrement().primaryKey(),
+  planoId: int("plano_id").notNull(),
+  acao: varchar("acao", { length: 500 }).notNull(),
+  responsavel: varchar("responsavel", { length: 255 }),
+  prazo: date("prazo"),
+  status: mysqlEnum("status_item_plano", ["pendente", "em_andamento", "concluido"]).default("pendente").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type AvaliacaoPlanoItem = typeof avaliacaoPlanoItens.$inferSelect;
+export type InsertAvaliacaoPlanoItem = typeof avaliacaoPlanoItens.$inferInsert;

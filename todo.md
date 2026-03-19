@@ -1116,11 +1116,11 @@
 - [x] Adicionar card de acesso ao módulo Contratos na Home
 - [x] Implementar auditoria e logs de contratos (registrarAuditoriaContrato em todas as operações)
 - [x] Gerar documentação da Fase 2 (docs/SGC_Fase2_Plano_Consolidacao.md)
-- [ ] Fase 2: Extração IA de PDF (contratos + aditivos) com revisão obrigatória
+- [x] Fase 2: Extração IA de PDF (contratos + aditivos) com revisão obrigatória
 - [ ] Fase 2: Cadastro de clientes via CNPJ + leitura de cartão CNPJ com IA
-- [ ] Fase 2: Workflow de Boletim de Medição com aprovação por e-mail
-- [ ] Fase 2: Metodologias de avaliação customizáveis (clouds + critérios + pesos)
-- [ ] Fase 2: Avaliação de desempenho contratual com trigger de Plano de Ação (score < 7)
+- [x] Fase 2: Workflow de Boletim de Medição com aprovação por e-mail
+- [x] Fase 2: Metodologias de avaliação customizáveis (clouds + critérios + pesos)
+- [x] Fase 2: Avaliação de desempenho contratual com trigger de Plano de Ação (score < 7)
 - [ ] Fase 2: Currículos de usuários internos com extração IA
 
 ## Contratos - Reorganização por Empresa
