@@ -126,8 +126,10 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
   );
 
   // Filtrar cards com base nas metodologias ativas (se não há config, mostra todos)
+  // O card "contratos" é um módulo permanente — sempre exibido, independente da configuração
+  const CARDS_PERMANENTES = ["contratos"];
   const analisesFiltradas = metodologiasAtivas && metodologiasAtivas.length > 0
-    ? analises.filter((a) => metodologiasAtivas.includes(a.id))
+    ? analises.filter((a) => CARDS_PERMANENTES.includes(a.id) || metodologiasAtivas.includes(a.id))
     : analises;
 
   // Buscar dados para calcular progresso

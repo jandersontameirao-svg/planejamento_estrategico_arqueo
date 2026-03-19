@@ -1148,3 +1148,6 @@
 - [x] Adicionar upload de cartão CNPJ (PDF/imagem) com extração IA via LLM
 - [x] Integrar busca CNPJ no ContratoForm (campo cliente com autocomplete por CNPJ)
 - [x] Exibir dados completos do cliente (endereço, sócios, atividade) na página ContratosClientes
+
+## Correção - Card de Gestão de Contratos
+- [x] Card de Gestão de Contratos não aparece quando empresa tem metodologias configuradas (ID "contratos" não está na lista METODOLOGIAS_DISPONIVEIS)
