@@ -43,22 +43,23 @@ function formatDate(val: string | Date | null | undefined) {
   return new Date(val).toLocaleDateString("pt-BR");
 }
 
-export default function Contratos() {
+interface ContratosProps {
+  empresaId: number;
+}
+export default function Contratos({ empresaId }: ContratosProps) {
   const [, navigate] = useLocation();
   const { user } = useAuth();
   const [busca, setBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("todos");
-  const [filtroEmpresa, setFiltroEmpresa] = useState("todas");
 
-  const { data: contratos = [], isLoading } = trpc.contratos.contratos.list.useQuery({});
-  const { data: dashboard } = trpc.contratos.dashboard.useQuery({});
+  const { data: contratos = [], isLoading } = trpc.contratos.contratos.list.useQuery({ empresaId });
+  const { data: dashboard } = trpc.contratos.dashboard.useQuery({ empresaId });
   const { data: empresas = [] } = trpc.empresas.list.useQuery();
 
   const contratosFiltrados = contratos.filter((c: any) => {
     const matchBusca = !busca || c.titulo.toLowerCase().includes(busca.toLowerCase()) || c.numero.toLowerCase().includes(busca.toLowerCase());
     const matchStatus = filtroStatus === "todos" || c.status === filtroStatus;
-    const matchEmpresa = filtroEmpresa === "todas" || String(c.empresaId) === filtroEmpresa;
-    return matchBusca && matchStatus && matchEmpresa;
+    return matchBusca && matchStatus;
   });
 
   return (
@@ -67,8 +68,8 @@ export default function Contratos() {
       <div className="bg-white border-b px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-              <ArrowLeft className="w-4 h-4 mr-1" /> Início
+            <Button variant="ghost" size="sm" onClick={() => navigate(`/empresa/${empresaId}/planejamento`)}>
+              <ArrowLeft className="w-4 h-4 mr-1" /> Planejamento
             </Button>
             <div className="h-5 w-px bg-gray-300" />
             <div className="flex items-center gap-2">
@@ -82,10 +83,10 @@ export default function Contratos() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigate("/contratos/clientes")}>
+            <Button variant="outline" size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos/clientes`)}>
               <Users className="w-4 h-4 mr-1" /> Clientes
             </Button>
-            <Button size="sm" onClick={() => navigate("/contratos/novo")}>
+            <Button size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos/novo`)}>
               <Plus className="w-4 h-4 mr-1" /> Novo Contrato
             </Button>
           </div>
@@ -173,17 +174,7 @@ export default function Contratos() {
               ))}
             </SelectContent>
           </Select>
-          <Select value={filtroEmpresa} onValueChange={setFiltroEmpresa}>
-            <SelectTrigger className="w-52">
-              <SelectValue placeholder="Empresa" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todas">Todas as empresas</SelectItem>
-              {empresas.map((e: any) => (
-                <SelectItem key={e.id} value={String(e.id)}>{e.nomeFantasia || e.razaoSocial}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+
         </div>
 
         {/* Lista de Contratos */}
@@ -202,7 +193,7 @@ export default function Contratos() {
                 {busca || filtroStatus !== "todos" ? "Tente ajustar os filtros" : "Clique em \"Novo Contrato\" para começar"}
               </p>
               {!busca && filtroStatus === "todos" && (
-                <Button className="mt-4" onClick={() => navigate("/contratos/novo")}>
+                <Button className="mt-4" onClick={() => navigate(`/empresa/${empresaId}/contratos/novo`)}>
                   <Plus className="w-4 h-4 mr-1" /> Criar Primeiro Contrato
                 </Button>
               )}
@@ -217,7 +208,7 @@ export default function Contratos() {
                 <Card
                   key={contrato.id}
                   className="hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/contratos/${contrato.id}`)}
+                  onClick={() => navigate(`/empresa/${empresaId}/contratos/${contrato.id}`)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">

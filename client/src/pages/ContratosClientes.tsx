@@ -17,7 +17,10 @@ const STATUS_COLORS: Record<string, string> = {
   prospecto: "bg-blue-100 text-blue-700",
 };
 
-export default function ContratosClientes() {
+interface ContratosClientesProps {
+  empresaId: number;
+}
+export default function ContratosClientes({ empresaId }: ContratosClientesProps) {
   const [, navigate] = useLocation();
   const [busca, setBusca] = useState("");
   const [showDialog, setShowDialog] = useState(false);
@@ -25,7 +28,7 @@ export default function ContratosClientes() {
   const [extraindoCNPJ, setExtraindoCNPJ] = useState(false);
 
   const { data: empresas = [] } = trpc.empresas.list.useQuery();
-  const { data: clientes = [], refetch } = trpc.contratos.clientes.list.useQuery({});
+  const { data: clientes = [], refetch } = trpc.contratos.clientes.list.useQuery({ empresaId });
 
   const extrairCnpj = trpc.contratos.clientes.extrairCnpj.useMutation();
   const createCliente = trpc.contratos.clientes.create.useMutation({
@@ -129,7 +132,7 @@ export default function ContratosClientes() {
       <div className="bg-white border-b px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/contratos")}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos`)}>
               <ArrowLeft className="w-4 h-4 mr-1" /> Contratos
             </Button>
             <div className="h-5 w-px bg-gray-300" />

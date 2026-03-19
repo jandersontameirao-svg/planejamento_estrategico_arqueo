@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useLocation, useParams } from "wouter";
+import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,10 +55,12 @@ function formatDate(val: string | Date | null | undefined) {
   return new Date(val).toLocaleDateString("pt-BR");
 }
 
-export default function ContratoDetalhe() {
-  const params = useParams<{ id: string }>();
+interface ContratoDetalheProps {
+  empresaId: number;
+  contratoId: number;
+}
+export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetalheProps) {
   const [, navigate] = useLocation();
-  const contratoId = parseInt(params.id);
 
   const [showMarcoDialog, setShowMarcoDialog] = useState(false);
   const [showRiscoDialog, setShowRiscoDialog] = useState(false);
@@ -200,7 +202,7 @@ export default function ContratoDetalhe() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate("/contratos")}>
+              <Button variant="ghost" size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos`)}>
                 <ArrowLeft className="w-4 h-4 mr-1" /> Contratos
               </Button>
               <div className="h-5 w-px bg-gray-300" />
@@ -455,7 +457,7 @@ export default function ContratoDetalhe() {
           <TabsContent value="aditivos" className="mt-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-semibold text-gray-900">Aditivos Contratuais</h3>
-              <Button size="sm" onClick={() => navigate(`/contratos/${contratoId}/aditivo/novo`)}>
+              <Button size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos/${contratoId}/aditivo/novo`)}>
                 <Plus className="w-4 h-4 mr-1" /> Novo Aditivo
               </Button>
             </div>

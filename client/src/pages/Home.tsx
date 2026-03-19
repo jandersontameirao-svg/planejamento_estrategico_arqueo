@@ -6,7 +6,7 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
   Building2, LayoutDashboard, LogOut, CheckCircle2, Users,
-  BarChart3, Target, ChevronRight, Globe, MapPin, FileText
+  BarChart3, Target, ChevronRight, Globe, MapPin
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { NotificationButton } from "@/components/NotificationButton";
@@ -403,33 +403,7 @@ export default function Home() {
             <AreasComEmpresas />
           </div>
 
-          {/* Card do Módulo de Contratos */}
-          <div className="mt-8 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
-            <Card
-              className="border-2 border-blue-200/60 bg-gradient-to-br from-blue-50/40 via-card to-indigo-50/20 hover:shadow-xl hover:scale-[1.01] hover:border-blue-300 transition-all duration-300 cursor-pointer"
-              onClick={() => setLocation("/contratos")}
-            >
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-gradient-to-br from-blue-500/20 to-indigo-500/10 rounded-lg">
-                    <FileText className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl text-blue-800">Gestão de Contratos</CardTitle>
-                    <CardDescription>SGC — Contratos, marcos financeiros, riscos contratuais e análise IA</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                  onClick={(e) => { e.stopPropagation(); setLocation("/contratos"); }}
-                >
-                  Acessar Gestão de Contratos
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+
         </div>
       </main>
     </div>

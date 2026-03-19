@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, DollarSign, SlidersHorizontal, X } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, DollarSign, SlidersHorizontal, X, FileText } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { Link, useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -103,6 +103,14 @@ const analises: AnaliseCard[] = [
     descricao: "Planejado vs Executado",
     icone: <DollarSign className="h-8 w-8" />,
     cor: "bg-emerald-600",
+    href: true,
+  },
+  {
+    id: "contratos",
+    titulo: "Gestão de Contratos",
+    descricao: "SGC — Contratos e Clientes",
+    icone: <FileText className="h-8 w-8" />,
+    cor: "bg-blue-700",
     href: true,
   },
 ];
@@ -247,7 +255,11 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
               key={analise.id}
               className={`cursor-pointer transition-all hover:shadow-lg ${isExpanded ? "col-span-full" : ""}`}
             >
-              <CardHeader onClick={() => analise.href ? navigate(`/empresa/${empresaId}/orcamento`) : toggleCard(analise.id)} className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader onClick={() => {
+                if (analise.id === "contratos") navigate(`/empresa/${empresaId}/contratos`);
+                else if (analise.href) navigate(`/empresa/${empresaId}/orcamento`);
+                else toggleCard(analise.id);
+              }} className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div className="flex items-center gap-3">
                   <div className={`${analise.cor} text-white p-3 rounded-lg`}>
                     {analise.icone}

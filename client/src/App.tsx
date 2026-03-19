@@ -99,10 +99,18 @@ function Router() {
       <Route path="/empresa/:id/orcamento">
         {(params) => <GestaoOrcamentaria empresaId={Number(params.id)} />}
       </Route>
-      <Route path="/contratos" component={Contratos} />
-      <Route path="/contratos/novo" component={ContratoForm} />
-      <Route path="/contratos/clientes" component={ContratosClientes} />
-      <Route path="/contratos/:id" component={ContratoDetalhe} />
+      <Route path="/empresa/:id/contratos">
+        {(params) => <Contratos empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/empresa/:id/contratos/novo">
+        {(params) => <ContratoForm empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/empresa/:id/contratos/clientes">
+        {(params) => <ContratosClientes empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/empresa/:id/contratos/:contratoId">
+        {(params) => <ContratoDetalhe empresaId={Number(params.id)} contratoId={Number(params.contratoId)} />}
+      </Route>
       <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />

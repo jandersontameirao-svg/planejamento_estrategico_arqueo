@@ -1122,3 +1122,20 @@
 - [ ] Fase 2: Metodologias de avaliação customizáveis (clouds + critérios + pesos)
 - [ ] Fase 2: Avaliação de desempenho contratual com trigger de Plano de Ação (score < 7)
 - [ ] Fase 2: Currículos de usuários internos com extração IA
+
+## Contratos - Reorganização por Empresa
+- [ ] Criar rotas /empresa/:id/contratos, /empresa/:id/contratos/novo, /empresa/:id/contratos/:contratoId
+- [ ] Adaptar páginas Contratos, ContratoDetalhe, ContratoForm para receber empresaId via parâmetro de rota
+- [ ] Adicionar card de Contratos no hub de planejamento de cada empresa
+- [ ] Remover card global de Contratos da Home
+- [ ] Remover rotas globais /contratos do App.tsx
+
+## Contratos - Reorganização por Empresa
+- [x] Mover Gestão de Contratos para dentro de cada empresa (rota /empresa/:id/contratos)
+- [x] Adaptar Contratos.tsx para receber empresaId como prop
+- [x] Adaptar ContratoDetalhe.tsx para receber empresaId e contratoId como props
+- [x] Adaptar ContratosClientes.tsx para receber empresaId como prop
+- [x] Adaptar ContratoForm.tsx para receber empresaId como prop
+- [x] Adicionar card de Gestão de Contratos no hub de planejamento da empresa
+- [x] Remover card global de Contratos da Home
+- [x] Remover rotas globais de contratos do App.tsx

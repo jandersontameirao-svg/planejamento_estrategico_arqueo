@@ -10,10 +10,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { ArrowLeft, FileText, Save } from "lucide-react";
 
-export default function ContratoForm() {
+interface ContratoFormProps {
+  empresaId: number;
+}
+export default function ContratoForm({ empresaId }: ContratoFormProps) {
   const [, navigate] = useLocation();
   const { data: empresas = [] } = trpc.empresas.list.useQuery();
-  const { data: clientes = [] } = trpc.contratos.clientes.list.useQuery({});
+  const { data: clientes = [] } = trpc.contratos.clientes.list.useQuery({ empresaId });
 
   const [form, setForm] = useState({
     numero: "",
@@ -21,7 +24,7 @@ export default function ContratoForm() {
     descricao: "",
     tipo: "servicos" as any,
     status: "rascunho" as any,
-    empresaId: "",
+    empresaId: String(empresaId),
     clienteId: "",
     dataInicio: "",
     dataFim: "",
@@ -34,7 +37,7 @@ export default function ContratoForm() {
   const createContrato = trpc.contratos.contratos.create.useMutation({
     onSuccess: (data: any) => {
       toast.success("Contrato criado com sucesso!");
-      navigate(`/contratos/${data.id}`);
+      navigate(`/empresa/${empresaId}/contratos/${data.id}`);
     },
     onError: (err: any) => {
       toast.error("Erro ao criar contrato: " + err.message);
@@ -62,7 +65,7 @@ export default function ContratoForm() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/contratos")}>
+          <Button variant="ghost" size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos`)}>
             <ArrowLeft className="w-4 h-4 mr-1" /> Contratos
           </Button>
           <div className="h-5 w-px bg-gray-300" />
@@ -158,7 +161,7 @@ export default function ContratoForm() {
                     <button
                       type="button"
                       className="text-blue-600 underline"
-                      onClick={() => navigate("/contratos/clientes/novo")}
+                      onClick={() => navigate(`/empresa/${empresaId}/contratos/clientes`)}
                     >
                       Cadastrar cliente
                     </button>
@@ -239,7 +242,7 @@ export default function ContratoForm() {
           </Card>
 
           <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => navigate("/contratos")}>
+            <Button type="button" variant="outline" onClick={() => navigate(`/empresa/${empresaId}/contratos`)}>
               Cancelar
             </Button>
             <Button type="submit" disabled={createContrato.isPending}>
