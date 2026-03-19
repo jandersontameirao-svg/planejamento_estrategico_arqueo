@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, date, tinyint, bigint } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, date, tinyint, bigint, json, index, unique } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -1259,3 +1259,302 @@ export const contratosSincronizacao = mysqlTable("contratos_sincronizacao", {
 });
 export type ContratosSincronizacao = typeof contratosSincronizacao.$inferSelect;
 export type InsertContratosSincronizacao = typeof contratosSincronizacao.$inferInsert;
+
+// =============================================================================
+// MÓDULO CONTRATOS - TABELAS AVANÇADAS (SGC Fase 1 - Integração)
+// Mapeamento: contracts→contratos, financial_milestones→contratosMarcos,
+//             companies→empresas, users→users
+// =============================================================================
+
+/**
+ * Boletins de Medição Avançados
+ * Registros de medições de serviços/entregas para fins de pagamento
+ */
+export const boletinsMedicao = mysqlTable("boletins_medicao", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 50 }).notNull().unique(), // BM-XXXX
+  contratoId: int("contrato_id").notNull(),
+  marcoId: int("marco_id"), // Marco financeiro associado (opcional)
+  scopeMarcoId: int("scope_marco_id"), // Marco de escopo exclusivo (Modelo A)
+
+  // Período de medição
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+
+  // Referência e identificação
+  referenceCode: varchar("reference_code", { length: 100 }),
+
+  // Status
+  status: mysqlEnum("status_boletim", [
+    "DRAFT", "SUBMITTED", "IN_REVIEW", "CHANGES_REQUESTED",
+    "APPROVED", "REJECTED", "EXPORTED_MANUAL", "APPROVED_MANUAL",
+    "SIGNED", "PAID", "CANCELLED"
+  ]).default("DRAFT").notNull(),
+
+  paymentStatus: mysqlEnum("payment_status_boletim", ["UNPAID", "PAID"]).default("UNPAID").notNull(),
+
+  total: decimal("total", { precision: 15, scale: 2 }).default("0").notNull(),
+
+  origin: mysqlEnum("origin_boletim", ["MANUAL", "AUTO_FROM_AI_MILESTONES"]).default("MANUAL").notNull(),
+  sourceRunId: varchar("source_run_id", { length: 255 }),
+
+  // Responsável pela aprovação
+  currentApproverId: int("current_approver_id"),
+  approverName: varchar("approver_name", { length: 255 }),
+  approverEmail: varchar("approver_email", { length: 255 }),
+
+  submittedAt: timestamp("submitted_at"),
+  approvedAt: timestamp("approved_at"),
+  rejectedAt: timestamp("rejected_at"),
+  rejectionReason: text("rejection_reason"),
+  observations: text("observations"),
+  approvalObservations: text("approval_observations"),
+
+  createdBy: int("created_by").notNull(),
+  updatedBy: int("updated_by"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  uniqueSourceRun: unique("unique_source_run_boletim").on(table.contratoId, table.sourceRunId),
+}));
+
+export type BoletimMedicao = typeof boletinsMedicao.$inferSelect;
+export type InsertBoletimMedicao = typeof boletinsMedicao.$inferInsert;
+
+/**
+ * Itens de Boletim de Medição
+ */
+export const boletinsMedicaoItens = mysqlTable("boletins_medicao_itens", {
+  id: int("id").autoincrement().primaryKey(),
+  boletimId: int("boletim_id").notNull(),
+  descricao: text("descricao").notNull(),
+  quantidade: decimal("quantidade", { precision: 15, scale: 2 }).notNull(),
+  unidade: varchar("unidade", { length: 50 }).notNull(),
+  precoUnitario: decimal("preco_unitario", { precision: 15, scale: 2 }).notNull(),
+  total: decimal("total", { precision: 15, scale: 2 }).notNull(),
+  marcoId: int("marco_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BoletimMedicaoItem = typeof boletinsMedicaoItens.$inferSelect;
+export type InsertBoletimMedicaoItem = typeof boletinsMedicaoItens.$inferInsert;
+
+/**
+ * Aprovadores de Boletins (contatos do cliente)
+ */
+export const boletinsAprovadores = mysqlTable("boletins_aprovadores", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 20 }).notNull().unique(),
+  contratoId: int("contrato_id").notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  role: mysqlEnum("role_aprovador", ["project_manager", "financial", "technical", "other"]).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BoletimAprovador = typeof boletinsAprovadores.$inferSelect;
+export type InsertBoletimAprovador = typeof boletinsAprovadores.$inferInsert;
+
+/**
+ * Histórico de Aprovações de Boletins
+ */
+export const boletinsAprovacaoHistorico = mysqlTable("boletins_aprovacao_historico", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 20 }).notNull().unique(),
+  boletimId: int("boletim_id").notNull(),
+  aprovadorId: int("aprovador_id"),
+  action: mysqlEnum("action_aprovacao", ["submitted", "approved", "rejected", "returned", "paid"]).notNull(),
+  status: mysqlEnum("status_aprovacao", ["pending", "approved", "rejected", "returned"]).notNull(),
+  observations: text("observations"),
+  pdfUrl: varchar("pdf_url", { length: 500 }),
+  pdfFileKey: varchar("pdf_file_key", { length: 500 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type BoletimAprovacaoHistorico = typeof boletinsAprovacaoHistorico.$inferSelect;
+
+/**
+ * Links de Aprovação por Email
+ */
+export const boletinsAprovacaoLinks = mysqlTable("boletins_aprovacao_links", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  boletimId: int("boletim_id").notNull(),
+  aprovadorId: int("aprovador_id").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expires_at"),
+  accessedAt: timestamp("accessed_at"),
+  isUsed: boolean("is_used").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type BoletimAprovacaoLink = typeof boletinsAprovacaoLinks.$inferSelect;
+
+/**
+ * Tokens de Aprovação Pública (sem login)
+ */
+export const boletinsAprovacaoTokens = mysqlTable("boletins_aprovacao_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  token: varchar("token", { length: 64 }).notNull().unique(),
+  boletimId: int("boletim_id").notNull(),
+  aprovadorEmail: varchar("aprovador_email", { length: 320 }).notNull(),
+  status: mysqlEnum("status_token", ["PENDING", "USED", "EXPIRED"]).default("PENDING").notNull(),
+  action: mysqlEnum("action_token", ["APPROVED", "REJECTED"]),
+  observations: text("observations"),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BoletimAprovacaoToken = typeof boletinsAprovacaoTokens.$inferSelect;
+
+/**
+ * Aprovações dos Clientes (resposta ao link de aprovação)
+ */
+export const boletinsClienteAprovacoes = mysqlTable("boletins_cliente_aprovacoes", {
+  id: int("id").autoincrement().primaryKey(),
+  boletimId: int("boletim_id").notNull(),
+  aprovadorId: int("aprovador_id").notNull(),
+  approvalStatus: mysqlEnum("approval_status_cliente", ["pending", "approved", "rejected"]).default("pending").notNull(),
+  approvedAt: timestamp("approved_at"),
+  rejectedAt: timestamp("rejected_at"),
+  observations: text("observations"),
+  rejectionReason: text("rejection_reason"),
+  clientContactName: varchar("client_contact_name", { length: 255 }),
+  clientContactEmail: varchar("client_contact_email", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BoletimClienteAprovacao = typeof boletinsClienteAprovacoes.$inferSelect;
+
+/**
+ * Ações de Aprovação (histórico completo de workflow)
+ */
+export const aprovacaoAcoes = mysqlTable("aprovacao_acoes", {
+  id: int("id").primaryKey().autoincrement(),
+  boletimId: int("boletim_id").notNull(),
+  userId: int("user_id").notNull(),
+  action: mysqlEnum("action_aprovacao_acao", [
+    "SUBMITTED", "APPROVED", "REJECTED", "CHANGES_REQUESTED", "SIGNED", "APPROVED_MANUAL"
+  ]).notNull(),
+  observations: text("observations"),
+  approvalMethod: mysqlEnum("approval_method", [
+    "EMAIL", "PDF_ASSINADO", "SEI", "PORTAL_CLIENTE", "OUTRO"
+  ]),
+  approverName: varchar("approver_name", { length: 255 }),
+  approverEmail: varchar("approver_email", { length: 255 }),
+  approvedAt: timestamp("approved_at"),
+  attachmentFileKey: varchar("attachment_file_key", { length: 500 }),
+  attachmentFileUrl: varchar("attachment_file_url", { length: 1000 }),
+  attachmentFileName: varchar("attachment_file_name", { length: 255 }),
+  metadata: json("metadata"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: int("created_by"),
+}, (table) => ({
+  boletimIdIdx: index("aprovacao_acoes_boletim_id_idx").on(table.boletimId),
+}));
+
+export type AprovacaoAcao = typeof aprovacaoAcoes.$inferSelect;
+
+/**
+ * Responsáveis Internos por Contrato
+ */
+export const contratosResponsaveis = mysqlTable("contratos_responsaveis", {
+  id: int("id").autoincrement().primaryKey(),
+  contratoId: int("contrato_id").notNull(),
+  responsibleName: varchar("responsible_name", { length: 255 }).notNull(),
+  responsibleEmail: varchar("responsible_email", { length: 255 }).notNull(),
+  financialEmail: varchar("financial_email", { length: 255 }).notNull(),
+  role: varchar("role", { length: 100 }),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ContratoResponsavel = typeof contratosResponsaveis.$inferSelect;
+
+/**
+ * Alertas de Vencimento de Marcos
+ */
+export const marcosAlertas = mysqlTable("marcos_alertas", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 20 }).notNull().unique(),
+  marcoId: int("marco_id").notNull(),
+  contratoId: int("contrato_id").notNull(),
+  empresaId: int("empresa_id").notNull(),
+  alertType: mysqlEnum("alert_type_marco", [
+    "approaching_due", "due_today", "overdue", "overdue_critical"
+  ]).notNull(),
+  status: mysqlEnum("status_alerta_marco", [
+    "active", "acknowledged", "resolved", "dismissed"
+  ]).default("active").notNull(),
+  notificationSent: boolean("notification_sent").default(false).notNull(),
+  notificationSentAt: timestamp("notification_sent_at"),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  daysBeforeDue: int("days_before_due"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MarcoAlerta = typeof marcosAlertas.$inferSelect;
+
+/**
+ * Recomendações IA para Contratos
+ */
+export const contratosRecomendacoes = mysqlTable("contratos_recomendacoes", {
+  id: int("id").autoincrement().primaryKey(),
+  contratoId: int("contrato_id").notNull(),
+  empresaId: int("empresa_id").notNull(),
+  type: mysqlEnum("type_recomendacao", [
+    "clause", "process", "monitoring", "documentation", "financial"
+  ]).notNull(),
+  priority: mysqlEnum("priority_recomendacao", ["high", "medium", "low"]).default("medium").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  reasoning: text("reasoning"),
+  relatedRisks: json("related_risks"),
+  basedOnContracts: json("based_on_contracts"),
+  wasHelpful: boolean("was_helpful"),
+  feedbackNotes: text("feedback_notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ContratoRecomendacao = typeof contratosRecomendacoes.$inferSelect;
+
+/**
+ * Histórico de Análises IA
+ */
+export const iaAnaliseHistorico = mysqlTable("ia_analise_historico", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 20 }).notNull().unique(),
+  contratoId: int("contrato_id"),
+  aditivoId: int("aditivo_id"),
+  userId: int("user_id").notNull(),
+  analysisType: mysqlEnum("analysis_type_ia", ["contract", "amendment"]).notNull(),
+  extractedData: json("extracted_data").$type<Record<string, unknown>>().notNull(),
+  fileName: varchar("file_name", { length: 255 }),
+  fileUrl: varchar("file_url", { length: 500 }),
+  fileKey: varchar("file_key", { length: 500 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type IaAnaliseHistorico = typeof iaAnaliseHistorico.$inferSelect;
+
+/**
+ * Sequências para geração de códigos únicos
+ */
+export const sequencias = mysqlTable("sequencias", {
+  key: varchar("key", { length: 100 }).primaryKey(),
+  currentValue: int("current_value").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Sequencia = typeof sequencias.$inferSelect;

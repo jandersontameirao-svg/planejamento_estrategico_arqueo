@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, FileText, DollarSign, AlertTriangle, CheckCircle2,
   Clock, Plus, Upload, Brain, Shield, FileCheck, Edit2, Trash2,
-  Download, Eye, Loader2, CheckSquare,
+  Download, Eye, Loader2, CheckSquare, Send, History, ClipboardList,
 } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -65,9 +65,12 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
   const [showMarcoDialog, setShowMarcoDialog] = useState(false);
   const [showRiscoDialog, setShowRiscoDialog] = useState(false);
   const [showRevisaoIA, setShowRevisaoIA] = useState(false);
+  const [showBoletimAprovDialog, setShowBoletimAprovDialog] = useState(false);
+  const [selectedBoletimId, setSelectedBoletimId] = useState<number | null>(null);
   const [dadosIA, setDadosIA] = useState<any>(null);
   const [analisandoIA, setAnalisandoIA] = useState(false);
   const [uploadingPDF, setUploadingPDF] = useState(false);
+  const [aprovForm, setAprovForm] = useState({ aprovadorNome: "", aprovadorEmail: "" });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: contrato, refetch } = trpc.contratos.contratos.get.useQuery({ id: contratoId });
@@ -75,6 +78,8 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
   const { data: riscos = [], refetch: refetchRiscos } = trpc.contratos.riscos.list.useQuery({ contratoId });
   const { data: documentos = [], refetch: refetchDocs } = trpc.contratos.documentos.list.useQuery({ contratoId });
   const { data: aditivos = [] } = trpc.contratos.aditivos.list.useQuery({ contratoId });
+  const { data: boletins = [], refetch: refetchBoletins } = trpc.contratos.boletins.list.useQuery({ contratoId });
+  const { data: auditoria = [] } = trpc.contratos.auditoria.porContrato.useQuery({ contratoId });
 
   const utils = trpc.useUtils();
 
@@ -92,6 +97,10 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
   });
   const updateContrato = trpc.contratos.contratos.update.useMutation({
     onSuccess: () => { refetch(); toast.success("Contrato atualizado!"); },
+  });
+  const enviarAprovacao = trpc.contratos.boletins.enviarAprovacao.useMutation({
+    onSuccess: () => { refetchBoletins(); setShowBoletimAprovDialog(false); toast.success("Boletim enviado para aprovação!"); },
+    onError: (e) => toast.error("Erro: " + e.message),
   });
   const updateRisco = trpc.contratos.riscos.update.useMutation({
     onSuccess: () => { refetchRiscos(); },
@@ -300,18 +309,24 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
 
         {/* Tabs */}
         <Tabs defaultValue="marcos">
-          <TabsList>
+          <TabsList className="flex-wrap h-auto gap-1">
             <TabsTrigger value="marcos">
-              <DollarSign className="w-4 h-4 mr-1" /> Marcos Financeiros
+              <DollarSign className="w-4 h-4 mr-1" /> Marcos ({marcos.length})
+            </TabsTrigger>
+            <TabsTrigger value="boletins">
+              <ClipboardList className="w-4 h-4 mr-1" /> Boletins ({boletins.length})
             </TabsTrigger>
             <TabsTrigger value="riscos">
-              <Shield className="w-4 h-4 mr-1" /> Riscos
+              <Shield className="w-4 h-4 mr-1" /> Riscos ({riscos.length})
             </TabsTrigger>
             <TabsTrigger value="aditivos">
-              <FileCheck className="w-4 h-4 mr-1" /> Aditivos
+              <FileCheck className="w-4 h-4 mr-1" /> Aditivos ({aditivos.length})
             </TabsTrigger>
             <TabsTrigger value="documentos">
-              <FileText className="w-4 h-4 mr-1" /> Documentos
+              <FileText className="w-4 h-4 mr-1" /> Documentos ({documentos.length})
+            </TabsTrigger>
+            <TabsTrigger value="auditoria">
+              <History className="w-4 h-4 mr-1" /> Auditoria ({auditoria.length})
             </TabsTrigger>
           </TabsList>
 
@@ -493,6 +508,67 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
             )}
           </TabsContent>
 
+          {/* BOLETINS DE MEDICAO */}
+          <TabsContent value="boletins" className="mt-4">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-semibold text-gray-900">Boletins de Medição</h3>
+            </div>
+            {boletins.length === 0 ? (
+              <Card>
+                <CardContent className="py-10 text-center text-gray-400">
+                  <ClipboardList className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                  <p>Nenhum boletim de medição cadastrado</p>
+                  <p className="text-sm mt-1">Os boletins são criados a partir dos marcos financeiros</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-2">
+                {boletins.map((b: any) => {
+                  const statusColors: Record<string, string> = {
+                    rascunho: "bg-gray-100 text-gray-700",
+                    enviado: "bg-blue-100 text-blue-700",
+                    em_aprovacao: "bg-yellow-100 text-yellow-700",
+                    aprovado: "bg-green-100 text-green-700",
+                    reprovado: "bg-red-100 text-red-700",
+                    pago: "bg-emerald-100 text-emerald-700",
+                  };
+                  return (
+                    <Card key={b.id}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-900">{b.numero}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${statusColors[b.status] ?? "bg-gray-100 text-gray-700"}`}>{b.status.replace("_", " ")}</span>
+                            </div>
+                            {b.descricao && <p className="text-sm text-gray-500 mt-1">{b.descricao}</p>}
+                            <div className="flex gap-3 mt-2 text-xs text-gray-500">
+                              {b.dataEmissao && <span>Emissão: {new Date(b.dataEmissao).toLocaleDateString("pt-BR")}</span>}
+                              {b.dataVencimento && <span>Vencimento: {new Date(b.dataVencimento).toLocaleDateString("pt-BR")}</span>}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-gray-900">{b.valorBruto ? `R$ ${Number(b.valorBruto).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "-"}</p>
+                            {b.status === "rascunho" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="mt-2 h-7 text-xs"
+                                onClick={() => { setSelectedBoletimId(b.id); setShowBoletimAprovDialog(true); }}
+                              >
+                                <Send className="w-3 h-3 mr-1" /> Enviar Aprovação
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+
           {/* DOCUMENTOS */}
           <TabsContent value="documentos" className="mt-4">
             <div className="flex justify-between items-center mb-3">
@@ -528,8 +604,103 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
               </div>
             )}
           </TabsContent>
+
+          {/* AUDITORIA */}
+          <TabsContent value="auditoria" className="mt-4">
+            <div className="mb-3">
+              <h3 className="font-semibold text-gray-900">Histórico de Auditoria</h3>
+              <p className="text-sm text-gray-500">Todas as alterações registradas automaticamente pelo sistema</p>
+            </div>
+            {auditoria.length === 0 ? (
+              <Card>
+                <CardContent className="py-10 text-center text-gray-400">
+                  <History className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                  <p>Nenhum registro de auditoria encontrado</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-2">
+                {auditoria.map((entry: any) => (
+                  <Card key={entry.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                          <History className="w-4 h-4 text-gray-500" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium text-sm text-gray-900">{entry.acao}</p>
+                            <span className="text-xs text-gray-400">
+                              {new Date(entry.createdAt).toLocaleString("pt-BR")}
+                            </span>
+                          </div>
+                          {entry.descricao && (
+                            <p className="text-sm text-gray-600 mt-1">{entry.descricao}</p>
+                          )}
+                          {entry.dadosAnteriores && (
+                            <details className="mt-2">
+                              <summary className="text-xs text-gray-400 cursor-pointer">Ver dados alterados</summary>
+                              <pre className="text-xs bg-gray-50 p-2 rounded mt-1 overflow-auto max-h-32">
+                                {JSON.stringify(entry.dadosAnteriores, null, 2)}
+                              </pre>
+                            </details>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
         </Tabs>
       </div>
+
+      {/* Dialog: Enviar Aprovação Boletim */}
+      <Dialog open={showBoletimAprovDialog} onOpenChange={setShowBoletimAprovDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Send className="w-5 h-5 text-blue-600" />
+              Enviar Boletim para Aprovação
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-gray-600">Informe os dados do aprovador que receberá o link de aprovação por e-mail.</p>
+            <div>
+              <Label>Nome do Aprovador *</Label>
+              <Input
+                value={aprovForm.aprovadorNome}
+                onChange={(e) => setAprovForm(f => ({ ...f, aprovadorNome: e.target.value }))}
+                placeholder="Ex: João Silva"
+              />
+            </div>
+            <div>
+              <Label>E-mail do Aprovador *</Label>
+              <Input
+                type="email"
+                value={aprovForm.aprovadorEmail}
+                onChange={(e) => setAprovForm(f => ({ ...f, aprovadorEmail: e.target.value }))}
+                placeholder="Ex: joao@empresa.com.br"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBoletimAprovDialog(false)}>Cancelar</Button>
+            <Button
+              onClick={() => selectedBoletimId && enviarAprovacao.mutate({
+                id: selectedBoletimId,
+                aprovadorNome: aprovForm.aprovadorNome,
+                aprovadorEmail: aprovForm.aprovadorEmail,
+              })}
+              disabled={!aprovForm.aprovadorNome || !aprovForm.aprovadorEmail || enviarAprovacao.isPending}
+            >
+              {enviarAprovacao.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Send className="w-4 h-4 mr-1" />}
+              Enviar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog: Novo Marco */}
       <Dialog open={showMarcoDialog} onOpenChange={setShowMarcoDialog}>
