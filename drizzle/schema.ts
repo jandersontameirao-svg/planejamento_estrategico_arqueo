@@ -977,3 +977,285 @@ export const empresaMetodologias = mysqlTable("empresa_metodologias", {
   createdAt: bigint("created_at", { mode: "number" }).notNull(),
   updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
 });
+
+
+// ============================================================
+// MÓDULO: GESTÃO DE CONTRATOS (SGC) — FASE 1
+// Integração controlada ao app principal de Gestão Estratégica
+// Fonte mestra de users e companies: app principal
+// ============================================================
+
+/**
+ * Clientes contratuais (CNPJ como identificador principal)
+ * Vinculados ao contexto corporativo via empresaId (fonte mestra: app principal)
+ */
+export const contratosClientes = mysqlTable("contratos_clientes", {
+  id: int("id").autoincrement().primaryKey(),
+  cnpj: varchar("cnpj", { length: 18 }).notNull(),
+  razaoSocial: varchar("razao_social", { length: 255 }).notNull(),
+  nomeFantasia: varchar("nome_fantasia", { length: 255 }),
+  email: varchar("email", { length: 255 }),
+  telefone: varchar("telefone", { length: 30 }),
+  endereco: text("endereco"),
+  cidade: varchar("cidade", { length: 100 }),
+  estado: varchar("estado", { length: 2 }),
+  cep: varchar("cep", { length: 9 }),
+  contatoNome: varchar("contato_nome", { length: 255 }),
+  contatoEmail: varchar("contato_email", { length: 255 }),
+  contatoTelefone: varchar("contato_telefone", { length: 30 }),
+  status: mysqlEnum("status", ["ativo", "inativo", "prospecto"]).default("ativo").notNull(),
+  observacoes: text("observacoes"),
+  logoUrl: text("logo_url"),
+  // Vínculo com empresa do app principal (fonte mestra)
+  empresaId: int("empresa_id"),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContratosCliente = typeof contratosClientes.$inferSelect;
+export type InsertContratosCliente = typeof contratosClientes.$inferInsert;
+
+/**
+ * Contratos principais
+ * Vinculados a empresa (app principal), cliente e usuário responsável
+ */
+export const contratos = mysqlTable("contratos", {
+  id: int("id").autoincrement().primaryKey(),
+  numero: varchar("numero", { length: 100 }).notNull(),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  tipo: mysqlEnum("tipo", ["servicos", "fornecimento", "consultoria", "manutencao", "parceria", "outro"]).default("servicos").notNull(),
+  status: mysqlEnum("status", [
+    "rascunho", "em_analise", "aprovado", "vigente", "suspenso", "encerrado", "cancelado"
+  ]).default("rascunho").notNull(),
+  // Vínculos com entidades mestras do app principal
+  empresaId: int("empresa_id").notNull(),
+  clienteId: int("cliente_id").notNull(),
+  responsavelUserId: int("responsavel_user_id"),
+  aprovadorUserId: int("aprovador_user_id"),
+  // Vínculos opcionais com módulos do app principal
+  projetoId: int("projeto_id"),
+  areaId: int("area_id"),
+  // Datas
+  dataInicio: date("data_inicio"),
+  dataFim: date("data_fim"),
+  dataAssinatura: date("data_assinatura"),
+  // Valores
+  valorTotal: decimal("valor_total", { precision: 15, scale: 2 }),
+  moeda: varchar("moeda", { length: 3 }).default("BRL"),
+  // Documentos
+  pdfUrl: text("pdf_url"),
+  pdfKey: text("pdf_key"),
+  // Dados extraídos por IA do PDF
+  resumoIA: text("resumo_ia"),
+  dadosExtradosIA: text("dados_extraidos_ia"), // JSON
+  iaRevisado: boolean("ia_revisado").default(false),
+  // Assinatura digital
+  assinaturaStatus: mysqlEnum("assinatura_status", ["pendente", "parcial", "assinado", "rejeitado"]).default("pendente"),
+  assinaturaUrl: text("assinatura_url"),
+  observacoes: text("observacoes"),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type Contrato = typeof contratos.$inferSelect;
+export type InsertContrato = typeof contratos.$inferInsert;
+
+/**
+ * Aditivos contratuais (alterações de escopo ou valor)
+ * Tipo: financeiro ou escopo (necessário para análise IA)
+ */
+export const contratosAditivos = mysqlTable("contratos_aditivos", {
+  id: int("id").autoincrement().primaryKey(),
+  contratoId: int("contrato_id").notNull(),
+  numero: varchar("numero", { length: 100 }).notNull(),
+  tipo: mysqlEnum("tipo", ["financeiro", "escopo", "prazo", "misto"]).notNull(),
+  descricao: text("descricao"),
+  valorAditivo: decimal("valor_aditivo", { precision: 15, scale: 2 }),
+  novaDataFim: date("nova_data_fim"),
+  pdfUrl: text("pdf_url"),
+  pdfKey: text("pdf_key"),
+  resumoIA: text("resumo_ia"),
+  dadosExtradosIA: text("dados_extraidos_ia"), // JSON
+  iaRevisado: boolean("ia_revisado").default(false),
+  status: mysqlEnum("status", ["rascunho", "aprovado", "vigente", "cancelado"]).default("rascunho").notNull(),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContratosAditivo = typeof contratosAditivos.$inferSelect;
+export type InsertContratosAditivo = typeof contratosAditivos.$inferInsert;
+
+/**
+ * Marcos financeiros
+ * Vinculados a contrato ou aditivo; status automático de atraso
+ */
+export const contratosMarcos = mysqlTable("contratos_marcos", {
+  id: int("id").autoincrement().primaryKey(),
+  contratoId: int("contrato_id").notNull(),
+  aditivoId: int("aditivo_id"),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  valorPrevisto: decimal("valor_previsto", { precision: 15, scale: 2 }).notNull(),
+  valorPago: decimal("valor_pago", { precision: 15, scale: 2 }),
+  dataPrevista: date("data_prevista").notNull(),
+  dataPagamento: date("data_pagamento"),
+  prazoPagemento: int("prazo_pagamento"), // dias após aprovação do boletim
+  status: mysqlEnum("status", ["pendente", "em_medicao", "aprovado", "pago", "atrasado", "cancelado"]).default("pendente").notNull(),
+  ordem: int("ordem").default(1),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContratosMarco = typeof contratosMarcos.$inferSelect;
+export type InsertContratosMarco = typeof contratosMarcos.$inferInsert;
+
+/**
+ * Boletins de medição
+ * Criados automaticamente a partir de marcos financeiros
+ * Um marco → um boletim
+ */
+export const contratosBoletins = mysqlTable("contratos_boletins", {
+  id: int("id").autoincrement().primaryKey(),
+  contratoId: int("contrato_id").notNull(),
+  marcoId: int("marco_id").notNull(),
+  numero: varchar("numero", { length: 50 }).notNull(),
+  titulo: varchar("titulo", { length: 255 }),
+  descricao: text("descricao"),
+  valorMedicao: decimal("valor_medicao", { precision: 15, scale: 2 }).notNull(),
+  percentualMedicao: decimal("percentual_medicao", { precision: 5, scale: 2 }),
+  periodo: varchar("periodo", { length: 50 }),
+  status: mysqlEnum("status", ["rascunho", "enviado", "em_aprovacao", "aprovado", "rejeitado", "pago"]).default("rascunho").notNull(),
+  // Responsável pela aprovação
+  aprovadorNome: varchar("aprovador_nome", { length: 255 }),
+  aprovadorEmail: varchar("aprovador_email", { length: 255 }),
+  aprovadorToken: varchar("aprovador_token", { length: 100 }), // token para link de aprovação externo
+  // Resultado da aprovação
+  dataEnvio: timestamp("data_envio"),
+  dataAprovacao: timestamp("data_aprovacao"),
+  observacoesAprovador: text("observacoes_aprovador"),
+  // PDF gerado
+  pdfUrl: text("pdf_url"),
+  pdfKey: text("pdf_key"),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContratosBoletim = typeof contratosBoletins.$inferSelect;
+export type InsertContratosBoletim = typeof contratosBoletins.$inferInsert;
+
+/**
+ * Fluxo de aprovação interna de contratos e boletins
+ */
+export const contratosAprovacoes = mysqlTable("contratos_aprovacoes", {
+  id: int("id").autoincrement().primaryKey(),
+  tipo: mysqlEnum("tipo", ["contrato", "aditivo", "boletim", "marco"]).notNull(),
+  referenciaId: int("referencia_id").notNull(), // ID do contrato/aditivo/boletim/marco
+  aprovadorUserId: int("aprovador_user_id").notNull(),
+  status: mysqlEnum("status", ["pendente", "aprovado", "rejeitado", "cancelado"]).default("pendente").notNull(),
+  observacoes: text("observacoes"),
+  dataDecisao: timestamp("data_decisao"),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContratosAprovacao = typeof contratosAprovacoes.$inferSelect;
+export type InsertContratosAprovacao = typeof contratosAprovacoes.$inferInsert;
+
+/**
+ * Riscos contratuais
+ * Análise de riscos por contrato com suporte a IA
+ */
+export const contratosRiscos = mysqlTable("contratos_riscos", {
+  id: int("id").autoincrement().primaryKey(),
+  contratoId: int("contrato_id").notNull(),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  categoria: mysqlEnum("categoria", [
+    "financeiro", "juridico", "operacional", "prazo", "escopo", "reputacional", "regulatorio", "outro"
+  ]).default("outro").notNull(),
+  probabilidade: mysqlEnum("probabilidade", ["baixa", "media", "alta"]).default("media").notNull(),
+  impacto: mysqlEnum("impacto", ["baixo", "medio", "alto"]).default("medio").notNull(),
+  severidade: mysqlEnum("severidade", ["baixa", "media", "alta", "critica"]).default("media").notNull(),
+  status: mysqlEnum("status", ["identificado", "em_mitigacao", "mitigado", "materializado", "aceito"]).default("identificado").notNull(),
+  planoMitigacao: text("plano_mitigacao"),
+  responsavelUserId: int("responsavel_user_id"),
+  dataIdentificacao: date("data_identificacao"),
+  dataRevisao: date("data_revisao"),
+  geradoPorIA: boolean("gerado_por_ia").default(false),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContratosRisco = typeof contratosRiscos.$inferSelect;
+export type InsertContratosRisco = typeof contratosRiscos.$inferInsert;
+
+/**
+ * Documentos vinculados a contratos
+ * Classificados automaticamente por IA
+ */
+export const contratosDocumentos = mysqlTable("contratos_documentos", {
+  id: int("id").autoincrement().primaryKey(),
+  contratoId: int("contrato_id").notNull(),
+  aditivoId: int("aditivo_id"),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  tipo: mysqlEnum("tipo", [
+    "contrato_principal", "aditivo", "boletim", "nota_fiscal", "comprovante_pagamento",
+    "proposta", "ata", "laudo", "certificado", "outro"
+  ]).default("outro").notNull(),
+  url: text("url").notNull(),
+  fileKey: text("file_key").notNull(),
+  mimeType: varchar("mime_type", { length: 100 }),
+  tamanhoBytes: int("tamanho_bytes"),
+  classificadoPorIA: boolean("classificado_por_ia").default(false),
+  observacoes: text("observacoes"),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContratosDocumento = typeof contratosDocumentos.$inferSelect;
+export type InsertContratosDocumento = typeof contratosDocumentos.$inferInsert;
+
+/**
+ * Trilha de auditoria específica do módulo Contratos
+ * Toda operação crítica gera registro auditável
+ */
+export const contratosAuditoria = mysqlTable("contratos_auditoria", {
+  id: int("id").autoincrement().primaryKey(),
+  entidade: mysqlEnum("entidade", [
+    "cliente", "contrato", "aditivo", "marco", "boletim", "aprovacao", "risco", "documento"
+  ]).notNull(),
+  entidadeId: int("entidade_id").notNull(),
+  acao: mysqlEnum("acao", [
+    "criacao", "edicao", "exclusao_logica", "aprovacao", "rejeicao",
+    "assinatura", "sincronizacao", "rollback", "reconciliacao", "envio_aprovacao"
+  ]).notNull(),
+  usuarioId: int("usuario_id"),
+  payloadAnterior: text("payload_anterior"), // JSON
+  payloadNovo: text("payload_novo"),         // JSON
+  ip: varchar("ip", { length: 45 }),
+  userAgent: text("user_agent"),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ContratosAuditoriaRecord = typeof contratosAuditoria.$inferSelect;
+export type InsertContratosAuditoriaRecord = typeof contratosAuditoria.$inferInsert;
+
+/**
+ * Sincronização de entidades-mestras entre sistemas
+ * Registra o estado da sincronização de users e companies
+ * Fonte mestra: app principal
+ */
+export const contratosSincronizacao = mysqlTable("contratos_sincronizacao", {
+  id: int("id").autoincrement().primaryKey(),
+  entidade: mysqlEnum("entidade", ["user", "empresa", "cliente"]).notNull(),
+  entidadeId: int("entidade_id").notNull(),
+  status: mysqlEnum("status", ["sincronizado", "pendente", "erro", "conflito"]).default("pendente").notNull(),
+  ultimaSincronizacao: timestamp("ultima_sincronizacao"),
+  hashDados: varchar("hash_dados", { length: 64 }),
+  erroDetalhes: text("erro_detalhes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContratosSincronizacao = typeof contratosSincronizacao.$inferSelect;
+export type InsertContratosSincronizacao = typeof contratosSincronizacao.$inferInsert;

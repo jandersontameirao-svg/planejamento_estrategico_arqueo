@@ -35,6 +35,10 @@ import PlanejamentoEstrategicoParticipacoes from "./pages/PlanejamentoEstrategic
 import DashboardAnalisesParticipacoes from "./pages/DashboardAnalisesParticipacoes";
 import GestaoOrcamentaria from "./pages/GestaoOrcamentaria";
 import AreasNegocio from "./pages/AreasNegocio";
+import Contratos from "./pages/Contratos";
+import ContratoDetalhe from "./pages/ContratoDetalhe";
+import ContratoForm from "./pages/ContratoForm";
+import ContratosClientes from "./pages/ContratosClientes";
 import PlanejamentoEstrategicoArea from "./pages/PlanejamentoEstrategicoArea";
 import DashboardAnalisesArea from "./pages/DashboardAnalisesArea";
 
@@ -95,6 +99,10 @@ function Router() {
       <Route path="/empresa/:id/orcamento">
         {(params) => <GestaoOrcamentaria empresaId={Number(params.id)} />}
       </Route>
+      <Route path="/contratos" component={Contratos} />
+      <Route path="/contratos/novo" component={ContratoForm} />
+      <Route path="/contratos/clientes" component={ContratosClientes} />
+      <Route path="/contratos/:id" component={ContratoDetalhe} />
       <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path={"/ 404"} component={NotFound} />

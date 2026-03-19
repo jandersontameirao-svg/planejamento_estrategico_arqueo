@@ -1,0 +1,200 @@
+CREATE TABLE `contratos` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`numero` varchar(100) NOT NULL,
+	`titulo` varchar(255) NOT NULL,
+	`descricao` text,
+	`tipo` enum('servicos','fornecimento','consultoria','manutencao','parceria','outro') NOT NULL DEFAULT 'servicos',
+	`status` enum('rascunho','em_analise','aprovado','vigente','suspenso','encerrado','cancelado') NOT NULL DEFAULT 'rascunho',
+	`empresa_id` int NOT NULL,
+	`cliente_id` int NOT NULL,
+	`responsavel_user_id` int,
+	`aprovador_user_id` int,
+	`projeto_id` int,
+	`area_id` int,
+	`data_inicio` date,
+	`data_fim` date,
+	`data_assinatura` date,
+	`valor_total` decimal(15,2),
+	`moeda` varchar(3) DEFAULT 'BRL',
+	`pdf_url` text,
+	`pdf_key` text,
+	`resumo_ia` text,
+	`dados_extraidos_ia` text,
+	`ia_revisado` boolean DEFAULT false,
+	`assinatura_status` enum('pendente','parcial','assinado','rejeitado') DEFAULT 'pendente',
+	`assinatura_url` text,
+	`observacoes` text,
+	`created_by_user_id` int,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `contratos_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `contratos_aditivos` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`contrato_id` int NOT NULL,
+	`numero` varchar(100) NOT NULL,
+	`tipo` enum('financeiro','escopo','prazo','misto') NOT NULL,
+	`descricao` text,
+	`valor_aditivo` decimal(15,2),
+	`nova_data_fim` date,
+	`pdf_url` text,
+	`pdf_key` text,
+	`resumo_ia` text,
+	`dados_extraidos_ia` text,
+	`ia_revisado` boolean DEFAULT false,
+	`status` enum('rascunho','aprovado','vigente','cancelado') NOT NULL DEFAULT 'rascunho',
+	`created_by_user_id` int,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `contratos_aditivos_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `contratos_aprovacoes` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`tipo` enum('contrato','aditivo','boletim','marco') NOT NULL,
+	`referencia_id` int NOT NULL,
+	`aprovador_user_id` int NOT NULL,
+	`status` enum('pendente','aprovado','rejeitado','cancelado') NOT NULL DEFAULT 'pendente',
+	`observacoes` text,
+	`data_decisao` timestamp,
+	`created_by_user_id` int,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `contratos_aprovacoes_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `contratos_auditoria` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`entidade` enum('cliente','contrato','aditivo','marco','boletim','aprovacao','risco','documento') NOT NULL,
+	`entidade_id` int NOT NULL,
+	`acao` enum('criacao','edicao','exclusao_logica','aprovacao','rejeicao','assinatura','sincronizacao','rollback','reconciliacao','envio_aprovacao') NOT NULL,
+	`usuario_id` int,
+	`payload_anterior` text,
+	`payload_novo` text,
+	`ip` varchar(45),
+	`user_agent` text,
+	`observacoes` text,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `contratos_auditoria_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `contratos_boletins` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`contrato_id` int NOT NULL,
+	`marco_id` int NOT NULL,
+	`numero` varchar(50) NOT NULL,
+	`titulo` varchar(255),
+	`descricao` text,
+	`valor_medicao` decimal(15,2) NOT NULL,
+	`percentual_medicao` decimal(5,2),
+	`periodo` varchar(50),
+	`status` enum('rascunho','enviado','em_aprovacao','aprovado','rejeitado','pago') NOT NULL DEFAULT 'rascunho',
+	`aprovador_nome` varchar(255),
+	`aprovador_email` varchar(255),
+	`aprovador_token` varchar(100),
+	`data_envio` timestamp,
+	`data_aprovacao` timestamp,
+	`observacoes_aprovador` text,
+	`pdf_url` text,
+	`pdf_key` text,
+	`created_by_user_id` int,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `contratos_boletins_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `contratos_clientes` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`cnpj` varchar(18) NOT NULL,
+	`razao_social` varchar(255) NOT NULL,
+	`nome_fantasia` varchar(255),
+	`email` varchar(255),
+	`telefone` varchar(30),
+	`endereco` text,
+	`cidade` varchar(100),
+	`estado` varchar(2),
+	`cep` varchar(9),
+	`contato_nome` varchar(255),
+	`contato_email` varchar(255),
+	`contato_telefone` varchar(30),
+	`status` enum('ativo','inativo','prospecto') NOT NULL DEFAULT 'ativo',
+	`observacoes` text,
+	`logo_url` text,
+	`empresa_id` int,
+	`created_by_user_id` int,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `contratos_clientes_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `contratos_documentos` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`contrato_id` int NOT NULL,
+	`aditivo_id` int,
+	`nome` varchar(255) NOT NULL,
+	`tipo` enum('contrato_principal','aditivo','boletim','nota_fiscal','comprovante_pagamento','proposta','ata','laudo','certificado','outro') NOT NULL DEFAULT 'outro',
+	`url` text NOT NULL,
+	`file_key` text NOT NULL,
+	`mime_type` varchar(100),
+	`tamanho_bytes` int,
+	`classificado_por_ia` boolean DEFAULT false,
+	`observacoes` text,
+	`created_by_user_id` int,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `contratos_documentos_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `contratos_marcos` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`contrato_id` int NOT NULL,
+	`aditivo_id` int,
+	`titulo` varchar(255) NOT NULL,
+	`descricao` text,
+	`valor_previsto` decimal(15,2) NOT NULL,
+	`valor_pago` decimal(15,2),
+	`data_prevista` date NOT NULL,
+	`data_pagamento` date,
+	`prazo_pagamento` int,
+	`status` enum('pendente','em_medicao','aprovado','pago','atrasado','cancelado') NOT NULL DEFAULT 'pendente',
+	`ordem` int DEFAULT 1,
+	`created_by_user_id` int,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `contratos_marcos_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `contratos_riscos` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`contrato_id` int NOT NULL,
+	`titulo` varchar(255) NOT NULL,
+	`descricao` text,
+	`categoria` enum('financeiro','juridico','operacional','prazo','escopo','reputacional','regulatorio','outro') NOT NULL DEFAULT 'outro',
+	`probabilidade` enum('baixa','media','alta') NOT NULL DEFAULT 'media',
+	`impacto` enum('baixo','medio','alto') NOT NULL DEFAULT 'medio',
+	`severidade` enum('baixa','media','alta','critica') NOT NULL DEFAULT 'media',
+	`status` enum('identificado','em_mitigacao','mitigado','materializado','aceito') NOT NULL DEFAULT 'identificado',
+	`plano_mitigacao` text,
+	`responsavel_user_id` int,
+	`data_identificacao` date,
+	`data_revisao` date,
+	`gerado_por_ia` boolean DEFAULT false,
+	`created_by_user_id` int,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `contratos_riscos_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `contratos_sincronizacao` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`entidade` enum('user','empresa','cliente') NOT NULL,
+	`entidade_id` int NOT NULL,
+	`status` enum('sincronizado','pendente','erro','conflito') NOT NULL DEFAULT 'pendente',
+	`ultima_sincronizacao` timestamp,
+	`hash_dados` varchar(64),
+	`erro_detalhes` text,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `contratos_sincronizacao_id` PRIMARY KEY(`id`)
+);

@@ -1075,3 +1075,50 @@
 
 ## Home - Reorganização Hierárquica
 - [x] Exibir empresas dentro de sua respectiva área de negócio na Home (não listadas separadamente)
+
+## Módulo Contratos (SGC) - Fase 1
+
+### Backend
+- [ ] Schema: tabelas contratos, clientes, marcos_financeiros, boletins_medicao, aprovacoes, riscos_contratuais, auditoria_contratos
+- [ ] Router tRPC: contratos (CRUD completo)
+- [ ] Router tRPC: clientes (CRUD completo)
+- [ ] Router tRPC: marcos_financeiros (CRUD + status automático)
+- [ ] Router tRPC: boletins_medicao (CRUD + fluxo de aprovação)
+- [ ] Router tRPC: aprovacoes (workflow de aprovação)
+- [ ] Router tRPC: riscos_contratuais (CRUD + análise IA)
+- [ ] Router tRPC: relatorios_contratos (dashboard + relatórios)
+- [ ] Auditoria: trilha de auditoria para todas operações críticas
+- [ ] Sincronização: vínculo contratos ↔ empresas do app principal
+
+### Frontend
+- [ ] Página /contratos (hub de contratos)
+- [ ] Página /contratos/dashboard
+- [ ] Página /contratos/clientes
+- [ ] Página /contratos/contratos
+- [ ] Página /contratos/marcos-financeiros
+- [ ] Página /contratos/boletins
+- [ ] Página /contratos/aprovacoes
+- [ ] Página /contratos/riscos
+- [ ] Página /contratos/relatorios
+- [ ] Página /contratos/configuracoes
+- [ ] Entrada de navegação no app principal (sem alterar estrutura existente)
+- [ ] Upload de PDF com extração IA de dados do contrato
+
+### Fase 2 - Preparação Arquitetural
+- [ ] Documento de plano de consolidação futura (mapa de entidades, checklist de migração)
+
+## Módulo Contratos (SGC) - Fase 1 Concluída
+- [x] Criar schema do banco: 10 tabelas do domínio Contratos (clientes, contratos, aditivos, marcos, boletins, riscos, documentos, avaliações, itens de avaliação, auditoria)
+- [x] Implementar routers tRPC: procedures CRUD + IA para contratos (30+ procedures)
+- [x] Criar contratos.db.ts com funções de banco incluindo auditoria automática
+- [x] Criar páginas: Contratos (lista + dashboard), ContratoDetalhe, ContratoForm, ContratosClientes
+- [x] Registrar rotas no App.tsx (/contratos, /contratos/novo, /contratos/clientes, /contratos/:id)
+- [x] Adicionar card de acesso ao módulo Contratos na Home
+- [x] Implementar auditoria e logs de contratos (registrarAuditoriaContrato em todas as operações)
+- [x] Gerar documentação da Fase 2 (docs/SGC_Fase2_Plano_Consolidacao.md)
+- [ ] Fase 2: Extração IA de PDF (contratos + aditivos) com revisão obrigatória
+- [ ] Fase 2: Cadastro de clientes via CNPJ + leitura de cartão CNPJ com IA
+- [ ] Fase 2: Workflow de Boletim de Medição com aprovação por e-mail
+- [ ] Fase 2: Metodologias de avaliação customizáveis (clouds + critérios + pesos)
+- [ ] Fase 2: Avaliação de desempenho contratual com trigger de Plano de Ação (score < 7)
+- [ ] Fase 2: Currículos de usuários internos com extração IA
