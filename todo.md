@@ -1072,3 +1072,6 @@
 - [x] Procedure importarOrcamentoIA no backend (extração de dados de PDF/XLSX/CSV via IA)
 - [x] Componente OrcamentoAnaliseIA com ScoreGauge, alertas, riscos, projeções e recomendações
 - [x] Componente OrcamentoImportacao reescrito com upload drag-and-drop e preview de lançamentos IA
+
+## Home - Reorganização Hierárquica
+- [x] Exibir empresas dentro de sua respectiva área de negócio na Home (não listadas separadamente)

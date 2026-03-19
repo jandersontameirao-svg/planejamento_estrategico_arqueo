@@ -89,6 +89,17 @@ export const appRouter = router({
       const { getAllAreasNegocio } = await import("./db");
       return await getAllAreasNegocio();
     }),
+    listWithEmpresas: protectedProcedure.query(async () => {
+      const { getAllAreasNegocio, getEmpresasVinculadasArea } = await import("./db");
+      const areas = await getAllAreasNegocio();
+      const areasComEmpresas = await Promise.all(
+        areas.map(async (area) => {
+          const empresas = await getEmpresasVinculadasArea(area.id);
+          return { ...area, empresas };
+        })
+      );
+      return areasComEmpresas;
+    }),
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {

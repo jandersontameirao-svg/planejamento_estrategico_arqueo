@@ -1,26 +1,88 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Building2, LayoutDashboard, LogOut, FileText, CheckCircle2, Users, Bell, BarChart3, Target } from "lucide-react";
+import {
+  Building2, LayoutDashboard, LogOut, CheckCircle2, Users, Bell,
+  BarChart3, Target, ChevronRight, Globe, MapPin
+} from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { NotificationButton } from "@/components/NotificationButton";
 
-// Componente para exibir cards das áreas de negócio
-function AreasNegocioCards() {
+// Componente que exibe cada empresa dentro de uma área
+function EmpresaCard({ empresa }: { empresa: any }) {
+  return (
+    <Card className="border border-primary/15 bg-gradient-to-br from-card to-primary/3 hover:shadow-md hover:border-primary/30 transition-all duration-200">
+      <CardContent className="pt-4 pb-4">
+        <div className="flex items-start gap-3">
+          <div className="p-2 bg-gradient-to-br from-primary/15 to-orange-500/10 rounded-lg shrink-0">
+            <Building2 className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h4 className="font-semibold text-sm text-foreground truncate">{empresa.nome}</h4>
+              <Badge
+                variant="outline"
+                className={`text-xs shrink-0 ${
+                  empresa.status === "ativa"
+                    ? "border-green-300 text-green-700 bg-green-50"
+                    : "border-gray-300 text-gray-600 bg-gray-50"
+                }`}
+              >
+                {empresa.status === "ativa" ? "Ativa" : "Inativa"}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">
+              {empresa.tipoAtuacao === "servicos"
+                ? "Serviços"
+                : empresa.tipoAtuacao === "produtos"
+                ? "Produtos"
+                : "Serviços + Produtos"}
+            </p>
+            <div className="flex gap-2">
+              <Link href={`/empresa/${empresa.id}/planejamento`} className="flex-1">
+                <Button
+                  size="sm"
+                  className="w-full h-7 text-xs bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-700 text-white"
+                >
+                  <Target className="h-3 w-3 mr-1" />
+                  Planejamento
+                </Button>
+              </Link>
+              <Link href={`/empresa/${empresa.id}/dashboard-analises`} className="flex-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-7 text-xs border-primary/30 text-primary hover:bg-primary/5"
+                >
+                  <BarChart3 className="h-3 w-3 mr-1" />
+                  Dashboard
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Seção de áreas com empresas agrupadas
+function AreasComEmpresas() {
   const [, setLocation] = useLocation();
-  const { data: areas, isLoading } = trpc.areasNegocio.list.useQuery();
-  
+  const { data: areas, isLoading } = trpc.areasNegocio.listWithEmpresas.useQuery();
+
   if (isLoading) {
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
-        <p className="text-sm text-muted-foreground">Carregando áreas...</p>
+        <p className="text-sm text-muted-foreground">Carregando áreas e empresas...</p>
       </div>
     );
   }
-  
+
   if (!areas || areas.length === 0) {
     return (
       <Card className="border-dashed border-2 border-purple-200">
@@ -35,49 +97,80 @@ function AreasNegocioCards() {
       </Card>
     );
   }
-  
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="space-y-6">
       {areas.map((area) => (
-        <Card 
-          key={area.id} 
-          className="border-2 border-purple-200/50 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer"
-          onClick={() => setLocation(`/area/${area.id}/planejamento`)}
+        <Card
+          key={area.id}
+          className="border-2 border-purple-200/60 hover:border-purple-300 transition-all duration-300"
         >
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-500/10 rounded-lg">
-                <Building2 className="h-6 w-6 text-purple-600" />
+          {/* Cabeçalho da Área */}
+          <CardHeader className="pb-3 bg-gradient-to-r from-purple-50/50 to-transparent rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-500/10 rounded-lg">
+                  <Building2 className="h-6 w-6 text-purple-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg text-purple-800">{area.nome}</CardTitle>
+                  <CardDescription className="flex items-center gap-1 text-xs">
+                    {area.pais && (
+                      <>
+                        <MapPin className="h-3 w-3" />
+                        {area.pais}
+                        <span className="mx-1">·</span>
+                      </>
+                    )}
+                    <span>{(area.empresas as any[]).length} empresa{(area.empresas as any[]).length !== 1 ? "s" : ""} vinculada{(area.empresas as any[]).length !== 1 ? "s" : ""}</span>
+                  </CardDescription>
+                </div>
               </div>
-              <div>
-                <CardTitle className="text-lg">{area.nome}</CardTitle>
-                {area.pais && (
-                  <CardDescription className="text-xs">{area.pais}</CardDescription>
-                )}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-purple-200 text-purple-700 hover:bg-purple-50 text-xs"
+                  onClick={() => setLocation(`/area/${area.id}/planejamento`)}
+                >
+                  <Target className="h-3 w-3 mr-1" />
+                  Planejamento
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-purple-200 text-purple-700 hover:bg-purple-50 text-xs"
+                  onClick={() => setLocation(`/area/${area.id}/dashboard`)}
+                >
+                  <BarChart3 className="h-3 w-3 mr-1" />
+                  Dashboard
+                </Button>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1 border-purple-200 text-purple-700 hover:bg-purple-50"
-                onClick={(e) => { e.stopPropagation(); setLocation(`/area/${area.id}/planejamento`); }}
-              >
-                <Target className="mr-1 h-3 w-3" />
-                Planejamento
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1 border-purple-200 text-purple-700 hover:bg-purple-50"
-                onClick={(e) => { e.stopPropagation(); setLocation(`/area/${area.id}/dashboard`); }}
-              >
-                <BarChart3 className="mr-1 h-3 w-3" />
-                Dashboard
-              </Button>
-            </div>
+
+          {/* Empresas da Área */}
+          <CardContent className="pt-3">
+            {(area.empresas as any[]).length === 0 ? (
+              <div className="text-center py-6 border-2 border-dashed border-purple-100 rounded-lg">
+                <Building2 className="h-8 w-8 mx-auto text-purple-200 mb-2" />
+                <p className="text-sm text-muted-foreground">Nenhuma empresa vinculada a esta área</p>
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="text-purple-600 text-xs mt-1"
+                  onClick={() => setLocation(`/area/${area.id}/planejamento`)}
+                >
+                  Vincular empresas <ChevronRight className="h-3 w-3 ml-1" />
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                {(area.empresas as any[]).map((empresa: any) => (
+                  <EmpresaCard key={empresa.id} empresa={empresa} />
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       ))}
@@ -88,10 +181,6 @@ function AreasNegocioCards() {
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const [, setLocation] = useLocation();
-  const { data: empresas, isLoading: loadingEmpresas } = trpc.empresas.list.useQuery(
-    undefined,
-    { enabled: isAuthenticated }
-  );
 
   if (loading) {
     return (
@@ -120,10 +209,9 @@ export default function Home() {
         </header>
 
         <main className="flex-1 flex items-center justify-center relative overflow-hidden">
-          {/* Background com gradiente animado */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/10"></div>
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent"></div>
-          
+
           <div className="container max-w-5xl text-center py-20 relative z-10">
             <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
               <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/30 via-orange-500/20 to-blue-500/10 backdrop-blur-sm border border-primary/30 mb-8 shadow-2xl hover:shadow-3xl transition-all duration-300">
@@ -238,7 +326,12 @@ export default function Home() {
                 </Button>
               </>
             )}
-            <Button variant="ghost" size="sm" onClick={() => logout()}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => logout()}
+              className="text-muted-foreground hover:text-foreground"
+            >
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
@@ -248,145 +341,68 @@ export default function Home() {
       <main className="flex-1 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5"></div>
         <div className="container py-12 relative z-10">
-        <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Bem-vindo ao Sistema de Gestão Estratégica
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Selecione uma empresa para visualizar o planejamento estratégico
-          </p>
-        </div>
 
-        {/* Card do Planejamento Estratégico do Grupo Arqueo Participações */}
-        <Card className="mb-6 border-2 border-primary/40 bg-gradient-to-br from-primary/5 via-card to-blue-500/5 hover:shadow-2xl hover:scale-[1.02] hover:border-primary/60 transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100" onClick={() => setLocation("/planejamento-participacoes")}>
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-primary/20 to-orange-500/10 rounded-lg">
-                <Target className="h-8 w-8 text-primary" />
-              </div>
-              <div>
-                <CardTitle className="text-xl bg-gradient-to-r from-primary to-orange-600 bg-clip-text text-transparent">Planejamento Estratégico – Grupo Arqueo Participações</CardTitle>
-                <CardDescription>Análises estratégicas completas do Grupo Arqueo Participações (PESTEL, SWOT, OKR, BSC e mais)</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span className="text-sm text-muted-foreground">Status: Operacional</span>
-            </div>
-            <Button className="w-full bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-700 text-white" onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-participacoes"); }}>
-              Acessar Planejamento Estratégico
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Seção de Áreas de Negócio */}
-        <div className="mb-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Building2 className="h-6 w-6 text-primary" />
-              Áreas de Negócio
-            </h2>
-            <Button variant="outline" onClick={() => setLocation("/areas-negocio")} className="border-primary/30 text-primary hover:bg-primary/5">
-              Gerenciar Áreas
-            </Button>
+          <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              Bem-vindo ao Sistema de Gestão Estratégica
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Visualize e gerencie o planejamento estratégico do Grupo Arqueo
+            </p>
           </div>
-          <AreasNegocioCards />
-        </div>
 
-        {/* Cards de Empresas */}
-        <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-          <h2 className="text-3xl font-bold mb-6">Empresas do Grupo</h2>
-          {loadingEmpresas ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Carregando empresas...</p>
+          {/* Card do Planejamento Estratégico do Grupo Arqueo Participações */}
+          <Card
+            className="mb-8 border-2 border-primary/40 bg-gradient-to-br from-primary/5 via-card to-blue-500/5 hover:shadow-2xl hover:scale-[1.01] hover:border-primary/60 transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100"
+            onClick={() => setLocation("/planejamento-participacoes")}
+          >
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-gradient-to-br from-primary/20 to-orange-500/10 rounded-lg">
+                  <Target className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl bg-gradient-to-r from-primary to-orange-600 bg-clip-text text-transparent">
+                    Planejamento Estratégico – Grupo Arqueo Participações
+                  </CardTitle>
+                  <CardDescription>
+                    Análises estratégicas completas do Grupo Arqueo Participações (PESTEL, SWOT, OKR, BSC e mais)
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                <span className="text-sm text-muted-foreground">Status: Operacional</span>
+              </div>
+              <Button
+                className="w-full bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-700 text-white"
+                onClick={(e) => { e.stopPropagation(); setLocation("/planejamento-participacoes"); }}
+              >
+                Acessar Planejamento Estratégico
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Seção de Áreas de Negócio com Empresas agrupadas */}
+          <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <Building2 className="h-6 w-6 text-primary" />
+                Áreas de Negócio
+              </h2>
+              <Button
+                variant="outline"
+                onClick={() => setLocation("/areas-negocio")}
+                className="border-primary/30 text-primary hover:bg-primary/5"
+              >
+                Gerenciar Áreas
+              </Button>
             </div>
-          ) : empresas && empresas.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {empresas.map((empresa) => (
-                <Card key={empresa.id} className="border-primary/20 bg-gradient-to-br from-card to-primary/5 hover:shadow-xl hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 h-full">
-                    <CardHeader>
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-br from-primary/20 to-orange-500/10 rounded-lg">
-                          <Building2 className="h-6 w-6 text-primary" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg text-primary">{empresa.nome}</CardTitle>
-                          <CardDescription>
-                            {empresa.tipoAtuacao === "servicos"
-                              ? "Serviços"
-                              : empresa.tipoAtuacao === "produtos"
-                              ? "Produtos"
-                              : "Serviços + Produtos"}
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Status:</span>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              empresa.status === "ativa"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {empresa.status === "ativa" ? "Ativa" : "Inativa"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                          <span className="text-xs text-muted-foreground">
-                            Status RAG: Verde
-                          </span>
-                        </div>
-                        
-                        {/* Botões de ação */}
-                        <div className="flex gap-2 mt-4">
-                          <Link href={`/empresa/${empresa.id}/planejamento`} className="flex-1">
-                            <Button size="sm" className="w-full bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-700 text-white">
-                              <Target className="h-4 w-4 mr-2" />
-                              Planejamento
-                            </Button>
-                          </Link>
-                          <Link href={`/empresa/${empresa.id}/dashboard-analises`} className="flex-1">
-                            <Button variant="outline" size="sm" className="w-full border-primary/30 text-primary hover:bg-primary/5">
-                              <BarChart3 className="h-4 w-4 mr-2" />
-                              Dashboard
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-                    </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Nenhuma empresa cadastrada</h3>
-                <p className="text-muted-foreground mb-4">
-                  {user?.role === "admin"
-                    ? "Comece criando sua primeira empresa"
-                    : "Entre em contato com o administrador para vincular empresas"}
-                </p>
-                {user?.role === "admin" && (
-                  <Button asChild>
-                    <Link href="/empresas">
-                      <Building2 className="mr-2 h-4 w-4" />
-                      Criar Primeira Empresa
-                    </Link>
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
+            <AreasComEmpresas />
+          </div>
+
         </div>
       </main>
     </div>
