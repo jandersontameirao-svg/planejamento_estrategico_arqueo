@@ -1221,3 +1221,45 @@
 - [ ] Atualizar Home.tsx: remover card Contratos ZIP concorrente
 - [ ] Verificar TypeScript 0 erros após consolidação
 - [ ] Rodar testes após consolidação
+
+## Homologação — Correções Necessárias (Checklist pasted_content_2.txt)
+
+### Seção 2 — Arquitetura e Navegação
+- [ ] Corrigir link /gestao-contratos na Home — rota não existe, deve redirecionar para /empresa/:id/contratos ou criar visão global read-only
+- [ ] Adicionar entrada de Contratos no hub da empresa (Empresas.tsx)
+- [ ] Verificar que a visão global não concorre com a operação por empresa
+
+### Seção 3 — CRUD de Clientes
+- [ ] Verificar busca por CNPJ na GestaoClientes (buscarCNPJ mutation)
+- [ ] Verificar upload de cartão CNPJ e extração IA (CNPJCardUpload)
+- [ ] Verificar que nenhum dado é salvo sem confirmação do usuário
+
+### Seção 4-5 — Contratos
+- [ ] Verificar que contrato exige vínculo com cliente (ContratoForm — clienteId obrigatório)
+- [ ] Verificar filtro por empresa e status na listagem
+- [ ] Verificar KPIs e valores totais na listagem
+
+### Seção 7 — Marcos Financeiros
+- [ ] Verificar status automático de marco vencido
+- [ ] Verificar edição de marco sem quebrar boletins vinculados
+
+### Seção 8 — Boletins
+- [ ] Verificar geração automática de boletim ao criar marco
+- [ ] Verificar que PDF do boletim é gerado após aprovação/rejeição
+
+### Seção 9 — Riscos
+- [ ] Verificar aba de riscos com filtros e badges
+
+### Seção 10 — Documentos
+- [ ] Adicionar botão de upload de documento na aba Documentos do ContratoDetalhe
+- [ ] Adicionar classificação IA ao fazer upload de documento
+
+### Seção 11 — Auditoria
+- [ ] Adicionar filtros por ação, período e entidade na aba Auditoria
+
+### Seção 12 — Avaliações
+- [ ] Verificar que AvaliacaoContratos tem CRUD completo, critérios, score e plano de ação
+
+### Seção 16 — UX
+- [ ] Verificar empty states em todas as abas
+- [ ] Verificar feedback visual em formulários

@@ -1,0 +1,40 @@
+{
+  "query": "SHOW TABLES LIKE '%contratos%'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SHOW TABLES LIKE '%contratos%'",
+  "rows": [
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)": "avaliacao_contratos"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)": "contratos"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)": "contratos_aditivos"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)": "contratos_auditoria"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)": "contratos_avaliacoes"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)": "contratos_boletins"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)": "contratos_clientes"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)": "contratos_documentos"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)": "contratos_marcos"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)": "contratos_riscos"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_GdPAuRogRcNPzV7ENB2n8s (%contratos%)\navaliacao_contratos\ncontratos\ncontratos_aditivos\ncontratos_auditoria\ncontratos_avaliacoes\ncontratos_boletins\ncontratos_clientes\ncontratos_documentos\ncontratos_marcos\ncontratos_riscos\n",
+  "stderr": "",
+  "execution_time_ms": 371
+}

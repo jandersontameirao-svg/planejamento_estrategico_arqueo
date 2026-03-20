@@ -38,6 +38,7 @@ import AreasNegocio from "./pages/AreasNegocio";
 import Contratos from "./pages/Contratos";
 import ContratoDetalhe from "./pages/ContratoDetalhe";
 import ContratoForm from "./pages/ContratoForm";
+import AditivoForm from "./pages/AditivoForm";
 import ContratosClientes from "./pages/ContratosClientes";
 import GestaoClientes from "./pages/GestaoClientes";
 import GestaoClienteDetalhe from "./pages/GestaoClienteDetalhe";
@@ -112,15 +113,18 @@ function Router() {
       <Route path="/empresa/:id/contratos/clientes">
         {(params) => <ContratosClientes empresaId={Number(params.id)} />}
       </Route>
+      <Route path="/empresa/:id/contratos/:contratoId/aditivo/novo">
+        {(params) => <AditivoForm empresaId={Number(params.id)} contratoId={Number(params.contratoId)} />}
+      </Route>
       <Route path="/empresa/:id/contratos/:contratoId">
         {(params) => <ContratoDetalhe empresaId={Number(params.id)} contratoId={Number(params.contratoId)} />}
       </Route>
       <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path="/aprovacao/:token" component={AprovacaoBoletim} />
-      <Route path="/gestao-clientes" component={GestaoClientes} />
+       <Route path="/gestao-clientes" component={GestaoClientes} />
       <Route path="/gestao-clientes/:id" component={GestaoClienteDetalhe} />
-
+      <Route path="/gestao-contratos">{() => { window.location.replace("/empresas"); return null; }}</Route>
       <Route path={"/ 404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

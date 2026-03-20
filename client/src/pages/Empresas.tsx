@@ -7,9 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Building2, Edit, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Building2, Edit, FileText, Plus, Trash2, Users } from "lucide-react";
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 
 export default function Empresas() {
@@ -285,6 +285,20 @@ export default function Empresas() {
                     <p className="line-clamp-2">{empresa.observacoes}</p>
                   </div>
                 )}
+                <div className="flex gap-2 mt-3 pt-3 border-t">
+                  <Button variant="outline" size="sm" className="flex-1" asChild>
+                    <Link href={`/empresa/${empresa.id}/contratos`}>
+                      <FileText className="w-3.5 h-3.5 mr-1" />
+                      Contratos
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1" asChild>
+                    <Link href={`/empresa/${empresa.id}/contratos/clientes`}>
+                      <Users className="w-3.5 h-3.5 mr-1" />
+                      Clientes
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

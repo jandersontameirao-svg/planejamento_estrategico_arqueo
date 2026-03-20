@@ -1,14 +1,14 @@
 /**
  * Serviço de Geração de PDF para Boletins de Medição
- * Adaptado do SGC para o app principal do Grupo Arqueo
+ * Usa a tabela contratos_boletins (SGC consolidado)
  */
 import PDFDocument from "pdfkit";
 import { getDb } from "../db";
 import {
-  boletinsMedicao,
-  boletinsMedicaoItens,
+  contratosBoletins,
   contratos,
   contratosClientes,
+  contratosMarcos,
   empresas,
 } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -16,135 +16,84 @@ import { storagePut } from "../storage";
 
 interface BoletimPDFData {
   boletim: {
-    code: string;
-    periodStart: Date;
-    periodEnd: Date;
-    status: string;
-    total: number;
-    observations?: string | null;
-  };
-  contrato: {
     numero: string;
-    objeto: string;
-    valorTotal: number;
+    titulo: string | null;
+    descricao: string | null;
+    valorMedicao: number;
+    periodo: string | null;
+    status: string;
+    observacoesAprovador: string | null;
+    aprovadorNome: string | null;
+    dataAprovacao: Date | null;
   };
-  cliente: {
-    razaoSocial: string;
-    cnpj: string;
-    email?: string | null;
-  };
-  empresa: {
-    nomeFantasia: string;
-    cnpj: string;
-  };
-  itens: Array<{
-    descricao: string;
-    quantidade: number;
-    unidade: string;
-    precoUnitario: number;
-    total: number;
-  }>;
+  contrato: { numero: string; objeto: string; valorTotal: number };
+  cliente: { razaoSocial: string; cnpj: string; email?: string | null };
+  empresa: { nomeFantasia: string; cnpj: string };
+  marco: { descricao: string; valor: number; dataVencimento: Date | null };
 }
 
-/**
- * Busca dados do boletim para geração de PDF
- */
-export async function fetchBoletimData(boletimId: number): Promise<BoletimPDFData | null> {
+async function fetchBoletimData(boletimId: number): Promise<BoletimPDFData | null> {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) return null;
 
-  const boletimResult = await db
-    .select()
-    .from(boletinsMedicao)
-    .where(eq(boletinsMedicao.id, boletimId))
-    .limit(1);
+  const [boletim] = await db.select().from(contratosBoletins).where(eq(contratosBoletins.id, boletimId));
+  if (!boletim) return null;
 
-  if (!boletimResult.length) return null;
-  const boletim = boletimResult[0];
+  const [contrato] = await db.select().from(contratos).where(eq(contratos.id, boletim.contratoId));
+  if (!contrato) return null;
 
-  const contratoResult = await db
-    .select()
-    .from(contratos)
-    .where(eq(contratos.id, boletim.contratoId))
-    .limit(1);
+  const [marco] = await db.select().from(contratosMarcos).where(eq(contratosMarcos.id, boletim.marcoId));
 
-  if (!contratoResult.length) return null;
-  const contrato = contratoResult[0];
+  const clienteRows = contrato.clienteId
+    ? await db.select().from(contratosClientes).where(eq(contratosClientes.id, contrato.clienteId))
+    : [];
+  const cliente = clienteRows[0] ?? null;
 
-  const clienteResult = await db
-    .select()
-    .from(contratosClientes)
-    .where(eq(contratosClientes.id, contrato.clienteId!))
-    .limit(1);
-
-  const cliente = clienteResult[0] || { razaoSocial: "N/A", cnpj: "N/A", email: null };
-
-  const empresaResult = await db
-    .select()
-    .from(empresas)
-    .where(eq(empresas.id, contrato.empresaId!))
-    .limit(1);
-
-  const empresa = empresaResult[0] || { nomeFantasia: "N/A", cnpj: "N/A" };
-
-  const itensResult = await db
-    .select()
-    .from(boletinsMedicaoItens)
-    .where(eq(boletinsMedicaoItens.boletimId, boletimId));
+  const [empresa] = await db.select().from(empresas).where(eq(empresas.id, contrato.empresaId));
 
   return {
     boletim: {
-      code: boletim.code,
-      periodStart: boletim.periodStart,
-      periodEnd: boletim.periodEnd,
+      numero: boletim.numero,
+      titulo: boletim.titulo,
+      descricao: boletim.descricao,
+      valorMedicao: Number(boletim.valorMedicao),
+      periodo: boletim.periodo,
       status: boletim.status,
-      total: parseFloat(boletim.total),
-      observations: boletim.observations,
+      observacoesAprovador: boletim.observacoesAprovador,
+      aprovadorNome: boletim.aprovadorNome,
+      dataAprovacao: boletim.dataAprovacao,
     },
     contrato: {
-      numero: contrato.numero || contrato.id.toString(),
-      objeto: contrato.descricao || contrato.titulo || "Não especificado",
-      valorTotal: parseFloat(contrato.valorTotal || "0"),
+      numero: contrato.numero ?? "",
+      objeto: contrato.descricao ?? contrato.titulo ?? "",
+      valorTotal: Number(contrato.valorTotal ?? 0),
     },
     cliente: {
-      razaoSocial: cliente.razaoSocial,
-      cnpj: cliente.cnpj,
-      email: cliente.email,
+      razaoSocial: cliente?.razaoSocial ?? "Não informado",
+      cnpj: cliente?.cnpj ?? "",
+      email: cliente?.email,
     },
     empresa: {
-      nomeFantasia: empresa.nome || "N/A",
-      cnpj: "N/A",
+      nomeFantasia: empresa?.nome ?? "Não informado",
+      cnpj: "",
     },
-    itens: itensResult.map((item) => ({
-      descricao: item.descricao,
-      quantidade: parseFloat(item.quantidade),
-      unidade: item.unidade,
-      precoUnitario: parseFloat(item.precoUnitario),
-      total: parseFloat(item.total),
-    })),
+    marco: {
+      descricao: marco?.titulo ?? marco?.descricao ?? "",
+      valor: Number(marco?.valorPrevisto ?? 0),
+      dataVencimento: marco?.dataPrevista ?? null,
+    },
   };
 }
 
-/**
- * Formata valor em reais
- */
 function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 }
 
-/**
- * Formata data em português
- */
-function formatDate(date: Date): string {
+function formatDate(date: Date | null | undefined): string {
+  if (!date) return "—";
   return new Intl.DateTimeFormat("pt-BR").format(date);
 }
 
-/**
- * Gera PDF do boletim de medição e salva no S3
- */
 export async function generateBoletimPDF(boletimId: number): Promise<{ url: string; key: string }> {
   const data = await fetchBoletimData(boletimId);
   if (!data) throw new Error(`Boletim ${boletimId} não encontrado`);
@@ -152,39 +101,24 @@ export async function generateBoletimPDF(boletimId: number): Promise<{ url: stri
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 50, size: "A4" });
     const chunks: Buffer[] = [];
-
     doc.on("data", (chunk) => chunks.push(chunk));
     doc.on("end", async () => {
       try {
         const pdfBuffer = Buffer.concat(chunks);
-        const fileKey = `contratos/boletins/${data.boletim.code}-${Date.now()}.pdf`;
+        const fileKey = `contratos/boletins/${data.boletim.numero}-${Date.now()}.pdf`;
         const { url } = await storagePut(fileKey, pdfBuffer, "application/pdf");
         resolve({ url, key: fileKey });
-      } catch (err) {
-        reject(err);
-      }
+      } catch (err) { reject(err); }
     });
     doc.on("error", reject);
 
-    // ── Cabeçalho ──────────────────────────────────────────────────────────
-    doc
-      .fontSize(18)
-      .font("Helvetica-Bold")
-      .text("BOLETIM DE MEDIÇÃO", { align: "center" });
-
-    doc
-      .fontSize(12)
-      .font("Helvetica")
-      .text(`Código: ${data.boletim.code}`, { align: "center" });
-
+    doc.fontSize(18).font("Helvetica-Bold").text("BOLETIM DE MEDIÇÃO", { align: "center" });
+    doc.fontSize(12).font("Helvetica").text(`Nº: ${data.boletim.numero}`, { align: "center" });
+    if (data.boletim.titulo) doc.fontSize(11).font("Helvetica").text(data.boletim.titulo, { align: "center" });
     doc.moveDown(0.5);
-    doc
-      .moveTo(50, doc.y)
-      .lineTo(545, doc.y)
-      .stroke();
+    doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
     doc.moveDown(0.5);
 
-    // ── Dados do Contrato ──────────────────────────────────────────────────
     doc.fontSize(11).font("Helvetica-Bold").text("DADOS DO CONTRATO");
     doc.moveDown(0.3);
     doc.fontSize(10).font("Helvetica");
@@ -193,72 +127,47 @@ export async function generateBoletimPDF(boletimId: number): Promise<{ url: stri
     doc.text(`Contrato Nº: ${data.contrato.numero}`);
     doc.text(`Objeto: ${data.contrato.objeto}`);
     doc.text(`Valor Total do Contrato: ${formatCurrency(data.contrato.valorTotal)}`);
-
     doc.moveDown(0.5);
     doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
     doc.moveDown(0.5);
 
-    // ── Período de Medição ─────────────────────────────────────────────────
-    doc.fontSize(11).font("Helvetica-Bold").text("PERÍODO DE MEDIÇÃO");
+    doc.fontSize(11).font("Helvetica-Bold").text("MARCO FINANCEIRO");
     doc.moveDown(0.3);
     doc.fontSize(10).font("Helvetica");
-    doc.text(
-      `De ${formatDate(data.boletim.periodStart)} a ${formatDate(data.boletim.periodEnd)}`
-    );
-
+    doc.text(`Descrição: ${data.marco.descricao}`);
+    doc.text(`Valor do Marco: ${formatCurrency(data.marco.valor)}`);
+    if (data.marco.dataVencimento) doc.text(`Vencimento: ${formatDate(data.marco.dataVencimento)}`);
+    if (data.boletim.periodo) doc.text(`Período: ${data.boletim.periodo}`);
     doc.moveDown(0.5);
     doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
     doc.moveDown(0.5);
 
-    // ── Itens de Medição ───────────────────────────────────────────────────
-    if (data.itens.length > 0) {
-      doc.fontSize(11).font("Helvetica-Bold").text("ITENS DE MEDIÇÃO");
-      doc.moveDown(0.3);
-
-      // Cabeçalho da tabela
-      const colX = [50, 220, 280, 330, 400, 470];
-      doc.fontSize(9).font("Helvetica-Bold");
-      doc.text("Descrição", colX[0], doc.y, { width: 165, continued: false });
-      const headerY = doc.y - 12;
-      doc.text("Qtd", colX[1], headerY, { width: 55 });
-      doc.text("Un", colX[2], headerY, { width: 45 });
-      doc.text("P. Unit.", colX[3], headerY, { width: 65 });
-      doc.text("Total", colX[4], headerY, { width: 70 });
-      doc.moveDown(0.3);
-      doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
-      doc.moveDown(0.2);
-
-      // Linhas da tabela
-      doc.fontSize(9).font("Helvetica");
-      for (const item of data.itens) {
-        const rowY = doc.y;
-        doc.text(item.descricao, colX[0], rowY, { width: 165 });
-        doc.text(item.quantidade.toString(), colX[1], rowY, { width: 55 });
-        doc.text(item.unidade, colX[2], rowY, { width: 45 });
-        doc.text(formatCurrency(item.precoUnitario), colX[3], rowY, { width: 65 });
-        doc.text(formatCurrency(item.total), colX[4], rowY, { width: 70 });
-        doc.moveDown(0.5);
-      }
-
-      doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
-      doc.moveDown(0.3);
-    }
-
-    // ── Total ──────────────────────────────────────────────────────────────
     doc.fontSize(12).font("Helvetica-Bold");
-    doc.text(`TOTAL DO BOLETIM: ${formatCurrency(data.boletim.total)}`, { align: "right" });
+    doc.text(`VALOR DA MEDIÇÃO: ${formatCurrency(data.boletim.valorMedicao)}`, { align: "right" });
+    doc.moveDown(0.5);
 
-    // ── Observações ────────────────────────────────────────────────────────
-    if (data.boletim.observations) {
-      doc.moveDown(0.5);
+    if (data.boletim.descricao) {
       doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
       doc.moveDown(0.3);
-      doc.fontSize(11).font("Helvetica-Bold").text("OBSERVAÇÕES");
+      doc.fontSize(11).font("Helvetica-Bold").text("DESCRIÇÃO");
       doc.moveDown(0.3);
-      doc.fontSize(10).font("Helvetica").text(data.boletim.observations);
+      doc.fontSize(10).font("Helvetica").text(data.boletim.descricao);
+      doc.moveDown(0.5);
     }
 
-    // ── Assinaturas ────────────────────────────────────────────────────────
+    if (data.boletim.status === "aprovado" || data.boletim.status === "rejeitado") {
+      doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
+      doc.moveDown(0.3);
+      doc.fontSize(11).font("Helvetica-Bold").text("RESULTADO DA APROVAÇÃO");
+      doc.moveDown(0.3);
+      doc.fontSize(10).font("Helvetica");
+      doc.text(`Decisão: ${data.boletim.status === "aprovado" ? "✓ APROVADO" : "✗ REJEITADO"}`);
+      if (data.boletim.aprovadorNome) doc.text(`Aprovador: ${data.boletim.aprovadorNome}`);
+      if (data.boletim.dataAprovacao) doc.text(`Data: ${formatDate(data.boletim.dataAprovacao)}`);
+      if (data.boletim.observacoesAprovador) doc.text(`Obs: ${data.boletim.observacoesAprovador}`);
+      doc.moveDown(0.5);
+    }
+
     doc.moveDown(2);
     doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
     doc.moveDown(0.5);
@@ -268,7 +177,9 @@ export async function generateBoletimPDF(boletimId: number): Promise<{ url: stri
     doc.moveDown(0.3);
     doc.text("Responsável pela Medição", 50);
     doc.text("Aprovador", 320, doc.y - 12);
-
+    doc.moveDown(2);
+    doc.fontSize(8).font("Helvetica").fillColor("gray")
+      .text(`Gerado em ${new Date().toLocaleString("pt-BR")} — Grupo Arqueo`, { align: "center" });
     doc.end();
   });
 }

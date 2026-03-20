@@ -73,6 +73,10 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
   const [uploadingPDF, setUploadingPDF] = useState(false);
   const [aprovForm, setAprovForm] = useState({ aprovadorNome: "", aprovadorEmail: "" });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const docFileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [filtroAuditoria, setFiltroAuditoria] = useState("");
+  const [filtroAuditoriaAcao, setFiltroAuditoriaAcao] = useState("todos");
 
   const { data: contrato, refetch } = trpc.contratos.contratos.get.useQuery({ id: contratoId });
   const { data: marcos = [], refetch: refetchMarcos } = trpc.contratos.marcos.list.useQuery({ contratoId });
@@ -106,6 +110,47 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
   const updateRisco = trpc.contratos.riscos.update.useMutation({
     onSuccess: () => { refetchRiscos(); },
   });
+  const createDocumento = trpc.contratos.documentos.create.useMutation({
+    onSuccess: () => { refetchDocs(); toast.success("Documento adicionado!"); },
+    onError: (e) => toast.error("Erro ao salvar documento: " + e.message),
+  });
+  const classificarDocIA = trpc.contratos.documentos.classificarIA.useMutation();
+
+  async function handleDocUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 16 * 1024 * 1024) { toast.error("Arquivo muito grande (máx 16MB)"); return; }
+    setUploadingDoc(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!res.ok) throw new Error("Falha no upload");
+      const { url, key } = await res.json();
+      // Classificar com IA
+      let tipo: string = "outro";
+      let nomeFormatado = file.name;
+      try {
+        const classif = await classificarDocIA.mutateAsync({ contratoId, documentoUrl: url, nomeArquivo: file.name }) as any;
+        if (classif?.tipo) tipo = classif.tipo;
+        if (classif?.nomeFormatado) nomeFormatado = classif.nomeFormatado;
+      } catch {}
+      await createDocumento.mutateAsync({
+        contratoId,
+        nome: nomeFormatado,
+        tipo: tipo as any,
+        url,
+        fileKey: key,
+        mimeType: file.type,
+        tamanhoBytes: file.size,
+      });
+    } catch (err: any) {
+      toast.error("Erro ao enviar documento: " + (err.message ?? "Tente novamente"));
+    } finally {
+      setUploadingDoc(false);
+      if (docFileInputRef.current) docFileInputRef.current.value = "";
+    }
+  }
 
   // Marco form state
   const [marcoForm, setMarcoForm] = useState({
@@ -576,13 +621,21 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
           {/* DOCUMENTOS */}
           <TabsContent value="documentos" className="mt-4">
             <div className="flex justify-between items-center mb-3">
-              <h3 className="font-semibold text-gray-900">Documentos</h3>
+              <h3 className="font-semibold text-gray-900">Documentos ({documentos.length})</h3>
+              <div className="flex items-center gap-2">
+                <input ref={docFileInputRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" className="hidden" onChange={handleDocUpload} />
+                <Button size="sm" onClick={() => docFileInputRef.current?.click()} disabled={uploadingDoc}>
+                  {uploadingDoc ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Upload className="w-4 h-4 mr-1" />}
+                  {uploadingDoc ? "Classificando com IA..." : "Adicionar Documento"}
+                </Button>
+              </div>
             </div>
             {documentos.length === 0 ? (
               <Card>
                 <CardContent className="py-10 text-center text-gray-400">
                   <FileText className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                  <p>Nenhum documento anexado</p>
+                  <p className="font-medium">Nenhum documento anexado</p>
+                  <p className="text-xs mt-1">Clique em "Adicionar Documento" para fazer upload — a IA classifica automaticamente</p>
                 </CardContent>
               </Card>
             ) : (
@@ -595,7 +648,10 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
                           <FileText className="w-5 h-5 text-blue-500" />
                           <div>
                             <p className="font-medium text-sm">{doc.nome}</p>
-                            <p className="text-xs text-gray-500">{doc.tipo}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">{doc.tipo?.replace(/_/g, " ")}</span>
+                              {doc.tamanhoBytes && <span className="text-xs text-gray-400">{(doc.tamanhoBytes / 1024).toFixed(0)} KB</span>}
+                            </div>
                           </div>
                         </div>
                         <Button size="sm" variant="outline" onClick={() => window.open(doc.url, "_blank")}>
@@ -611,51 +667,79 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
 
           {/* AUDITORIA */}
           <TabsContent value="auditoria" className="mt-4">
-            <div className="mb-3">
+            <div className="mb-4">
               <h3 className="font-semibold text-gray-900">Histórico de Auditoria</h3>
-              <p className="text-sm text-gray-500">Todas as alterações registradas automaticamente pelo sistema</p>
-            </div>
-            {auditoria.length === 0 ? (
-              <Card>
-                <CardContent className="py-10 text-center text-gray-400">
-                  <History className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                  <p>Nenhum registro de auditoria encontrado</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-2">
-                {auditoria.map((entry: any) => (
-                  <Card key={entry.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                          <History className="w-4 h-4 text-gray-500" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <p className="font-medium text-sm text-gray-900">{entry.acao}</p>
-                            <span className="text-xs text-gray-400">
-                              {new Date(entry.createdAt).toLocaleString("pt-BR")}
-                            </span>
-                          </div>
-                          {entry.descricao && (
-                            <p className="text-sm text-gray-600 mt-1">{entry.descricao}</p>
-                          )}
-                          {entry.dadosAnteriores && (
-                            <details className="mt-2">
-                              <summary className="text-xs text-gray-400 cursor-pointer">Ver dados alterados</summary>
-                              <pre className="text-xs bg-gray-50 p-2 rounded mt-1 overflow-auto max-h-32">
-                                {JSON.stringify(entry.dadosAnteriores, null, 2)}
-                              </pre>
-                            </details>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+              <p className="text-sm text-gray-500 mb-3">Todas as alterações registradas automaticamente pelo sistema</p>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Buscar por ação ou descrição..."
+                  value={filtroAuditoria}
+                  onChange={(e) => setFiltroAuditoria(e.target.value)}
+                  className="max-w-xs"
+                />
+                <Select value={filtroAuditoriaAcao} onValueChange={setFiltroAuditoriaAcao}>
+                  <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todas as ações</SelectItem>
+                    <SelectItem value="criacao">Criação</SelectItem>
+                    <SelectItem value="edicao">Edição</SelectItem>
+                    <SelectItem value="exclusao">Exclusão</SelectItem>
+                    <SelectItem value="aprovacao">Aprovação</SelectItem>
+                    <SelectItem value="rejeicao">Rejeição</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            )}
+            </div>
+            {(() => {
+              const filtrados = auditoria.filter((entry: any) => {
+                const matchTexto = !filtroAuditoria || (entry.acao?.toLowerCase().includes(filtroAuditoria.toLowerCase()) || entry.descricao?.toLowerCase().includes(filtroAuditoria.toLowerCase()));
+                const matchAcao = filtroAuditoriaAcao === "todos" || entry.acao?.toLowerCase().includes(filtroAuditoriaAcao);
+                return matchTexto && matchAcao;
+              });
+              if (filtrados.length === 0) return (
+                <Card><CardContent className="py-10 text-center text-gray-400">
+                  <History className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                  <p>Nenhum registro encontrado</p>
+                </CardContent></Card>
+              );
+              return (
+                <div className="space-y-2">
+                  {filtrados.map((entry: any) => (
+                    <Card key={entry.id}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                            <History className="w-4 h-4 text-gray-500" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium text-sm text-gray-900">{entry.acao}</p>
+                                {entry.entidade && <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">{entry.entidade}</span>}
+                              </div>
+                              <span className="text-xs text-gray-400">
+                                {new Date(entry.createdAt).toLocaleString("pt-BR")}
+                              </span>
+                            </div>
+                            {entry.descricao && (
+                              <p className="text-sm text-gray-600 mt-1">{entry.descricao}</p>
+                            )}
+                            {(entry.dadosAnteriores || entry.dadosNovos) && (
+                              <details className="mt-2">
+                                <summary className="text-xs text-gray-400 cursor-pointer">Ver dados alterados</summary>
+                                <pre className="text-xs bg-gray-50 p-2 rounded mt-1 overflow-auto max-h-32">
+                                  {JSON.stringify(entry.dadosAnteriores ?? entry.dadosNovos, null, 2)}
+                                </pre>
+                              </details>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              );
+            })()}
           </TabsContent>
 
           <TabsContent value="avaliacao" className="mt-4">
