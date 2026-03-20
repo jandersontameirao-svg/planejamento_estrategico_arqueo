@@ -1757,3 +1757,172 @@ export const companyClients = mysqlTable("company_clients", {
 });
 export type CompanyClient = typeof companyClients.$inferSelect;
 export type InsertCompanyClient = typeof companyClients.$inferInsert;
+
+// ============================================================
+// MÓDULO DE GESTÃO DE CONTRATOS (ZIP v1.0.0)
+// Tabelas isoladas — não interferem com o SGC existente
+// ============================================================
+
+export const contracts = mysqlTable("contracts", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 50 }),
+  businessNumber: varchar("business_number", { length: 20 }),
+  signedDate: date("signed_date"),
+  signedYear: int("signed_year"),
+  signedSeq: int("signed_seq"),
+  isSigned: tinyint("is_signed").default(0).notNull(),
+  companyId: int("companyId").notNull(),
+  clientId: int("clientId").notNull(),
+  contractSeq: int("contract_seq"),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  totalValue: decimal("totalValue", { precision: 15, scale: 2 }).notNull(),
+  startDate: timestamp("startDate").notNull(),
+  endDate: timestamp("endDate"),
+  status: mysqlEnum("status_contract", ["active", "completed", "cancelled"]).default("active").notNull(),
+  observations: text("observations"),
+  pdfUrl: varchar("pdf_url", { length: 1000 }),
+  pdfFileKey: varchar("pdf_file_key", { length: 500 }),
+  managerUserId: int("manager_user_id"),
+  managerName: varchar("manager_name", { length: 255 }),
+  managerEmail: varchar("manager_email", { length: 255 }),
+  approverName: varchar("approver_name", { length: 255 }),
+  approverEmail: varchar("approver_email", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type Contract = typeof contracts.$inferSelect;
+export type InsertContract = typeof contracts.$inferInsert;
+
+export const financialMilestones = mysqlTable("financial_milestones", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contract_id").notNull(),
+  amendmentId: int("amendment_id"),
+  description: text("description").notNull(),
+  valorPrevisto: decimal("valor_previsto", { precision: 15, scale: 2 }).notNull(),
+  valorPago: decimal("valor_pago", { precision: 15, scale: 2 }).default("0").notNull(),
+  dueDate: timestamp("due_date").notNull(),
+  prazoPagamento: int("prazo_pagamento").default(0).notNull(),
+  status: mysqlEnum("status_milestone", ["pending", "paid", "overdue", "cancelled"]).default("pending").notNull(),
+  paidDate: timestamp("paid_date"),
+  dataRecebimento: timestamp("data_recebimento"),
+  origin: mysqlEnum("origin_milestone", ["manual", "ai"]).default("manual").notNull(),
+  confidence: decimal("confidence", { precision: 3, scale: 2 }).default("1.00"),
+  evidenceQuotes: text("evidence_quotes"),
+  conditionText: text("condition_text"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type FinancialMilestone = typeof financialMilestones.$inferSelect;
+export type InsertFinancialMilestone = typeof financialMilestones.$inferInsert;
+
+export const contractAmendments = mysqlTable("contract_amendments", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contract_id").notNull(),
+  businessNumber: varchar("business_number", { length: 30 }).notNull(),
+  seq: int("seq").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  tipo: mysqlEnum("tipo_amendment", ["financeiro", "escopo"]).default("escopo").notNull(),
+  additionalValue: decimal("additional_value", { precision: 15, scale: 2 }).notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  status: mysqlEnum("status_amendment", ["active", "completed", "cancelled"]).default("active").notNull(),
+  pdfUrl: varchar("pdf_url", { length: 500 }),
+  pdfFileKey: varchar("pdf_file_key", { length: 500 }),
+  changeTypes: json("change_types"),
+  financialImpact: json("financial_impact"),
+  scheduleImpact: json("schedule_impact"),
+  scopeChanges: text("scope_changes"),
+  aiAnalysis: json("ai_analysis"),
+  effectiveDate: date("effective_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContractAmendment = typeof contractAmendments.$inferSelect;
+export type InsertContractAmendment = typeof contractAmendments.$inferInsert;
+
+export const contractRisks = mysqlTable("contract_risks", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contract_id").notNull(),
+  tipo: mysqlEnum("tipo_risk", ["financeiro", "legal", "operacional", "prazo"]).notNull(),
+  descricao: text("descricao").notNull(),
+  severidade: mysqlEnum("severidade", ["baixa", "media", "alta", "critica"]).default("media").notNull(),
+  acoesMitigacao: text("acoes_mitigacao"),
+  responsavel: varchar("responsavel", { length: 255 }),
+  status: mysqlEnum("status_risk", ["aberto", "mitigado", "aceito", "fechado"]).default("aberto").notNull(),
+  origin: mysqlEnum("origin_risk", ["manual", "ai"]).default("manual").notNull(),
+  confidence: decimal("confidence_risk", { precision: 3, scale: 2 }),
+  evidenceQuotes: text("evidence_quotes_risk"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ContractRisk = typeof contractRisks.$inferSelect;
+export type InsertContractRisk = typeof contractRisks.$inferInsert;
+
+export const contractDocuments = mysqlTable("contract_documents", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contract_id").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  type: varchar("type", { length: 100 }),
+  url: varchar("url", { length: 1000 }).notNull(),
+  fileKey: varchar("file_key", { length: 500 }),
+  size: int("size"),
+  mimeType: varchar("mime_type", { length: 100 }),
+  aiClassification: varchar("ai_classification", { length: 255 }),
+  uploadedBy: int("uploaded_by"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ContractDocument = typeof contractDocuments.$inferSelect;
+export type InsertContractDocument = typeof contractDocuments.$inferInsert;
+
+export const contractApprovers = mysqlTable("contract_approvers", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contract_id").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  role: varchar("role", { length: 100 }),
+  order: int("order").default(1).notNull(),
+  status: mysqlEnum("status_approver", ["pending", "approved", "rejected"]).default("pending").notNull(),
+  approvedAt: timestamp("approved_at"),
+  observations: text("observations"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ContractApprover = typeof contractApprovers.$inferSelect;
+export type InsertContractApprover = typeof contractApprovers.$inferInsert;
+
+export const contractResponsible = mysqlTable("contract_responsible", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contract_id").notNull(),
+  userId: int("user_id"),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  role: varchar("role", { length: 100 }),
+  type: mysqlEnum("type_responsible", ["manager", "approver", "executor", "witness"]).default("executor").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ContractResponsible = typeof contractResponsible.$inferSelect;
+export type InsertContractResponsible = typeof contractResponsible.$inferInsert;
+
+export const auditLogs = mysqlTable("audit_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  entityType: varchar("entityType", { length: 50 }).notNull(),
+  entityId: int("entityId").notNull(),
+  action: mysqlEnum("action_audit", ["create", "update", "delete", "apply", "sign"]).notNull(),
+  changes: text("changes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
+
+// Tabela de sequências para geração de códigos únicos (contratos, aditivos)
+export const sequences = mysqlTable("sequences", {
+  id: int("id").autoincrement().primaryKey(),
+  key: varchar("key", { length: 100 }).notNull().unique(),
+  currentValue: int("current_value").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type Sequence = typeof sequences.$inferSelect;
+export type InsertSequence = typeof sequences.$inferInsert;

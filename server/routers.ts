@@ -7,6 +7,15 @@ import { contratosRouter } from "./routers/contratos";
 import { avaliacaoContratosRouter } from "./routers/avaliacaoContratos";
 import { clientsRouter } from "./routers/clients";
 import { getMetodologiasEmpresa, saveMetodologiasEmpresa, METODOLOGIAS_DISPONIVEIS } from "./metodologias";
+import {
+  contractsRouter,
+  milestonesRouter,
+  amendmentsRouter,
+  contractRisksRouter,
+  contractDocumentsRouter,
+  contractApproversRouter,
+  contractResponsibleRouter,
+} from "./routers/contracts";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
@@ -16,6 +25,14 @@ export const appRouter = router({
   contratos: contratosRouter,
   avaliacaoContratos: avaliacaoContratosRouter,
   clients: clientsRouter,
+  // Módulo Gestão de Contratos (ZIP v1.0.0)
+  contractsModule: contractsRouter,
+  contractMilestones: milestonesRouter,
+  contractAmendments: amendmentsRouter,
+  contractRisks: contractRisksRouter,
+  contractDocuments: contractDocumentsRouter,
+  contractApprovers: contractApproversRouter,
+  contractResponsible: contractResponsibleRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

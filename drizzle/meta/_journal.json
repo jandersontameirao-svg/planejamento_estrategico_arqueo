@@ -71,6 +71,13 @@
       "when": 1774009878828,
       "tag": "0009_new_jane_foster",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1774011920088,
+      "tag": "0010_superb_manta",
+      "breakpoints": true
     }
   ]
 }

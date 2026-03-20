@@ -41,6 +41,9 @@ import ContratoForm from "./pages/ContratoForm";
 import ContratosClientes from "./pages/ContratosClientes";
 import GestaoClientes from "./pages/GestaoClientes";
 import GestaoClienteDetalhe from "./pages/GestaoClienteDetalhe";
+import ContratosZip from "./pages/ContratosZip";
+import ContratoZipForm from "./pages/ContratoZipForm";
+import ContratoZipDetalhe from "./pages/ContratoZipDetalhe";
 import PlanejamentoEstrategicoArea from "./pages/PlanejamentoEstrategicoArea";
 import DashboardAnalisesArea from "./pages/DashboardAnalisesArea";
 import AprovacaoBoletim from "./pages/AprovacaoBoletim";
@@ -119,6 +122,9 @@ function Router() {
       <Route path="/aprovacao/:token" component={AprovacaoBoletim} />
       <Route path="/gestao-clientes" component={GestaoClientes} />
       <Route path="/gestao-clientes/:id" component={GestaoClienteDetalhe} />
+      <Route path="/gestao-contratos" component={ContratosZip} />
+      <Route path="/gestao-contratos/novo" component={ContratoZipForm} />
+      <Route path="/gestao-contratos/:id" component={ContratoZipDetalhe} />
       <Route path={"/ 404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -1172,3 +1172,20 @@
 - [x] Registrar rotas /clients e /clients/:id no App.tsx
 - [x] Adicionar botão "Clientes" no menu principal do Home.tsx
 - [x] Escrever testes para o router de clientes
+
+## Módulo de Gestão de Contratos (ZIP v1.0.0) — Implantação Isolada
+- [x] Adicionar tabelas contracts, financial_milestones, contract_amendments, contract_risks, contract_documents, contract_approvers, contract_responsible, audit_logs ao schema.ts
+- [x] Adicionar tabela sequences ao schema.ts e criar via SQL
+- [x] Criar server/contracts.db.ts com todos os helpers de banco
+- [x] Criar server/services/sequences.ts (geração de sequências)
+- [x] Criar server/services/contractNumbering.ts (numeração de contratos)
+- [x] Criar server/services/amendmentAnalysis.ts (análise de aditivos por IA)
+- [x] Criar server/services/contractAnalysis.ts (análise de contratos por IA)
+- [x] Criar server/routers/contracts.ts com todas as procedures do módulo
+- [x] Registrar todos os routers do módulo no server/routers.ts
+- [x] Criar página ContratosZip.tsx (listagem com filtros e stats)
+- [x] Criar página ContratoZipForm.tsx (formulário com upload PDF + análise IA + revisão obrigatória)
+- [x] Criar página ContratoZipDetalhe.tsx (detalhe com 6 abas: visão geral, marcos, aditivos, riscos, documentos, responsáveis)
+- [x] Registrar rotas /gestao-contratos, /gestao-contratos/novo, /gestao-contratos/:id no App.tsx
+- [x] Adicionar botão "Contratos" no menu principal do Home.tsx
+- [x] Escrever testes do módulo de contratos (89 testes passando)
