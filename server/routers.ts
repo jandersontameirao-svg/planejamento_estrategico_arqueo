@@ -6,6 +6,7 @@ import { orcamentoRouter } from "./routers/orcamento";
 import { contratosRouter } from "./routers/contratos";
 import { avaliacaoContratosRouter } from "./routers/avaliacaoContratos";
 import { clientsRouter } from "./routers/clients";
+import { boletinsRouter } from "./routers/boletins";
 import { getMetodologiasEmpresa, saveMetodologiasEmpresa, METODOLOGIAS_DISPONIVEIS } from "./metodologias";
 import {
   contractsRouter,
@@ -29,6 +30,7 @@ export const appRouter = router({
   contractsModule: contractsRouter,
   contractMilestones: milestonesRouter,
   contractAmendments: amendmentsRouter,
+  boletins: boletinsRouter,
   contractRisks: contractRisksRouter,
   contractDocuments: contractDocumentsRouter,
   contractApprovers: contractApproversRouter,

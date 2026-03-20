@@ -1195,3 +1195,15 @@
 - [x] Adicionar botão "Novo Contrato" na aba de contratos do cliente
 - [x] Adaptar ContratoZipForm para receber clientId via query string e pré-preencher o cliente
 - [x] Garantir que ao criar contrato a partir do cliente, o retorno volta para a página do cliente
+
+## Boletim de Medição Automático e Aditivos com IA
+- [x] Criar DB helpers para boletins (boletins.db.ts)
+- [x] Criar router tRPC de boletins (boletins.ts)
+- [x] Criar página de listagem de boletins por contrato (aba Boletins em ContratoZipDetalhe)
+- [x] Criar página pública de aprovação de boletim via token (BoletimAprovacao.tsx)
+- [x] Integrar boletim automático via botão Gerar Boletim em cada marco financeiro
+- [x] Adicionar aba "Boletins" na página ContratoZipDetalhe
+- [x] Adicionar botão "Gerar Boletim" em cada marco financeiro
+- [x] Implementar aditivo com análise IA (upload PDF + extração + revisão obrigatória)
+- [x] Adicionar página AditivoZipForm.tsx com fluxo IA idêntico ao ContratoZipForm
+- [x] Integrar AditivoZipForm na aba de Aditivos do ContratoZipDetalhe

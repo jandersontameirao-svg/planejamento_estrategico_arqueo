@@ -57,7 +57,7 @@ const RISK_STATUS: Record<string, string> = {
   fechado: "bg-gray-500/20 text-gray-400 border-gray-500/30",
 };
 
-type Tab = "overview" | "milestones" | "amendments" | "risks" | "documents" | "responsibles";
+type Tab = "overview" | "milestones" | "amendments" | "risks" | "documents" | "responsibles" | "boletins";
 
 export default function ContratoZipDetalhe() {
   const [, params] = useRoute("/gestao-contratos/:id");
@@ -108,6 +108,10 @@ export default function ContratoZipDetalhe() {
     { contractId },
     { enabled: !!contractId }
   );
+  const { data: boletins = [] } = trpc.boletins.list.useQuery(
+    { contratoId: contractId },
+    { enabled: !!contractId }
+  );
 
   // Mutations
   const signMut = trpc.contractsModule.sign.useMutation({
@@ -151,6 +155,21 @@ export default function ContratoZipDetalhe() {
     onSuccess: () => { utils.contractDocuments.list.invalidate({ contractId }); toast.success("Documento removido."); },
     onError: (e) => toast.error(e.message),
   });
+  const createBoletimMut = trpc.boletins.createFromMarco.useMutation({
+    onSuccess: () => { utils.boletins.list.invalidate({ contratoId: contractId }); toast.success("Boletim de medição gerado!"); setActiveTab("boletins"); },
+    onError: (e) => toast.error(e.message),
+  });
+  const enviarBoletimMut = trpc.boletins.enviarParaAprovacao.useMutation({
+    onSuccess: () => { utils.boletins.list.invalidate({ contratoId: contractId }); toast.success("Boletim enviado para aprovação!"); },
+    onError: (e) => toast.error(e.message),
+  });
+  const marcarPagoMut = trpc.boletins.marcarComoPago.useMutation({
+    onSuccess: () => { utils.boletins.list.invalidate({ contratoId: contractId }); toast.success("Boletim marcado como pago!"); },
+    onError: (e) => toast.error(e.message),
+  });
+  const updateAprovadorMut = trpc.boletins.updateAprovador.useMutation({
+    onError: (e) => toast.error(e.message),
+  });
 
   async function handleGenerateMitigation() {
     if (!riskForm.descricao) { toast.error("Preencha a descrição do risco primeiro."); return; }
@@ -180,6 +199,7 @@ export default function ContratoZipDetalhe() {
     { id: "risks", label: "Riscos", icon: <AlertTriangle className="h-4 w-4" />, count: risks.length },
     { id: "documents", label: "Documentos", icon: <Paperclip className="h-4 w-4" />, count: documents.length },
     { id: "responsibles", label: "Responsáveis", icon: <Users className="h-4 w-4" />, count: approvers.length + responsibles.length },
+    { id: "boletins", label: "Boletins", icon: <FileText className="h-4 w-4" />, count: boletins.length },
   ];
 
   if (isLoading) {
@@ -476,6 +496,16 @@ export default function ContratoZipDetalhe() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            className="h-7 w-7 text-blue-400"
+                            title="Gerar Boletim de Medição"
+                            onClick={() => createBoletimMut.mutate({ marcoId: m.id, contratoId: contractId })}
+                            disabled={createBoletimMut.isPending}
+                          >
+                            {createBoletimMut.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="h-7 w-7 text-red-400"
                             onClick={() => deleteMilestoneMut.mutate({ id: m.id })}
                           >
@@ -501,10 +531,10 @@ export default function ContratoZipDetalhe() {
             </h2>
             <Button
               size="sm"
-              onClick={() => { setAmendmentForm({ title: "", description: "", tipo: "escopo", additionalValue: "0", startDate: "", endDate: "" }); setShowAmendmentModal(true); }}
+              onClick={() => navigate(`/gestao-contratos/${contractId}/aditivo/novo`)}
               className="bg-orange-500 hover:bg-orange-600 text-white"
             >
-              <Plus className="mr-2 h-4 w-4" /> Novo Aditivo
+              <Plus className="mr-2 h-4 w-4" /> Novo Aditivo com IA
             </Button>
           </div>
           {amendments.length === 0 ? (
@@ -975,6 +1005,108 @@ export default function ContratoZipDetalhe() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Tab: Boletins de Medição */}
+      {activeTab === "boletins" && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              Boletins de Medição ({boletins.length})
+            </h2>
+            <p className="text-xs text-muted-foreground">Gerados automaticamente a partir dos marcos financeiros</p>
+          </div>
+          {boletins.length === 0 ? (
+            <Card className="border-dashed">
+              <CardContent className="py-8 text-center text-muted-foreground text-sm">
+                <FileText className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                <p>Nenhum boletim gerado ainda.</p>
+                <p className="text-xs mt-1">Clique no ícone <FileText className="inline h-3 w-3" /> em um marco financeiro para gerar o boletim.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-2">
+              {(boletins as any[]).map((b) => {
+                const statusColors: Record<string, string> = {
+                  pendente: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+                  enviado: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+                  aprovado: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+                  reprovado: "bg-red-500/20 text-red-400 border-red-500/30",
+                  pago: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+                };
+                const sc = statusColors[b.status] ?? statusColors.pendente;
+                const statusLabels: Record<string, string> = {
+                  pendente: "Pendente",
+                  enviado: "Aguardando Aprovação",
+                  aprovado: "Aprovado",
+                  reprovado: "Reprovado",
+                  pago: "Pago",
+                };
+                return (
+                  <Card key={b.id} className="border border-white/10 hover:border-orange-500/20 transition-all group">
+                    <CardContent className="py-3 px-4">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium text-sm truncate">{b.numero}</p>
+                            <Badge className={`text-xs border ${sc} shrink-0`}>{statusLabels[b.status] ?? b.status}</Badge>
+                          </div>
+                          <div className="flex gap-4 text-xs text-muted-foreground">
+                            {b.valorBruto && <span className="text-emerald-400 font-medium">{formatCurrency(b.valorBruto)}</span>}
+                            {b.dataEmissao && <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {formatDate(b.dataEmissao)}</span>}
+                            {b.aprovadorNome && <span className="flex items-center gap-1"><UserCheck className="h-3 w-3" /> {b.aprovadorNome}</span>}
+                          </div>
+                          {b.observacoes && <p className="text-xs text-muted-foreground mt-1 truncate">{b.observacoes}</p>}
+                        </div>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {b.status === "pendente" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs text-blue-400 hover:text-blue-300"
+                              onClick={async () => {
+                                const email = prompt("E-mail do aprovador:");
+                                const nome = prompt("Nome do aprovador:");
+                                if (email && nome) {
+                                  await updateAprovadorMut.mutateAsync({ id: b.id, aprovadorEmail: email, aprovadorNome: nome });
+                                  enviarBoletimMut.mutate({ id: b.id });
+                                }
+                              }}
+                              disabled={enviarBoletimMut.isPending || updateAprovadorMut.isPending}
+                            >
+                              <Mail className="h-3 w-3 mr-1" /> Enviar
+                            </Button>
+                          )}
+                          {b.status === "aprovado" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs text-emerald-400 hover:text-emerald-300"
+                              onClick={() => marcarPagoMut.mutate({ id: b.id })}
+                              disabled={marcarPagoMut.isPending}
+                            >
+                              <CheckCircle2 className="h-3 w-3 mr-1" /> Marcar Pago
+                            </Button>
+                          )}
+                          {b.linkAprovacao && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              onClick={() => window.open(b.linkAprovacao, "_blank")}
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
