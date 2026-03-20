@@ -3,7 +3,7 @@
  * Rota: /gestao-contratos/novo
  * Inclui: upload de PDF, análise por IA, revisão obrigatória antes de salvar
  */
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -45,10 +45,16 @@ export default function ContratoZipForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const utils = trpc.useUtils();
 
+  // Ler query params para pré-preencher cliente vindo da página do cliente
+  const searchParams = new URLSearchParams(window.location.search);
+  const prefilledClientId = searchParams.get("clientId") || "";
+  const prefilledClientName = searchParams.get("clientName") || "";
+  const returnToClient = prefilledClientId ? `/gestao-clientes/${prefilledClientId}` : null;
+
   // Formulário
   const [form, setForm] = useState({
     companyId: "",
-    clientId: "",
+    clientId: prefilledClientId,
     title: "",
     description: "",
     totalValue: "",
@@ -81,6 +87,14 @@ export default function ContratoZipForm() {
   const applyAnalysisMut = trpc.contractsModule.applyAnalysis.useMutation({
     onError: (e) => toast.error(e.message),
   });
+
+  // Quando os clientes carregarem e houver pré-preenchimento, garantir que o valor está definido
+  useEffect(() => {
+    if (prefilledClientId && (clientes as any[]).length > 0) {
+      setForm((prev) => ({ ...prev, clientId: prefilledClientId }));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [(clientes as any[]).length]);
 
   // Filtrar clientes pela empresa selecionada
   const clientesFiltrados = form.companyId
@@ -195,7 +209,11 @@ export default function ContratoZipForm() {
       utils.contractsModule.stats.invalidate();
       sessionStorage.removeItem("pendingContractId");
       toast.success("Contrato criado com marcos e riscos!");
-      navigate(`/gestao-contratos/${contractId}`);
+      if (returnToClient) {
+        navigate(returnToClient);
+      } else {
+        navigate(`/gestao-contratos/${contractId}`);
+      }
     } catch (err: any) {
       toast.error(err.message || "Erro ao aplicar análise.");
     }
@@ -229,7 +247,11 @@ export default function ContratoZipForm() {
       utils.contractsModule.list.invalidate();
       utils.contractsModule.stats.invalidate();
       toast.success("Contrato criado!");
-      navigate(`/gestao-contratos/${contract.id}`);
+      if (returnToClient) {
+        navigate(returnToClient);
+      } else {
+        navigate(`/gestao-contratos/${contract.id}`);
+      }
     } catch (err: any) {
       toast.error(err.message || "Erro ao criar contrato.");
     }
@@ -396,15 +418,22 @@ export default function ContratoZipForm() {
     <div className="container py-6 max-w-3xl space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/gestao-contratos")}>
+        <Button variant="ghost" size="icon" onClick={() => navigate(returnToClient ?? "/gestao-contratos")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
           <h1 className="text-xl font-bold flex items-center gap-2">
             <FileText className="h-5 w-5 text-orange-500" />
             Novo Contrato
+            {prefilledClientName && (
+              <span className="text-sm font-normal text-muted-foreground">— {prefilledClientName}</span>
+            )}
           </h1>
-          <p className="text-sm text-muted-foreground">Preencha os dados ou faça upload do PDF para análise automática</p>
+          <p className="text-sm text-muted-foreground">
+            {prefilledClientName
+              ? `Criando contrato para ${prefilledClientName}`
+              : "Preencha os dados ou faça upload do PDF para análise automática"}
+          </p>
         </div>
       </div>
 
@@ -550,7 +579,7 @@ export default function ContratoZipForm() {
 
       {/* Ações */}
       <div className="flex justify-end gap-3">
-        <Button variant="outline" onClick={() => navigate("/gestao-contratos")}>
+        <Button variant="outline" onClick={() => navigate(returnToClient ?? "/gestao-contratos")}>
           Cancelar
         </Button>
         {pdfUrl && (

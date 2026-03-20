@@ -1189,3 +1189,9 @@
 - [x] Registrar rotas /gestao-contratos, /gestao-contratos/novo, /gestao-contratos/:id no App.tsx
 - [x] Adicionar botão "Contratos" no menu principal do Home.tsx
 - [x] Escrever testes do módulo de contratos (89 testes passando)
+
+## Integração Fluxo Gestão de Clientes → Contratos
+- [x] Adicionar aba "Contratos" na página GestaoClienteDetalhe com listagem dos contratos do cliente
+- [x] Adicionar botão "Novo Contrato" na aba de contratos do cliente
+- [x] Adaptar ContratoZipForm para receber clientId via query string e pré-preencher o cliente
+- [x] Garantir que ao criar contrato a partir do cliente, o retorno volta para a página do cliente
