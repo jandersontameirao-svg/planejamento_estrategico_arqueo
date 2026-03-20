@@ -39,6 +39,8 @@ import Contratos from "./pages/Contratos";
 import ContratoDetalhe from "./pages/ContratoDetalhe";
 import ContratoForm from "./pages/ContratoForm";
 import ContratosClientes from "./pages/ContratosClientes";
+import GestaoClientes from "./pages/GestaoClientes";
+import GestaoClienteDetalhe from "./pages/GestaoClienteDetalhe";
 import PlanejamentoEstrategicoArea from "./pages/PlanejamentoEstrategicoArea";
 import DashboardAnalisesArea from "./pages/DashboardAnalisesArea";
 import AprovacaoBoletim from "./pages/AprovacaoBoletim";
@@ -115,6 +117,8 @@ function Router() {
       <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path="/aprovacao/:token" component={AprovacaoBoletim} />
+      <Route path="/gestao-clientes" component={GestaoClientes} />
+      <Route path="/gestao-clientes/:id" component={GestaoClienteDetalhe} />
       <Route path={"/ 404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

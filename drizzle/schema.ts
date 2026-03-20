@@ -1716,3 +1716,44 @@ export const avaliacaoPlanoItens = mysqlTable("avaliacao_plano_itens", {
 });
 export type AvaliacaoPlanoItem = typeof avaliacaoPlanoItens.$inferSelect;
 export type InsertAvaliacaoPlanoItem = typeof avaliacaoPlanoItens.$inferInsert;
+
+
+// ============================================================
+// MÓDULO DE GESTÃO DE CLIENTES (v1.0.0)
+// Tabelas isoladas — não interferem com o SGC existente
+// ============================================================
+
+export const clients = mysqlTable("clients", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 20 }).notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  fantasyName: varchar("fantasy_name", { length: 255 }),
+  taxId: varchar("tax_id", { length: 18 }).notNull().unique(),
+  logradouro: varchar("logradouro", { length: 255 }),
+  complemento: varchar("complemento", { length: 255 }),
+  bairro: varchar("bairro", { length: 100 }),
+  cep: varchar("cep", { length: 10 }),
+  municipio: varchar("municipio", { length: 100 }),
+  uf: varchar("uf", { length: 2 }),
+  telefone: varchar("telefone", { length: 20 }),
+  email: varchar("email", { length: 255 }),
+  contact: varchar("contact", { length: 255 }),
+  atividadeEconomica: text("atividade_economica"),
+  naturezaJuridica: varchar("natureza_juridica", { length: 255 }),
+  dataAbertura: date("data_abertura"),
+  situacaoCadastral: varchar("situacao_cadastral", { length: 50 }),
+  logoUrl: varchar("logo_url", { length: 500 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type Client = typeof clients.$inferSelect;
+export type InsertClient = typeof clients.$inferInsert;
+
+export const companyClients = mysqlTable("company_clients", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("company_id").notNull(),
+  clientId: int("client_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type CompanyClient = typeof companyClients.$inferSelect;
+export type InsertCompanyClient = typeof companyClients.$inferInsert;

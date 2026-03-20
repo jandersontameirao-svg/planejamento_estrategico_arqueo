@@ -1151,3 +1151,24 @@
 
 ## Correção - Card de Gestão de Contratos
 - [x] Card de Gestão de Contratos não aparece quando empresa tem metodologias configuradas (ID "contratos" não está na lista METODOLOGIAS_DISPONIVEIS)
+
+## Módulo de Gestão de Clientes (Centralizado)
+- [ ] Tabela centralizada de clientes (independente de empresa/contrato)
+- [ ] Upload de cartão CNPJ (imagem/PDF) com extração automática via IA
+- [ ] Busca automática por CNPJ na BrasilAPI/ReceitaWS com fallback IA
+- [ ] Campos completos: razão social, nome fantasia, CPF/CNPJ, endereço, contato, natureza jurídica, data abertura, situação cadastral, atividade econômica
+- [ ] Listagem de clientes com busca por nome/CNPJ e filtros
+- [ ] Visualização detalhada do cliente com contratos vinculados
+- [ ] Rota /clientes e entrada no menu de navegação
+- [ ] Vinculação de clientes existentes a empresas do grupo
+
+## Módulo de Gestão de Clientes (ZIP v1.0.0) — Implantação Isolada
+- [x] Criar tabelas `clients` e `company_clients` no banco e no schema.ts
+- [x] Implantar services: cnpjConsulta.ts e cnpjOcr.ts em server/services/
+- [x] Criar router tRPC isolado: server/routers/clients.router.ts
+- [x] Registrar router `clients` no server/routers.ts (sem remover nada)
+- [x] Implantar componentes: CNPJCardUpload.tsx, ClientLogo.tsx, StatusBadge.tsx
+- [x] Implantar páginas: Clients.tsx e ClientDetails.tsx adaptadas ao projeto
+- [x] Registrar rotas /clients e /clients/:id no App.tsx
+- [x] Adicionar botão "Clientes" no menu principal do Home.tsx
+- [x] Escrever testes para o router de clientes

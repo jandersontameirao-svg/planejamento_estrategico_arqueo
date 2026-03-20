@@ -64,6 +64,13 @@
       "when": 1773948498973,
       "tag": "0008_illegal_sabretooth",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1774009878828,
+      "tag": "0009_new_jane_foster",
+      "breakpoints": true
     }
   ]
 }
