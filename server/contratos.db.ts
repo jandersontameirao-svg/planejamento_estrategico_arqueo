@@ -34,24 +34,27 @@ import {
 // ─── AUDITORIA INTERNA ───────────────────────────────────────────────────────
 
 export async function registrarAuditoriaContrato(params: {
-  entidade: "cliente" | "contrato" | "aditivo" | "marco" | "boletim" | "aprovacao" | "risco" | "documento";
+  entidade: string;
   entidadeId: number;
-  acao: "criacao" | "edicao" | "exclusao_logica" | "aprovacao" | "rejeicao" | "assinatura" | "sincronizacao" | "rollback" | "reconciliacao" | "envio_aprovacao";
+  acao: string;
   usuarioId?: number;
   payloadAnterior?: unknown;
   payloadNovo?: unknown;
   observacoes?: string;
+  contratoId?: number;
 }) {
   const db = await getDb();
   if (!db) return;
+  // O banco usa contrato_id NOT NULL — para entidades sem contrato direto, usamos entidadeId
+  const contratoId = params.contratoId ?? (params.entidade === "contrato" ? params.entidadeId : 0);
+  const descricao = `${params.entidade}:${params.entidadeId} — ${params.acao}${params.observacoes ? " — " + params.observacoes : ""}`;
   await db.insert(contratosAuditoria).values({
-    entidade: params.entidade,
-    entidadeId: params.entidadeId,
-    acao: params.acao,
+    contratoId,
     usuarioId: params.usuarioId,
-    payloadAnterior: params.payloadAnterior ? JSON.stringify(params.payloadAnterior) : null,
-    payloadNovo: params.payloadNovo ? JSON.stringify(params.payloadNovo) : null,
-    observacoes: params.observacoes,
+    acao: params.acao,
+    descricao,
+    dadosAntes: params.payloadAnterior ? JSON.stringify(params.payloadAnterior) : null,
+    dadosDepois: params.payloadNovo ? JSON.stringify(params.payloadNovo) : null,
   });
 }
 
@@ -111,6 +114,14 @@ export async function getAllContratos(empresaId?: number) {
       .orderBy(desc(contratos.createdAt));
   }
   return await db.select().from(contratos).orderBy(desc(contratos.createdAt));
+}
+
+export async function getContratosByClienteId(clienteId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(contratos)
+    .where(eq(contratos.clienteId, clienteId))
+    .orderBy(desc(contratos.createdAt));
 }
 
 export async function getContratoById(id: number) {
@@ -334,12 +345,7 @@ export async function getAuditoriaContrato(contratoId: number) {
   const db = await getDb();
   if (!db) return [];
   return await db.select().from(contratosAuditoria)
-    .where(
-      and(
-        eq(contratosAuditoria.entidade, "contrato"),
-        eq(contratosAuditoria.entidadeId, contratoId)
-      )
-    )
+    .where(eq(contratosAuditoria.contratoId, contratoId))
     .orderBy(desc(contratosAuditoria.createdAt));
 }
 

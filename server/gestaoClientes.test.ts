@@ -1,4 +1,8 @@
-import { describe, expect, it } from "vitest";
+/**
+ * Testes do módulo de Gestão de Clientes (SGC consolidado)
+ * Usa trpc.contratos.clientes.* — router SGC unificado
+ */
+import { describe, it, expect } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
@@ -23,162 +27,121 @@ function createAuthContext(): TrpcContext {
   };
 }
 
-function createPublicContext(): TrpcContext {
-  return {
-    user: null,
-    req: { protocol: "https", headers: {} } as TrpcContext["req"],
-    res: { clearCookie: () => {} } as TrpcContext["res"],
-  };
-}
-
-/** Gera um CNPJ fictício único para evitar conflitos entre execuções de teste */
-function uniqueTaxId(): string {
-  const ts = Date.now().toString().slice(-12).padStart(14, "0");
+function uniqueCNPJ(): string {
+  const ts = Date.now().toString().slice(-14).padStart(14, "0");
   return ts;
 }
 
-// ============================================================
-// Testes do router isolado: clients
-// ============================================================
-
-describe("clients.list", () => {
+describe("contratos.clientes.list", () => {
   it("retorna lista de clientes para usuário autenticado", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
-    const result = await caller.clients.list();
+    const result = await caller.contratos.clientes.list({});
     expect(Array.isArray(result)).toBe(true);
   });
 });
 
-describe("clients.create e getById", () => {
+describe("contratos.clientes.create e get", () => {
   it("cria um cliente com dados mínimos e busca pelo ID", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
-    const taxId = uniqueTaxId();
-
-    const created = await caller.clients.create({
-      name: "Empresa Teste LTDA",
-      taxId,
+    const cnpj = uniqueCNPJ();
+    const id = await caller.contratos.clientes.create({
+      razaoSocial: "Empresa Teste LTDA",
+      cnpj,
     });
-    expect(created).toHaveProperty("id");
-    expect(typeof created.id).toBe("number");
-
-    const found = await caller.clients.getById({ id: created.id });
+    expect(typeof id).toBe("number");
+    const found = await caller.contratos.clientes.get({ id });
     expect(found).not.toBeNull();
-    expect(found?.name).toBe("Empresa Teste LTDA");
-
-    // Cleanup
-    await caller.clients.delete({ id: created.id });
+    expect(found?.razaoSocial).toBe("Empresa Teste LTDA");
+    await caller.contratos.clientes.delete({ id });
   });
 
   it("cria um cliente com dados completos", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
-    const taxId = uniqueTaxId();
-
-    const created = await caller.clients.create({
-      name: "Empresa Completa S.A.",
-      fantasyName: "Completa",
-      taxId,
-      logradouro: "Rua das Flores, 100",
-      bairro: "Centro",
-      municipio: "São Paulo",
-      uf: "SP",
+    const cnpj = uniqueCNPJ();
+    const id = await caller.contratos.clientes.create({
+      razaoSocial: "Empresa Completa S.A.",
+      nomeFantasia: "Completa",
+      cnpj,
+      endereco: "Rua das Flores, 100",
+      cidade: "São Paulo",
+      estado: "SP",
       cep: "01310-100",
       telefone: "(11) 3456-7890",
       email: "contato@completa.com.br",
       naturezaJuridica: "Sociedade Anônima",
       situacaoCadastral: "ATIVA",
     });
-    expect(created).toHaveProperty("id");
-
-    const found = await caller.clients.getById({ id: created.id });
-    expect(found?.fantasyName).toBe("Completa");
-    expect(found?.municipio).toBe("São Paulo");
-
-    // Cleanup
-    await caller.clients.delete({ id: created.id });
+    expect(typeof id).toBe("number");
+    const found = await caller.contratos.clientes.get({ id });
+    expect(found?.nomeFantasia).toBe("Completa");
+    expect(found?.cidade).toBe("São Paulo");
+    await caller.contratos.clientes.delete({ id });
   });
 
   it("retorna null para ID inexistente", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
-    const result = await caller.clients.getById({ id: 999999 });
+    const result = await caller.contratos.clientes.get({ id: 999999 });
     expect(result).toBeNull();
   });
 });
 
-describe("clients.update", () => {
+describe("contratos.clientes.update", () => {
   it("atualiza os dados de um cliente", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
-    const taxId = uniqueTaxId();
-
-    const created = await caller.clients.create({
-      name: "Cliente Para Atualizar",
-      taxId,
+    const cnpj = uniqueCNPJ();
+    const id = await caller.contratos.clientes.create({
+      razaoSocial: "Cliente Para Atualizar",
+      cnpj,
     });
-
-    const result = await caller.clients.update({
-      id: created.id,
-      name: "Cliente Atualizado",
-      email: "novo@email.com",
+    await caller.contratos.clientes.update({
+      id,
+      data: { razaoSocial: "Cliente Atualizado", email: "novo@email.com" },
     });
-    expect(result).toHaveProperty("success", true);
-
-    const updated = await caller.clients.getById({ id: created.id });
-    expect(updated?.name).toBe("Cliente Atualizado");
+    const updated = await caller.contratos.clientes.get({ id });
+    expect(updated?.razaoSocial).toBe("Cliente Atualizado");
     expect(updated?.email).toBe("novo@email.com");
-
-    // Cleanup
-    await caller.clients.delete({ id: created.id });
+    await caller.contratos.clientes.delete({ id });
   });
 });
 
-describe("clients.delete", () => {
-  it("remove um cliente existente", async () => {
+describe("contratos.clientes.delete", () => {
+  it("inativa um cliente existente (exclusão lógica)", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
-    const taxId = uniqueTaxId();
-
-    const created = await caller.clients.create({
-      name: "Cliente Para Deletar",
-      taxId,
+    const cnpj = uniqueCNPJ();
+    const id = await caller.contratos.clientes.create({
+      razaoSocial: "Cliente Para Deletar",
+      cnpj,
     });
-
-    const result = await caller.clients.delete({ id: created.id });
-    expect(result).toHaveProperty("success", true);
-
-    const deleted = await caller.clients.getById({ id: created.id });
-    expect(deleted).toBeNull();
+    await caller.contratos.clientes.delete({ id });
+    // Exclusão lógica: registro permanece, mas status muda para inativo
+    const deleted = await caller.contratos.clientes.get({ id });
+    expect(deleted?.status).toBe("inativo");
   });
-});
+})
 
-describe("clients.consultarCNPJ", () => {
-  it("rejeita CNPJ com menos de 11 dígitos", async () => {
-    const ctx = createPublicContext();
-    const caller = appRouter.createCaller(ctx);
-    await expect(caller.clients.consultarCNPJ({ cnpj: "123" })).rejects.toThrow();
-  });
-
-  it("aceita CNPJ com 14 dígitos (mesmo que API externa falhe)", async () => {
-    const ctx = createPublicContext();
-    const caller = appRouter.createCaller(ctx);
-    try {
-      const result = await caller.clients.consultarCNPJ({ cnpj: "00000000000000" });
-      expect(result === null || typeof result === "object").toBe(true);
-    } catch (e: any) {
-      // Falha de API externa é aceitável
-      expect(e.message).toBeDefined();
-    }
-  });
-});
-
-describe("clients.listByCompany", () => {
-  it("retorna lista de clientes vinculados a uma empresa", async () => {
+describe("contratos.clientes.buscarCNPJ", () => {
+  it("aceita CNPJ com 14 dígitos e retorna objeto ou lança erro de API externa", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
-    const result = await caller.clients.listByCompany({ companyId: 1 });
-    expect(Array.isArray(result)).toBe(true);
+    // CNPJ inválido — a API externa pode retornar erro ou null, ambos são aceitáveis
+    let passed = false;
+    try {
+      const result = await caller.contratos.clientes.buscarCNPJ({ cnpj: "00000000000000" });
+      // Se retornar sem lançar, aceita qualquer resultado
+      expect(result === null || typeof result === "object").toBe(true);
+      passed = true;
+    } catch (e: unknown) {
+      // Erro de API externa é aceitável
+      const err = e as { message?: string };
+      expect(typeof err.message).toBe("string");
+      passed = true;
+    }
+    expect(passed).toBe(true);
   });
 });

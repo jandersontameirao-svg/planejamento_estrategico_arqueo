@@ -1207,3 +1207,17 @@
 - [x] Implementar aditivo com análise IA (upload PDF + extração + revisão obrigatória)
 - [x] Adicionar página AditivoZipForm.tsx com fluxo IA idêntico ao ContratoZipForm
 - [x] Integrar AditivoZipForm na aba de Aditivos do ContratoZipDetalhe
+
+## Consolidação Arquitetural (2026-03-20)
+- [ ] Remover tabelas ZIP duplicadas do schema (clients, company_clients, contracts, financial_milestones, contract_amendments, contract_risks, contract_documents, contract_approvers, contract_responsible, audit_logs, sequences)
+- [ ] Consolidar router contratos.ts como único router de clientes e contratos
+- [ ] Remover routers ZIP duplicados do routers.ts
+- [ ] Remover páginas ZIP duplicadas (ContratosZip, ContratoZipDetalhe, ContratoZipForm, AditivoZipForm, BoletimAprovacao)
+- [ ] Atualizar GestaoClientes para usar trpc.contratos.clientes (SGC base)
+- [ ] Atualizar GestaoClienteDetalhe para mostrar contratos SGC
+- [ ] Atualizar ContratoDetalhe (SGC) com abas completas
+- [ ] Garantir que /empresa/:id/contratos seja o ponto de entrada operacional
+- [ ] Atualizar App.tsx: remover rotas ZIP, manter rotas SGC
+- [ ] Atualizar Home.tsx: remover card Contratos ZIP concorrente
+- [ ] Verificar TypeScript 0 erros após consolidação
+- [ ] Rodar testes após consolidação

@@ -15,6 +15,7 @@ import {
   updateContratosCliente,
   deleteContratosCliente,
   getAllContratos,
+  getContratosByClienteId,
   getContratoById,
   createContrato,
   updateContrato,
@@ -390,7 +391,11 @@ export const contratosRouter = router({
       .query(async ({ input }) => {
         return await getAllContratos(input.empresaId);
       }),
-
+    listByCliente: protectedProcedure
+      .input(z.object({ clienteId: z.number() }))
+      .query(async ({ input }) => {
+        return await getContratosByClienteId(input.clienteId);
+      }),
     get: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {

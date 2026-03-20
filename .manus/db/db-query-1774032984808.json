@@ -1,0 +1,19 @@
+{
+  "query": "SHOW TABLES LIKE 'contratos_auditoria'; SHOW TABLES LIKE 'sequencias'; SHOW TABLES LIKE 'contratos_clientes';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SHOW TABLES LIKE 'contratos_auditoria'; SHOW TABLES LIKE 'sequencias'; SHOW TABLES LIKE 'contratos_clientes';",
+  "rows": [
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (contratos_auditoria)": "contratos_auditoria"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (contratos_auditoria)": "Tables_in_GdPAuRogRcNPzV7ENB2n8s (contratos_clientes)"
+    },
+    {
+      "Tables_in_GdPAuRogRcNPzV7ENB2n8s (contratos_auditoria)": "contratos_clientes"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_GdPAuRogRcNPzV7ENB2n8s (contratos_auditoria)\ncontratos_auditoria\nTables_in_GdPAuRogRcNPzV7ENB2n8s (contratos_clientes)\ncontratos_clientes\n",
+  "stderr": "",
+  "execution_time_ms": 593
+}

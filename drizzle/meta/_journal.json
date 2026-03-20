@@ -78,6 +78,13 @@
       "when": 1774011920088,
       "tag": "0010_superb_manta",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1774032973180,
+      "tag": "0011_blue_lizard",
+      "breakpoints": true
     }
   ]
 }

@@ -14,14 +14,14 @@ export default function CNPJCardUpload({ onDataExtracted }: CNPJCardUploadProps)
   const [preview, setPreview] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
 
-  const ocrMutation = trpc.clients.extractFromCNPJCard.useMutation({
-    onSuccess: (data) => {
+  const ocrMutation = trpc.contratos.clientes.extrairCartaoCNPJ.useMutation({
+    onSuccess: (data: unknown) => {
       onDataExtracted(data as Record<string, string>);
       setFile(null);
       setPreview("");
       toast.success("Dados extraídos com sucesso!");
     },
-    onError: (error) => {
+    onError: (error: { message: string }) => {
       toast.error(error.message || "Erro ao extrair dados do Cartão CNPJ");
     },
   });
@@ -59,8 +59,18 @@ export default function CNPJCardUpload({ onDataExtracted }: CNPJCardUploadProps)
       return;
     }
     const reader = new FileReader();
-    reader.onloadend = () => {
-      ocrMutation.mutate({ imageBase64: reader.result as string });
+    reader.onloadend = async () => {
+      // Upload do arquivo para S3, depois envia URL para a IA
+      const formData = new FormData();
+      if (file) formData.append("file", file);
+      try {
+        const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+        if (!uploadRes.ok) throw new Error("Falha no upload");
+        const { url } = await uploadRes.json() as { url: string };
+        ocrMutation.mutate({ imageUrl: url });
+      } catch {
+        toast.error("Erro ao fazer upload do arquivo");
+      }
     };
     reader.readAsDataURL(file);
   };

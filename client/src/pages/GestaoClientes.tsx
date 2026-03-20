@@ -4,33 +4,32 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Link } from "wouter";
 import {
   Users, Plus, Search, Building2, Mail, Phone, Pencil, Trash2,
-  Loader2, Upload, MapPin, Briefcase, FileText, RefreshCw, X,
+  Loader2, Upload, MapPin, Briefcase, FileText, RefreshCw,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type FormState = {
-  name: string; fantasyName: string; taxId: string;
-  logradouro: string; complemento: string; bairro: string;
-  cep: string; municipio: string; uf: string;
-  telefone: string; email: string; contact: string;
-  atividadeEconomica: string; naturezaJuridica: string;
+  razaoSocial: string; nomeFantasia: string; cnpj: string;
+  endereco: string; cep: string; cidade: string; estado: string;
+  telefone: string; email: string; contatoNome: string;
+  cnaeDescricao: string; naturezaJuridica: string;
   dataAbertura: string; situacaoCadastral: string; logoUrl: string;
+  status: "ativo" | "inativo" | "prospecto";
 };
 
 const FORM_VAZIO: FormState = {
-  name: "", fantasyName: "", taxId: "",
-  logradouro: "", complemento: "", bairro: "",
-  cep: "", municipio: "", uf: "",
-  telefone: "", email: "", contact: "",
-  atividadeEconomica: "", naturezaJuridica: "",
+  razaoSocial: "", nomeFantasia: "", cnpj: "",
+  endereco: "", cep: "", cidade: "", estado: "",
+  telefone: "", email: "", contatoNome: "",
+  cnaeDescricao: "", naturezaJuridica: "",
   dataAbertura: "", situacaoCadastral: "", logoUrl: "",
+  status: "ativo",
 };
 
 function formatCNPJ(v: string) {
@@ -59,25 +58,22 @@ export default function GestaoClientes() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const utils = trpc.useUtils();
-  const { data: clientes = [], isLoading } = trpc.clients.list.useQuery();
+  const { data: clientes = [], isLoading } = trpc.contratos.clientes.list.useQuery({});
 
-  const createMut = trpc.clients.create.useMutation({
-    onSuccess: () => { utils.clients.list.invalidate(); toast.success("Cliente cadastrado!"); fecharModal(); },
-    onError: (e) => toast.error(e.message),
+  const createMut = trpc.contratos.clientes.create.useMutation({
+    onSuccess: () => { utils.contratos.clientes.list.invalidate(); toast.success("Cliente cadastrado!"); fecharModal(); },
+    onError: (e: { message: string }) => toast.error(e.message),
   });
-  const updateMut = trpc.clients.update.useMutation({
-    onSuccess: () => { utils.clients.list.invalidate(); toast.success("Cliente atualizado!"); fecharModal(); },
-    onError: (e) => toast.error(e.message),
+  const updateMut = trpc.contratos.clientes.update.useMutation({
+    onSuccess: () => { utils.contratos.clientes.list.invalidate(); toast.success("Cliente atualizado!"); fecharModal(); },
+    onError: (e: { message: string }) => toast.error(e.message),
   });
-  const deleteMut = trpc.clients.delete.useMutation({
-    onSuccess: () => { utils.clients.list.invalidate(); toast.success("Cliente removido."); },
-    onError: (e) => toast.error(e.message),
+  const deleteMut = trpc.contratos.clientes.delete.useMutation({
+    onSuccess: () => { utils.contratos.clientes.list.invalidate(); toast.success("Cliente removido."); },
+    onError: (e: { message: string }) => toast.error(e.message),
   });
-  const buscarCNPJQuery = trpc.clients.consultarCNPJ.useQuery(
-    { cnpj: form.taxId.replace(/\D/g, "") },
-    { enabled: false, retry: false }
-  );
-  const extrairCartaoMut = trpc.clients.extractFromCNPJCard.useMutation();
+  const buscarCNPJMut = trpc.contratos.clientes.buscarCNPJ.useMutation();
+  const extrairCartaoMut = trpc.contratos.clientes.extrairCartaoCNPJ.useMutation();
 
   function fecharModal() {
     setShowModal(false);
@@ -85,16 +81,25 @@ export default function GestaoClientes() {
     setForm(FORM_VAZIO);
   }
 
-  function abrirEditar(c: any) {
+  function abrirEditar(c: typeof clientes[number]) {
     setEditandoId(c.id);
     setForm({
-      name: c.name || "", fantasyName: c.fantasyName || "", taxId: c.taxId || "",
-      logradouro: c.logradouro || "", complemento: c.complemento || "", bairro: c.bairro || "",
-      cep: c.cep || "", municipio: c.municipio || "", uf: c.uf || "",
-      telefone: c.telefone || "", email: c.email || "", contact: c.contact || "",
-      atividadeEconomica: c.atividadeEconomica || "", naturezaJuridica: c.naturezaJuridica || "",
-      dataAbertura: c.dataAbertura ? (typeof c.dataAbertura === "string" ? c.dataAbertura : c.dataAbertura.toISOString().split("T")[0]) : "",
-      situacaoCadastral: c.situacaoCadastral || "", logoUrl: c.logoUrl || "",
+      razaoSocial: c.razaoSocial || "",
+      nomeFantasia: c.nomeFantasia || "",
+      cnpj: c.cnpj || "",
+      endereco: c.endereco || "",
+      cep: c.cep || "",
+      cidade: c.cidade || "",
+      estado: c.estado || "",
+      telefone: c.telefone || "",
+      email: c.email || "",
+      contatoNome: c.contatoNome || "",
+      cnaeDescricao: c.cnaeDescricao || "",
+      naturezaJuridica: c.naturezaJuridica || "",
+      dataAbertura: c.dataAbertura || "",
+      situacaoCadastral: c.situacaoCadastral || "",
+      logoUrl: c.logoUrl || "",
+      status: (c.status as "ativo" | "inativo" | "prospecto") || "ativo",
     });
     setShowModal(true);
   }
@@ -104,29 +109,26 @@ export default function GestaoClientes() {
   }
 
   async function handleBuscarCNPJ() {
-    const cnpjLimpo = form.taxId.replace(/\D/g, "");
+    const cnpjLimpo = form.cnpj.replace(/\D/g, "");
     if (cnpjLimpo.length !== 14) { toast.error("CNPJ inválido (14 dígitos)"); return; }
     setBuscandoCNPJ(true);
     try {
-      const result = await buscarCNPJQuery.refetch();
-      const dados = result.data;
+      const dados = await buscarCNPJMut.mutateAsync({ cnpj: form.cnpj.replace(/\D/g, "") }) as Record<string, string> | null | undefined;
       if (dados) {
         setForm(f => ({
           ...f,
-          name: (dados as any).razaoSocial || f.name,
-          fantasyName: (dados as any).nomeFantasia || f.fantasyName,
-          email: (dados as any).email || f.email,
-          telefone: (dados as any).telefone || f.telefone,
-          logradouro: (dados as any).logradouro || f.logradouro,
-          complemento: (dados as any).complemento || f.complemento,
-          bairro: (dados as any).bairro || f.bairro,
-          municipio: (dados as any).municipio || f.municipio,
-          uf: (dados as any).uf || f.uf,
-          cep: (dados as any).cep ? formatCEP((dados as any).cep) : f.cep,
-          atividadeEconomica: (dados as any).atividadeEconomica || f.atividadeEconomica,
-          naturezaJuridica: (dados as any).naturezaJuridica || f.naturezaJuridica,
-          situacaoCadastral: (dados as any).situacaoCadastral || f.situacaoCadastral,
-          dataAbertura: (dados as any).dataAbertura || f.dataAbertura,
+          razaoSocial: dados.razaoSocial || f.razaoSocial,
+          nomeFantasia: dados.nomeFantasia || f.nomeFantasia,
+          email: dados.email || f.email,
+          telefone: dados.telefone || f.telefone,
+          endereco: dados.endereco || f.endereco,
+          cidade: dados.cidade || f.cidade,
+          estado: dados.estado || f.estado,
+          cep: dados.cep ? formatCEP(dados.cep) : f.cep,
+          cnaeDescricao: dados.cnaeDescricao || f.cnaeDescricao,
+          naturezaJuridica: dados.naturezaJuridica || f.naturezaJuridica,
+          situacaoCadastral: dados.situacaoCadastral || f.situacaoCadastral,
+          dataAbertura: dados.dataAbertura || f.dataAbertura,
         }));
         toast.success("Dados preenchidos via Receita Federal!");
       } else {
@@ -142,38 +144,37 @@ export default function GestaoClientes() {
     if (file.size > 5 * 1024 * 1024) { toast.error("Arquivo muito grande (máx. 5MB)"); return; }
     setUploadingCartao(true);
     try {
-      const reader = new FileReader();
-      reader.onload = async (ev) => {
-        const base64 = ev.target?.result as string;
-        try {
-          const dados = await extrairCartaoMut.mutateAsync({ imageBase64: base64 });
-          if (dados) {
-            setForm(f => ({
-              ...f,
-              taxId: (dados as any).cnpj ? formatCNPJ((dados as any).cnpj) : f.taxId,
-              name: (dados as any).razaoSocial || f.name,
-              fantasyName: (dados as any).nomeFantasia || f.fantasyName,
-              email: (dados as any).email || f.email,
-              telefone: (dados as any).telefone || f.telefone,
-              logradouro: (dados as any).logradouro || f.logradouro,
-              complemento: (dados as any).complemento || f.complemento,
-              bairro: (dados as any).bairro || f.bairro,
-              municipio: (dados as any).municipio || f.municipio,
-              uf: (dados as any).uf || f.uf,
-              cep: (dados as any).cep ? formatCEP((dados as any).cep) : f.cep,
-              atividadeEconomica: (dados as any).atividadeEconomica || f.atividadeEconomica,
-              naturezaJuridica: (dados as any).naturezaJuridica || f.naturezaJuridica,
-              situacaoCadastral: (dados as any).situacaoCadastral || f.situacaoCadastral,
-              dataAbertura: (dados as any).dataAbertura || f.dataAbertura,
-            }));
-            toast.success("Dados extraídos do cartão CNPJ!");
-          }
-        } catch { toast.error("Erro ao extrair dados do cartão"); }
-        finally { setUploadingCartao(false); }
-      };
-      reader.readAsDataURL(file);
-    } catch { setUploadingCartao(false); }
-    if (fileInputRef.current) fileInputRef.current.value = "";
+      // Upload do arquivo para S3 primeiro, depois envia a URL para a IA
+      const formData = new FormData();
+      formData.append("file", file);
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!uploadRes.ok) throw new Error("Falha no upload");
+      const { url } = await uploadRes.json() as { url: string };
+      const dados = await extrairCartaoMut.mutateAsync({ imageUrl: url }) as Record<string, string> | null;
+      if (dados) {
+        setForm(f => ({
+          ...f,
+          cnpj: dados.cnpj ? formatCNPJ(dados.cnpj) : f.cnpj,
+          razaoSocial: dados.razaoSocial || f.razaoSocial,
+          nomeFantasia: dados.nomeFantasia || f.nomeFantasia,
+          email: dados.email || f.email,
+          telefone: dados.telefone || f.telefone,
+          endereco: dados.endereco || f.endereco,
+          cidade: dados.cidade || f.cidade,
+          estado: dados.estado || f.estado,
+          cep: dados.cep ? formatCEP(dados.cep) : f.cep,
+          cnaeDescricao: dados.cnaeDescricao || f.cnaeDescricao,
+          naturezaJuridica: dados.naturezaJuridica || f.naturezaJuridica,
+          situacaoCadastral: dados.situacaoCadastral || f.situacaoCadastral,
+          dataAbertura: dados.dataAbertura || f.dataAbertura,
+        }));
+        toast.success("Dados extraídos do cartão CNPJ!");
+      }
+    } catch { toast.error("Erro ao extrair dados do cartão"); }
+    finally {
+      setUploadingCartao(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   }
 
   async function handleBuscarCEP(cep: string) {
@@ -182,15 +183,13 @@ export default function GestaoClientes() {
     setLoadingCep(true);
     try {
       const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-      const data = await res.json();
+      const data = await res.json() as Record<string, string> & { erro?: boolean };
       if (data.erro) { toast.error("CEP não encontrado"); return; }
       setForm(f => ({
         ...f,
-        logradouro: data.logradouro || f.logradouro,
-        bairro: data.bairro || f.bairro,
-        municipio: data.localidade || f.municipio,
-        uf: data.uf || f.uf,
-        complemento: data.complemento || f.complemento,
+        endereco: [data.logradouro, data.bairro].filter(Boolean).join(", ") || f.endereco,
+        cidade: data.localidade || f.cidade,
+        estado: data.uf || f.estado,
       }));
     } catch { toast.error("Erro ao buscar CEP"); }
     finally { setLoadingCep(false); }
@@ -198,18 +197,42 @@ export default function GestaoClientes() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.name.trim()) { toast.error("Nome/Razão Social é obrigatório"); return; }
+    if (!form.razaoSocial.trim()) { toast.error("Razão Social é obrigatória"); return; }
+    if (!form.cnpj.trim()) { toast.error("CNPJ é obrigatório"); return; }
+    const payload = {
+      cnpj: form.cnpj,
+      razaoSocial: form.razaoSocial,
+      nomeFantasia: form.nomeFantasia || undefined,
+      email: form.email || undefined,
+      telefone: form.telefone || undefined,
+      endereco: form.endereco || undefined,
+      cidade: form.cidade || undefined,
+      estado: form.estado || undefined,
+      cep: form.cep || undefined,
+      contatoNome: form.contatoNome || undefined,
+      cnaeDescricao: form.cnaeDescricao || undefined,
+      naturezaJuridica: form.naturezaJuridica || undefined,
+      dataAbertura: form.dataAbertura || undefined,
+      situacaoCadastral: form.situacaoCadastral || undefined,
+      logoUrl: form.logoUrl || undefined,
+      status: form.status,
+    };
     if (editandoId) {
-      updateMut.mutate({ id: editandoId, ...form });
+      updateMut.mutate({ id: editandoId, data: payload });
     } else {
-      createMut.mutate(form);
+      createMut.mutate(payload);
     }
   }
 
-  const filtrados = clientes.filter(c => {
+  const filtrados = clientes.filter((c) => {
     if (!busca) return true;
     const q = busca.toLowerCase();
-    return c.name?.toLowerCase().includes(q) || c.fantasyName?.toLowerCase().includes(q) || c.taxId?.includes(q) || c.municipio?.toLowerCase().includes(q);
+    return (
+      c.razaoSocial?.toLowerCase().includes(q) ||
+      c.nomeFantasia?.toLowerCase().includes(q) ||
+      c.cnpj?.includes(q) ||
+      c.cidade?.toLowerCase().includes(q)
+    );
   });
 
   return (
@@ -251,13 +274,13 @@ export default function GestaoClientes() {
         <Card className="p-4">
           <p className="text-sm text-muted-foreground">Ativos</p>
           <p className="text-2xl font-bold text-green-600">
-            {clientes.filter(c => !c.situacaoCadastral || c.situacaoCadastral.toLowerCase().includes("ativa")).length}
+            {clientes.filter((c) => c.status === "ativo").length}
           </p>
         </Card>
         <Card className="p-4">
           <p className="text-sm text-muted-foreground">Com Endereço</p>
           <p className="text-2xl font-bold text-blue-600">
-            {clientes.filter(c => c.municipio).length}
+            {clientes.filter((c) => c.cidade).length}
           </p>
         </Card>
         <Card className="p-4">
@@ -296,32 +319,30 @@ export default function GestaoClientes() {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base leading-tight truncate">{c.name}</CardTitle>
-                    {c.fantasyName && <p className="text-sm text-muted-foreground truncate">{c.fantasyName}</p>}
-                    <CardDescription className="font-mono text-xs mt-1">{c.taxId}</CardDescription>
+                    <CardTitle className="text-base leading-tight truncate">{c.razaoSocial}</CardTitle>
+                    {c.nomeFantasia && <p className="text-sm text-muted-foreground truncate">{c.nomeFantasia}</p>}
+                    <CardDescription className="font-mono text-xs mt-1">{c.cnpj}</CardDescription>
                   </div>
                   {c.logoUrl ? (
-                    <img src={c.logoUrl} alt={c.name} className="w-10 h-10 rounded object-contain shrink-0" />
+                    <img src={c.logoUrl} alt={c.razaoSocial} className="w-10 h-10 rounded object-contain shrink-0" />
                   ) : (
                     <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center shrink-0">
                       <Building2 className="h-5 w-5 text-primary" />
                     </div>
                   )}
                 </div>
-                {c.situacaoCadastral && (
-                  <Badge
-                    variant={c.situacaoCadastral.toLowerCase().includes("ativa") ? "default" : "secondary"}
-                    className="w-fit text-xs mt-1"
-                  >
-                    {c.situacaoCadastral}
-                  </Badge>
-                )}
+                <Badge
+                  variant={c.status === "ativo" ? "default" : c.status === "prospecto" ? "outline" : "secondary"}
+                  className="w-fit text-xs mt-1"
+                >
+                  {c.status === "ativo" ? "Ativo" : c.status === "prospecto" ? "Prospecto" : "Inativo"}
+                </Badge>
               </CardHeader>
               <CardContent className="flex-1 space-y-1.5 pb-3">
-                {(c.municipio || c.uf) && (
+                {(c.cidade || c.estado) && (
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <MapPin className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{[c.municipio, c.uf].filter(Boolean).join(" - ")}</span>
+                    <span className="truncate">{[c.cidade, c.estado].filter(Boolean).join(" - ")}</span>
                   </div>
                 )}
                 {c.telefone && (
@@ -336,10 +357,10 @@ export default function GestaoClientes() {
                     <span className="truncate">{c.email}</span>
                   </div>
                 )}
-                {c.atividadeEconomica && (
+                {c.cnaeDescricao && (
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <Briefcase className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate text-xs">{c.atividadeEconomica}</span>
+                    <span className="truncate text-xs">{c.cnaeDescricao}</span>
                   </div>
                 )}
               </CardContent>
@@ -354,7 +375,7 @@ export default function GestaoClientes() {
                   </Button>
                   <Button
                     variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive"
-                    onClick={() => { if (confirm(`Excluir "${c.name}"?`)) deleteMut.mutate({ id: c.id }); }}
+                    onClick={() => { if (confirm(`Excluir "${c.razaoSocial}"?`)) deleteMut.mutate({ id: c.id }); }}
                     title="Excluir"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -402,28 +423,28 @@ export default function GestaoClientes() {
             {/* Dados Principais */}
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2">
-                <Label htmlFor="name">Nome / Razão Social *</Label>
-                <Input id="name" value={form.name} onChange={e => setField("name", e.target.value)} required />
+                <Label htmlFor="razaoSocial">Razão Social *</Label>
+                <Input id="razaoSocial" value={form.razaoSocial} onChange={e => setField("razaoSocial", e.target.value)} required />
               </div>
               <div>
-                <Label htmlFor="fantasyName">Nome Fantasia</Label>
-                <Input id="fantasyName" value={form.fantasyName} onChange={e => setField("fantasyName", e.target.value)} />
+                <Label htmlFor="nomeFantasia">Nome Fantasia</Label>
+                <Input id="nomeFantasia" value={form.nomeFantasia} onChange={e => setField("nomeFantasia", e.target.value)} />
               </div>
 
               <div>
-                <Label htmlFor="taxId">CPF / CNPJ *</Label>
+                <Label htmlFor="cnpj">CNPJ *</Label>
                 <div className="flex gap-2">
                   <Input
-                    id="taxId"
-                    value={form.taxId}
-                    onChange={e => setField("taxId", formatCNPJ(e.target.value))}
+                    id="cnpj"
+                    value={form.cnpj}
+                    onChange={e => setField("cnpj", formatCNPJ(e.target.value))}
                     required
                     placeholder="00.000.000/0000-00"
                   />
                   <Button
                     type="button" variant="outline" size="icon"
                     onClick={handleBuscarCNPJ}
-                    disabled={buscandoCNPJ || form.taxId.replace(/\D/g, "").length !== 14}
+                    disabled={buscandoCNPJ || form.cnpj.replace(/\D/g, "").length !== 14}
                     title="Consultar CNPJ na Receita Federal"
                   >
                     {buscandoCNPJ ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
@@ -436,16 +457,8 @@ export default function GestaoClientes() {
                 <h3 className="font-semibold text-xs text-muted-foreground uppercase tracking-wide mb-2 border-b pb-1">Endereço</h3>
               </div>
               <div className="col-span-2">
-                <Label htmlFor="logradouro">Logradouro</Label>
-                <Input id="logradouro" value={form.logradouro} onChange={e => setField("logradouro", e.target.value)} />
-              </div>
-              <div>
-                <Label htmlFor="complemento">Complemento</Label>
-                <Input id="complemento" value={form.complemento} onChange={e => setField("complemento", e.target.value)} />
-              </div>
-              <div>
-                <Label htmlFor="bairro">Bairro</Label>
-                <Input id="bairro" value={form.bairro} onChange={e => setField("bairro", e.target.value)} />
+                <Label htmlFor="endereco">Logradouro / Endereço</Label>
+                <Input id="endereco" value={form.endereco} onChange={e => setField("endereco", e.target.value)} />
               </div>
               <div>
                 <Label htmlFor="cep">CEP</Label>
@@ -464,12 +477,12 @@ export default function GestaoClientes() {
                 {loadingCep && <p className="text-xs text-muted-foreground mt-1">Buscando endereço...</p>}
               </div>
               <div>
-                <Label htmlFor="municipio">Município</Label>
-                <Input id="municipio" value={form.municipio} onChange={e => setField("municipio", e.target.value)} />
+                <Label htmlFor="cidade">Cidade</Label>
+                <Input id="cidade" value={form.cidade} onChange={e => setField("cidade", e.target.value)} />
               </div>
               <div>
-                <Label htmlFor="uf">UF</Label>
-                <Input id="uf" value={form.uf} onChange={e => setField("uf", e.target.value.toUpperCase())} maxLength={2} placeholder="SP" />
+                <Label htmlFor="estado">Estado (UF)</Label>
+                <Input id="estado" value={form.estado} onChange={e => setField("estado", e.target.value.toUpperCase())} maxLength={2} placeholder="SP" />
               </div>
 
               {/* Contato */}
@@ -485,8 +498,8 @@ export default function GestaoClientes() {
                 <Input id="email" type="email" value={form.email} onChange={e => setField("email", e.target.value)} placeholder="contato@empresa.com.br" />
               </div>
               <div>
-                <Label htmlFor="contact">Contato Adicional</Label>
-                <Input id="contact" value={form.contact} onChange={e => setField("contact", e.target.value)} placeholder="Outro telefone ou email" />
+                <Label htmlFor="contatoNome">Nome do Contato</Label>
+                <Input id="contatoNome" value={form.contatoNome} onChange={e => setField("contatoNome", e.target.value)} />
               </div>
 
               {/* Informações Adicionais */}
@@ -494,8 +507,8 @@ export default function GestaoClientes() {
                 <h3 className="font-semibold text-xs text-muted-foreground uppercase tracking-wide mb-2 border-b pb-1">Informações Adicionais</h3>
               </div>
               <div className="col-span-2">
-                <Label htmlFor="atividadeEconomica">Atividade Econômica</Label>
-                <Input id="atividadeEconomica" value={form.atividadeEconomica} onChange={e => setField("atividadeEconomica", e.target.value)} />
+                <Label htmlFor="cnaeDescricao">Atividade Econômica (CNAE)</Label>
+                <Input id="cnaeDescricao" value={form.cnaeDescricao} onChange={e => setField("cnaeDescricao", e.target.value)} />
               </div>
               <div>
                 <Label htmlFor="naturezaJuridica">Natureza Jurídica</Label>
