@@ -6,7 +6,7 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
   Building2, LayoutDashboard, LogOut, CheckCircle2, Users,
-  BarChart3, Target, ChevronRight, Globe, MapPin, UserCheck, FileText
+  BarChart3, Target, ChevronRight, Globe, MapPin, UserCheck
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { NotificationButton } from "@/components/NotificationButton";
@@ -307,18 +307,6 @@ export default function Home() {
               <Link href="/dashboard-comparativo">
                 <BarChart3 className="mr-2 h-4 w-4" />
                 Comparativo
-              </Link>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/gestao-clientes">
-                <UserCheck className="mr-2 h-4 w-4" />
-                Clientes
-              </Link>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/gestao-contratos">
-                <FileText className="mr-2 h-4 w-4" />
-                Contratos
               </Link>
             </Button>
             {user?.role === "admin" && (

@@ -1263,3 +1263,10 @@
 ### Seção 16 — UX
 - [ ] Verificar empty states em todas as abas
 - [ ] Verificar feedback visual em formulários
+
+## Correção de Navegação / Frontend (pasted_content_3)
+- [x] Remover botões "Clientes" (/gestao-clientes) e "Contratos" (/gestao-contratos) do header da Home.tsx
+- [ ] Manter acesso a Clientes apenas como cadastro mestre (link discreto)
+- [x] Converter /gestao-contratos, /gestao-contratos/novo e /gestao-contratos/:id em redirects no App.tsx
+- [x] Validar que hub da empresa mostra card Gestão de Contratos destacado
+- [x] Validar que ContratoDetalhe.tsx mostra todas as 8 abas visíveis

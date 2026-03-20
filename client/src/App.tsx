@@ -125,6 +125,8 @@ function Router() {
        <Route path="/gestao-clientes" component={GestaoClientes} />
       <Route path="/gestao-clientes/:id" component={GestaoClienteDetalhe} />
       <Route path="/gestao-contratos">{() => { window.location.replace("/empresas"); return null; }}</Route>
+      <Route path="/gestao-contratos/novo">{() => { window.location.replace("/empresas"); return null; }}</Route>
+      <Route path="/gestao-contratos/:id">{() => { window.location.replace("/empresas"); return null; }}</Route>
       <Route path={"/ 404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
