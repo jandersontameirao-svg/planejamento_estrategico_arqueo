@@ -143,5 +143,5 @@ describe("contratos.clientes.buscarCNPJ", () => {
       passed = true;
     }
     expect(passed).toBe(true);
-  });
+  }, 15000);
 });

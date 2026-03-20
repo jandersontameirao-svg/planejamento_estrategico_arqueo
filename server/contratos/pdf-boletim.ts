@@ -1,6 +1,7 @@
 /**
  * Serviço de Geração de PDF para Boletins de Medição
  * Usa a tabela contratos_boletins (SGC consolidado)
+ * Inclui logo da empresa no cabeçalho quando disponível
  */
 import PDFDocument from "pdfkit";
 import { getDb } from "../db";
@@ -13,6 +14,8 @@ import {
 } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { storagePut } from "../storage";
+import https from "https";
+import http from "http";
 
 interface BoletimPDFData {
   boletim: {
@@ -28,7 +31,7 @@ interface BoletimPDFData {
   };
   contrato: { numero: string; objeto: string; valorTotal: number };
   cliente: { razaoSocial: string; cnpj: string; email?: string | null };
-  empresa: { nomeFantasia: string; cnpj: string };
+  empresa: { nomeFantasia: string; cnpj: string; logoUrl?: string | null };
   marco: { descricao: string; valor: number; dataVencimento: Date | null };
 }
 
@@ -76,6 +79,7 @@ async function fetchBoletimData(boletimId: number): Promise<BoletimPDFData | nul
     empresa: {
       nomeFantasia: empresa?.nome ?? "Não informado",
       cnpj: "",
+      logoUrl: (empresa as any)?.logoUrl ?? null,
     },
     marco: {
       descricao: marco?.titulo ?? marco?.descricao ?? "",
@@ -83,6 +87,21 @@ async function fetchBoletimData(boletimId: number): Promise<BoletimPDFData | nul
       dataVencimento: marco?.dataPrevista ?? null,
     },
   };
+}
+
+async function downloadLogoBuffer(url: string): Promise<Buffer | null> {
+  return new Promise((resolve) => {
+    const client = url.startsWith("https") ? https : http;
+    const req = client.get(url, (res) => {
+      if (res.statusCode !== 200) { resolve(null); return; }
+      const chunks: Buffer[] = [];
+      res.on("data", (c: Buffer) => chunks.push(c));
+      res.on("end", () => resolve(Buffer.concat(chunks)));
+      res.on("error", () => resolve(null));
+    });
+    req.on("error", () => resolve(null));
+    req.setTimeout(5000, () => { req.destroy(); resolve(null); });
+  });
 }
 
 function formatCurrency(value: number): string {
@@ -98,6 +117,12 @@ export async function generateBoletimPDF(boletimId: number): Promise<{ url: stri
   const data = await fetchBoletimData(boletimId);
   if (!data) throw new Error(`Boletim ${boletimId} não encontrado`);
 
+  // Baixar logo antes de criar o PDF (fora da Promise do PDFDocument)
+  let logoBuffer: Buffer | null = null;
+  if (data.empresa.logoUrl) {
+    logoBuffer = await downloadLogoBuffer(data.empresa.logoUrl);
+  }
+
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 50, size: "A4" });
     const chunks: Buffer[] = [];
@@ -112,13 +137,32 @@ export async function generateBoletimPDF(boletimId: number): Promise<{ url: stri
     });
     doc.on("error", reject);
 
-    doc.fontSize(18).font("Helvetica-Bold").text("BOLETIM DE MEDIÇÃO", { align: "center" });
-    doc.fontSize(12).font("Helvetica").text(`Nº: ${data.boletim.numero}`, { align: "center" });
+    // ── Cabeçalho com logo ──────────────────────────────────────────────────
+    const headerY = doc.y;
+    if (logoBuffer) {
+      try {
+        doc.image(logoBuffer, 50, headerY, { height: 50, fit: [130, 50] });
+        doc.fontSize(18).font("Helvetica-Bold")
+          .text("BOLETIM DE MEDIÇÃO", 190, headerY + 6, { align: "right", width: 355 });
+        doc.fontSize(12).font("Helvetica")
+          .text(`Nº: ${data.boletim.numero}`, 190, headerY + 30, { align: "right", width: 355 });
+        doc.y = headerY + 60;
+      } catch {
+        // fallback sem logo
+        doc.fontSize(18).font("Helvetica-Bold").text("BOLETIM DE MEDIÇÃO", { align: "center" });
+        doc.fontSize(12).font("Helvetica").text(`Nº: ${data.boletim.numero}`, { align: "center" });
+      }
+    } else {
+      doc.fontSize(18).font("Helvetica-Bold").text("BOLETIM DE MEDIÇÃO", { align: "center" });
+      doc.fontSize(12).font("Helvetica").text(`Nº: ${data.boletim.numero}`, { align: "center" });
+    }
+
     if (data.boletim.titulo) doc.fontSize(11).font("Helvetica").text(data.boletim.titulo, { align: "center" });
     doc.moveDown(0.5);
     doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
     doc.moveDown(0.5);
 
+    // ── Dados do Contrato ───────────────────────────────────────────────────
     doc.fontSize(11).font("Helvetica-Bold").text("DADOS DO CONTRATO");
     doc.moveDown(0.3);
     doc.fontSize(10).font("Helvetica");
@@ -131,6 +175,7 @@ export async function generateBoletimPDF(boletimId: number): Promise<{ url: stri
     doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
     doc.moveDown(0.5);
 
+    // ── Marco Financeiro ────────────────────────────────────────────────────
     doc.fontSize(11).font("Helvetica-Bold").text("MARCO FINANCEIRO");
     doc.moveDown(0.3);
     doc.fontSize(10).font("Helvetica");
@@ -155,6 +200,7 @@ export async function generateBoletimPDF(boletimId: number): Promise<{ url: stri
       doc.moveDown(0.5);
     }
 
+    // ── Resultado da Aprovação ──────────────────────────────────────────────
     if (data.boletim.status === "aprovado" || data.boletim.status === "rejeitado") {
       doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
       doc.moveDown(0.3);
@@ -168,6 +214,7 @@ export async function generateBoletimPDF(boletimId: number): Promise<{ url: stri
       doc.moveDown(0.5);
     }
 
+    // ── Assinaturas ─────────────────────────────────────────────────────────
     doc.moveDown(2);
     doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
     doc.moveDown(0.5);

@@ -7,9 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Building2, Edit, FileText, Plus, Trash2, Users } from "lucide-react";
+import { ArrowLeft, Building2, Edit, FileText, Plus, Trash2, Upload, Users, X } from "lucide-react";
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { toast } from "sonner";
 
 export default function Empresas() {
@@ -21,9 +21,14 @@ export default function Empresas() {
     tipoAtuacao: "servicos" as "servicos" | "produtos" | "servicos_produtos",
     status: "ativa" as "ativa" | "inativa",
     observacoes: "",
+    logoUrl: "",
+    logoKey: "",
   });
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string>("");
 
   const { data: empresas, isLoading, refetch } = trpc.empresas.list.useQuery();
+
   const createMutation = trpc.empresas.create.useMutation({
     onSuccess: () => {
       toast.success("Empresa criada com sucesso!");
@@ -64,8 +69,39 @@ export default function Empresas() {
       tipoAtuacao: "servicos",
       status: "ativa",
       observacoes: "",
+      logoUrl: "",
+      logoKey: "",
     });
+    setLogoPreview("");
     setEditingId(null);
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem (PNG, JPG, SVG)");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("A logo deve ter no máximo 2MB");
+      return;
+    }
+    setLogoUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error("Falha no upload");
+      const { url, key } = await res.json();
+      setFormData((prev) => ({ ...prev, logoUrl: url, logoKey: key }));
+      setLogoPreview(url);
+      toast.success("Logo enviada com sucesso!");
+    } catch {
+      toast.error("Erro ao enviar a logo");
+    } finally {
+      setLogoUploading(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -84,7 +120,10 @@ export default function Empresas() {
       tipoAtuacao: empresa.tipoAtuacao,
       status: empresa.status,
       observacoes: empresa.observacoes || "",
+      logoUrl: empresa.logoUrl || "",
+      logoKey: empresa.logoKey || "",
     });
+    setLogoPreview(empresa.logoUrl || "");
     setDialogOpen(true);
   };
 
@@ -138,7 +177,7 @@ export default function Empresas() {
                 Nova Empresa
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
               <form onSubmit={handleSubmit}>
                 <DialogHeader>
                   <DialogTitle>
@@ -149,6 +188,51 @@ export default function Empresas() {
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
+                  {/* Logo */}
+                  <div className="grid gap-2">
+                    <Label>Logo da Empresa</Label>
+                    {logoPreview ? (
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={logoPreview}
+                          alt="Logo preview"
+                          className="h-16 w-auto max-w-[180px] object-contain border rounded-lg p-1 bg-white"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setLogoPreview("");
+                            setFormData((prev) => ({ ...prev, logoUrl: "", logoKey: "" }));
+                          }}
+                        >
+                          <X className="h-4 w-4 mr-1" /> Remover
+                        </Button>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                        {logoUploading ? (
+                          <span className="text-sm text-muted-foreground">Enviando...</span>
+                        ) : (
+                          <>
+                            <Upload className="h-6 w-6 text-muted-foreground mb-1" />
+                            <span className="text-sm text-muted-foreground text-center px-4">
+                              Clique para enviar a logo (PNG, JPG, SVG — máx. 2MB)
+                            </span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleLogoUpload}
+                          disabled={logoUploading}
+                        />
+                      </label>
+                    )}
+                  </div>
+
                   <div className="grid gap-2">
                     <Label htmlFor="nome">Nome da Empresa</Label>
                     <Input
@@ -220,7 +304,7 @@ export default function Empresas() {
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit">
+                  <Button type="submit" disabled={logoUploading}>
                     {editingId ? "Atualizar" : "Criar"}
                   </Button>
                 </DialogFooter>
@@ -236,9 +320,19 @@ export default function Empresas() {
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Building2 className="h-6 w-6 text-primary" />
-                  </div>
+                  {(empresa as any).logoUrl ? (
+                    <div className="h-12 w-12 flex items-center justify-center rounded-lg border bg-white p-1 shrink-0">
+                      <img
+                        src={(empresa as any).logoUrl}
+                        alt={`Logo ${empresa.nome}`}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="p-2 bg-primary/10 rounded-lg shrink-0">
+                      <Building2 className="h-6 w-6 text-primary" />
+                    </div>
+                  )}
                   <div>
                     <CardTitle className="text-lg">{empresa.nome}</CardTitle>
                     <CardDescription>
