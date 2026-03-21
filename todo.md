@@ -1270,3 +1270,7 @@
 - [x] Converter /gestao-contratos, /gestao-contratos/novo e /gestao-contratos/:id em redirects no App.tsx
 - [x] Validar que hub da empresa mostra card Gestão de Contratos destacado
 - [x] Validar que ContratoDetalhe.tsx mostra todas as 8 abas visíveis
+
+## Menu Admin - Cadastro Mestre de Clientes
+- [x] Adicionar link "Cadastro de Clientes" no bloco admin da Home.tsx (visível apenas para admin)
+- [x] Link aponta para /gestao-clientes (cadastro mestre global)
