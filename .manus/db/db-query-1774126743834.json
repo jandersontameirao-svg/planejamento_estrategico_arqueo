@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `contratos_boletins`\n  ADD COLUMN IF NOT EXISTS `titulo` varchar(255) DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `valor_medicao` decimal(15,2) DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `percentual_medicao` decimal(5,2) DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `periodo` varchar(50) DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `token_rejeicao` varchar(100) DEFAULT NULL,\n  MODIFY COLUMN `status` enum('rascunho','enviado','em_aprovacao','aprovado','rejeitado','pago','pendente','reprovado','cancelado') DEFAULT 'rascunho';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute ALTER TABLE `contratos_boletins`\n  ADD COLUMN IF NOT EXISTS `titulo` varchar(255) DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `valor_medicao` decimal(15,2) DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `percentual_medicao` decimal(5,2) DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `periodo` varchar(50) DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `token_rejeicao` varchar(100) DEFAULT NULL,\n  MODIFY COLUMN `status` enum('rascunho','enviado','em_aprovacao','aprovado','rejeitado','pago','pendente','reprovado','cancelado') DEFAULT 'rascunho';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2236
+}

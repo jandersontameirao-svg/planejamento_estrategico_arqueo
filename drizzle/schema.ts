@@ -1031,42 +1031,45 @@ export type InsertContratosCliente = typeof contratosClientes.$inferInsert;
  */
 export const contratos = mysqlTable("contratos", {
   id: int("id").autoincrement().primaryKey(),
-  numero: varchar("numero", { length: 100 }).notNull(),
+  // Vínculos com entidades mestras
+  empresaId: int("empresa_id").notNull(),
+  clienteId: int("cliente_id"),
+  // Dados básicos
+  numero: varchar("numero", { length: 100 }),
   titulo: varchar("titulo", { length: 255 }).notNull(),
   descricao: text("descricao"),
-  tipo: mysqlEnum("tipo", ["servicos", "fornecimento", "consultoria", "manutencao", "parceria", "outro"]).default("servicos").notNull(),
+  // Enums alinhados com o banco real
+  tipo: mysqlEnum("tipo", ["servico", "produto", "misto", "consultoria", "manutencao", "outros"]).default("servico").notNull(),
   status: mysqlEnum("status", [
-    "rascunho", "em_analise", "aprovado", "vigente", "suspenso", "encerrado", "cancelado"
+    "rascunho", "ativo", "suspenso", "encerrado", "rescindido"
   ]).default("rascunho").notNull(),
-  // Vínculos com entidades mestras do app principal
-  empresaId: int("empresa_id").notNull(),
-  clienteId: int("cliente_id").notNull(),
-  responsavelUserId: int("responsavel_user_id"),
-  aprovadorUserId: int("aprovador_user_id"),
-  // Vínculos opcionais com módulos do app principal
-  projetoId: int("projeto_id"),
-  areaId: int("area_id"),
+  // Valores
+  valorTotal: decimal("valor_total", { precision: 15, scale: 2 }),
   // Datas
   dataInicio: date("data_inicio"),
   dataFim: date("data_fim"),
   dataAssinatura: date("data_assinatura"),
-  // Valores
-  valorTotal: decimal("valor_total", { precision: 15, scale: 2 }),
-  moeda: varchar("moeda", { length: 3 }).default("BRL"),
+  // Responsável (coluna original do banco)
+  responsavelId: int("responsavel_id"),
   // Documentos
   pdfUrl: text("pdf_url"),
-  pdfKey: text("pdf_key"),
   // Dados extraídos por IA do PDF
   resumoIA: text("resumo_ia"),
-  dadosExtradosIA: text("dados_extraidos_ia"), // JSON
   iaRevisado: boolean("ia_revisado").default(false),
-  // Assinatura digital
-  assinaturaStatus: mysqlEnum("assinatura_status", ["pendente", "parcial", "assinado", "rejeitado"]).default("pendente"),
-  assinaturaUrl: text("assinatura_url"),
-  observacoes: text("observacoes"),
   createdByUserId: int("created_by_user_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  // Colunas adicionadas via ALTER TABLE
+  responsavelUserId: int("responsavel_user_id"),
+  aprovadorUserId: int("aprovador_user_id"),
+  projetoId: int("projeto_id"),
+  areaId: int("area_id"),
+  moeda: varchar("moeda", { length: 3 }).default("BRL"),
+  pdfKey: text("pdf_key"),
+  dadosExtradosIA: text("dados_extraidos_ia"),
+  assinaturaStatus: mysqlEnum("assinatura_status", ["pendente", "parcial", "assinado", "rejeitado"]).default("pendente"),
+  assinaturaUrl: text("assinatura_url"),
+  observacoes: text("observacoes"),
 });
 export type Contrato = typeof contratos.$inferSelect;
 export type InsertContrato = typeof contratos.$inferInsert;

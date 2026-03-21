@@ -1274,3 +1274,23 @@
 ## Menu Admin - Cadastro Mestre de Clientes
 - [x] Adicionar link "Cadastro de Clientes" no bloco admin da Home.tsx (visível apenas para admin)
 - [x] Link aponta para /gestao-clientes (cadastro mestre global)
+
+## Checklist Visual Frontend (Pasted_content_17.txt)
+- [x] Home: sem atalhos para fluxo antigo, orienta para empresas
+- [x] Hub da empresa: card Gestão de Contratos visível e navegável
+- [x] Listagem de contratos: título, empresa, KPIs, filtros, botão Novo Contrato, empty state
+- [x] Formulário Novo Contrato: campos obrigatórios, cliente centralizado, upload PDF, botões salvar/cancelar
+- [x] Extração IA: upload visível, feedback de loading, resultado editável, revisão antes de salvar
+- [x] Detalhe do contrato: cabeçalho completo (nome, cliente, empresa, status, valor, datas)
+- [x] Aba Visão Geral: informações principais carregam
+- [x] Aba Aditivos: lista, botão novo aditivo, upload PDF
+- [x] Aba Marcos Financeiros: lista, valores, vencimentos, status, botão criar
+- [x] Aba Boletins: lista, status, aprovação/reprovação, PDF
+- [x] Aba Riscos: lista, severidade, probabilidade, responsável, mitigação, botão criar
+- [x] Aba Documentos: upload, lista, classificação, download
+- [x] Aba Avaliações: estrutura, score, plano de ação
+- [x] Aba Auditoria: logs, filtros, tabela legível
+- [x] Clientes: listagem, busca, botão novo, detalhe com contratos vinculados
+- [x] Rotas antigas: /gestao-contratos redireciona, sem duplicidade de módulo
+- [x] Navegação: breadcrumbs, botão voltar, sem navegação circular
+- [x] Estados visuais: loading, empty state, erro, sucesso, modais

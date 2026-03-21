@@ -19,13 +19,11 @@ import {
 import AvaliacaoContratos from "./AvaliacaoContratos";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  rascunho: { label: "Rascunho", color: "bg-gray-100 text-gray-700" },
-  em_analise: { label: "Em Análise", color: "bg-yellow-100 text-yellow-700" },
-  aprovado: { label: "Aprovado", color: "bg-blue-100 text-blue-700" },
-  vigente: { label: "Vigente", color: "bg-green-100 text-green-700" },
-  suspenso: { label: "Suspenso", color: "bg-orange-100 text-orange-700" },
-  encerrado: { label: "Encerrado", color: "bg-gray-200 text-gray-600" },
-  cancelado: { label: "Cancelado", color: "bg-red-100 text-red-700" },
+  rascunho:   { label: "Rascunho",   color: "bg-gray-100 text-gray-700" },
+  ativo:      { label: "Ativo",      color: "bg-green-100 text-green-700" },
+  suspenso:   { label: "Suspenso",   color: "bg-orange-100 text-orange-700" },
+  encerrado:  { label: "Encerrado",  color: "bg-gray-200 text-gray-600" },
+  rescindido: { label: "Rescindido", color: "bg-red-100 text-red-700" },
 };
 
 const MARCO_STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -124,7 +122,7 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const res = await fetch("/api/upload-pdf", { method: "POST", body: formData });
       if (!res.ok) throw new Error("Falha no upload");
       const { url, key } = await res.json();
       // Classificar com IA
@@ -174,7 +172,7 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
       // Upload via fetch para o endpoint de storage
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const res = await fetch("/api/upload-pdf", { method: "POST", body: formData });
       if (!res.ok) throw new Error("Falha no upload");
       const { url, key } = await res.json();
 
@@ -274,6 +272,13 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
                   )}
                 </div>
                 <h1 className="text-lg font-semibold text-gray-900">{contrato.titulo}</h1>
+                {((contrato as any).nomeCliente || (contrato as any).nomeEmpresa) && (
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {(contrato as any).nomeEmpresa && <span>{(contrato as any).nomeEmpresa}</span>}
+                    {(contrato as any).nomeEmpresa && (contrato as any).nomeCliente && <span className="mx-1">→</span>}
+                    {(contrato as any).nomeCliente && <span className="font-medium text-gray-700">{(contrato as any).nomeCliente}</span>}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2">

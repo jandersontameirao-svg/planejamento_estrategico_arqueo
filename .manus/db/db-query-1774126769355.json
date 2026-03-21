@@ -1,0 +1,74 @@
+{
+  "query": "ALTER TABLE `contratos_marcos`\n  ADD COLUMN IF NOT EXISTS `prazo_pagamento` int DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `ordem` int DEFAULT 1,\n  ADD COLUMN IF NOT EXISTS `created_by_user_id` int DEFAULT NULL,\n  MODIFY COLUMN `status` enum('pendente','em_medicao','aprovado','pago','atrasado','cancelado') DEFAULT 'pendente',\n  MODIFY COLUMN `valor_previsto` decimal(15,2) NOT NULL DEFAULT 0;\n\nDESCRIBE contratos_documentos;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute ALTER TABLE `contratos_marcos`\n  ADD COLUMN IF NOT EXISTS `prazo_pagamento` int DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `ordem` int DEFAULT 1,\n  ADD COLUMN IF NOT EXISTS `created_by_user_id` int DEFAULT NULL,\n  MODIFY COLUMN `status` enum('pendente','em_medicao','aprovado','pago','atrasado','cancelado') DEFAULT 'pendente',\n  MODIFY COLUMN `valor_previsto` decimal(15,2) NOT NULL DEFAULT 0;\n\nDESCRIBE contratos_documentos;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "contrato_id",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "nome",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "tipo",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "url",
+      "Type": "text",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "tamanho",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "uploaded_by_user_id",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "created_at",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\ncontrato_id\tint\tNO\t\tNULL\t\nnome\tvarchar(255)\tNO\t\tNULL\t\ntipo\tvarchar(100)\tYES\t\tNULL\t\nurl\ttext\tNO\t\tNULL\t\ntamanho\tint\tYES\t\tNULL\t\nuploaded_by_user_id\tint\tYES\t\tNULL\t\ncreated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\n",
+  "stderr": "",
+  "execution_time_ms": 1087
+}

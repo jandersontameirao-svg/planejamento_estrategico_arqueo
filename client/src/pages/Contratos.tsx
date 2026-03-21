@@ -13,22 +13,20 @@ import {
 } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  rascunho: { label: "Rascunho", color: "bg-gray-100 text-gray-700" },
-  em_analise: { label: "Em Análise", color: "bg-yellow-100 text-yellow-700" },
-  aprovado: { label: "Aprovado", color: "bg-blue-100 text-blue-700" },
-  vigente: { label: "Vigente", color: "bg-green-100 text-green-700" },
-  suspenso: { label: "Suspenso", color: "bg-orange-100 text-orange-700" },
-  encerrado: { label: "Encerrado", color: "bg-gray-200 text-gray-600" },
-  cancelado: { label: "Cancelado", color: "bg-red-100 text-red-700" },
+  rascunho:   { label: "Rascunho",   color: "bg-gray-100 text-gray-700" },
+  ativo:      { label: "Ativo",      color: "bg-green-100 text-green-700" },
+  suspenso:   { label: "Suspenso",   color: "bg-orange-100 text-orange-700" },
+  encerrado:  { label: "Encerrado",  color: "bg-gray-200 text-gray-600" },
+  rescindido: { label: "Rescindido", color: "bg-red-100 text-red-700" },
 };
 
 const TIPO_LABELS: Record<string, string> = {
-  servicos: "Serviços",
-  fornecimento: "Fornecimento",
+  servico:     "Serviço",
+  produto:     "Produto",
+  misto:       "Misto",
   consultoria: "Consultoria",
-  manutencao: "Manutenção",
-  parceria: "Parceria",
-  outro: "Outro",
+  manutencao:  "Manutenção",
+  outros:      "Outros",
 };
 
 function formatCurrency(val: string | null | undefined) {
@@ -117,8 +115,8 @@ export default function Contratos({ empresaId }: ContratosProps) {
                     <CheckCircle2 className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Vigentes</p>
-                    <p className="text-2xl font-bold text-green-700">{(dashboard as any).vigentes ?? 0}</p>
+                    <p className="text-xs text-gray-500">Ativos</p>
+                    <p className="text-2xl font-bold text-green-700">{(dashboard as any).ativos ?? (dashboard as any).vigentes ?? 0}</p>
                   </div>
                 </div>
               </CardContent>

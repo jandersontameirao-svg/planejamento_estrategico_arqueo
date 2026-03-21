@@ -19,6 +19,7 @@ import {
   contratosDocumentos,
   contratosAuditoria,
   contratosSincronizacao,
+  empresas,
   type ContratosCliente,
   type InsertContratosCliente,
   type Contrato,
@@ -128,7 +129,21 @@ export async function getContratoById(id: number) {
   const db = await getDb();
   if (!db) return null;
   const [row] = await db.select().from(contratos).where(eq(contratos.id, id));
-  return row ?? null;
+  if (!row) return null;
+  // Enrich with client and company names
+  let nomeCliente: string | null = null;
+  let nomeEmpresa: string | null = null;
+  if (row.clienteId) {
+    const [cliente] = await db.select({ razaoSocial: contratosClientes.razaoSocial, nomeFantasia: contratosClientes.nomeFantasia })
+      .from(contratosClientes).where(eq(contratosClientes.id, row.clienteId));
+    if (cliente) nomeCliente = cliente.nomeFantasia || cliente.razaoSocial;
+  }
+  if (row.empresaId) {
+    const [empresa] = await db.select({ nome: empresas.nome })
+      .from(empresas).where(eq(empresas.id, row.empresaId));
+    if (empresa) nomeEmpresa = empresa.nome;
+  }
+  return { ...row, nomeCliente, nomeEmpresa };
 }
 
 export async function createContrato(data: InsertContrato, userId?: number) {
@@ -151,7 +166,7 @@ export async function updateContrato(id: number, data: Partial<InsertContrato>, 
 export async function deleteContrato(id: number, userId?: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.update(contratos).set({ status: "cancelado" }).where(eq(contratos.id, id));
+  await db.update(contratos).set({ status: "rescindido" }).where(eq(contratos.id, id));
   await registrarAuditoriaContrato({ entidade: "contrato", entidadeId: id, acao: "exclusao_logica", usuarioId: userId });
 }
 
@@ -367,7 +382,7 @@ export async function getDashboardContratos(empresaId?: number) {
 
   const [totais] = await db.select({
     total: sql<number>`count(*)`,
-    vigentes: sql<number>`sum(case when ${contratos.status} = 'vigente' then 1 else 0 end)`,
+    ativos: sql<number>`sum(case when ${contratos.status} = 'ativo' then 1 else 0 end)`,
     encerrados: sql<number>`sum(case when ${contratos.status} = 'encerrado' then 1 else 0 end)`,
     valorTotal: sql<number>`sum(${contratos.valorTotal})`,
   }).from(contratos).where(whereClause ?? sql`1=1`);

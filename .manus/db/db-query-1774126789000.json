@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `contratos_boletins`\n  ADD COLUMN IF NOT EXISTS `aprovador_token` varchar(100) DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `data_envio` timestamp DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `observacoes_aprovador` text DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `pdf_key` text DEFAULT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute ALTER TABLE `contratos_boletins`\n  ADD COLUMN IF NOT EXISTS `aprovador_token` varchar(100) DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `data_envio` timestamp DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `observacoes_aprovador` text DEFAULT NULL,\n  ADD COLUMN IF NOT EXISTS `pdf_key` text DEFAULT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 984
+}

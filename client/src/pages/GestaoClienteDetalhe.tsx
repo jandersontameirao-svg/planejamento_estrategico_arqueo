@@ -38,13 +38,11 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
 }
 
 const STATUS_MAP: Record<string, { label: string; icon: typeof CheckCircle2; className: string }> = {
-  vigente:    { label: "Vigente",    icon: CheckCircle2, className: "bg-green-100 text-green-800 border-green-200" },
-  aprovado:   { label: "Aprovado",   icon: CheckCircle2, className: "bg-blue-100 text-blue-800 border-blue-200" },
+  ativo:      { label: "Ativo",      icon: CheckCircle2, className: "bg-green-100 text-green-800 border-green-200" },
   encerrado:  { label: "Encerrado",  icon: CheckCircle2, className: "bg-gray-100 text-gray-800 border-gray-200" },
-  cancelado:  { label: "Cancelado",  icon: XCircle,      className: "bg-red-100 text-red-800 border-red-200" },
+  rescindido: { label: "Rescindido", icon: XCircle,      className: "bg-red-100 text-red-800 border-red-200" },
   suspenso:   { label: "Suspenso",   icon: XCircle,      className: "bg-orange-100 text-orange-800 border-orange-200" },
   rascunho:   { label: "Rascunho",   icon: Clock,        className: "bg-yellow-100 text-yellow-800 border-yellow-200" },
-  em_analise: { label: "Em Análise", icon: Clock,        className: "bg-purple-100 text-purple-800 border-purple-200" },
 };
 
 function ContractStatusBadge({ status }: { status: string }) {
@@ -144,7 +142,7 @@ export default function GestaoClienteDetalhe() {
     );
   }
 
-  const activeContratos = contratos?.filter((c) => c.status === "vigente" || c.status === "aprovado").length ?? 0;
+  const activeContratos = contratos?.filter((c) => c.status === "ativo").length ?? 0;
   const totalValue = contratos?.reduce((sum, c) => sum + parseFloat(String(c.valorTotal || 0)), 0) ?? 0;
 
   return (

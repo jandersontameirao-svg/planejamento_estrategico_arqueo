@@ -73,7 +73,7 @@ export async function analyzeContractWithAI(
 
       const total = contratosEmpresa.length;
       const encerrados = contratosEmpresa.filter(c => c.status === "encerrado").length;
-      const cancelados = contratosEmpresa.filter(c => c.status === "cancelado").length;
+      const cancelados = contratosEmpresa.filter(c => c.status === "rescindido").length;
 
       historicalContext = `
 **Histórico da Empresa:**

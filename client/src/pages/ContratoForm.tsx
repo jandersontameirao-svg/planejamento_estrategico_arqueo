@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -7,12 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft, FileText, Save, Search, Building2, ExternalLink } from "lucide-react";
+import {
+  ArrowLeft, FileText, Save, Search, Building2, ExternalLink,
+  Upload, Brain, CheckCircle2, AlertCircle, X, Loader2, FileUp,
+} from "lucide-react";
 
 interface ContratoFormProps {
   empresaId: number;
 }
+
 export default function ContratoForm({ empresaId }: ContratoFormProps) {
   const [, navigate] = useLocation();
   const { data: empresas = [] } = trpc.empresas.list.useQuery();
@@ -22,7 +27,7 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
     numero: "",
     titulo: "",
     descricao: "",
-    tipo: "servicos" as any,
+    tipo: "servico" as any,
     status: "rascunho" as any,
     empresaId: String(empresaId),
     clienteId: "",
@@ -33,6 +38,18 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
     moeda: "BRL",
     observacoes: "",
   });
+
+  // PDF upload state
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [iaResult, setIaResult] = useState<any>(null);
+  const [iaRevisado, setIaRevisado] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const extrairPDF = trpc.contratos.contratos.extrairPDF.useMutation();
 
   const createContrato = trpc.contratos.contratos.create.useMutation({
     onSuccess: (data: any) => {
@@ -59,16 +76,78 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
     );
   }, [clientes, form.empresaId, buscaCliente]);
 
+  async function handleFileSelect(file: File) {
+    if (!file.type.includes("pdf")) {
+      toast.error("Apenas arquivos PDF são aceitos");
+      return;
+    }
+    if (file.size > 16 * 1024 * 1024) {
+      toast.error("Arquivo muito grande. Limite de 16MB.");
+      return;
+    }
+    setPdfFile(file);
+    setIaResult(null);
+    setIaRevisado(false);
+
+    // Upload to S3
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload-pdf", { method: "POST", body: formData });
+      if (!res.ok) throw new Error("Falha no upload");
+      const { url } = await res.json();
+      setPdfUrl(url);
+      toast.success("PDF enviado. Iniciando extração por IA...");
+
+      // Extract with AI
+      setIsExtracting(true);
+      const result = await extrairPDF.mutateAsync({ pdfUrl: url }) as any;
+      setIaResult(result);
+      // Pre-fill form with AI data
+      if (result) {
+        setForm(f => ({
+          ...f,
+          titulo: result.titulo || f.titulo,
+          numero: result.numero || f.numero,
+          valorTotal: result.valorTotal ? String(result.valorTotal) : f.valorTotal,
+          dataInicio: result.dataInicio ? result.dataInicio.split("T")[0] : f.dataInicio,
+          dataFim: result.dataFim ? result.dataFim.split("T")[0] : f.dataFim,
+          descricao: result.resumo || f.descricao,
+          tipo: result.tipo || f.tipo,
+        }));
+        toast.success("Dados extraídos pela IA. Revise antes de salvar.");
+      }
+    } catch (err: any) {
+      toast.error("Erro na extração: " + (err.message || "Tente novamente"));
+    } finally {
+      setIsUploading(false);
+      setIsExtracting(false);
+    }
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileSelect(file);
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.numero || !form.titulo || !form.empresaId || !form.clienteId) {
       toast.error("Preencha os campos obrigatórios");
       return;
     }
+    if (iaResult && !iaRevisado) {
+      toast.error("Revise os dados extraídos pela IA antes de salvar");
+      return;
+    }
     createContrato.mutate({
       ...form,
       empresaId: parseInt(form.empresaId),
       clienteId: parseInt(form.clienteId),
+      pdfUrl: pdfUrl ?? undefined,
     });
   }
 
@@ -91,6 +170,123 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
 
       <div className="max-w-3xl mx-auto px-6 py-6">
         <form onSubmit={handleSubmit} className="space-y-6">
+
+          {/* PDF Upload + IA */}
+          <Card className="border-2 border-dashed border-blue-200 bg-blue-50/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Brain className="w-4 h-4 text-purple-600" />
+                Documento do Contrato (PDF)
+                <Badge variant="outline" className="text-purple-600 border-purple-300 text-xs">IA disponível</Badge>
+              </CardTitle>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Faça upload do PDF para extração automática de dados. Você poderá preencher manualmente se preferir.
+              </p>
+            </CardHeader>
+            <CardContent>
+              {!pdfFile ? (
+                <div
+                  className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                    isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
+                  }`}
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <FileUp className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-700">Arraste o PDF aqui ou clique para selecionar</p>
+                  <p className="text-xs text-gray-400 mt-1">PDF até 16MB • A IA extrai valores, marcos e riscos automaticamente</p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    className="hidden"
+                    onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                    <FileText className="w-5 h-5 text-red-500 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{pdfFile.name}</p>
+                      <p className="text-xs text-gray-400">{(pdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                    {(isUploading || isExtracting) ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                    ) : iaResult ? (
+                      <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    ) : null}
+                    <button
+                      type="button"
+                      className="text-gray-400 hover:text-red-500"
+                      onClick={() => { setPdfFile(null); setPdfUrl(null); setIaResult(null); setIaRevisado(false); }}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {isUploading && (
+                    <div className="flex items-center gap-2 text-sm text-blue-600">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Enviando arquivo...
+                    </div>
+                  )}
+                  {isExtracting && (
+                    <div className="flex items-center gap-2 text-sm text-purple-600">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Extraindo dados com IA...
+                    </div>
+                  )}
+
+                  {iaResult && (
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-1.5">
+                          <Brain className="w-3.5 h-3.5 text-purple-600" />
+                          <span className="text-xs font-semibold text-purple-700">Dados extraídos pela IA</span>
+                        </div>
+                        {!iaRevisado && (
+                          <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300 text-xs">Revisão pendente</Badge>
+                        )}
+                        {iaRevisado && (
+                          <Badge className="bg-green-100 text-green-700 border-green-300 text-xs">Revisado</Badge>
+                        )}
+                      </div>
+                      {iaResult.resumo && (
+                        <p className="text-xs text-purple-800 mb-2">{iaResult.resumo}</p>
+                      )}
+                      <div className="grid grid-cols-2 gap-1 text-xs text-purple-700">
+                        {iaResult.titulo && <span>• Título: {iaResult.titulo}</span>}
+                        {iaResult.valorTotal && <span>• Valor: R$ {Number(iaResult.valorTotal).toLocaleString("pt-BR")}</span>}
+                        {iaResult.marcos?.length > 0 && <span>• {iaResult.marcos.length} marco(s) identificado(s)</span>}
+                        {iaResult.riscos?.length > 0 && <span>• {iaResult.riscos.length} risco(s) identificado(s)</span>}
+                      </div>
+                      {!iaRevisado && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="mt-2 h-7 text-xs bg-purple-600 hover:bg-purple-700"
+                          onClick={() => setIaRevisado(true)}
+                        >
+                          <CheckCircle2 className="w-3 h-3 mr-1" /> Confirmar revisão dos dados
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
+                  {!iaResult && !isUploading && !isExtracting && pdfUrl && (
+                    <div className="flex items-center gap-2 text-sm text-amber-600">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      Extração não disponível. Preencha os dados manualmente.
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Identificação</CardTitle>
@@ -110,12 +306,12 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
                   <Select value={form.tipo} onValueChange={(v) => setForm(f => ({ ...f, tipo: v }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="servicos">Serviços</SelectItem>
-                      <SelectItem value="fornecimento">Fornecimento</SelectItem>
+                      <SelectItem value="servico">Serviço</SelectItem>
+                      <SelectItem value="produto">Produto</SelectItem>
+                      <SelectItem value="misto">Misto</SelectItem>
                       <SelectItem value="consultoria">Consultoria</SelectItem>
                       <SelectItem value="manutencao">Manutenção</SelectItem>
-                      <SelectItem value="parceria">Parceria</SelectItem>
-                      <SelectItem value="outro">Outro</SelectItem>
+                      <SelectItem value="outros">Outros</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -158,7 +354,6 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
               </div>
               <div>
                 <Label>Cliente / Contratado *</Label>
-                {/* Busca rápida por CNPJ ou nome */}
                 <div className="relative mt-1 mb-2">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
                   <Input
@@ -283,7 +478,7 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
             <Button type="button" variant="outline" onClick={() => navigate(`/empresa/${empresaId}/contratos`)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={createContrato.isPending}>
+            <Button type="submit" disabled={createContrato.isPending || isUploading || isExtracting}>
               <Save className="w-4 h-4 mr-1" />
               {createContrato.isPending ? "Salvando..." : "Criar Contrato"}
             </Button>
