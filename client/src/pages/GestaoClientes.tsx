@@ -65,15 +65,15 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
   const { data: clientes = [], isLoading } = trpc.contratos.clientes.list.useQuery({ empresaId });
 
   const createMut = trpc.contratos.clientes.create.useMutation({
-    onSuccess: () => { utils.contratos.clientes.list.invalidate(); toast.success("Cliente cadastrado!"); fecharModal(); },
+    onSuccess: () => { utils.contratos.clientes.list.invalidate({ empresaId }); toast.success("Cliente cadastrado!"); fecharModal(); },
     onError: (e: { message: string }) => toast.error(e.message),
   });
   const updateMut = trpc.contratos.clientes.update.useMutation({
-    onSuccess: () => { utils.contratos.clientes.list.invalidate(); toast.success("Cliente atualizado!"); fecharModal(); },
+    onSuccess: () => { utils.contratos.clientes.list.invalidate({ empresaId }); toast.success("Cliente atualizado!"); fecharModal(); },
     onError: (e: { message: string }) => toast.error(e.message),
   });
   const deleteMut = trpc.contratos.clientes.delete.useMutation({
-    onSuccess: () => { utils.contratos.clientes.list.invalidate(); toast.success("Cliente removido."); },
+    onSuccess: () => { utils.contratos.clientes.list.invalidate({ empresaId }); toast.success("Cliente removido."); },
     onError: (e: { message: string }) => toast.error(e.message),
   });
   const buscarCNPJMut = trpc.contratos.clientes.buscarCNPJ.useMutation();
@@ -220,6 +220,8 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
       situacaoCadastral: form.situacaoCadastral || undefined,
       logoUrl: form.logoUrl || undefined,
       status: form.status,
+      // Vínculo automático: quando acessado via /empresa/:id/clientes, vincula o cliente à empresa
+      empresaId: empresaId || undefined,
     };
     if (editandoId) {
       updateMut.mutate({ id: editandoId, data: payload });

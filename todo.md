@@ -1299,3 +1299,8 @@
 - [x] Adicionar card "Gestão de Clientes" no hub da empresa (PlanejamentoEstrategicoEmpresa.tsx)
 - [x] Criar rota /empresa/:id/clientes no App.tsx apontando para GestaoClientes filtrado por empresa
 - [x] Adaptar GestaoClientes para aceitar empresaId como prop/param e filtrar clientes por empresa
+
+## Vínculo Automático de Clientes à Empresa
+- [x] Verificar schema e backend: empresaId salvo na criação do cliente
+- [x] GestaoClientes: passar empresaId automaticamente no payload de criação quando acessado via /empresa/:id/clientes
+- [x] Garantir que invalidate() da query usa o empresaId correto após criação/edição/exclusão
