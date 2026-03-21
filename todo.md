@@ -1294,3 +1294,8 @@
 - [x] Rotas antigas: /gestao-contratos redireciona, sem duplicidade de módulo
 - [x] Navegação: breadcrumbs, botão voltar, sem navegação circular
 - [x] Estados visuais: loading, empty state, erro, sucesso, modais
+
+## Card Gestão de Clientes no Hub da Empresa
+- [x] Adicionar card "Gestão de Clientes" no hub da empresa (PlanejamentoEstrategicoEmpresa.tsx)
+- [x] Criar rota /empresa/:id/clientes no App.tsx apontando para GestaoClientes filtrado por empresa
+- [x] Adaptar GestaoClientes para aceitar empresaId como prop/param e filtrar clientes por empresa

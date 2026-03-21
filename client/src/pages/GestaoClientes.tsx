@@ -7,10 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import {
   Users, Plus, Search, Building2, Mail, Phone, Pencil, Trash2,
-  Loader2, Upload, MapPin, Briefcase, FileText, RefreshCw,
+  Loader2, Upload, MapPin, Briefcase, FileText, RefreshCw, ArrowLeft,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -47,7 +47,11 @@ function formatCEP(v: string) {
 }
 
 // ── Componente Principal ──────────────────────────────────────────────────────
-export default function GestaoClientes() {
+interface GestaoClientesProps {
+  empresaId?: number;
+}
+export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) {
+  const [, navigate] = useLocation();
   const [busca, setBusca] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editandoId, setEditandoId] = useState<number | null>(null);
@@ -58,7 +62,7 @@ export default function GestaoClientes() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const utils = trpc.useUtils();
-  const { data: clientes = [], isLoading } = trpc.contratos.clientes.list.useQuery({});
+  const { data: clientes = [], isLoading } = trpc.contratos.clientes.list.useQuery({ empresaId });
 
   const createMut = trpc.contratos.clientes.create.useMutation({
     onSuccess: () => { utils.contratos.clientes.list.invalidate(); toast.success("Cliente cadastrado!"); fecharModal(); },
@@ -240,12 +244,17 @@ export default function GestaoClientes() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
+          {empresaId && (
+            <Button variant="ghost" size="sm" className="mb-2 -ml-2" onClick={() => navigate(`/empresa/${empresaId}/planejamento`)}>
+              <ArrowLeft className="w-4 h-4 mr-1" /> Voltar ao Hub
+            </Button>
+          )}
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Users className="h-8 w-8 text-primary" />
             Gestão de Clientes
           </h1>
           <p className="text-muted-foreground mt-1">
-            Cadastro global compartilhado entre todas as empresas do Grupo Arqueo
+            {empresaId ? "Clientes vinculados a esta empresa" : "Cadastro global compartilhado entre todas as empresas do Grupo Arqueo"}
           </p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">

@@ -122,8 +122,11 @@ function Router() {
       <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path="/aprovacao/:token" component={AprovacaoBoletim} />
-       <Route path="/gestao-clientes" component={GestaoClientes} />
+      <Route path="/gestao-clientes">{() => <GestaoClientes />}</Route>
       <Route path="/gestao-clientes/:id" component={GestaoClienteDetalhe} />
+      <Route path="/empresa/:id/clientes">
+        {(params) => <GestaoClientes empresaId={Number(params.id)} />}
+      </Route>
       <Route path="/gestao-contratos">{() => { window.location.replace("/empresas"); return null; }}</Route>
       <Route path="/gestao-contratos/novo">{() => { window.location.replace("/empresas"); return null; }}</Route>
       <Route path="/gestao-contratos/:id">{() => { window.location.replace("/empresas"); return null; }}</Route>
