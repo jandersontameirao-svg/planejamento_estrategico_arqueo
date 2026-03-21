@@ -20,6 +20,7 @@ import {
   contratosAuditoria,
   contratosSincronizacao,
   empresas,
+  empresaCliente,
   type ContratosCliente,
   type InsertContratosCliente,
   type Contrato,
@@ -64,13 +65,36 @@ export async function registrarAuditoriaContrato(params: {
 export async function getAllContratosClientes(empresaId?: number) {
   const db = await getDb();
   if (!db) return [];
-  const query = db.select().from(contratosClientes).orderBy(desc(contratosClientes.createdAt));
   if (empresaId) {
-    return await db.select().from(contratosClientes)
-      .where(eq(contratosClientes.empresaId, empresaId))
-      .orderBy(desc(contratosClientes.createdAt));
+    // Filtra via tabela de junção N:N
+    return await db
+      .select({ cliente: contratosClientes })
+      .from(contratosClientes)
+      .innerJoin(empresaCliente, eq(empresaCliente.clienteId, contratosClientes.id))
+      .where(eq(empresaCliente.empresaId, empresaId))
+      .orderBy(desc(contratosClientes.createdAt))
+      .then((rows) => rows.map((r) => r.cliente));
   }
-  return await query;
+  return await db.select().from(contratosClientes).orderBy(desc(contratosClientes.createdAt));
+}
+
+// Vincula um cliente a uma empresa via tabela de junção N:N
+export async function vincularClienteEmpresa(clienteId: number, empId: number, userId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(empresaCliente)
+    .values({ clienteId, empresaId: empId, createdAt: Date.now() })
+    .onDuplicateKeyUpdate({ set: { clienteId, empresaId: empId } });
+  await registrarAuditoriaContrato({ entidade: "cliente", entidadeId: clienteId, acao: "edicao", usuarioId: userId, payloadNovo: { vincularEmpresaId: empId } });
+}
+
+// Desvincula um cliente de uma empresa específica via tabela de junção N:N
+export async function desvincularClienteEmpresa(clienteId: number, empId: number, userId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(empresaCliente)
+    .where(and(eq(empresaCliente.clienteId, clienteId), eq(empresaCliente.empresaId, empId)));
+  await registrarAuditoriaContrato({ entidade: "cliente", entidadeId: clienteId, acao: "edicao", usuarioId: userId, payloadNovo: { desvincularEmpresaId: empId } });
 }
 
 export async function getContratosClienteById(id: number) {

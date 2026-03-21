@@ -1311,3 +1311,12 @@
 - [x] Frontend: modal seletor com busca de clientes globais não vinculados à empresa
 - [x] Frontend: botão "Vincular Cliente Existente" visível apenas na view por empresa
 - [x] Frontend: botão "Desvincular" em cada cliente na view por empresa
+
+## Relacionamento N:N Clientes-Empresas
+- [x] Criar tabela empresa_cliente no banco (clienteId, empresaId, createdAt)
+- [x] Atualizar schema Drizzle com tabela empresaCliente
+- [x] Atualizar helpers: listagem por empresa via JOIN, vincular/desvincular via tabela de junção
+- [x] Atualizar procedures: vincularEmpresa e desvincularEmpresa usam tabela de junção
+- [x] Atualizar frontend: modal seletor sem aviso de "já vinculado a outra empresa"
+- [x] Atualizar frontend: botão desvincular remove da tabela de junção
+- [x] Migrar dados existentes de empresa_id para a tabela de junção

@@ -100,6 +100,13 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
     },
     onError: (e: { message: string }) => toast.error(e.message),
   });
+  // empresaId é garantido quando o botão desvincular é exibido
+  const handleDesvincular = (c: { id: number; razaoSocial: string }) => {
+    if (!empresaId) return;
+    if (confirm(`Desvincular "${c.razaoSocial}" desta empresa?`)) {
+      desvincularMut.mutate({ clienteId: c.id, empresaId });
+    }
+  };
   const buscarCNPJMut = trpc.contratos.clientes.buscarCNPJ.useMutation();
   const extrairCartaoMut = trpc.contratos.clientes.extrairCartaoCNPJ.useMutation();
 
@@ -417,7 +424,7 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
                   {empresaId && (
                     <Button
                       variant="ghost" size="icon" className="h-8 w-8 hover:text-amber-600"
-                      onClick={() => { if (confirm(`Desvincular "${c.razaoSocial}" desta empresa?`)) desvincularMut.mutate({ clienteId: c.id }); }}
+                      onClick={() => handleDesvincular(c)}
                       title="Desvincular da empresa"
                     >
                       <ArrowLeft className="h-3.5 w-3.5" />
@@ -619,8 +626,7 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
           <div className="flex-1 overflow-y-auto space-y-2 pr-1">
             {clientesGlobais
               .filter((c) => {
-                // Exclui clientes já vinculados a esta empresa
-                if (c.empresaId === empresaId) return false;
+                // Filtra apenas por busca (N:N permite vínculos múltiplos)
                 if (!buscaVincular) return true;
                 const q = buscaVincular.toLowerCase();
                 return (
@@ -640,9 +646,6 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
                     <p className="text-xs text-muted-foreground">
                       {c.cnpj}{c.cidade ? ` • ${c.cidade}/${c.estado}` : ""}
                     </p>
-                    {c.empresaId && c.empresaId !== empresaId && (
-                      <span className="text-xs text-amber-600">⚠️ Já vinculado a outra empresa</span>
-                    )}
                   </div>
                   <Button
                     size="sm"
@@ -661,7 +664,7 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
                 </div>
               ))
             }
-            {clientesGlobais.filter((c) => c.empresaId !== empresaId).length === 0 && (
+            {clientesGlobais.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 <Users className="h-8 w-8 mx-auto mb-2 opacity-40" />
                 <p className="text-sm">Nenhum cliente disponível para vincular.</p>

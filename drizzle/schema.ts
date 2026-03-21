@@ -1026,6 +1026,19 @@ export type ContratosCliente = typeof contratosClientes.$inferSelect;
 export type InsertContratosCliente = typeof contratosClientes.$inferInsert;
 
 /**
+ * Tabela de junção N:N entre clientes e empresas
+ * Permite que um cliente seja vinculado a múltiplas empresas do grupo
+ */
+export const empresaCliente = mysqlTable("empresa_cliente", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresa_id").notNull(),
+  clienteId: int("cliente_id").notNull(),
+  createdAt: bigint("created_at", { mode: "number" }).$defaultFn(() => Date.now()),
+});
+export type EmpresaCliente = typeof empresaCliente.$inferSelect;
+export type InsertEmpresaCliente = typeof empresaCliente.$inferInsert;
+
+/**
  * Contratos principais
  * Vinculados a empresa (app principal), cliente e usuário responsável
  */

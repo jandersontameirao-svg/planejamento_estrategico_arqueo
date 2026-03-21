@@ -1,0 +1,12 @@
+{
+  "query": "\nCREATE TABLE IF NOT EXISTS empresa_cliente (\n  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n  empresa_id INT NOT NULL,\n  cliente_id INT NOT NULL,\n  created_at BIGINT NOT NULL DEFAULT (UNIX_TIMESTAMP() * 1000),\n  UNIQUE KEY uq_empresa_cliente (empresa_id, cliente_id),\n  KEY idx_empresa_id (empresa_id),\n  KEY idx_cliente_id (cliente_id)\n);\n\n-- Migrar dados existentes de empresa_id para a tabela de junção\nINSERT IGNORE INTO empresa_cliente (empresa_id, cliente_id)\nSELECT empresa_id, id FROM contratos_clientes\nWHERE empresa_id IS NOT NULL;\n\n-- Verificar a migração\nSELECT COUNT(*) as total_vinculos FROM empresa_cliente;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute \nCREATE TABLE IF NOT EXISTS empresa_cliente (\n  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n  empresa_id INT NOT NULL,\n  cliente_id INT NOT NULL,\n  created_at BIGINT NOT NULL DEFAULT (UNIX_TIMESTAMP() * 1000),\n  UNIQUE KEY uq_empresa_cliente (empresa_id, cliente_id),\n  KEY idx_empresa_id (empresa_id),\n  KEY idx_cliente_id (cliente_id)\n);\n\n-- Migrar dados existentes de empresa_id para a tabela de junção\nINSERT IGNORE INTO empresa_cliente (empresa_id, cliente_id)\nSELECT empresa_id, id FROM contratos_clientes\nWHERE empresa_id IS NOT NULL;\n\n-- Verificar a migração\nSELECT COUNT(*) as total_vinculos FROM empresa_cliente;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1064 (42000) at line 2: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 5 column 57 near \"* 1000),",
+    "  UNIQUE KEY uq_empresa_cliente (empresa_id, cliente_id),",
+    "  KEY idx_empresa_id (empresa_id),",
+    "  KEY idx_cliente_id (cliente_id)",
+    ")\""
+  ]
+}

@@ -38,6 +38,8 @@ import {
   getAuditoriaContrato,
   getAuditoriaGeral,
   getDashboardContratos,
+  vincularClienteEmpresa,
+  desvincularClienteEmpresa,
 } from "../contratos.db";
 
 function parseContent(content: string | unknown): unknown {
@@ -159,7 +161,13 @@ export const contratosRouter = router({
     create: protectedProcedure
       .input(clienteSchema)
       .mutation(async ({ input, ctx }) => {
-        return await createContratosCliente(input as any, ctx.user.id);
+        const { empresaId, ...clienteData } = input;
+        const id = await createContratosCliente(clienteData as any, ctx.user.id);
+        // Se empresaId foi fornecido, vincula via tabela de junção N:N
+        if (empresaId) {
+          await vincularClienteEmpresa(id, empresaId, ctx.user.id);
+        }
+        return id;
       }),
 
     update: protectedProcedure
@@ -389,19 +397,19 @@ export const contratosRouter = router({
         return await getAllContratosClientes();
       }),
 
-    // Vincula um cliente existente a uma empresa (atualiza empresaId)
+    // Vincula um cliente existente a uma empresa via tabela de junção N:N
     vincularEmpresa: protectedProcedure
       .input(z.object({ clienteId: z.number(), empresaId: z.number() }))
       .mutation(async ({ input, ctx }) => {
-        await updateContratosCliente(input.clienteId, { empresaId: input.empresaId } as any, ctx.user.id);
+        await vincularClienteEmpresa(input.clienteId, input.empresaId, ctx.user.id);
         return { ok: true };
       }),
 
-    // Desvincula um cliente de uma empresa (remove empresaId)
+    // Desvincula um cliente de uma empresa específica via tabela de junção N:N
     desvincularEmpresa: protectedProcedure
-      .input(z.object({ clienteId: z.number() }))
+      .input(z.object({ clienteId: z.number(), empresaId: z.number() }))
       .mutation(async ({ input, ctx }) => {
-        await updateContratosCliente(input.clienteId, { empresaId: null } as any, ctx.user.id);
+        await desvincularClienteEmpresa(input.clienteId, input.empresaId, ctx.user.id);
         return { ok: true };
       }),
   }),
