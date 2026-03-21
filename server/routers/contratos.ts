@@ -379,11 +379,32 @@ export const contratosRouter = router({
         });
         const content = response.choices?.[0]?.message?.content;
         const parsed = content ? parseContent(content) as any : null;
-        if (parsed) return { ...parsed, fonte: "cartao_ia" as const, socios: "[]", dadosReceita: JSON.stringify(parsed) };
+         if (parsed) return { ...parsed, fonte: "cartao_ia" as const, socios: "[]", dadosReceita: JSON.stringify(parsed) };
         return null;
       }),
-  }),
 
+    // Lista todos os clientes globais (sem filtro de empresa) — para o seletor de vínculo
+    listGlobal: protectedProcedure
+      .query(async () => {
+        return await getAllContratosClientes();
+      }),
+
+    // Vincula um cliente existente a uma empresa (atualiza empresaId)
+    vincularEmpresa: protectedProcedure
+      .input(z.object({ clienteId: z.number(), empresaId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        await updateContratosCliente(input.clienteId, { empresaId: input.empresaId } as any, ctx.user.id);
+        return { ok: true };
+      }),
+
+    // Desvincula um cliente de uma empresa (remove empresaId)
+    desvincularEmpresa: protectedProcedure
+      .input(z.object({ clienteId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        await updateContratosCliente(input.clienteId, { empresaId: null } as any, ctx.user.id);
+        return { ok: true };
+      }),
+  }),
   // ── CONTRATOS ──────────────────────────────────────────────────────────────
   contratos: router({
     list: protectedProcedure

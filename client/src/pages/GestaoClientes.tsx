@@ -60,9 +60,17 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
   const [uploadingCartao, setUploadingCartao] = useState(false);
   const [loadingCep, setLoadingCep] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Estado do modal de vínculo
+  const [showVincularModal, setShowVincularModal] = useState(false);
+  const [buscaVincular, setBuscaVincular] = useState("");
 
   const utils = trpc.useUtils();
   const { data: clientes = [], isLoading } = trpc.contratos.clientes.list.useQuery({ empresaId });
+  // Todos os clientes globais para o seletor de vínculo (só carrega quando o modal está aberto)
+  const { data: clientesGlobais = [] } = trpc.contratos.clientes.listGlobal.useQuery(
+    undefined,
+    { enabled: showVincularModal }
+  );
 
   const createMut = trpc.contratos.clientes.create.useMutation({
     onSuccess: () => { utils.contratos.clientes.list.invalidate({ empresaId }); toast.success("Cliente cadastrado!"); fecharModal(); },
@@ -74,6 +82,22 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
   });
   const deleteMut = trpc.contratos.clientes.delete.useMutation({
     onSuccess: () => { utils.contratos.clientes.list.invalidate({ empresaId }); toast.success("Cliente removido."); },
+    onError: (e: { message: string }) => toast.error(e.message),
+  });
+  const vincularMut = trpc.contratos.clientes.vincularEmpresa.useMutation({
+    onSuccess: () => {
+      utils.contratos.clientes.list.invalidate({ empresaId });
+      utils.contratos.clientes.listGlobal.invalidate();
+      toast.success("Cliente vinculado com sucesso!");
+    },
+    onError: (e: { message: string }) => toast.error(e.message),
+  });
+  const desvincularMut = trpc.contratos.clientes.desvincularEmpresa.useMutation({
+    onSuccess: () => {
+      utils.contratos.clientes.list.invalidate({ empresaId });
+      utils.contratos.clientes.listGlobal.invalidate();
+      toast.success("Cliente desvinculado.");
+    },
     onError: (e: { message: string }) => toast.error(e.message),
   });
   const buscarCNPJMut = trpc.contratos.clientes.buscarCNPJ.useMutation();
@@ -273,6 +297,12 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
             <Plus className="mr-2 h-4 w-4" />
             Novo Cliente
           </Button>
+          {empresaId && (
+            <Button variant="outline" onClick={() => { setBuscaVincular(""); setShowVincularModal(true); }}>
+              <Users className="mr-2 h-4 w-4" />
+              Vincular Existente
+            </Button>
+          )}
         </div>
       </div>
 
@@ -384,6 +414,15 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => abrirEditar(c)} title="Editar">
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
+                  {empresaId && (
+                    <Button
+                      variant="ghost" size="icon" className="h-8 w-8 hover:text-amber-600"
+                      onClick={() => { if (confirm(`Desvincular "${c.razaoSocial}" desta empresa?`)) desvincularMut.mutate({ clienteId: c.id }); }}
+                      title="Desvincular da empresa"
+                    >
+                      <ArrowLeft className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive"
                     onClick={() => { if (confirm(`Excluir "${c.razaoSocial}"?`)) deleteMut.mutate({ id: c.id }); }}
@@ -548,6 +587,92 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Vínculo de Cliente Existente */}
+      <Dialog open={showVincularModal} onOpenChange={setShowVincularModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col w-[95vw]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              Vincular Cliente Existente
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Selecione um cliente do cadastro global para vincular a esta empresa.
+            </p>
+          </DialogHeader>
+
+          {/* Busca */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nome, CNPJ ou cidade..."
+              value={buscaVincular}
+              onChange={(e) => setBuscaVincular(e.target.value)}
+              className="pl-9"
+              autoFocus
+            />
+          </div>
+
+          {/* Lista de clientes globais */}
+          <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+            {clientesGlobais
+              .filter((c) => {
+                // Exclui clientes já vinculados a esta empresa
+                if (c.empresaId === empresaId) return false;
+                if (!buscaVincular) return true;
+                const q = buscaVincular.toLowerCase();
+                return (
+                  c.razaoSocial.toLowerCase().includes(q) ||
+                  (c.nomeFantasia ?? "").toLowerCase().includes(q) ||
+                  c.cnpj.includes(q) ||
+                  (c.cidade ?? "").toLowerCase().includes(q)
+                );
+              })
+              .map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm truncate">{c.razaoSocial}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {c.cnpj}{c.cidade ? ` • ${c.cidade}/${c.estado}` : ""}
+                    </p>
+                    {c.empresaId && c.empresaId !== empresaId && (
+                      <span className="text-xs text-amber-600">⚠️ Já vinculado a outra empresa</span>
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-3 shrink-0"
+                    disabled={vincularMut.isPending}
+                    onClick={() => {
+                      if (empresaId) {
+                        vincularMut.mutate({ clienteId: c.id, empresaId });
+                      }
+                    }}
+                  >
+                    <Plus className="h-3.5 w-3.5 mr-1" />
+                    Vincular
+                  </Button>
+                </div>
+              ))
+            }
+            {clientesGlobais.filter((c) => c.empresaId !== empresaId).length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                <Users className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                <p className="text-sm">Nenhum cliente disponível para vincular.</p>
+                <p className="text-xs mt-1">Todos os clientes já estão vinculados a esta empresa ou não há clientes cadastrados.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end pt-2 border-t">
+            <Button variant="outline" onClick={() => setShowVincularModal(false)}>Fechar</Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

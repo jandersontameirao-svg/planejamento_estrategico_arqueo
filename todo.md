@@ -1304,3 +1304,10 @@
 - [x] Verificar schema e backend: empresaId salvo na criação do cliente
 - [x] GestaoClientes: passar empresaId automaticamente no payload de criação quando acessado via /empresa/:id/clientes
 - [x] Garantir que invalidate() da query usa o empresaId correto após criação/edição/exclusão
+
+## Vincular Clientes Existentes à Empresa
+- [x] Backend: procedure vincularClienteEmpresa (atualiza empresaId de cliente existente)
+- [x] Backend: procedure desvincularClienteEmpresa (remove empresaId do cliente)
+- [x] Frontend: modal seletor com busca de clientes globais não vinculados à empresa
+- [x] Frontend: botão "Vincular Cliente Existente" visível apenas na view por empresa
+- [x] Frontend: botão "Desvincular" em cada cliente na view por empresa
