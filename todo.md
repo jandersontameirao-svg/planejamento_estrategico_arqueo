@@ -1320,3 +1320,13 @@
 - [x] Atualizar frontend: modal seletor sem aviso de "já vinculado a outra empresa"
 - [x] Atualizar frontend: botão desvincular remove da tabela de junção
 - [x] Migrar dados existentes de empresa_id para a tabela de junção
+
+## Upload de Arquivo + Extração IA na Gestão Orçamentária
+- [x] Analisar estrutura atual do módulo (schema, routers, aba Importação)
+- [x] Backend: procedure de upload de arquivo orçamentário (PDF/Excel/CSV)
+- [x] Backend: procedure de extração por IA (LLM analisa arquivo e retorna categorias/itens/valores)
+- [x] Frontend: interface de upload na aba Importação com drag-and-drop
+- [x] Frontend: feedback de loading durante extração por IA
+- [x] Frontend: tela de revisão dos dados extraídos (categorias, itens, valores mensais)
+- [x] Frontend: botão de confirmação para salvar dados extraídos no banco
+- [x] Persistência: salvar categorias/itens/valores extraídos nas tabelas existentes
