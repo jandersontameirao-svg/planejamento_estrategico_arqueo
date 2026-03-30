@@ -25,6 +25,7 @@ import OrcamentoPlanejado from "./OrcamentoPlanejado";
 import OrcamentoCategorias from "./OrcamentoCategorias";
 import OrcamentoImportacao from "./OrcamentoImportacao";
 import OrcamentoAnaliseIA from "./OrcamentoAnaliseIA";
+import RelatorioOrcamentario from "./RelatorioOrcamentario";
 
 interface GestaoOrcamentariaProps {
   empresaId: number;
@@ -273,7 +274,7 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
 
         {/* Tabs principais */}
         <Tabs value={abaAtiva} onValueChange={setAbaAtiva}>
-          <TabsList className="grid grid-cols-6 w-full">
+          <TabsList className="grid grid-cols-7 w-full">
             <TabsTrigger value="dashboard">
               <BarChart3 className="h-4 w-4 mr-1" /> Dashboard
             </TabsTrigger>
@@ -288,6 +289,9 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
             </TabsTrigger>
             <TabsTrigger value="categorias">
               <Settings className="h-4 w-4 mr-1" /> Categorias
+            </TabsTrigger>
+            <TabsTrigger value="relatorio">
+              <FileText className="h-4 w-4 mr-1" /> Relatório
             </TabsTrigger>
             <TabsTrigger value="analise-ia">
               <Brain className="h-4 w-4 mr-1" /> Análise IA
@@ -409,6 +413,11 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
           {/* Categorias */}
           <TabsContent value="categorias" className="mt-6">
             <OrcamentoCategorias />
+          </TabsContent>
+
+          {/* Relatório Detalhado */}
+          <TabsContent value="relatorio" className="mt-6">
+            <RelatorioOrcamentario empresaId={empresaId} ano={anoSelecionado} />
           </TabsContent>
 
           {/* Análise IA */}

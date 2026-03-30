@@ -511,3 +511,188 @@ export async function getDashboardOrcamento(empresaId: number, ano: number) {
     executadoPorMes,
   };
 }
+
+
+// ─── RELATÓRIO DETALHADO: PLANEJADO vs EXECUTADO ──────────────────────────
+
+export async function getRelatorioDetalhadoPvsE(empresaId: number, ano: number, categoriaIdFiltro?: number) {
+  const d = await db();
+
+  // Buscar versão aprovada ou mais recente do ano
+  const versoes = await getVersoesByEmpresa(empresaId);
+  const versaoAtiva = versoes.find((v: any) => v.ano === ano && v.status === "aprovado")
+    ?? versoes.find((v: any) => v.ano === ano)
+    ?? null;
+
+  if (!versaoAtiva) {
+    return { versaoId: null, versaoNome: null, categorias: [], totais: null };
+  }
+
+  // Buscar linhas planejadas
+  const linhasPlanejadas = await getLinhasPlanejadas(versaoAtiva.id);
+
+  // Buscar executado
+  const linhasExecutadas = await getExecutadoByEmpresa(empresaId, ano);
+
+  // Buscar categorias e subcategorias para nomes
+  const todasCategorias = await getCategorias();
+  const todasSubcategorias = await getSubcategorias(undefined);
+
+  const catMap = new Map((todasCategorias as any[]).map(c => [c.id, c]));
+  const subMap = new Map((todasSubcategorias as any[]).map(s => [s.id, s]));
+
+  const mesesKeys = ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"] as const;
+  const mesesNomes = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+  // Agrupar executado por subcategoria e mês
+  const execPorSubMes = new Map<string, number>();
+  const execPorCatMes = new Map<string, number>();
+
+  for (const exec of linhasExecutadas as any[]) {
+    let mesIdx = -1;
+    if (exec.competencia) {
+      const parts = exec.competencia.split("-");
+      mesIdx = parseInt(parts[1], 10) - 1;
+    } else if (exec.dataLancamento) {
+      mesIdx = new Date(exec.dataLancamento).getMonth();
+    }
+    if (mesIdx < 0 || mesIdx > 11) continue;
+
+    const valor = parseFloat(exec.valorConvertidoBase ?? "0");
+    const subId = exec.subcategoriaId ?? 0;
+    const catId = exec.categoriaId ?? 0;
+
+    const keySubMes = `${subId}_${mesIdx}`;
+    execPorSubMes.set(keySubMes, (execPorSubMes.get(keySubMes) ?? 0) + valor);
+
+    const keyCatMes = `${catId}_${mesIdx}`;
+    execPorCatMes.set(keyCatMes, (execPorCatMes.get(keyCatMes) ?? 0) + valor);
+  }
+
+  // Agrupar por categoria > subcategoria
+  type SubcategoriaRelatorio = {
+    subcategoriaId: number;
+    subcategoriaNome: string;
+    meses: Array<{ mes: string; planejado: number; executado: number; variacao: number; percentual: number }>;
+    totalPlanejado: number;
+    totalExecutado: number;
+    totalVariacao: number;
+    totalPercentual: number;
+  };
+
+  type CategoriaRelatorio = {
+    categoriaId: number;
+    categoriaNome: string;
+    subcategorias: SubcategoriaRelatorio[];
+    meses: Array<{ mes: string; planejado: number; executado: number; variacao: number; percentual: number }>;
+    totalPlanejado: number;
+    totalExecutado: number;
+    totalVariacao: number;
+    totalPercentual: number;
+  };
+
+  const categoriasMap = new Map<number, CategoriaRelatorio>();
+
+  // Processar linhas planejadas
+  for (const lp of linhasPlanejadas as any[]) {
+    const catId = lp.categoriaId;
+    const subId = lp.subcategoriaId ?? 0;
+
+    if (categoriaIdFiltro && catId !== categoriaIdFiltro) continue;
+
+    if (!categoriasMap.has(catId)) {
+      const cat = catMap.get(catId);
+      categoriasMap.set(catId, {
+        categoriaId: catId,
+        categoriaNome: cat?.nome ?? `Categoria ${catId}`,
+        subcategorias: [],
+        meses: mesesNomes.map(m => ({ mes: m, planejado: 0, executado: 0, variacao: 0, percentual: 0 })),
+        totalPlanejado: 0,
+        totalExecutado: 0,
+        totalVariacao: 0,
+        totalPercentual: 0,
+      });
+    }
+
+    const catRel = categoriasMap.get(catId)!;
+    const sub = subMap.get(subId);
+
+    const subMeses = mesesKeys.map((mesKey, idx) => {
+      const planejado = parseFloat(lp[mesKey] ?? "0");
+      const executado = execPorSubMes.get(`${subId}_${idx}`) ?? 0;
+      const variacao = executado - planejado;
+      const percentual = planejado > 0 ? ((executado / planejado) * 100) : (executado > 0 ? 100 : 0);
+      return { mes: mesesNomes[idx], planejado, executado, variacao, percentual };
+    });
+
+    const totalPlanejadoSub = subMeses.reduce((a, m) => a + m.planejado, 0);
+    const totalExecutadoSub = subMeses.reduce((a, m) => a + m.executado, 0);
+
+    catRel.subcategorias.push({
+      subcategoriaId: subId,
+      subcategoriaNome: sub?.nome ?? lp.descricao ?? `Subcategoria ${subId}`,
+      meses: subMeses,
+      totalPlanejado: totalPlanejadoSub,
+      totalExecutado: totalExecutadoSub,
+      totalVariacao: totalExecutadoSub - totalPlanejadoSub,
+      totalPercentual: totalPlanejadoSub > 0 ? (totalExecutadoSub / totalPlanejadoSub) * 100 : (totalExecutadoSub > 0 ? 100 : 0),
+    });
+
+    // Acumular nos totais da categoria
+    for (let i = 0; i < 12; i++) {
+      catRel.meses[i].planejado += subMeses[i].planejado;
+      catRel.meses[i].executado += subMeses[i].executado;
+    }
+  }
+
+  // Calcular totais de cada categoria e variações
+  const categorias: CategoriaRelatorio[] = [];
+  let grandTotalPlanejado = 0;
+  let grandTotalExecutado = 0;
+
+  for (const catRel of Array.from(categoriasMap.values())) {
+    catRel.totalPlanejado = catRel.meses.reduce((a: number, m: { planejado: number }) => a + m.planejado, 0);
+    catRel.totalExecutado = catRel.meses.reduce((a: number, m: { executado: number }) => a + m.executado, 0);
+    catRel.totalVariacao = catRel.totalExecutado - catRel.totalPlanejado;
+    catRel.totalPercentual = catRel.totalPlanejado > 0 ? (catRel.totalExecutado / catRel.totalPlanejado) * 100 : 0;
+
+    for (const m of catRel.meses) {
+      m.variacao = m.executado - m.planejado;
+      m.percentual = m.planejado > 0 ? (m.executado / m.planejado) * 100 : (m.executado > 0 ? 100 : 0);
+    }
+
+    grandTotalPlanejado += catRel.totalPlanejado;
+    grandTotalExecutado += catRel.totalExecutado;
+    categorias.push(catRel);
+  }
+
+  // Ordenar categorias por nome
+  categorias.sort((a, b) => a.categoriaNome.localeCompare(b.categoriaNome));
+
+  // Totais gerais por mês
+  const totaisMeses = mesesNomes.map((mes, idx) => {
+    const planejado = categorias.reduce((a, c) => a + c.meses[idx].planejado, 0);
+    const executado = categorias.reduce((a, c) => a + c.meses[idx].executado, 0);
+    return {
+      mes,
+      planejado,
+      executado,
+      variacao: executado - planejado,
+      percentual: planejado > 0 ? (executado / planejado) * 100 : (executado > 0 ? 100 : 0),
+    };
+  });
+
+  return {
+    versaoId: versaoAtiva.id,
+    versaoNome: versaoAtiva.nomeVersao,
+    versaoStatus: versaoAtiva.status,
+    categorias,
+    totais: {
+      meses: totaisMeses,
+      totalPlanejado: grandTotalPlanejado,
+      totalExecutado: grandTotalExecutado,
+      totalVariacao: grandTotalExecutado - grandTotalPlanejado,
+      totalPercentual: grandTotalPlanejado > 0 ? (grandTotalExecutado / grandTotalPlanejado) * 100 : 0,
+    },
+  };
+}

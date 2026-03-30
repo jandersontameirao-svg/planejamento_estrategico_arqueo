@@ -1374,3 +1374,14 @@
 - [x] Lançar planejado Jan-Mar com valores reais do executado (8 novas linhas)
 - [x] Projetar planejado Abr-Dez com média mensal do 1º trimestre
 - [x] Validar totais: 19 linhas planejadas, R$ 179.869,46 total anual (antes: 11 linhas, R$ 135.410,53)
+
+## Módulo de Relatórios Detalhados - Planejado vs Executado
+- [x] Criar procedure tRPC getRelatorioDetalhado (planejado vs executado por categoria/subcategoria/mês)
+- [x] Criar página RelatorioOrcamentario com tabela detalhada e filtros (categoria, mês, visão resumida/mensal)
+- [x] Exibir variação absoluta (R$) e percentual (%) com componentes VariacaoIndicator
+- [x] Incluir totalizadores por categoria e geral (cards + linha de total na tabela)
+- [x] Adicionar indicadores visuais (badges: Abaixo/No alvo/Atenção/Acima) com cores
+- [x] Permitir impressão do relatório (botão Imprimir com window.print)
+- [x] Integrar como aba "Relatório" na GestaoOrcamentaria (7 abas)
+- [x] Gráfico comparativo horizontal por categoria
+- [x] Testes vitest: 4 testes passando (estrutura, filtro, empresa vazia, cálculo variação)

@@ -28,6 +28,7 @@ import {
   inserirLinhasExecutado,
   getRevisoesByVersao,
   getDashboardOrcamento,
+  getRelatorioDetalhadoPvsE,
 } from "../orcamento";
 
 export const orcamentoRouter = router({
@@ -243,6 +244,17 @@ export const orcamentoRouter = router({
     .input(z.object({ empresaId: z.number(), ano: z.number() }))
     .query(async ({ input }) => {
       return getDashboardOrcamento(input.empresaId, input.ano);
+    }),
+
+  // ── RELATÓRIO DETALHADO: PLANEJADO vs EXECUTADO ──────────────────────────
+  getRelatorioDetalhado: protectedProcedure
+    .input(z.object({
+      empresaId: z.number(),
+      ano: z.number(),
+      categoriaId: z.number().optional(),
+    }))
+    .query(async ({ input }) => {
+      return getRelatorioDetalhadoPvsE(input.empresaId, input.ano, input.categoriaId);
     }),
 
   // ── IA: IMPORTAÇÃO INTELIGENTE ───────────────────────────────────────────────
