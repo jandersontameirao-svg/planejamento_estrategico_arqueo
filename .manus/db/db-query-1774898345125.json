@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO orcamento_planejado_linhas (versaoId, categoriaId, subcategoriaId, descricao, janeiro, fevereiro, marco, abril, maio, junho, julho, agosto, setembro, outubro, novembro, dezembro, totalAnual, observacoes) VALUES (3, 30016, 30038, 'Simples Nacional (Das)', 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 3698.16, 'Jan-Mar: valor real executado | Abr-Dez: projeção baseada na média do 1º trimestre');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute INSERT INTO orcamento_planejado_linhas (versaoId, categoriaId, subcategoriaId, descricao, janeiro, fevereiro, marco, abril, maio, junho, julho, agosto, setembro, outubro, novembro, dezembro, totalAnual, observacoes) VALUES (3, 30016, 30038, 'Simples Nacional (Das)', 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 308.18, 3698.16, 'Jan-Mar: valor real executado | Abr-Dez: projeção baseada na média do 1º trimestre');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 347
+}

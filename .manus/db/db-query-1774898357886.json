@@ -1,0 +1,65 @@
+{
+  "query": "SELECT c.nome as categoria, COUNT(*) as linhas, SUM(l.totalAnual) as totalAnual FROM orcamento_planejado_linhas l JOIN orcamento_categorias c ON c.id = l.categoriaId WHERE l.versaoId = 3 GROUP BY c.nome ORDER BY totalAnual DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT c.nome as categoria, COUNT(*) as linhas, SUM(l.totalAnual) as totalAnual FROM orcamento_planejado_linhas l JOIN orcamento_categorias c ON c.id = l.categoriaId WHERE l.versaoId = 3 GROUP BY c.nome ORDER BY totalAnual DESC;",
+  "rows": [
+    {
+      "categoria": "Despesas com Serviços",
+      "linhas": "4",
+      "totalAnual": "64056.50"
+    },
+    {
+      "categoria": "Diretoria",
+      "linhas": "1",
+      "totalAnual": "57672.12"
+    },
+    {
+      "categoria": "Imobilizado",
+      "linhas": "1",
+      "totalAnual": "24999.93"
+    },
+    {
+      "categoria": "Tributos, Taxas e Contribuições",
+      "linhas": "3",
+      "totalAnual": "10754.14"
+    },
+    {
+      "categoria": "Custos Diretos de Projeto",
+      "linhas": "2",
+      "totalAnual": "6177.96"
+    },
+    {
+      "categoria": "Despesas Gerais",
+      "linhas": "2",
+      "totalAnual": "5817.00"
+    },
+    {
+      "categoria": "Despesas Administrativas",
+      "linhas": "1",
+      "totalAnual": "5040.00"
+    },
+    {
+      "categoria": "Movimentações Financeiras",
+      "linhas": "2",
+      "totalAnual": "2860.58"
+    },
+    {
+      "categoria": "Despesas Financeiras",
+      "linhas": "1",
+      "totalAnual": "1106.40"
+    },
+    {
+      "categoria": "Despesas de Consumo",
+      "linhas": "1",
+      "totalAnual": "851.88"
+    },
+    {
+      "categoria": "Despesas com Aluguéis e Condomínios",
+      "linhas": "1",
+      "totalAnual": "532.95"
+    }
+  ],
+  "messages": [],
+  "stdout": "categoria\tlinhas\ttotalAnual\nDespesas com Serviços\t4\t64056.50\nDiretoria\t1\t57672.12\nImobilizado\t1\t24999.93\nTributos, Taxas e Contribuições\t3\t10754.14\nCustos Diretos de Projeto\t2\t6177.96\nDespesas Gerais\t2\t5817.00\nDespesas Administrativas\t1\t5040.00\nMovimentações Financeiras\t2\t2860.58\nDespesas Financeiras\t1\t1106.40\nDespesas de Consumo\t1\t851.88\nDespesas com Aluguéis e Condomínios\t1\t532.95\n",
+  "stderr": "",
+  "execution_time_ms": 360
+}

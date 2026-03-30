@@ -1,0 +1,87 @@
+{
+  "query": "SELECT l.id, l.subcategoriaId, s.nome as subcategoria, c.nome as categoria, l.totalAnual FROM orcamento_planejado_linhas l JOIN orcamento_subcategorias s ON s.id = l.subcategoriaId JOIN orcamento_categorias c ON c.id = s.categoriaId WHERE l.versaoId = (SELECT id FROM orcamento_versoes WHERE empresaId = 660004) ORDER BY c.nome, s.nome;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT l.id, l.subcategoriaId, s.nome as subcategoria, c.nome as categoria, l.totalAnual FROM orcamento_planejado_linhas l JOIN orcamento_subcategorias s ON s.id = l.subcategoriaId JOIN orcamento_categorias c ON c.id = s.categoriaId WHERE l.versaoId = (SELECT id FROM orcamento_versoes WHERE empresaId = 660004) ORDER BY c.nome, s.nome;",
+  "rows": [
+    {
+      "id": "60",
+      "subcategoriaId": "8",
+      "subcategoria": "Reunioes E Confraternizaçoes",
+      "categoria": "Despesas Administrativas",
+      "totalAnual": "5040.00"
+    },
+    {
+      "id": "61",
+      "subcategoriaId": "9",
+      "subcategoria": "Alugueis",
+      "categoria": "Despesas com Aluguéis e Condomínios",
+      "totalAnual": "532.95"
+    },
+    {
+      "id": "62",
+      "subcategoriaId": "12",
+      "subcategoria": "Feiras Exposicoes Congressos E Conferencias",
+      "categoria": "Despesas com Serviços",
+      "totalAnual": "24000.00"
+    },
+    {
+      "id": "63",
+      "subcategoriaId": "16",
+      "subcategoria": "Servicos Contabeis",
+      "categoria": "Despesas com Serviços",
+      "totalAnual": "10536.50"
+    },
+    {
+      "id": "64",
+      "subcategoriaId": "26",
+      "subcategoria": "Telefone E Internet",
+      "categoria": "Despesas de Consumo",
+      "totalAnual": "851.88"
+    },
+    {
+      "id": "65",
+      "subcategoriaId": "28",
+      "subcategoria": "Despesas Bancarias",
+      "categoria": "Despesas Financeiras",
+      "totalAnual": "1106.40"
+    },
+    {
+      "id": "66",
+      "subcategoriaId": "29",
+      "subcategoria": "Certificados Digitais",
+      "categoria": "Despesas Gerais",
+      "totalAnual": "499.92"
+    },
+    {
+      "id": "67",
+      "subcategoriaId": "30",
+      "subcategoria": "Licenca De Softwares",
+      "categoria": "Despesas Gerais",
+      "totalAnual": "5317.08"
+    },
+    {
+      "id": "68",
+      "subcategoriaId": "31",
+      "subcategoria": "Retirada Socio",
+      "categoria": "Diretoria",
+      "totalAnual": "57672.12"
+    },
+    {
+      "id": "69",
+      "subcategoriaId": "37",
+      "subcategoria": "Maquinas E Equipamentos",
+      "categoria": "Imobilizado",
+      "totalAnual": "24999.93"
+    },
+    {
+      "id": "70",
+      "subcategoriaId": "44",
+      "subcategoria": "Entidades De Classe E Associacoes",
+      "categoria": "Tributos, Taxas e Contribuições",
+      "totalAnual": "4853.75"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsubcategoriaId\tsubcategoria\tcategoria\ttotalAnual\n60\t8\tReunioes E Confraternizaçoes\tDespesas Administrativas\t5040.00\n61\t9\tAlugueis\tDespesas com Aluguéis e Condomínios\t532.95\n62\t12\tFeiras Exposicoes Congressos E Conferencias\tDespesas com Serviços\t24000.00\n63\t16\tServicos Contabeis\tDespesas com Serviços\t10536.50\n64\t26\tTelefone E Internet\tDespesas de Consumo\t851.88\n65\t28\tDespesas Bancarias\tDespesas Financeiras\t1106.40\n66\t29\tCertificados Digitais\tDespesas Gerais\t499.92\n67\t30\tLicenca De Softwares\tDespesas Gerais\t5317.08\n68\t31\tRetirada Socio\tDiretoria\t57672.12\n69\t37\tMaquinas E Equipamentos\tImobilizado\t24999.93\n70\t44\tEntidades De Classe E Associacoes\tTributos, Taxas e Contribuições\t4853.75\n",
+  "stderr": "",
+  "execution_time_ms": 378
+}

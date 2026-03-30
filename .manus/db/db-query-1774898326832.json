@@ -1,0 +1,15 @@
+{
+  "query": "SELECT s.id, s.nome, c.nome as categoria FROM orcamento_subcategorias s JOIN orcamento_categorias c ON c.id = s.categoriaId WHERE s.nome LIKE '%Simples%' OR s.nome LIKE '%simples%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT s.id, s.nome, c.nome as categoria FROM orcamento_subcategorias s JOIN orcamento_categorias c ON c.id = s.categoriaId WHERE s.nome LIKE '%Simples%' OR s.nome LIKE '%simples%';",
+  "rows": [
+    {
+      "id": "47",
+      "nome": "Simples Nacional (parcelamento)",
+      "categoria": "Tributos, Taxas e Contribuições"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcategoria\n47\tSimples Nacional (parcelamento)\tTributos, Taxas e Contribuições\n",
+  "stderr": "",
+  "execution_time_ms": 407
+}

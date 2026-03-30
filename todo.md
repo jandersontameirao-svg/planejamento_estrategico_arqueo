@@ -1367,3 +1367,10 @@
 - [x] Lançar planejado Jan-Mar com valores reais do executado (1/3 do trimestral por mês)
 - [x] Projetar planejado Abr-Dez com média mensal do 1º trimestre (9 meses)
 - [x] Validar totais: 80 linhas planejadas, R$ 4.984.894,42 total anual (antes: 44 linhas, R$ 3.297.931,94)
+
+## Expansão Plano de Contas - Custos Operacionais de Projeto (Arqueocean)
+- [x] Comparar executado vs planejado: 8 itens sem correspondência identificados
+- [x] Reutilizar categorias existentes (Custos Diretos de Projeto, Movimentações Financeiras) + criar 2 novas subcategorias (Simples Nacional DAS, Taxas Diversas)
+- [x] Lançar planejado Jan-Mar com valores reais do executado (8 novas linhas)
+- [x] Projetar planejado Abr-Dez com média mensal do 1º trimestre
+- [x] Validar totais: 19 linhas planejadas, R$ 179.869,46 total anual (antes: 11 linhas, R$ 135.410,53)

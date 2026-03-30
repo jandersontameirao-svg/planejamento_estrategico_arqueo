@@ -1,0 +1,14 @@
+{
+  "query": "SELECT id, nomeVersao FROM orcamento_versoes WHERE empresaId = 660004;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, nomeVersao FROM orcamento_versoes WHERE empresaId = 660004;",
+  "rows": [
+    {
+      "id": "3",
+      "nomeVersao": "Orçamento 2026 - Arqueocean"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnomeVersao\n3\tOrçamento 2026 - Arqueocean\n",
+  "stderr": "",
+  "execution_time_ms": 371
+}

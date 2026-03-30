@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO orcamento_subcategorias (categoriaId, nome) SELECT c.id, 'Simples Nacional (Das)' FROM orcamento_categorias c WHERE c.nome = 'Tributos, Taxas e Contribuições' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute INSERT INTO orcamento_subcategorias (categoriaId, nome) SELECT c.id, 'Simples Nacional (Das)' FROM orcamento_categorias c WHERE c.nome = 'Tributos, Taxas e Contribuições' LIMIT 1;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 353
+}
