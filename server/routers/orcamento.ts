@@ -29,6 +29,7 @@ import {
   getRevisoesByVersao,
   getDashboardOrcamento,
   getRelatorioDetalhadoPvsE,
+  getAnaliseCustos,
 } from "../orcamento";
 
 export const orcamentoRouter = router({
@@ -255,6 +256,16 @@ export const orcamentoRouter = router({
     }))
     .query(async ({ input }) => {
       return getRelatorioDetalhadoPvsE(input.empresaId, input.ano, input.categoriaId);
+    }),
+
+  // ── ANÁLISE DE CUSTOS ────────────────────────────────────────────────────────
+  getAnaliseCustos: protectedProcedure
+    .input(z.object({
+      empresaId: z.number(),
+      ano: z.number(),
+    }))
+    .query(async ({ input }) => {
+      return getAnaliseCustos(input.empresaId, input.ano);
     }),
 
   // ── IA: IMPORTAÇÃO INTELIGENTE ───────────────────────────────────────────────

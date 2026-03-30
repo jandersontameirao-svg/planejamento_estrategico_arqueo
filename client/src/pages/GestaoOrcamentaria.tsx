@@ -15,7 +15,7 @@ import PageHeader from "@/components/PageHeader";
 import {
   DollarSign, TrendingUp, TrendingDown, BarChart3, Upload,
   Plus, Settings, Copy, Lock, CheckCircle, FileText, AlertTriangle,
-  ChevronRight, RefreshCw, Brain
+  ChevronRight, RefreshCw, Brain, Target
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -26,6 +26,7 @@ import OrcamentoCategorias from "./OrcamentoCategorias";
 import OrcamentoImportacao from "./OrcamentoImportacao";
 import OrcamentoAnaliseIA from "./OrcamentoAnaliseIA";
 import RelatorioOrcamentario from "./RelatorioOrcamentario";
+import AnaliseOrcamentaria from "./AnaliseOrcamentaria";
 
 interface GestaoOrcamentariaProps {
   empresaId: number;
@@ -274,7 +275,7 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
 
         {/* Tabs principais */}
         <Tabs value={abaAtiva} onValueChange={setAbaAtiva}>
-          <TabsList className="grid grid-cols-7 w-full">
+          <TabsList className="grid grid-cols-8 w-full">
             <TabsTrigger value="dashboard">
               <BarChart3 className="h-4 w-4 mr-1" /> Dashboard
             </TabsTrigger>
@@ -293,8 +294,11 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
             <TabsTrigger value="relatorio">
               <FileText className="h-4 w-4 mr-1" /> Relatório
             </TabsTrigger>
+            <TabsTrigger value="analise-custos">
+              <Target className="h-4 w-4 mr-1" /> Análise
+            </TabsTrigger>
             <TabsTrigger value="analise-ia">
-              <Brain className="h-4 w-4 mr-1" /> Análise IA
+              <Brain className="h-4 w-4 mr-1" /> IA
             </TabsTrigger>
           </TabsList>
 
@@ -418,6 +422,11 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
           {/* Relatório Detalhado */}
           <TabsContent value="relatorio" className="mt-6">
             <RelatorioOrcamentario empresaId={empresaId} ano={anoSelecionado} />
+          </TabsContent>
+
+          {/* Análise de Custos */}
+          <TabsContent value="analise-custos" className="mt-6">
+            <AnaliseOrcamentaria empresaId={empresaId} ano={anoSelecionado} />
           </TabsContent>
 
           {/* Análise IA */}

@@ -696,3 +696,290 @@ export async function getRelatorioDetalhadoPvsE(empresaId: number, ano: number, 
     },
   };
 }
+
+// ─── ANÁLISE DE CUSTOS ─────────────────────────────────────────────────────
+
+export async function getAnaliseCustos(empresaId: number, ano: number) {
+  const d = await db();
+
+  // Buscar versão aprovada ou mais recente do ano
+  const versoes = await getVersoesByEmpresa(empresaId);
+  const versaoAtiva = (versoes as any[]).find((v: any) => v.ano === ano && v.status === "aprovado")
+    ?? (versoes as any[]).find((v: any) => v.ano === ano)
+    ?? null;
+
+  if (!versaoAtiva) {
+    return { versaoId: null, itens: [], classificacaoABC: { A: [], B: [], C: [] }, alertas: [], tendencias: [], resumo: null };
+  }
+
+  // Buscar linhas planejadas
+  const linhasPlanejadas = await getLinhasPlanejadas(versaoAtiva.id);
+
+  // Buscar executado
+  const linhasExecutadas = await getExecutadoByEmpresa(empresaId, ano);
+
+  // Buscar categorias e subcategorias
+  const todasCategorias = await getCategorias();
+  const todasSubcategorias = await getSubcategorias(undefined);
+
+  const catMap = new Map((todasCategorias as any[]).map(c => [c.id, c]));
+  const subMap = new Map((todasSubcategorias as any[]).map(s => [s.id, s]));
+
+  const mesesKeys = ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"] as const;
+
+  // Agrupar executado por subcategoria e mês
+  const execPorSubMes = new Map<string, number>();
+  for (const exec of linhasExecutadas as any[]) {
+    let mesIdx = -1;
+    if (exec.competencia) {
+      const parts = exec.competencia.split("-");
+      mesIdx = parseInt(parts[1], 10) - 1;
+    } else if (exec.dataLancamento) {
+      mesIdx = new Date(exec.dataLancamento).getMonth();
+    }
+    if (mesIdx < 0 || mesIdx > 11) continue;
+    const valor = parseFloat(exec.valorConvertidoBase ?? "0");
+    const subId = exec.subcategoriaId ?? 0;
+    const key = `${subId}_${mesIdx}`;
+    execPorSubMes.set(key, (execPorSubMes.get(key) ?? 0) + valor);
+  }
+
+  // Construir itens de análise por subcategoria
+  type ItemAnalise = {
+    subcategoriaId: number;
+    subcategoriaNome: string;
+    categoriaId: number;
+    categoriaNome: string;
+    categoriaTipo: string;
+    planejadoAnual: number;
+    executadoAnual: number;
+    variacao: number;
+    percentualExecucao: number;
+    meses: Array<{ mes: number; planejado: number; executado: number }>;
+    tendencia: "crescente" | "estavel" | "decrescente" | "sem_dados";
+    natureza: "fixo" | "variavel";
+    classificacaoABC?: "A" | "B" | "C";
+    potencialEconomia: number;
+    prioridade: "alta" | "media" | "baixa";
+  };
+
+  const itens: ItemAnalise[] = [];
+
+  // Categorias consideradas fixas
+  const categoriasFixas = new Set([
+    "Salários e Encargos", "Encargos Sociais e Trabalhistas", "Benefícios",
+    "Infraestrutura e Ocupação", "Tecnologia e Sistemas", "Serviços Contábeis e Jurídicos",
+    "Tributos e Impostos"
+  ]);
+
+  for (const lp of linhasPlanejadas as any[]) {
+    const catId = lp.categoriaId;
+    const subId = lp.subcategoriaId ?? 0;
+    const cat = catMap.get(catId);
+    const sub = subMap.get(subId);
+
+    const meses: Array<{ mes: number; planejado: number; executado: number }> = [];
+    let planejadoAnual = 0;
+    let executadoAnual = 0;
+
+    for (let i = 0; i < 12; i++) {
+      const planejado = parseFloat(lp[mesesKeys[i]] ?? "0");
+      const executado = execPorSubMes.get(`${subId}_${i}`) ?? 0;
+      meses.push({ mes: i, planejado, executado });
+      planejadoAnual += planejado;
+      executadoAnual += executado;
+    }
+
+    // Calcular tendência (regressão linear simples nos meses com executado)
+    const mesesComExec = meses.filter(m => m.executado > 0);
+    let tendencia: "crescente" | "estavel" | "decrescente" | "sem_dados" = "sem_dados";
+
+    if (mesesComExec.length >= 2) {
+      const n = mesesComExec.length;
+      const xs = mesesComExec.map((_, i) => i);
+      const ys = mesesComExec.map(m => m.executado);
+      const sumX = xs.reduce((a, b) => a + b, 0);
+      const sumY = ys.reduce((a, b) => a + b, 0);
+      const sumXY = xs.reduce((a, x, i) => a + x * ys[i], 0);
+      const sumX2 = xs.reduce((a, x) => a + x * x, 0);
+      const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+      const avgY = sumY / n;
+      const slopePercent = avgY > 0 ? (slope / avgY) * 100 : 0;
+
+      if (slopePercent > 5) tendencia = "crescente";
+      else if (slopePercent < -5) tendencia = "decrescente";
+      else tendencia = "estavel";
+    }
+
+    const variacao = executadoAnual - planejadoAnual;
+    const percentualExecucao = planejadoAnual > 0 ? (executadoAnual / planejadoAnual) * 100 : (executadoAnual > 0 ? 100 : 0);
+    const catNome = cat?.nome ?? `Categoria ${catId}`;
+    const natureza = categoriasFixas.has(catNome) ? "fixo" as const : "variavel" as const;
+
+    // Potencial de economia: se executado > planejado, a diferença é potencial de economia
+    const potencialEconomia = variacao > 0 ? variacao : 0;
+
+    // Prioridade baseada no valor e desvio
+    let prioridade: "alta" | "media" | "baixa" = "baixa";
+    if (percentualExecucao > 120 && executadoAnual > 10000) prioridade = "alta";
+    else if (percentualExecucao > 110 || (tendencia === "crescente" && executadoAnual > 5000)) prioridade = "media";
+
+    itens.push({
+      subcategoriaId: subId,
+      subcategoriaNome: sub?.nome ?? lp.descricao ?? `Subcategoria ${subId}`,
+      categoriaId: catId,
+      categoriaNome: catNome,
+      categoriaTipo: cat?.tipo ?? "outro",
+      planejadoAnual,
+      executadoAnual,
+      variacao,
+      percentualExecucao,
+      meses,
+      tendencia,
+      natureza,
+      potencialEconomia,
+      prioridade,
+    });
+  }
+
+  // ── CLASSIFICAÇÃO ABC ──
+  // Ordenar por executado (ou planejado se não há executado) decrescente
+  const itensOrdenados = [...itens].sort((a, b) => {
+    const valA = a.executadoAnual > 0 ? a.executadoAnual : a.planejadoAnual;
+    const valB = b.executadoAnual > 0 ? b.executadoAnual : b.planejadoAnual;
+    return valB - valA;
+  });
+
+  const totalGasto = itensOrdenados.reduce((a, i) => a + (i.executadoAnual > 0 ? i.executadoAnual : i.planejadoAnual), 0);
+  let acumulado = 0;
+
+  const classificacaoABC: { A: ItemAnalise[]; B: ItemAnalise[]; C: ItemAnalise[] } = { A: [], B: [], C: [] };
+
+  for (const item of itensOrdenados) {
+    const val = item.executadoAnual > 0 ? item.executadoAnual : item.planejadoAnual;
+    acumulado += val;
+    const percentAcum = totalGasto > 0 ? (acumulado / totalGasto) * 100 : 0;
+
+    if (percentAcum <= 80) {
+      item.classificacaoABC = "A";
+      classificacaoABC.A.push(item);
+    } else if (percentAcum <= 95) {
+      item.classificacaoABC = "B";
+      classificacaoABC.B.push(item);
+    } else {
+      item.classificacaoABC = "C";
+      classificacaoABC.C.push(item);
+    }
+  }
+
+  // ── ALERTAS ──
+  type Alerta = {
+    tipo: "acima_orcamento" | "tendencia_alta" | "gasto_nao_previsto" | "economia_possivel";
+    severidade: "critica" | "alta" | "media" | "info";
+    titulo: string;
+    descricao: string;
+    subcategoriaId: number;
+    subcategoriaNome: string;
+    valor: number;
+  };
+
+  const alertas: Alerta[] = [];
+
+  for (const item of itens) {
+    // Acima do orçamento (> 120%)
+    if (item.percentualExecucao > 120 && item.executadoAnual > 0) {
+      alertas.push({
+        tipo: "acima_orcamento",
+        severidade: item.variacao > 50000 ? "critica" : item.variacao > 10000 ? "alta" : "media",
+        titulo: `${item.subcategoriaNome} acima do orçamento`,
+        descricao: `Executado ${item.percentualExecucao.toFixed(0)}% do planejado (R$ ${item.variacao.toFixed(2)} acima)`,
+        subcategoriaId: item.subcategoriaId,
+        subcategoriaNome: item.subcategoriaNome,
+        valor: item.variacao,
+      });
+    }
+
+    // Tendência crescente em itens classe A ou B
+    if (item.tendencia === "crescente" && (item.classificacaoABC === "A" || item.classificacaoABC === "B")) {
+      alertas.push({
+        tipo: "tendencia_alta",
+        severidade: "media",
+        titulo: `${item.subcategoriaNome} com tendência crescente`,
+        descricao: `Item classe ${item.classificacaoABC} com custo em alta — monitorar de perto`,
+        subcategoriaId: item.subcategoriaId,
+        subcategoriaNome: item.subcategoriaNome,
+        valor: item.executadoAnual,
+      });
+    }
+
+    // Gasto não previsto (executado > 0, planejado = 0)
+    if (item.planejadoAnual === 0 && item.executadoAnual > 0) {
+      alertas.push({
+        tipo: "gasto_nao_previsto",
+        severidade: item.executadoAnual > 10000 ? "alta" : "media",
+        titulo: `${item.subcategoriaNome} — gasto não previsto`,
+        descricao: `R$ ${item.executadoAnual.toFixed(2)} gastos sem previsão orçamentária`,
+        subcategoriaId: item.subcategoriaId,
+        subcategoriaNome: item.subcategoriaNome,
+        valor: item.executadoAnual,
+      });
+    }
+  }
+
+  // Economia possível: itens variáveis classe A com execução > 100%
+  const itensEconomia = itens
+    .filter(i => i.natureza === "variavel" && i.classificacaoABC === "A" && i.percentualExecucao > 100)
+    .sort((a, b) => b.potencialEconomia - a.potencialEconomia);
+
+  for (const item of itensEconomia.slice(0, 5)) {
+    alertas.push({
+      tipo: "economia_possivel",
+      severidade: "info",
+      titulo: `Potencial de economia: ${item.subcategoriaNome}`,
+      descricao: `Custo variável classe A acima do previsto. Potencial de economia: R$ ${item.potencialEconomia.toFixed(2)}`,
+      subcategoriaId: item.subcategoriaId,
+      subcategoriaNome: item.subcategoriaNome,
+      valor: item.potencialEconomia,
+    });
+  }
+
+  // Ordenar alertas por severidade
+  const severidadeOrdem = { critica: 0, alta: 1, media: 2, info: 3 };
+  alertas.sort((a, b) => severidadeOrdem[a.severidade] - severidadeOrdem[b.severidade]);
+
+  // ── RESUMO ──
+  const totalPlanejado = itens.reduce((a, i) => a + i.planejadoAnual, 0);
+  const totalExecutado = itens.reduce((a, i) => a + i.executadoAnual, 0);
+  const totalFixo = itens.filter(i => i.natureza === "fixo").reduce((a, i) => a + i.executadoAnual, 0);
+  const totalVariavel = itens.filter(i => i.natureza === "variavel").reduce((a, i) => a + i.executadoAnual, 0);
+  const totalPotencialEconomia = itens.reduce((a, i) => a + i.potencialEconomia, 0);
+  const itensAcima = itens.filter(i => i.percentualExecucao > 110 && i.executadoAnual > 0).length;
+  const itensCrescentes = itens.filter(i => i.tendencia === "crescente").length;
+
+  return {
+    versaoId: versaoAtiva.id,
+    itens: itensOrdenados,
+    classificacaoABC: {
+      A: classificacaoABC.A.map(i => ({ id: i.subcategoriaId, nome: i.subcategoriaNome, categoria: i.categoriaNome, valor: i.executadoAnual > 0 ? i.executadoAnual : i.planejadoAnual, natureza: i.natureza })),
+      B: classificacaoABC.B.map(i => ({ id: i.subcategoriaId, nome: i.subcategoriaNome, categoria: i.categoriaNome, valor: i.executadoAnual > 0 ? i.executadoAnual : i.planejadoAnual, natureza: i.natureza })),
+      C: classificacaoABC.C.map(i => ({ id: i.subcategoriaId, nome: i.subcategoriaNome, categoria: i.categoriaNome, valor: i.executadoAnual > 0 ? i.executadoAnual : i.planejadoAnual, natureza: i.natureza })),
+    },
+    alertas,
+    resumo: {
+      totalPlanejado,
+      totalExecutado,
+      variacaoTotal: totalExecutado - totalPlanejado,
+      percentualExecucao: totalPlanejado > 0 ? (totalExecutado / totalPlanejado) * 100 : 0,
+      totalFixo,
+      totalVariavel,
+      percentualFixo: totalExecutado > 0 ? (totalFixo / totalExecutado) * 100 : 0,
+      percentualVariavel: totalExecutado > 0 ? (totalVariavel / totalExecutado) * 100 : 0,
+      totalPotencialEconomia,
+      itensAcima,
+      itensCrescentes,
+      totalItensA: classificacaoABC.A.length,
+      totalItensB: classificacaoABC.B.length,
+      totalItensC: classificacaoABC.C.length,
+    },
+  };
+}

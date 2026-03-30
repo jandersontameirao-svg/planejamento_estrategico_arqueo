@@ -1393,3 +1393,16 @@
 - [x] Incluir gráfico mensal comparativo por categoria
 - [x] Cards de totais do mês + acumulado até o mês
 - [x] 3 visões: Detalhamento Mensal, Resumo Anual, Evolução Mensal
+
+## Módulo de Análise de Custos
+- [x] Procedure tRPC getAnaliseCustos com classificação ABC, desvios e tendências
+- [x] Classificação ABC automática dos gastos (A=80%, B=95%, C=100%)
+- [x] Identificação dos maiores desvios (executado vs previsto) com alertas
+- [x] Ranking de itens com maior potencial de economia (aba Economia)
+- [x] Indicadores de tendência (crescente/estável/decrescente) via regressão linear
+- [x] Separação Fixo vs Variável com gráfico de pizza
+- [x] Alertas automáticos: acima_orcamento, tendencia_alta, gasto_nao_previsto, economia_possivel
+- [x] Gráficos: Pareto ABC, treemap de gastos, pizza fixo/variável
+- [x] 5 sub-abas: Resumo, Curva ABC, Alertas, Detalhado, Economia
+- [x] Integrar como nova aba "Análise" na GestaoOrcamentaria (8 abas)
+- [x] Testes vitest: 5 testes passando (estrutura, ABC, empresa vazia, totais, tendências)
