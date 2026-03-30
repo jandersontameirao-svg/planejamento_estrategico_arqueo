@@ -1347,3 +1347,10 @@
 ## Correção: Empresas não aparecem na área Grupo Arqueo Brasil
 - [x] Verificar areaId das empresas Arqueogis Preventiva (660003) e Arqueocean (660004)
 - [x] Vincular empresas à área de negócio Grupo Arqueo Brasil (tabela empresa_area_vinculo)
+
+## Importação Executado 1º Trimestre - Arqueocean
+- [x] Extrair dados do PDF Gastos1TrimestreArqueocean (16 itens, total R$ 26.454,15)
+- [x] Verificar estrutura de tabelas de executado no banco
+- [x] Mapear itens do PDF para linhas planejadas e subcategorias existentes (12 itens mapeados)
+- [x] Inserir valores executados no banco (Jan-Mar 2026) - 36 linhas, R$ 26.454,15 total
+- [x] Validar dados importados: 3 meses x 12 itens = 36 linhas, total confere

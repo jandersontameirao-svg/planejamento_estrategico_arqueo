@@ -1,0 +1,25 @@
+{
+  "query": "SELECT competencia, COUNT(*) as linhas, SUM(valorOriginal) as total FROM orcamento_executado_linhas WHERE empresaId = 660004 GROUP BY competencia ORDER BY competencia;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT competencia, COUNT(*) as linhas, SUM(valorOriginal) as total FROM orcamento_executado_linhas WHERE empresaId = 660004 GROUP BY competencia ORDER BY competencia;",
+  "rows": [
+    {
+      "competencia": "2026-01",
+      "linhas": "12",
+      "total": "8818.05"
+    },
+    {
+      "competencia": "2026-02",
+      "linhas": "12",
+      "total": "8818.05"
+    },
+    {
+      "competencia": "2026-03",
+      "linhas": "12",
+      "total": "8818.05"
+    }
+  ],
+  "messages": [],
+  "stdout": "competencia\tlinhas\ttotal\n2026-01\t12\t8818.05\n2026-02\t12\t8818.05\n2026-03\t12\t8818.05\n",
+  "stderr": "",
+  "execution_time_ms": 399
+}

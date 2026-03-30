@@ -1,0 +1,50 @@
+{
+  "query": "SELECT s.id, s.nome, c.nome as categoria FROM orcamento_subcategorias s JOIN orcamento_categorias c ON c.id = s.categoriaId ORDER BY c.nome, s.nome LIMIT 10 OFFSET 40;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT s.id, s.nome, c.nome as categoria FROM orcamento_subcategorias s JOIN orcamento_categorias c ON c.id = s.categoriaId ORDER BY c.nome, s.nome LIMIT 10 OFFSET 40;",
+  "rows": [
+    {
+      "id": "41",
+      "nome": "13°salario",
+      "categoria": "Salários e Ordenados"
+    },
+    {
+      "id": "42",
+      "nome": "Ferias",
+      "categoria": "Salários e Ordenados"
+    },
+    {
+      "id": "43",
+      "nome": "Salarios",
+      "categoria": "Salários e Ordenados"
+    },
+    {
+      "id": "44",
+      "nome": "Entidades De Classe E Associacoes",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "id": "48",
+      "nome": "Iof - Imposto Sobre Operacoes Financeiras",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "id": "45",
+      "nome": "Iptu Tlp",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "id": "46",
+      "nome": "Ipva",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "id": "47",
+      "nome": "Simples Nacional (parcelamento)",
+      "categoria": "Tributos, Taxas e Contribuições"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcategoria\n41\t13°salario\tSalários e Ordenados\n42\tFerias\tSalários e Ordenados\n43\tSalarios\tSalários e Ordenados\n44\tEntidades De Classe E Associacoes\tTributos, Taxas e Contribuições\n48\tIof - Imposto Sobre Operacoes Financeiras\tTributos, Taxas e Contribuições\n45\tIptu Tlp\tTributos, Taxas e Contribuições\n46\tIpva\tTributos, Taxas e Contribuições\n47\tSimples Nacional (parcelamento)\tTributos, Taxas e Contribuições\n",
+  "stderr": "",
+  "execution_time_ms": 359
+}

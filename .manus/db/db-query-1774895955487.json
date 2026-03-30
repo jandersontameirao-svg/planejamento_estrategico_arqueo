@@ -1,0 +1,150 @@
+{
+  "query": "SELECT s.id, s.nome, c.nome as categoria FROM orcamento_subcategorias s JOIN orcamento_categorias c ON c.id = s.categoriaId ORDER BY c.nome, s.nome LIMIT 28 OFFSET 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT s.id, s.nome, c.nome as categoria FROM orcamento_subcategorias s JOIN orcamento_categorias c ON c.id = s.categoriaId ORDER BY c.nome, s.nome LIMIT 28 OFFSET 20;",
+  "rows": [
+    {
+      "id": "21",
+      "nome": "Combustivel E Lubrificantes",
+      "categoria": "Despesas com Veículos"
+    },
+    {
+      "id": "22",
+      "nome": "Agua E Esgoto",
+      "categoria": "Despesas de Consumo"
+    },
+    {
+      "id": "23",
+      "nome": "Energia Eletrica",
+      "categoria": "Despesas de Consumo"
+    },
+    {
+      "id": "24",
+      "nome": "Lanches E Refeicoes",
+      "categoria": "Despesas de Consumo"
+    },
+    {
+      "id": "25",
+      "nome": "Materiais De Limpeza/higiene",
+      "categoria": "Despesas de Consumo"
+    },
+    {
+      "id": "26",
+      "nome": "Telefone E Internet",
+      "categoria": "Despesas de Consumo"
+    },
+    {
+      "id": "27",
+      "nome": "Anuidade Cartao De Credito",
+      "categoria": "Despesas Financeiras"
+    },
+    {
+      "id": "28",
+      "nome": "Despesas Bancarias",
+      "categoria": "Despesas Financeiras"
+    },
+    {
+      "id": "29",
+      "nome": "Certificados Digitais",
+      "categoria": "Despesas Gerais"
+    },
+    {
+      "id": "30",
+      "nome": "Licenca De Softwares",
+      "categoria": "Despesas Gerais"
+    },
+    {
+      "id": "31",
+      "nome": "Retirada Socio",
+      "categoria": "Diretoria"
+    },
+    {
+      "id": "32",
+      "nome": "Fgts",
+      "categoria": "Encargos"
+    },
+    {
+      "id": "33",
+      "nome": "Inss",
+      "categoria": "Encargos"
+    },
+    {
+      "id": "34",
+      "nome": "Consorcios",
+      "categoria": "Imobilizado"
+    },
+    {
+      "id": "35",
+      "nome": "Equipamentos De Informatica",
+      "categoria": "Imobilizado"
+    },
+    {
+      "id": "37",
+      "nome": "Maquinas E Equipamentos",
+      "categoria": "Imobilizado"
+    },
+    {
+      "id": "36",
+      "nome": "Moveis E Utensilios",
+      "categoria": "Imobilizado"
+    },
+    {
+      "id": "38",
+      "nome": "Amortizacao De Emprestimo",
+      "categoria": "Liquidação de Empréstimo"
+    },
+    {
+      "id": "39",
+      "nome": "Exames Periodicos/seg. Do Trabalho",
+      "categoria": "Outros Custos com Pessoal"
+    },
+    {
+      "id": "40",
+      "nome": "Uniformes E Acessorios",
+      "categoria": "Outros Custos com Pessoal"
+    },
+    {
+      "id": "41",
+      "nome": "13°salario",
+      "categoria": "Salários e Ordenados"
+    },
+    {
+      "id": "42",
+      "nome": "Ferias",
+      "categoria": "Salários e Ordenados"
+    },
+    {
+      "id": "43",
+      "nome": "Salarios",
+      "categoria": "Salários e Ordenados"
+    },
+    {
+      "id": "44",
+      "nome": "Entidades De Classe E Associacoes",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "id": "48",
+      "nome": "Iof - Imposto Sobre Operacoes Financeiras",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "id": "45",
+      "nome": "Iptu Tlp",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "id": "46",
+      "nome": "Ipva",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "id": "47",
+      "nome": "Simples Nacional (parcelamento)",
+      "categoria": "Tributos, Taxas e Contribuições"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tcategoria\n21\tCombustivel E Lubrificantes\tDespesas com Veículos\n22\tAgua E Esgoto\tDespesas de Consumo\n23\tEnergia Eletrica\tDespesas de Consumo\n24\tLanches E Refeicoes\tDespesas de Consumo\n25\tMateriais De Limpeza/higiene\tDespesas de Consumo\n26\tTelefone E Internet\tDespesas de Consumo\n27\tAnuidade Cartao De Credito\tDespesas Financeiras\n28\tDespesas Bancarias\tDespesas Financeiras\n29\tCertificados Digitais\tDespesas Gerais\n30\tLicenca De Softwares\tDespesas Gerais\n31\tRetirada Socio\tDiretoria\n32\tFgts\tEncargos\n33\tInss\tEncargos\n34\tConsorcios\tImobilizado\n35\tEquipamentos De Informatica\tImobilizado\n37\tMaquinas E Equipamentos\tImobilizado\n36\tMoveis E Utensilios\tImobilizado\n38\tAmortizacao De Emprestimo\tLiquidação de Empréstimo\n39\tExames Periodicos/seg. Do Trabalho\tOutros Custos com Pessoal\n40\tUniformes E Acessorios\tOutros Custos com Pessoal\n41\t13°salario\tSalários e Ordenados\n42\tFerias\tSalários e Ordenados\n43\tSalarios\tSalários e Ordenados\n44\tEntidades De Classe E Associacoes\tTributos, Taxas e Contribuições\n48\tIof - Imposto Sobre Operacoes Financeiras\tTributos, Taxas e Contribuições\n45\tIptu Tlp\tTributos, Taxas e Contribuições\n46\tIpva\tTributos, Taxas e Contribuições\n47\tSimples Nacional (parcelamento)\tTributos, Taxas e Contribuições\n",
+  "stderr": "",
+  "execution_time_ms": 373
+}
