@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO empresas (nome, tipoAtuacao, status, areaId, observacoes) VALUES ('Arqueogis Preventiva', 'servicos', 'ativa', 1, 'Empresa de arqueologia preventiva do Grupo Arqueo'); INSERT INTO empresas (nome, tipoAtuacao, status, areaId, observacoes) VALUES ('Arqueocean', 'servicos', 'ativa', 1, 'Empresa de arqueologia subaquática do Grupo Arqueo');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute INSERT INTO empresas (nome, tipoAtuacao, status, areaId, observacoes) VALUES ('Arqueogis Preventiva', 'servicos', 'ativa', 1, 'Empresa de arqueologia preventiva do Grupo Arqueo'); INSERT INTO empresas (nome, tipoAtuacao, status, areaId, observacoes) VALUES ('Arqueocean', 'servicos', 'ativa', 1, 'Empresa de arqueologia subaquática do Grupo Arqueo');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 418
+}

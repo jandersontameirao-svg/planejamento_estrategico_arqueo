@@ -1,0 +1,130 @@
+{
+  "query": "SELECT id, nome FROM orcamento_categorias ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, nome FROM orcamento_categorias ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Receita Operacional"
+    },
+    {
+      "id": "2",
+      "nome": "Outras Receitas"
+    },
+    {
+      "id": "3",
+      "nome": "Pessoal e Encargos"
+    },
+    {
+      "id": "4",
+      "nome": "Serviços de Terceiros"
+    },
+    {
+      "id": "5",
+      "nome": "Materiais e Insumos"
+    },
+    {
+      "id": "6",
+      "nome": "Marketing e Vendas"
+    },
+    {
+      "id": "7",
+      "nome": "Administrativo"
+    },
+    {
+      "id": "8",
+      "nome": "Tecnologia e Sistemas"
+    },
+    {
+      "id": "9",
+      "nome": "Viagens e Deslocamentos"
+    },
+    {
+      "id": "10",
+      "nome": "Aluguel e Infraestrutura"
+    },
+    {
+      "id": "11",
+      "nome": "Impostos e Taxas"
+    },
+    {
+      "id": "12",
+      "nome": "Investimentos em Ativos"
+    },
+    {
+      "id": "13",
+      "nome": "P&D e Inovação"
+    },
+    {
+      "id": "14",
+      "nome": "Reserva e Contingência"
+    },
+    {
+      "id": "30001",
+      "nome": "Benefícios"
+    },
+    {
+      "id": "30002",
+      "nome": "Salários e Ordenados"
+    },
+    {
+      "id": "30003",
+      "nome": "Encargos"
+    },
+    {
+      "id": "30004",
+      "nome": "Outros Custos com Pessoal"
+    },
+    {
+      "id": "30005",
+      "nome": "Custos com Serviços Contratados"
+    },
+    {
+      "id": "30006",
+      "nome": "Despesas Administrativas"
+    },
+    {
+      "id": "30007",
+      "nome": "Despesas com Aluguéis e Condomínios"
+    },
+    {
+      "id": "30008",
+      "nome": "Despesas com Serviços"
+    },
+    {
+      "id": "30009",
+      "nome": "Despesas com Veículos"
+    },
+    {
+      "id": "30010",
+      "nome": "Despesas de Consumo"
+    },
+    {
+      "id": "30011",
+      "nome": "Despesas Financeiras"
+    },
+    {
+      "id": "30012",
+      "nome": "Despesas Gerais"
+    },
+    {
+      "id": "30013",
+      "nome": "Diretoria"
+    },
+    {
+      "id": "30014",
+      "nome": "Imobilizado"
+    },
+    {
+      "id": "30015",
+      "nome": "Liquidação de Empréstimo"
+    },
+    {
+      "id": "30016",
+      "nome": "Tributos, Taxas e Contribuições"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\n1\tReceita Operacional\n2\tOutras Receitas\n3\tPessoal e Encargos\n4\tServiços de Terceiros\n5\tMateriais e Insumos\n6\tMarketing e Vendas\n7\tAdministrativo\n8\tTecnologia e Sistemas\n9\tViagens e Deslocamentos\n10\tAluguel e Infraestrutura\n11\tImpostos e Taxas\n12\tInvestimentos em Ativos\n13\tP&D e Inovação\n14\tReserva e Contingência\n30001\tBenefícios\n30002\tSalários e Ordenados\n30003\tEncargos\n30004\tOutros Custos com Pessoal\n30005\tCustos com Serviços Contratados\n30006\tDespesas Administrativas\n30007\tDespesas com Aluguéis e Condomínios\n30008\tDespesas com Serviços\n30009\tDespesas com Veículos\n30010\tDespesas de Consumo\n30011\tDespesas Financeiras\n30012\tDespesas Gerais\n30013\tDiretoria\n30014\tImobilizado\n30015\tLiquidação de Empréstimo\n30016\tTributos, Taxas e Contribuições\n",
+  "stderr": "",
+  "execution_time_ms": 504
+}

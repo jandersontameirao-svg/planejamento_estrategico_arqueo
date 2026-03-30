@@ -1,0 +1,45 @@
+{
+  "query": "SELECT l.descricao, l.janeiro, l.fevereiro, l.marco, l.totalAnual FROM orcamento_planejado_linhas l WHERE l.versaoId = 1 ORDER BY l.totalAnual DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT l.descricao, l.janeiro, l.fevereiro, l.marco, l.totalAnual FROM orcamento_planejado_linhas l WHERE l.versaoId = 1 ORDER BY l.totalAnual DESC LIMIT 5;",
+  "rows": [
+    {
+      "descricao": "Servicos Administrativos",
+      "janeiro": "75800.00",
+      "fevereiro": "75800.00",
+      "marco": "75800.00",
+      "totalAnual": "957600.00"
+    },
+    {
+      "descricao": "Amortizacao De Emprestimo",
+      "janeiro": "58476.30",
+      "fevereiro": "59787.67",
+      "marco": "57498.24",
+      "totalAnual": "869329.51"
+    },
+    {
+      "descricao": "Contratacao Pessoa Juridica",
+      "janeiro": "19800.00",
+      "fevereiro": "19800.00",
+      "marco": "19800.00",
+      "totalAnual": "237600.00"
+    },
+    {
+      "descricao": "Retirada Socio",
+      "janeiro": "17148.98",
+      "fevereiro": "17148.98",
+      "marco": "17148.98",
+      "totalAnual": "205787.76"
+    },
+    {
+      "descricao": "Salarios",
+      "janeiro": "20806.53",
+      "fevereiro": "20806.53",
+      "marco": "19175.53",
+      "totalAnual": "196670.86"
+    }
+  ],
+  "messages": [],
+  "stdout": "descricao\tjaneiro\tfevereiro\tmarco\ttotalAnual\nServicos Administrativos\t75800.00\t75800.00\t75800.00\t957600.00\nAmortizacao De Emprestimo\t58476.30\t59787.67\t57498.24\t869329.51\nContratacao Pessoa Juridica\t19800.00\t19800.00\t19800.00\t237600.00\nRetirada Socio\t17148.98\t17148.98\t17148.98\t205787.76\nSalarios\t20806.53\t20806.53\t19175.53\t196670.86\n",
+  "stderr": "",
+  "execution_time_ms": 371
+}

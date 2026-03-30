@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, nome, cnpj, status FROM empresas ORDER BY id; SELECT id, nome FROM areas_negocio ORDER BY id; SELECT ae.area_id, ae.empresa_id, e.nome as empresa_nome, a.nome as area_nome FROM area_empresas ae JOIN empresas e ON ae.empresa_id = e.id JOIN areas_negocio a ON ae.area_id = a.id ORDER BY ae.area_id, ae.empresa_id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, nome, cnpj, status FROM empresas ORDER BY id; SELECT id, nome FROM areas_negocio ORDER BY id; SELECT ae.area_id, ae.empresa_id, e.nome as empresa_nome, a.nome as area_nome FROM area_empresas ae JOIN empresas e ON ae.empresa_id = e.id JOIN areas_negocio a ON ae.area_id = a.id ORDER BY ae.area_id, ae.empresa_id;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'cnpj' in 'field list'"
+  ]
+}

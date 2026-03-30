@@ -1330,3 +1330,16 @@
 - [x] Frontend: tela de revisão dos dados extraídos (categorias, itens, valores mensais)
 - [x] Frontend: botão de confirmação para salvar dados extraídos no banco
 - [x] Persistência: salvar categorias/itens/valores extraídos nas tabelas existentes
+
+## Criação de Empresas e Lançamento de Orçamento (Planilha)
+- [x] Analisar planilha Excel: mapear plano de contas e valores por empresa
+- [x] Criar empresa Arqueogis Preventiva na Área Arqueo Brasil
+- [x] Criar empresa Arqueocean na Área Arqueo Brasil
+- [x] Criar 16 categorias orçamentárias conforme plano de contas da planilha
+- [x] Criar 48 subcategorias vinculadas às categorias
+- [x] Criar versões orçamentárias 2026 para as 4 empresas (status aprovado)
+- [x] Lançar orçamento Arqueoproject conforme planilha (44 linhas, R$ 3.297.931,94)
+- [x] Lançar orçamento Arqueogis Geoprocessamento conforme planilha (15 linhas, R$ 201.311,32)
+- [x] Lançar orçamento Arqueogis Preventiva conforme planilha (4 linhas, R$ 91.813,46)
+- [x] Lançar orçamento Arqueocean conforme planilha (11 linhas, R$ 135.410,53)
+- [x] Validar dados no banco: totais conferem com planilha original

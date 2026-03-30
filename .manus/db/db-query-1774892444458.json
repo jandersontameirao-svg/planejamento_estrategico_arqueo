@@ -1,0 +1,94 @@
+{
+  "query": "SELECT id, nome, tipo, escopoTipo FROM orcamento_categorias ORDER BY nome LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, nome, tipo, escopoTipo FROM orcamento_categorias ORDER BY nome LIMIT 20;",
+  "rows": [
+    {
+      "id": "7",
+      "nome": "Administrativo",
+      "tipo": "despesa",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "10",
+      "nome": "Aluguel e Infraestrutura",
+      "tipo": "despesa",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "11",
+      "nome": "Impostos e Taxas",
+      "tipo": "despesa",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "12",
+      "nome": "Investimentos em Ativos",
+      "tipo": "investimento",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "6",
+      "nome": "Marketing e Vendas",
+      "tipo": "despesa",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "5",
+      "nome": "Materiais e Insumos",
+      "tipo": "custo",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "2",
+      "nome": "Outras Receitas",
+      "tipo": "receita",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "13",
+      "nome": "P&D e Inovação",
+      "tipo": "investimento",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "3",
+      "nome": "Pessoal e Encargos",
+      "tipo": "custo",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "1",
+      "nome": "Receita Operacional",
+      "tipo": "receita",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "14",
+      "nome": "Reserva e Contingência",
+      "tipo": "outro",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "4",
+      "nome": "Serviços de Terceiros",
+      "tipo": "custo",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "8",
+      "nome": "Tecnologia e Sistemas",
+      "tipo": "despesa",
+      "escopoTipo": "global"
+    },
+    {
+      "id": "9",
+      "nome": "Viagens e Deslocamentos",
+      "tipo": "despesa",
+      "escopoTipo": "global"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\ttipo\tescopoTipo\n7\tAdministrativo\tdespesa\tglobal\n10\tAluguel e Infraestrutura\tdespesa\tglobal\n11\tImpostos e Taxas\tdespesa\tglobal\n12\tInvestimentos em Ativos\tinvestimento\tglobal\n6\tMarketing e Vendas\tdespesa\tglobal\n5\tMateriais e Insumos\tcusto\tglobal\n2\tOutras Receitas\treceita\tglobal\n13\tP&D e Inovação\tinvestimento\tglobal\n3\tPessoal e Encargos\tcusto\tglobal\n1\tReceita Operacional\treceita\tglobal\n14\tReserva e Contingência\toutro\tglobal\n4\tServiços de Terceiros\tcusto\tglobal\n8\tTecnologia e Sistemas\tdespesa\tglobal\n9\tViagens e Deslocamentos\tdespesa\tglobal\n",
+  "stderr": "",
+  "execution_time_ms": 363
+}

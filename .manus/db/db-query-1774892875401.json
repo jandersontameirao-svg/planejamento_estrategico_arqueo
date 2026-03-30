@@ -1,0 +1,74 @@
+{
+  "query": "SELECT c.nome as categoria, COUNT(s.id) as subcategorias FROM orcamento_categorias c LEFT JOIN orcamento_subcategorias s ON s.categoriaId = c.id WHERE c.id >= 30001 GROUP BY c.id, c.nome ORDER BY c.nome;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT c.nome as categoria, COUNT(s.id) as subcategorias FROM orcamento_categorias c LEFT JOIN orcamento_subcategorias s ON s.categoriaId = c.id WHERE c.id >= 30001 GROUP BY c.id, c.nome ORDER BY c.nome;",
+  "rows": [
+    {
+      "categoria": "Benefícios",
+      "subcategorias": "4"
+    },
+    {
+      "categoria": "Custos com Serviços Contratados",
+      "subcategorias": "1"
+    },
+    {
+      "categoria": "Despesas Administrativas",
+      "subcategorias": "3"
+    },
+    {
+      "categoria": "Despesas com Aluguéis e Condomínios",
+      "subcategorias": "3"
+    },
+    {
+      "categoria": "Despesas com Serviços",
+      "subcategorias": "9"
+    },
+    {
+      "categoria": "Despesas com Veículos",
+      "subcategorias": "1"
+    },
+    {
+      "categoria": "Despesas de Consumo",
+      "subcategorias": "5"
+    },
+    {
+      "categoria": "Despesas Financeiras",
+      "subcategorias": "2"
+    },
+    {
+      "categoria": "Despesas Gerais",
+      "subcategorias": "2"
+    },
+    {
+      "categoria": "Diretoria",
+      "subcategorias": "1"
+    },
+    {
+      "categoria": "Encargos",
+      "subcategorias": "2"
+    },
+    {
+      "categoria": "Imobilizado",
+      "subcategorias": "4"
+    },
+    {
+      "categoria": "Liquidação de Empréstimo",
+      "subcategorias": "1"
+    },
+    {
+      "categoria": "Outros Custos com Pessoal",
+      "subcategorias": "2"
+    },
+    {
+      "categoria": "Salários e Ordenados",
+      "subcategorias": "3"
+    },
+    {
+      "categoria": "Tributos, Taxas e Contribuições",
+      "subcategorias": "5"
+    }
+  ],
+  "messages": [],
+  "stdout": "categoria\tsubcategorias\nBenefícios\t4\nCustos com Serviços Contratados\t1\nDespesas Administrativas\t3\nDespesas com Aluguéis e Condomínios\t3\nDespesas com Serviços\t9\nDespesas com Veículos\t1\nDespesas de Consumo\t5\nDespesas Financeiras\t2\nDespesas Gerais\t2\nDiretoria\t1\nEncargos\t2\nImobilizado\t4\nLiquidação de Empréstimo\t1\nOutros Custos com Pessoal\t2\nSalários e Ordenados\t3\nTributos, Taxas e Contribuições\t5\n",
+  "stderr": "",
+  "execution_time_ms": 370
+}

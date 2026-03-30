@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, empresaId, nome, ano, status FROM orcamento_versoes WHERE empresaId IN (1, 30001, 660003, 660004) ORDER BY empresaId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, empresaId, nome, ano, status FROM orcamento_versoes WHERE empresaId IN (1, 30001, 660003, 660004) ORDER BY empresaId;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'nome' in 'field list'"
+  ]
+}

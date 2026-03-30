@@ -1,0 +1,8 @@
+{
+  "query": "SELECT v.empresaId, e.nome as empresa, v.nomeVersao, COUNT(l.id) as linhas, SUM(l.totalAnual) as total FROM orcamento_versoes v JOIN orcamento_planejado_linhas l ON l.versaoId = v.id JOIN empresas e ON e.id = v.empresaId GROUP BY v.id ORDER BY v.empresaId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT v.empresaId, e.nome as empresa, v.nomeVersao, COUNT(l.id) as linhas, SUM(l.totalAnual) as total FROM orcamento_versoes v JOIN orcamento_planejado_linhas l ON l.versaoId = v.id JOIN empresas e ON e.id = v.empresaId GROUP BY v.id ORDER BY v.empresaId;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1055 (42000) at line 1: Expression #2 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'GdPAuRogRcNPzV7ENB2n8s.e.nome' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by"
+  ]
+}

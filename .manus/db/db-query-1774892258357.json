@@ -1,0 +1,240 @@
+{
+  "query": "SELECT id, nome, status FROM empresas ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, nome, status FROM empresas ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Arqueoproject Projetos e Pesquisas LTDA",
+      "status": "ativa"
+    },
+    {
+      "id": "30001",
+      "nome": "arqueogis geoprocessamento",
+      "status": "ativa"
+    },
+    {
+      "id": "210002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "210003",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "210004",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "210005",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "210006",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "210007",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "210008",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "210009",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "240002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "270002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "300002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "330002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "330003",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "330004",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "360002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "360003",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "360004",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "360005",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "390002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "390003",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "390004",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "390005",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "390006",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "390007",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "420002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "450002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480003",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480004",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480005",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480006",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480007",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480008",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480009",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480010",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480011",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "480012",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "510002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "540002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "570002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "600002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "600003",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "630002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    },
+    {
+      "id": "660002",
+      "nome": "Empresa Teste Ações",
+      "status": "ativa"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tstatus\n1\tArqueoproject Projetos e Pesquisas LTDA\tativa\n30001\tarqueogis geoprocessamento\tativa\n210002\tEmpresa Teste Ações\tativa\n210003\tEmpresa Teste Ações\tativa\n210004\tEmpresa Teste Ações\tativa\n210005\tEmpresa Teste Ações\tativa\n210006\tEmpresa Teste Ações\tativa\n210007\tEmpresa Teste Ações\tativa\n210008\tEmpresa Teste Ações\tativa\n210009\tEmpresa Teste Ações\tativa\n240002\tEmpresa Teste Ações\tativa\n270002\tEmpresa Teste Ações\tativa\n300002\tEmpresa Teste Ações\tativa\n330002\tEmpresa Teste Ações\tativa\n330003\tEmpresa Teste Ações\tativa\n330004\tEmpresa Teste Ações\tativa\n360002\tEmpresa Teste Ações\tativa\n360003\tEmpresa Teste Ações\tativa\n360004\tEmpresa Teste Ações\tativa\n360005\tEmpresa Teste Ações\tativa\n390002\tEmpresa Teste Ações\tativa\n390003\tEmpresa Teste Ações\tativa\n390004\tEmpresa Teste Ações\tativa\n390005\tEmpresa Teste Ações\tativa\n390006\tEmpresa Teste Ações\tativa\n390007\tEmpresa Teste Ações\tativa\n420002\tEmpresa Teste Ações\tativa\n450002\tEmpresa Teste Ações\tativa\n480002\tEmpresa Teste Ações\tativa\n480003\tEmpresa Teste Ações\tativa\n480004\tEmpresa Teste Ações\tativa\n480005\tEmpresa Teste Ações\tativa\n480006\tEmpresa Teste Ações\tativa\n480007\tEmpresa Teste Ações\tativa\n480008\tEmpresa Teste Ações\tativa\n480009\tEmpresa Teste Ações\tativa\n480010\tEmpresa Teste Ações\tativa\n480011\tEmpresa Teste Ações\tativa\n480012\tEmpresa Teste Ações\tativa\n510002\tEmpresa Teste Ações\tativa\n540002\tEmpresa Teste Ações\tativa\n570002\tEmpresa Teste Ações\tativa\n600002\tEmpresa Teste Ações\tativa\n600003\tEmpresa Teste Ações\tativa\n630002\tEmpresa Teste Ações\tativa\n660002\tEmpresa Teste Ações\tativa\n",
+  "stderr": "",
+  "execution_time_ms": 349
+}
