@@ -40,6 +40,8 @@ import {
   getDashboardContratos,
   vincularClienteEmpresa,
   desvincularClienteEmpresa,
+  getDashboardReceita,
+  getResultadoOperacional,
 } from "../contratos.db";
 
 function parseContent(content: string | unknown): unknown {
@@ -910,6 +912,19 @@ export const contratosRouter = router({
         return { success: true, status: novoStatus };
       }),
   }),
+
+  // ── RECEITA & RESULTADO ────────────────────────────────────────────────────
+  dashboardReceita: protectedProcedure
+    .input(z.object({ empresaId: z.number().optional(), ano: z.number().optional() }))
+    .query(async ({ input }) => {
+      return await getDashboardReceita(input.empresaId, input.ano);
+    }),
+
+  resultadoOperacional: protectedProcedure
+    .input(z.object({ empresaId: z.number(), ano: z.number().optional() }))
+    .query(async ({ input }) => {
+      return await getResultadoOperacional(input.empresaId, input.ano);
+    }),
 
   // ── AUDITORIA ──────────────────────────────────────────────────────────────
   auditoria: router({

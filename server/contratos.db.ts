@@ -433,3 +433,246 @@ export async function getDashboardContratos(empresaId?: number) {
 
   return { totais, marcosStats, riscosStats, boletinsStats };
 }
+
+
+// ─── DASHBOARD DE RECEITA ────────────────────────────────────────────────────
+
+/**
+ * Dashboard de Receita Prevista vs Realizada
+ * Agrega marcos financeiros por mês e compara previsto vs pago
+ */
+export async function getDashboardReceita(empresaId?: number, ano?: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const anoFiltro = ano ?? new Date().getFullYear();
+
+  // Receita por contrato (previsto vs pago)
+  const receitaPorContrato = await db.select({
+    contratoId: contratos.id,
+    titulo: contratos.titulo,
+    numero: contratos.numero,
+    status: contratos.status,
+    empresaId: contratos.empresaId,
+    valorContrato: contratos.valorTotal,
+    totalPrevisto: sql<number>`COALESCE(SUM(${contratosMarcos.valorPrevisto}), 0)`,
+    totalPago: sql<number>`COALESCE(SUM(${contratosMarcos.valorPago}), 0)`,
+    totalMarcos: sql<number>`COUNT(${contratosMarcos.id})`,
+    marcosPagos: sql<number>`SUM(CASE WHEN ${contratosMarcos.status} = 'pago' THEN 1 ELSE 0 END)`,
+    marcosAtrasados: sql<number>`SUM(CASE WHEN ${contratosMarcos.status} = 'atrasado' THEN 1 ELSE 0 END)`,
+  })
+    .from(contratos)
+    .leftJoin(contratosMarcos, eq(contratos.id, contratosMarcos.contratoId))
+    .where(empresaId ? eq(contratos.empresaId, empresaId) : sql`1=1`)
+    .groupBy(contratos.id);
+
+  // Receita mensal (baseada em data_prevista dos marcos)
+  const receitaMensal = await db.select({
+    mes: sql<number>`MONTH(${contratosMarcos.dataPrevista})`,
+    previsto: sql<number>`COALESCE(SUM(${contratosMarcos.valorPrevisto}), 0)`,
+    pago: sql<number>`COALESCE(SUM(${contratosMarcos.valorPago}), 0)`,
+  })
+    .from(contratosMarcos)
+    .innerJoin(contratos, eq(contratosMarcos.contratoId, contratos.id))
+    .where(
+      and(
+        sql`YEAR(${contratosMarcos.dataPrevista}) = ${anoFiltro}`,
+        empresaId ? eq(contratos.empresaId, empresaId) : sql`1=1`
+      )
+    )
+    .groupBy(sql`MONTH(${contratosMarcos.dataPrevista})`)
+    .orderBy(sql`MONTH(${contratosMarcos.dataPrevista})`);
+
+  // Preencher todos os 12 meses
+  const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  const receitaMensalCompleta = meses.map((nome, i) => {
+    const found = receitaMensal.find((r: any) => Number(r.mes) === i + 1);
+    return {
+      mes: i + 1,
+      nome,
+      previsto: found ? Number(found.previsto) : 0,
+      pago: found ? Number(found.pago) : 0,
+    };
+  });
+
+  // Totais gerais
+  const totalPrevisto = receitaPorContrato.reduce((s, c) => s + Number(c.totalPrevisto), 0);
+  const totalPago = receitaPorContrato.reduce((s, c) => s + Number(c.totalPago), 0);
+  const totalContratos = receitaPorContrato.length;
+  const contratosAtivos = receitaPorContrato.filter(c => c.status === "ativo").length;
+
+  // Receita por status de marco
+  const [statusMarcos] = await db.select({
+    pendentes: sql<number>`SUM(CASE WHEN ${contratosMarcos.status} IN ('pendente', 'em_medicao') THEN ${contratosMarcos.valorPrevisto} ELSE 0 END)`,
+    aprovados: sql<number>`SUM(CASE WHEN ${contratosMarcos.status} = 'aprovado' THEN ${contratosMarcos.valorPrevisto} ELSE 0 END)`,
+    pagos: sql<number>`SUM(CASE WHEN ${contratosMarcos.status} = 'pago' THEN ${contratosMarcos.valorPago} ELSE 0 END)`,
+    atrasados: sql<number>`SUM(CASE WHEN ${contratosMarcos.status} = 'atrasado' THEN ${contratosMarcos.valorPrevisto} ELSE 0 END)`,
+  })
+    .from(contratosMarcos)
+    .innerJoin(contratos, eq(contratosMarcos.contratoId, contratos.id))
+    .where(empresaId ? eq(contratos.empresaId, empresaId) : sql`1=1`);
+
+  return {
+    totais: {
+      totalPrevisto,
+      totalPago,
+      totalContratos,
+      contratosAtivos,
+      percentualRecebido: totalPrevisto > 0 ? (totalPago / totalPrevisto) * 100 : 0,
+    },
+    statusMarcos: {
+      pendentes: Number(statusMarcos?.pendentes ?? 0),
+      aprovados: Number(statusMarcos?.aprovados ?? 0),
+      pagos: Number(statusMarcos?.pagos ?? 0),
+      atrasados: Number(statusMarcos?.atrasados ?? 0),
+    },
+    receitaMensal: receitaMensalCompleta,
+    receitaPorContrato: receitaPorContrato.map(c => ({
+      ...c,
+      valorContrato: Number(c.valorContrato ?? 0),
+      totalPrevisto: Number(c.totalPrevisto),
+      totalPago: Number(c.totalPago),
+      totalMarcos: Number(c.totalMarcos),
+      marcosPagos: Number(c.marcosPagos),
+      marcosAtrasados: Number(c.marcosAtrasados),
+      percentual: Number(c.totalPrevisto) > 0 ? (Number(c.totalPago) / Number(c.totalPrevisto)) * 100 : 0,
+    })),
+    ano: anoFiltro,
+  };
+}
+
+/**
+ * Resultado Operacional (DRE Simplificado)
+ * Cruza receita dos contratos com custos/despesas do orçamento
+ */
+export async function getResultadoOperacional(empresaId: number, ano?: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const anoFiltro = ano ?? new Date().getFullYear();
+
+  // 1. RECEITA: soma dos marcos pagos por mês
+  const receitaMensal = await db.select({
+    mes: sql<number>`MONTH(${contratosMarcos.dataPagamento})`,
+    valor: sql<number>`COALESCE(SUM(${contratosMarcos.valorPago}), 0)`,
+  })
+    .from(contratosMarcos)
+    .innerJoin(contratos, eq(contratosMarcos.contratoId, contratos.id))
+    .where(
+      and(
+        eq(contratos.empresaId, empresaId),
+        eq(contratosMarcos.status, "pago"),
+        sql`YEAR(${contratosMarcos.dataPagamento}) = ${anoFiltro}`
+      )
+    )
+    .groupBy(sql`MONTH(${contratosMarcos.dataPagamento})`);
+
+  // Receita prevista (marcos com data prevista no ano)
+  const receitaPrevistaMensal = await db.select({
+    mes: sql<number>`MONTH(${contratosMarcos.dataPrevista})`,
+    valor: sql<number>`COALESCE(SUM(${contratosMarcos.valorPrevisto}), 0)`,
+  })
+    .from(contratosMarcos)
+    .innerJoin(contratos, eq(contratosMarcos.contratoId, contratos.id))
+    .where(
+      and(
+        eq(contratos.empresaId, empresaId),
+        sql`YEAR(${contratosMarcos.dataPrevista}) = ${anoFiltro}`
+      )
+    )
+    .groupBy(sql`MONTH(${contratosMarcos.dataPrevista})`);
+
+  // 2. CUSTOS/DESPESAS EXECUTADOS: do módulo orçamentário
+  const { orcamentoExecutadoLinhas, orcamentoPlanejadoLinhas, orcamentoVersoes } = await import("../drizzle/schema");
+  
+  const custosExecutados = await db.select({
+    competencia: orcamentoExecutadoLinhas.competencia,
+    valor: sql<number>`COALESCE(SUM(${orcamentoExecutadoLinhas.valorOriginal}), 0)`,
+  })
+    .from(orcamentoExecutadoLinhas)
+    .where(
+      and(
+        eq(orcamentoExecutadoLinhas.empresaId, empresaId),
+        sql`${orcamentoExecutadoLinhas.competencia} LIKE '${sql.raw(String(anoFiltro))}%'`,
+        eq(orcamentoExecutadoLinhas.ativo, 1)
+      )
+    )
+    .groupBy(orcamentoExecutadoLinhas.competencia);
+
+  // 3. CUSTOS/DESPESAS PLANEJADOS: do módulo orçamentário (versão aprovada)
+  const [versaoAprovada] = await db.select()
+    .from(orcamentoVersoes)
+    .where(
+      and(
+        eq(orcamentoVersoes.empresaId, empresaId),
+        eq(orcamentoVersoes.ano, anoFiltro),
+        eq(orcamentoVersoes.status, "aprovado")
+      )
+    )
+    .limit(1);
+
+  let custosPlanjMensal: { mes: number; valor: number }[] = [];
+  if (versaoAprovada) {
+    const mesesCols = ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+    const linhasPlanejadas = await db.select()
+      .from(orcamentoPlanejadoLinhas)
+      .where(eq(orcamentoPlanejadoLinhas.versaoId, versaoAprovada.id));
+
+    custosPlanjMensal = mesesCols.map((col, i) => ({
+      mes: i + 1,
+      valor: linhasPlanejadas.reduce((sum, l) => sum + Number((l as any)[col] ?? 0), 0),
+    }));
+  }
+
+  // Montar DRE mensal
+  const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  const dreMensal = meses.map((nome, i) => {
+    const mesNum = i + 1;
+    const comp = `${anoFiltro}-${String(mesNum).padStart(2, "0")}`;
+
+    const recPrev = receitaPrevistaMensal.find((r: any) => Number(r.mes) === mesNum);
+    const recReal = receitaMensal.find((r: any) => Number(r.mes) === mesNum);
+    const custoExec = custosExecutados.find((c: any) => c.competencia === comp);
+    const custoPlan = custosPlanjMensal.find(c => c.mes === mesNum);
+
+    const receitaPrevista = recPrev ? Number(recPrev.valor) : 0;
+    const receitaRealizada = recReal ? Number(recReal.valor) : 0;
+    const despesaPlanejada = custoPlan ? custoPlan.valor : 0;
+    const despesaExecutada = custoExec ? Number(custoExec.valor) : 0;
+
+    return {
+      mes: mesNum,
+      nome,
+      receitaPrevista,
+      receitaRealizada,
+      despesaPlanejada,
+      despesaExecutada,
+      resultadoPrevisto: receitaPrevista - despesaPlanejada,
+      resultadoRealizado: receitaRealizada - despesaExecutada,
+      margemPrevista: receitaPrevista > 0 ? ((receitaPrevista - despesaPlanejada) / receitaPrevista) * 100 : 0,
+      margemRealizada: receitaRealizada > 0 ? ((receitaRealizada - despesaExecutada) / receitaRealizada) * 100 : 0,
+    };
+  });
+
+  // Acumulados
+  const totalReceitaPrevista = dreMensal.reduce((s, m) => s + m.receitaPrevista, 0);
+  const totalReceitaRealizada = dreMensal.reduce((s, m) => s + m.receitaRealizada, 0);
+  const totalDespesaPlanejada = dreMensal.reduce((s, m) => s + m.despesaPlanejada, 0);
+  const totalDespesaExecutada = dreMensal.reduce((s, m) => s + m.despesaExecutada, 0);
+
+  return {
+    ano: anoFiltro,
+    empresaId,
+    dreMensal,
+    totais: {
+      receitaPrevista: totalReceitaPrevista,
+      receitaRealizada: totalReceitaRealizada,
+      despesaPlanejada: totalDespesaPlanejada,
+      despesaExecutada: totalDespesaExecutada,
+      resultadoPrevisto: totalReceitaPrevista - totalDespesaPlanejada,
+      resultadoRealizado: totalReceitaRealizada - totalDespesaExecutada,
+      margemPrevista: totalReceitaPrevista > 0 ? ((totalReceitaPrevista - totalDespesaPlanejada) / totalReceitaPrevista) * 100 : 0,
+      margemRealizada: totalReceitaRealizada > 0 ? ((totalReceitaRealizada - totalDespesaExecutada) / totalReceitaRealizada) * 100 : 0,
+    },
+  };
+}

@@ -1416,3 +1416,25 @@
 - [x] Dialog "Criar Revisão" com motivo, nome sugerido e checkbox de congelar
 - [x] Nova aba "Versões" na GestaoOrcamentaria (9 abas)
 - [x] Testes vitest: 6 testes passando (listar, comparar, estrutura, erro, tipo função)
+
+## Módulo de Gestão de Contratos (Receitas)
+- [x] Schema: tabelas contratos, marcos_financeiros, boletins, aditivos, riscos, documentos, auditoria (já existiam)
+- [x] Backend: CRUD de contratos com upload de PDF e extração por IA (já existia)
+- [x] Backend: CRUD de marcos financeiros (já existia)
+- [x] Backend: Boletins de medição com fluxo de aprovação (já existia)
+- [x] Backend: CRUD de aditivos (financeiro/escopo) (já existia)
+- [x] Frontend: Página de listagem de contratos por empresa (já existia)
+- [x] Frontend: Formulário de cadastro de contrato com upload PDF (já existia)
+- [x] Frontend: Página de detalhes do contrato com 7 abas (já existia)
+- [x] Rotas no App.tsx (já existiam)
+- [x] Backend: Procedure getDashboardReceita (receita prevista vs realizada por empresa/mês)
+- [x] Backend: Procedure getResultadoOperacional (receita - custos = margem)
+- [x] Frontend: Dashboard de Receita com 3 sub-abas (Receita, DRE, Por Contrato)
+- [x] Frontend: DRE simplificado mensal com receita, despesa, resultado e margem
+- [x] Frontend: KPIs de receita prevista, recebida, a receber e atrasados
+- [x] Frontend: Pipeline de marcos por status (pendentes, aprovados, pagos, atrasados)
+- [x] Frontend: Gráfico receita mensal prevista vs recebida
+- [x] Frontend: Evolução do resultado operacional mensal
+- [x] Frontend: Detalhamento por contrato com progresso
+- [x] Integrado como aba "Financeiro" na GestaoOrcamentaria (10 abas)
+- [x] Testes vitest: 9 testes passando (estrutura, meses, consolidado, DRE, margem, campos)

@@ -28,6 +28,7 @@ import OrcamentoAnaliseIA from "./OrcamentoAnaliseIA";
 import RelatorioOrcamentario from "./RelatorioOrcamentario";
 import AnaliseOrcamentaria from "./AnaliseOrcamentaria";
 import ComparativoVersoes from "./ComparativoVersoes";
+import DashboardReceita from "./DashboardReceita";
 
 interface GestaoOrcamentariaProps {
   empresaId: number;
@@ -305,6 +306,9 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
             <TabsTrigger value="comparativo">
               <GitCompare className="h-4 w-4 mr-1" /> Versões
             </TabsTrigger>
+            <TabsTrigger value="financeiro">
+              <TrendingUp className="h-4 w-4 mr-1" /> Financeiro
+            </TabsTrigger>
             <TabsTrigger value="analise-ia">
               <Brain className="h-4 w-4 mr-1" /> IA
             </TabsTrigger>
@@ -443,6 +447,10 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
           </TabsContent>
 
           {/* Análise IA */}
+          <TabsContent value="financeiro" className="mt-6">
+            <DashboardReceita empresaId={empresaId} />
+          </TabsContent>
+
           <TabsContent value="analise-ia" className="mt-6">
             <OrcamentoAnaliseIA empresaId={empresaId} ano={anoSelecionado} />
           </TabsContent>
