@@ -9,8 +9,8 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from "@/components/ui/table";
 import {
-  ChevronDown, ChevronRight, TrendingUp, TrendingDown, Minus,
-  FileText, Printer, Filter, BarChart3, AlertTriangle
+  ChevronDown, ChevronRight, ChevronLeft, TrendingUp, TrendingDown, Minus,
+  FileText, Printer, Filter, BarChart3, AlertTriangle, Calendar
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -21,9 +21,15 @@ interface RelatorioOrcamentarioProps {
   ano: number;
 }
 
-const MESES_NOMES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+const MESES_NOMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+const MESES_CURTOS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 function formatCurrency(value: number) {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+}
+
+function formatCurrencyCompact(value: number) {
+  if (Math.abs(value) < 0.01) return "—";
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 }
 
@@ -57,11 +63,29 @@ function VariacaoBadge({ percentual }: { percentual: number }) {
   return <Badge className="bg-red-100 text-red-800 hover:bg-red-100 text-xs">Acima</Badge>;
 }
 
+// Barra de progresso visual para % execução
+function ProgressBar({ percentual }: { percentual: number }) {
+  const width = Math.min(percentual, 150);
+  let bgColor = "bg-green-500";
+  if (percentual > 120) bgColor = "bg-red-500";
+  else if (percentual > 100) bgColor = "bg-yellow-500";
+  else if (percentual > 80) bgColor = "bg-blue-500";
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
+        <div className={`h-full ${bgColor} rounded-full transition-all`} style={{ width: `${Math.min(width, 100)}%` }} />
+      </div>
+      <span className="text-xs font-medium w-12 text-right">{formatPercent(percentual)}</span>
+    </div>
+  );
+}
+
 export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcamentarioProps) {
   const [categoriaFiltro, setCategoriaFiltro] = useState<string>("todas");
   const [expandedCats, setExpandedCats] = useState<Set<number>>(new Set());
-  const [viewMode, setViewMode] = useState<"resumo" | "mensal">("resumo");
-  const [mesSelecionado, setMesSelecionado] = useState<string>("todos");
+  const [mesAtual, setMesAtual] = useState<number>(Math.min(new Date().getMonth(), 11));
+  const [viewMode, setViewMode] = useState<"mensal" | "anual" | "evolucao">("mensal");
   const printRef = useRef<HTMLDivElement>(null);
 
   const { data: relatorio, isLoading } = trpc.orcamento.getRelatorioDetalhado.useQuery({
@@ -89,25 +113,58 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
 
   const collapseAll = () => setExpandedCats(new Set());
 
-  // Dados para gráfico de barras por categoria
-  const chartData = useMemo(() => {
+  const prevMes = () => setMesAtual(prev => Math.max(0, prev - 1));
+  const nextMes = () => setMesAtual(prev => Math.min(11, prev + 1));
+
+  // Dados para gráfico do mês selecionado (por categoria)
+  const chartMesData = useMemo(() => {
     if (!relatorio?.categorias) return [];
-    return relatorio.categorias.map((cat: any) => ({
-      nome: cat.categoriaNome.length > 20 ? cat.categoriaNome.slice(0, 18) + "..." : cat.categoriaNome,
-      Planejado: cat.totalPlanejado,
-      Executado: cat.totalExecutado,
-    }));
+    return relatorio.categorias
+      .map((cat: any) => ({
+        nome: cat.categoriaNome.length > 25 ? cat.categoriaNome.slice(0, 23) + "..." : cat.categoriaNome,
+        Previsto: cat.meses[mesAtual].planejado,
+        Executado: cat.meses[mesAtual].executado,
+      }))
+      .filter((d: any) => d.Previsto > 0 || d.Executado > 0);
+  }, [relatorio, mesAtual]);
+
+  // Dados para gráfico de evolução mensal
+  const chartEvolucao = useMemo(() => {
+    if (!relatorio?.totais?.meses) return [];
+    let acumPrev = 0;
+    let acumExec = 0;
+    return relatorio.totais.meses.map((m: any, i: number) => {
+      acumPrev += m.planejado;
+      acumExec += m.executado;
+      return {
+        mes: MESES_CURTOS[i],
+        Previsto: m.planejado,
+        Executado: m.executado,
+        "Prev. Acum.": acumPrev,
+        "Exec. Acum.": acumExec,
+      };
+    });
   }, [relatorio]);
 
-  // Dados mensais para gráfico
-  const chartMensal = useMemo(() => {
-    if (!relatorio?.totais?.meses) return [];
-    return relatorio.totais.meses.map((m: any) => ({
-      mes: m.mes,
-      Planejado: m.planejado,
-      Executado: m.executado,
-    }));
-  }, [relatorio]);
+  // Totais do mês selecionado
+  const totaisMes = useMemo(() => {
+    if (!relatorio?.totais?.meses) return null;
+    return relatorio.totais.meses[mesAtual];
+  }, [relatorio, mesAtual]);
+
+  // Acumulado até o mês selecionado
+  const acumuladoAteMes = useMemo(() => {
+    if (!relatorio?.totais?.meses) return null;
+    let prevAcum = 0;
+    let execAcum = 0;
+    for (let i = 0; i <= mesAtual; i++) {
+      prevAcum += relatorio.totais.meses[i].planejado;
+      execAcum += relatorio.totais.meses[i].executado;
+    }
+    const variacao = execAcum - prevAcum;
+    const percentual = prevAcum > 0 ? (execAcum / prevAcum) * 100 : 0;
+    return { prevAcum, execAcum, variacao, percentual };
+  }, [relatorio, mesAtual]);
 
   const handlePrint = () => {
     window.print();
@@ -137,8 +194,6 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
     );
   }
 
-  const mesIdx = mesSelecionado !== "todos" ? Number(mesSelecionado) : -1;
-
   return (
     <div className="space-y-6 print:space-y-4" ref={printRef}>
       {/* Header com filtros */}
@@ -148,7 +203,7 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
             <div>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Relatório Detalhado — Planejado vs Executado
+                Relatório Detalhado — Previsto vs Executado
               </CardTitle>
               <CardDescription className="mt-1">
                 Versão: {relatorio.versaoNome} | Ano: {ano}
@@ -163,6 +218,20 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
         </CardHeader>
         <CardContent className="print:hidden">
           <div className="flex flex-wrap gap-3 items-center">
+            {/* Seletor de visão */}
+            <div className="flex items-center gap-2">
+              <Select value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mensal">Detalhamento Mensal</SelectItem>
+                  <SelectItem value="anual">Resumo Anual</SelectItem>
+                  <SelectItem value="evolucao">Evolução Mensal</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Filtro de categoria */}
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <Select value={categoriaFiltro} onValueChange={setCategoriaFiltro}>
@@ -177,30 +246,6 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-2">
-              <Select value={mesSelecionado} onValueChange={setMesSelecionado}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Mês" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos os meses</SelectItem>
-                  {MESES_NOMES.map((m, i) => (
-                    <SelectItem key={i} value={String(i)}>{m}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center gap-2">
-              <Select value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="resumo">Visão Resumida</SelectItem>
-                  <SelectItem value="mensal">Visão Mensal</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <div className="flex gap-1 ml-auto">
               <Button variant="ghost" size="sm" onClick={expandAll}>Expandir tudo</Button>
               <Button variant="ghost" size="sm" onClick={collapseAll}>Recolher tudo</Button>
@@ -209,266 +254,484 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
         </CardContent>
       </Card>
 
-      {/* Cards de Totais */}
-      {relatorio.totais && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* VISÃO MENSAL DETALHADA */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {viewMode === "mensal" && (
+        <>
+          {/* Navegação entre meses */}
           <Card>
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-muted-foreground">Total Planejado</p>
-              <p className="text-xl font-bold text-blue-600">{formatCurrency(relatorio.totais.totalPlanejado)}</p>
+            <CardContent className="py-3">
+              <div className="flex items-center justify-between">
+                <Button variant="ghost" size="sm" onClick={prevMes} disabled={mesAtual === 0}>
+                  <ChevronLeft className="h-4 w-4 mr-1" /> Anterior
+                </Button>
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-orange-600" />
+                  <span className="text-lg font-bold">{MESES_NOMES[mesAtual]} {ano}</span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={nextMes} disabled={mesAtual === 11}>
+                  Próximo <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+              {/* Mini navegação rápida */}
+              <div className="flex justify-center gap-1 mt-2">
+                {MESES_CURTOS.map((m, i) => (
+                  <Button
+                    key={i}
+                    variant={i === mesAtual ? "default" : "ghost"}
+                    size="sm"
+                    className={`h-7 px-2 text-xs ${i === mesAtual ? "bg-orange-600 hover:bg-orange-700" : ""}`}
+                    onClick={() => setMesAtual(i)}
+                  >
+                    {m}
+                  </Button>
+                ))}
+              </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-muted-foreground">Total Executado</p>
-              <p className="text-xl font-bold text-green-600">{formatCurrency(relatorio.totais.totalExecutado)}</p>
+
+          {/* Cards de Totais do Mês */}
+          {totaisMes && acumuladoAteMes && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+              <Card>
+                <CardContent className="pt-3 pb-3">
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Previsto no Mês</p>
+                  <p className="text-lg font-bold text-blue-600">{formatCurrency(totaisMes.planejado)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-3 pb-3">
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Executado no Mês</p>
+                  <p className="text-lg font-bold text-green-600">{formatCurrency(totaisMes.executado)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-3 pb-3">
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Variação no Mês</p>
+                  <p className={`text-lg font-bold ${totaisMes.variacao > 0 ? "text-red-600" : "text-green-600"}`}>
+                    {totaisMes.variacao > 0 ? "+" : ""}{formatCurrency(totaisMes.variacao)}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-3 pb-3">
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Previsto Acum.</p>
+                  <p className="text-lg font-bold text-blue-500">{formatCurrency(acumuladoAteMes.prevAcum)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-3 pb-3">
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Executado Acum.</p>
+                  <p className="text-lg font-bold text-green-500">{formatCurrency(acumuladoAteMes.execAcum)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-3 pb-3">
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide">% Exec. Mês</p>
+                  <ProgressBar percentual={totaisMes.percentual} />
+                  <VariacaoBadge percentual={totaisMes.percentual} />
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Gráfico do mês por categoria */}
+          {chartMesData.length > 0 && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Previsto vs Executado — {MESES_NOMES[mesAtual]}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={Math.max(200, chartMesData.length * 35)}>
+                  <BarChart data={chartMesData} layout="vertical" margin={{ left: 10, right: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
+                    <YAxis type="category" dataKey="nome" width={180} tick={{ fontSize: 11 }} />
+                    <Tooltip formatter={(v: any) => formatCurrency(v)} />
+                    <Legend />
+                    <Bar dataKey="Previsto" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="Executado" fill="#22c55e" radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Tabela detalhada do mês com subcategorias */}
+          <Card className="print:break-before-page">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">
+                Detalhamento por Categoria e Subcategoria — {MESES_NOMES[mesAtual]} {ano}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="w-[320px] font-bold">Categoria / Subcategoria</TableHead>
+                      <TableHead className="text-right font-bold w-[130px]">Previsto</TableHead>
+                      <TableHead className="text-right font-bold w-[130px]">Executado</TableHead>
+                      <TableHead className="text-right font-bold w-[160px]">Variação (R$)</TableHead>
+                      <TableHead className="text-center font-bold w-[100px]">% Exec.</TableHead>
+                      <TableHead className="text-center font-bold w-[80px]">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {relatorio.categorias.map((cat: any) => {
+                      const isExpanded = expandedCats.has(cat.categoriaId);
+                      const catPlan = cat.meses[mesAtual].planejado;
+                      const catExec = cat.meses[mesAtual].executado;
+                      const catVar = catExec - catPlan;
+                      const catPct = catPlan > 0 ? (catExec / catPlan) * 100 : (catExec > 0 ? 100 : 0);
+
+                      // Pular categorias sem valores no mês
+                      if (catPlan === 0 && catExec === 0) return null;
+
+                      return (
+                        <>{/* Fragment */}
+                          <TableRow
+                            key={`cat-${cat.categoriaId}`}
+                            className="cursor-pointer hover:bg-muted/30 font-semibold bg-muted/20"
+                            onClick={() => toggleCat(cat.categoriaId)}
+                          >
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {isExpanded ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
+                                <span>{cat.categoriaNome}</span>
+                                <span className="text-xs text-muted-foreground font-normal">({cat.subcategorias.length})</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">{formatCurrency(catPlan)}</TableCell>
+                            <TableCell className="text-right">{formatCurrency(catExec)}</TableCell>
+                            <TableCell className="text-right">
+                              <VariacaoIndicator variacao={catVar} percentual={catPct} />
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <ProgressBar percentual={catPct} />
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <VariacaoBadge percentual={catPct} />
+                            </TableCell>
+                          </TableRow>
+                          {isExpanded && cat.subcategorias.map((sub: any) => {
+                            const subPlan = sub.meses[mesAtual].planejado;
+                            const subExec = sub.meses[mesAtual].executado;
+                            const subVar = subExec - subPlan;
+                            const subPct = subPlan > 0 ? (subExec / subPlan) * 100 : (subExec > 0 ? 100 : 0);
+
+                            if (subPlan === 0 && subExec === 0) return null;
+
+                            return (
+                              <TableRow key={`sub-${sub.subcategoriaId}`} className="text-sm hover:bg-muted/10">
+                                <TableCell className="pl-10 text-muted-foreground">{sub.subcategoriaNome}</TableCell>
+                                <TableCell className="text-right">{formatCurrencyCompact(subPlan)}</TableCell>
+                                <TableCell className="text-right">{formatCurrencyCompact(subExec)}</TableCell>
+                                <TableCell className="text-right">
+                                  <VariacaoIndicator variacao={subVar} percentual={subPct} />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <ProgressBar percentual={subPct} />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <VariacaoBadge percentual={subPct} />
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </>
+                      );
+                    })}
+                    {/* Linha de totais */}
+                    {totaisMes && (
+                      <TableRow className="font-bold bg-muted/40 border-t-2">
+                        <TableCell>TOTAL — {MESES_NOMES[mesAtual].toUpperCase()}</TableCell>
+                        <TableCell className="text-right">{formatCurrency(totaisMes.planejado)}</TableCell>
+                        <TableCell className="text-right">{formatCurrency(totaisMes.executado)}</TableCell>
+                        <TableCell className="text-right">
+                          <VariacaoIndicator variacao={totaisMes.variacao} percentual={totaisMes.percentual} />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <ProgressBar percentual={totaisMes.percentual} />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <VariacaoBadge percentual={totaisMes.percentual} />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-muted-foreground">Variação</p>
-              <p className={`text-xl font-bold ${relatorio.totais.totalVariacao > 0 ? "text-red-600" : "text-green-600"}`}>
-                {relatorio.totais.totalVariacao > 0 ? "+" : ""}{formatCurrency(relatorio.totais.totalVariacao)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-muted-foreground">% Execução</p>
-              <p className="text-xl font-bold">{formatPercent(relatorio.totais.totalPercentual)}</p>
-              <VariacaoBadge percentual={relatorio.totais.totalPercentual} />
-            </CardContent>
-          </Card>
-        </div>
+        </>
       )}
 
-      {/* Gráfico comparativo por categoria */}
-      {chartData.length > 0 && (
-        <Card className="print:break-before-page">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Comparativo por Categoria
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={Math.max(250, chartData.length * 40)}>
-              <BarChart data={chartData} layout="vertical" margin={{ left: 10, right: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
-                <YAxis type="category" dataKey="nome" width={160} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: any) => formatCurrency(v)} />
-                <Legend />
-                <Bar dataKey="Planejado" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                <Bar dataKey="Executado" fill="#22c55e" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      )}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* VISÃO ANUAL (RESUMO) */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {viewMode === "anual" && (
+        <>
+          {/* Cards de Totais Anuais */}
+          {relatorio.totais && (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="pt-4 pb-4">
+                  <p className="text-sm text-muted-foreground">Total Previsto Anual</p>
+                  <p className="text-xl font-bold text-blue-600">{formatCurrency(relatorio.totais.totalPlanejado)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-4 pb-4">
+                  <p className="text-sm text-muted-foreground">Total Executado</p>
+                  <p className="text-xl font-bold text-green-600">{formatCurrency(relatorio.totais.totalExecutado)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-4 pb-4">
+                  <p className="text-sm text-muted-foreground">Variação</p>
+                  <p className={`text-xl font-bold ${relatorio.totais.totalVariacao > 0 ? "text-red-600" : "text-green-600"}`}>
+                    {relatorio.totais.totalVariacao > 0 ? "+" : ""}{formatCurrency(relatorio.totais.totalVariacao)}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-4 pb-4">
+                  <p className="text-sm text-muted-foreground">% Execução</p>
+                  <p className="text-xl font-bold">{formatPercent(relatorio.totais.totalPercentual)}</p>
+                  <VariacaoBadge percentual={relatorio.totais.totalPercentual} />
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-      {/* Tabela detalhada */}
-      <Card className="print:break-before-page">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">
-            {viewMode === "resumo" ? "Detalhamento por Categoria e Subcategoria" : "Detalhamento Mensal"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            {viewMode === "resumo" ? (
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead className="w-[300px] font-bold">Categoria / Subcategoria</TableHead>
-                    <TableHead className="text-right font-bold">Planejado</TableHead>
-                    <TableHead className="text-right font-bold">Executado</TableHead>
-                    <TableHead className="text-right font-bold">Variação (R$)</TableHead>
-                    <TableHead className="text-right font-bold">% Exec.</TableHead>
-                    <TableHead className="text-center font-bold">Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {relatorio.categorias.map((cat: any) => {
-                    const isExpanded = expandedCats.has(cat.categoriaId);
-                    // Se mês selecionado, filtrar valores
-                    const catPlan = mesIdx >= 0 ? cat.meses[mesIdx].planejado : cat.totalPlanejado;
-                    const catExec = mesIdx >= 0 ? cat.meses[mesIdx].executado : cat.totalExecutado;
-                    const catVar = catExec - catPlan;
-                    const catPct = catPlan > 0 ? (catExec / catPlan) * 100 : (catExec > 0 ? 100 : 0);
-
-                    return (
-                      <>{/* Fragment for category + subcategories */}
-                        <TableRow
-                          key={`cat-${cat.categoriaId}`}
-                          className="cursor-pointer hover:bg-muted/30 font-semibold bg-muted/20"
-                          onClick={() => toggleCat(cat.categoriaId)}
-                        >
-                          <TableCell className="flex items-center gap-2">
-                            {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                            {cat.categoriaNome}
-                            <span className="text-xs text-muted-foreground font-normal">({cat.subcategorias.length})</span>
-                          </TableCell>
-                          <TableCell className="text-right">{formatCurrency(catPlan)}</TableCell>
-                          <TableCell className="text-right">{formatCurrency(catExec)}</TableCell>
-                          <TableCell className="text-right">
-                            <VariacaoIndicator variacao={catVar} percentual={catPct} />
-                          </TableCell>
-                          <TableCell className="text-right">{formatPercent(catPct)}</TableCell>
-                          <TableCell className="text-center">
-                            <VariacaoBadge percentual={catPct} />
-                          </TableCell>
-                        </TableRow>
-                        {isExpanded && cat.subcategorias.map((sub: any) => {
-                          const subPlan = mesIdx >= 0 ? sub.meses[mesIdx].planejado : sub.totalPlanejado;
-                          const subExec = mesIdx >= 0 ? sub.meses[mesIdx].executado : sub.totalExecutado;
-                          const subVar = subExec - subPlan;
-                          const subPct = subPlan > 0 ? (subExec / subPlan) * 100 : (subExec > 0 ? 100 : 0);
-                          return (
-                            <TableRow key={`sub-${sub.subcategoriaId}`} className="text-sm">
+          {/* Tabela anual com todas categorias e subcategorias */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Detalhamento Anual por Categoria e Subcategoria</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="w-[300px] font-bold">Categoria / Subcategoria</TableHead>
+                      <TableHead className="text-right font-bold">Previsto Anual</TableHead>
+                      <TableHead className="text-right font-bold">Executado</TableHead>
+                      <TableHead className="text-right font-bold">Variação (R$)</TableHead>
+                      <TableHead className="text-center font-bold">% Exec.</TableHead>
+                      <TableHead className="text-center font-bold">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {relatorio.categorias.map((cat: any) => {
+                      const isExpanded = expandedCats.has(cat.categoriaId);
+                      return (
+                        <>
+                          <TableRow
+                            key={`cat-${cat.categoriaId}`}
+                            className="cursor-pointer hover:bg-muted/30 font-semibold bg-muted/20"
+                            onClick={() => toggleCat(cat.categoriaId)}
+                          >
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {isExpanded ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
+                                <span>{cat.categoriaNome}</span>
+                                <span className="text-xs text-muted-foreground font-normal">({cat.subcategorias.length})</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">{formatCurrency(cat.totalPlanejado)}</TableCell>
+                            <TableCell className="text-right">{formatCurrency(cat.totalExecutado)}</TableCell>
+                            <TableCell className="text-right">
+                              <VariacaoIndicator variacao={cat.totalVariacao} percentual={cat.totalPercentual} />
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <ProgressBar percentual={cat.totalPercentual} />
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <VariacaoBadge percentual={cat.totalPercentual} />
+                            </TableCell>
+                          </TableRow>
+                          {isExpanded && cat.subcategorias.map((sub: any) => (
+                            <TableRow key={`sub-${sub.subcategoriaId}`} className="text-sm hover:bg-muted/10">
                               <TableCell className="pl-10 text-muted-foreground">{sub.subcategoriaNome}</TableCell>
-                              <TableCell className="text-right">{formatCurrency(subPlan)}</TableCell>
-                              <TableCell className="text-right">{formatCurrency(subExec)}</TableCell>
+                              <TableCell className="text-right">{formatCurrency(sub.totalPlanejado)}</TableCell>
+                              <TableCell className="text-right">{formatCurrency(sub.totalExecutado)}</TableCell>
                               <TableCell className="text-right">
-                                <VariacaoIndicator variacao={subVar} percentual={subPct} />
+                                <VariacaoIndicator variacao={sub.totalVariacao} percentual={sub.totalPercentual} />
                               </TableCell>
-                              <TableCell className="text-right">{formatPercent(subPct)}</TableCell>
                               <TableCell className="text-center">
-                                <VariacaoBadge percentual={subPct} />
+                                <ProgressBar percentual={sub.totalPercentual} />
+                              </TableCell>
+                              <TableCell className="text-center">
+                                <VariacaoBadge percentual={sub.totalPercentual} />
                               </TableCell>
                             </TableRow>
-                          );
-                        })}
-                      </>
-                    );
-                  })}
-                  {/* Linha de totais */}
-                  {relatorio.totais && (
-                    <TableRow className="font-bold bg-muted/40 border-t-2">
-                      <TableCell>TOTAL GERAL</TableCell>
-                      <TableCell className="text-right">
-                        {formatCurrency(mesIdx >= 0 ? relatorio.totais.meses[mesIdx].planejado : relatorio.totais.totalPlanejado)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatCurrency(mesIdx >= 0 ? relatorio.totais.meses[mesIdx].executado : relatorio.totais.totalExecutado)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <VariacaoIndicator
-                          variacao={mesIdx >= 0 ? relatorio.totais.meses[mesIdx].variacao : relatorio.totais.totalVariacao}
-                          percentual={mesIdx >= 0 ? relatorio.totais.meses[mesIdx].percentual : relatorio.totais.totalPercentual}
-                        />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatPercent(mesIdx >= 0 ? relatorio.totais.meses[mesIdx].percentual : relatorio.totais.totalPercentual)}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <VariacaoBadge percentual={mesIdx >= 0 ? relatorio.totais.meses[mesIdx].percentual : relatorio.totais.totalPercentual} />
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            ) : (
-              /* Visão Mensal */
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead className="w-[200px] font-bold sticky left-0 bg-muted/50 z-10">Categoria</TableHead>
-                    {MESES_NOMES.map(m => (
-                      <TableHead key={m} className="text-center font-bold min-w-[120px]" colSpan={1}>
-                        {m}
-                      </TableHead>
-                    ))}
-                    <TableHead className="text-right font-bold min-w-[120px]">Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {relatorio.categorias.map((cat: any) => (
-                    <>
-                      {/* Planejado row */}
-                      <TableRow key={`cat-plan-${cat.categoriaId}`} className="bg-blue-50/50">
-                        <TableCell className="font-semibold sticky left-0 bg-blue-50/50 z-10">
-                          <span className="text-xs text-blue-600 block">Planejado</span>
-                          {cat.categoriaNome}
-                        </TableCell>
-                        {cat.meses.map((m: any, i: number) => (
-                          <TableCell key={i} className="text-right text-xs">
-                            {formatCurrency(m.planejado)}
-                          </TableCell>
-                        ))}
-                        <TableCell className="text-right font-semibold">{formatCurrency(cat.totalPlanejado)}</TableCell>
-                      </TableRow>
-                      {/* Executado row */}
-                      <TableRow key={`cat-exec-${cat.categoriaId}`} className="bg-green-50/50">
-                        <TableCell className="sticky left-0 bg-green-50/50 z-10">
-                          <span className="text-xs text-green-600">Executado</span>
-                        </TableCell>
-                        {cat.meses.map((m: any, i: number) => (
-                          <TableCell key={i} className="text-right text-xs">
-                            {formatCurrency(m.executado)}
-                          </TableCell>
-                        ))}
-                        <TableCell className="text-right font-semibold">{formatCurrency(cat.totalExecutado)}</TableCell>
-                      </TableRow>
-                      {/* Variação row */}
-                      <TableRow key={`cat-var-${cat.categoriaId}`} className="border-b-2">
-                        <TableCell className="sticky left-0 bg-background z-10">
-                          <span className="text-xs text-muted-foreground">Variação</span>
-                        </TableCell>
-                        {cat.meses.map((m: any, i: number) => (
-                          <TableCell key={i} className="text-right">
-                            <VariacaoIndicator variacao={m.variacao} percentual={m.percentual} />
-                          </TableCell>
-                        ))}
-                        <TableCell className="text-right">
-                          <VariacaoIndicator variacao={cat.totalVariacao} percentual={cat.totalPercentual} />
-                        </TableCell>
-                      </TableRow>
-                    </>
-                  ))}
-                  {/* Totais gerais */}
-                  {relatorio.totais && (
-                    <>
-                      <TableRow className="font-bold bg-blue-100/50">
-                        <TableCell className="sticky left-0 bg-blue-100/50 z-10">
-                          <span className="text-xs text-blue-600 block">Planejado</span>
-                          TOTAL GERAL
-                        </TableCell>
-                        {relatorio.totais.meses.map((m: any, i: number) => (
-                          <TableCell key={i} className="text-right text-xs">{formatCurrency(m.planejado)}</TableCell>
-                        ))}
+                          ))}
+                        </>
+                      );
+                    })}
+                    {relatorio.totais && (
+                      <TableRow className="font-bold bg-muted/40 border-t-2">
+                        <TableCell>TOTAL GERAL — {ano}</TableCell>
                         <TableCell className="text-right">{formatCurrency(relatorio.totais.totalPlanejado)}</TableCell>
-                      </TableRow>
-                      <TableRow className="font-bold bg-green-100/50">
-                        <TableCell className="sticky left-0 bg-green-100/50 z-10">
-                          <span className="text-xs text-green-600">Executado</span>
-                        </TableCell>
-                        {relatorio.totais.meses.map((m: any, i: number) => (
-                          <TableCell key={i} className="text-right text-xs">{formatCurrency(m.executado)}</TableCell>
-                        ))}
                         <TableCell className="text-right">{formatCurrency(relatorio.totais.totalExecutado)}</TableCell>
-                      </TableRow>
-                      <TableRow className="font-bold border-t-2">
-                        <TableCell className="sticky left-0 bg-background z-10">
-                          <span className="text-xs text-muted-foreground">Variação</span>
-                        </TableCell>
-                        {relatorio.totais.meses.map((m: any, i: number) => (
-                          <TableCell key={i} className="text-right">
-                            <VariacaoIndicator variacao={m.variacao} percentual={m.percentual} />
-                          </TableCell>
-                        ))}
                         <TableCell className="text-right">
                           <VariacaoIndicator variacao={relatorio.totais.totalVariacao} percentual={relatorio.totais.totalPercentual} />
                         </TableCell>
+                        <TableCell className="text-center">
+                          <ProgressBar percentual={relatorio.totais.totalPercentual} />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <VariacaoBadge percentual={relatorio.totais.totalPercentual} />
+                        </TableCell>
                       </TableRow>
-                    </>
-                  )}
-                </TableBody>
-              </Table>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* VISÃO EVOLUÇÃO MENSAL */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {viewMode === "evolucao" && (
+        <>
+          {/* Gráfico de evolução mensal */}
+          {chartEvolucao.length > 0 && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Evolução Mensal — Previsto vs Executado
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={320}>
+                  <BarChart data={chartEvolucao}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="mes" />
+                    <YAxis tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip formatter={(v: any) => formatCurrency(v)} />
+                    <Legend />
+                    <Bar dataKey="Previsto" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Executado" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Tabela de evolução mês a mês por categoria */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Evolução Mensal por Categoria</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="w-[200px] font-bold sticky left-0 bg-muted/50 z-10">Categoria</TableHead>
+                      <TableHead className="text-center font-bold w-[60px] text-[10px]">Tipo</TableHead>
+                      {MESES_CURTOS.map(m => (
+                        <TableHead key={m} className="text-center font-bold min-w-[100px] text-xs">{m}</TableHead>
+                      ))}
+                      <TableHead className="text-right font-bold min-w-[110px]">Total</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {relatorio.categorias.map((cat: any) => (
+                      <>
+                        <TableRow key={`cat-prev-${cat.categoriaId}`} className="bg-blue-50/40">
+                          <TableCell className="font-semibold sticky left-0 bg-blue-50/40 z-10 text-sm" rowSpan={1}>
+                            {cat.categoriaNome}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <span className="text-[10px] text-blue-600 font-medium">Prev.</span>
+                          </TableCell>
+                          {cat.meses.map((m: any, i: number) => (
+                            <TableCell key={i} className="text-right text-[11px]">
+                              {formatCurrencyCompact(m.planejado)}
+                            </TableCell>
+                          ))}
+                          <TableCell className="text-right font-semibold text-xs">{formatCurrency(cat.totalPlanejado)}</TableCell>
+                        </TableRow>
+                        <TableRow key={`cat-exec-${cat.categoriaId}`} className="bg-green-50/40">
+                          <TableCell className="sticky left-0 bg-green-50/40 z-10" />
+                          <TableCell className="text-center">
+                            <span className="text-[10px] text-green-600 font-medium">Exec.</span>
+                          </TableCell>
+                          {cat.meses.map((m: any, i: number) => (
+                            <TableCell key={i} className="text-right text-[11px]">
+                              {formatCurrencyCompact(m.executado)}
+                            </TableCell>
+                          ))}
+                          <TableCell className="text-right font-semibold text-xs">{formatCurrency(cat.totalExecutado)}</TableCell>
+                        </TableRow>
+                        <TableRow key={`cat-var-${cat.categoriaId}`} className="border-b-2">
+                          <TableCell className="sticky left-0 bg-background z-10" />
+                          <TableCell className="text-center">
+                            <span className="text-[10px] text-muted-foreground font-medium">Var.</span>
+                          </TableCell>
+                          {cat.meses.map((m: any, i: number) => (
+                            <TableCell key={i} className="text-right">
+                              <VariacaoIndicator variacao={m.variacao} percentual={m.percentual} />
+                            </TableCell>
+                          ))}
+                          <TableCell className="text-right">
+                            <VariacaoIndicator variacao={cat.totalVariacao} percentual={cat.totalPercentual} />
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    ))}
+                    {/* Totais gerais */}
+                    {relatorio.totais && (
+                      <>
+                        <TableRow className="font-bold bg-blue-100/50">
+                          <TableCell className="sticky left-0 bg-blue-100/50 z-10">TOTAL GERAL</TableCell>
+                          <TableCell className="text-center"><span className="text-[10px] text-blue-600">Prev.</span></TableCell>
+                          {relatorio.totais.meses.map((m: any, i: number) => (
+                            <TableCell key={i} className="text-right text-[11px]">{formatCurrency(m.planejado)}</TableCell>
+                          ))}
+                          <TableCell className="text-right">{formatCurrency(relatorio.totais.totalPlanejado)}</TableCell>
+                        </TableRow>
+                        <TableRow className="font-bold bg-green-100/50">
+                          <TableCell className="sticky left-0 bg-green-100/50 z-10" />
+                          <TableCell className="text-center"><span className="text-[10px] text-green-600">Exec.</span></TableCell>
+                          {relatorio.totais.meses.map((m: any, i: number) => (
+                            <TableCell key={i} className="text-right text-[11px]">{formatCurrency(m.executado)}</TableCell>
+                          ))}
+                          <TableCell className="text-right">{formatCurrency(relatorio.totais.totalExecutado)}</TableCell>
+                        </TableRow>
+                        <TableRow className="font-bold border-t-2">
+                          <TableCell className="sticky left-0 bg-background z-10" />
+                          <TableCell className="text-center"><span className="text-[10px] text-muted-foreground">Var.</span></TableCell>
+                          {relatorio.totais.meses.map((m: any, i: number) => (
+                            <TableCell key={i} className="text-right">
+                              <VariacaoIndicator variacao={m.variacao} percentual={m.percentual} />
+                            </TableCell>
+                          ))}
+                          <TableCell className="text-right">
+                            <VariacaoIndicator variacao={relatorio.totais.totalVariacao} percentual={relatorio.totais.totalPercentual} />
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }

@@ -1385,3 +1385,11 @@
 - [x] Integrar como aba "Relatório" na GestaoOrcamentaria (7 abas)
 - [x] Gráfico comparativo horizontal por categoria
 - [x] Testes vitest: 4 testes passando (estrutura, filtro, empresa vazia, cálculo variação)
+
+## Melhoria Relatório - Detalhamento Mensal Previsto vs Executado
+- [x] Redesenhar visão mensal com tabela detalhada por mês selecionado + visão anual + evolução
+- [x] Mostrar cada subcategoria com previsto, executado, variação, % e barra de progresso
+- [x] Adicionar navegação entre meses (anterior/próximo + seleção rápida)
+- [x] Incluir gráfico mensal comparativo por categoria
+- [x] Cards de totais do mês + acumulado até o mês
+- [x] 3 visões: Detalhamento Mensal, Resumo Anual, Evolução Mensal
