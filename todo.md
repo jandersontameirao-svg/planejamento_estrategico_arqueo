@@ -1360,3 +1360,10 @@
 - [x] Mapear 80 itens do PDF para 48 subcategorias existentes no plano de contas
 - [x] Inserir valores executados no banco (Jan-Mar 2026) - 240 linhas, R$ 1.067.154,75 total
 - [x] Validar dados importados: 3 meses x 80 itens = 240 linhas, total confere
+
+## Expansão Plano de Contas - Custos Operacionais de Projeto (Arqueoproject)
+- [x] Criar 7 novas categorias: Custos Diretos de Projeto, Custos com Materiais e Serviços, Custos Trabalhistas Eventuais, Movimentações Financeiras, Tributos Operacionais, Investimentos e Melhorias, Despesas Não Classificadas
+- [x] Criar 32 subcategorias para as novas categorias + 4 subcategorias extras em categorias existentes (Veículos)
+- [x] Lançar planejado Jan-Mar com valores reais do executado (1/3 do trimestral por mês)
+- [x] Projetar planejado Abr-Dez com média mensal do 1º trimestre (9 meses)
+- [x] Validar totais: 80 linhas planejadas, R$ 4.984.894,42 total anual (antes: 44 linhas, R$ 3.297.931,94)

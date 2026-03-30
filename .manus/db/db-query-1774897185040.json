@@ -1,0 +1,230 @@
+{
+  "query": "SELECT DISTINCT l.subcategoriaId, s.nome as subcategoria, c.nome as categoria FROM orcamento_planejado_linhas l JOIN orcamento_subcategorias s ON s.id = l.subcategoriaId JOIN orcamento_categorias c ON c.id = s.categoriaId WHERE l.versaoId IN (SELECT id FROM orcamento_versoes WHERE empresaId = 1) ORDER BY c.nome, s.nome;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT DISTINCT l.subcategoriaId, s.nome as subcategoria, c.nome as categoria FROM orcamento_planejado_linhas l JOIN orcamento_subcategorias s ON s.id = l.subcategoriaId JOIN orcamento_categorias c ON c.id = s.categoriaId WHERE l.versaoId IN (SELECT id FROM orcamento_versoes WHERE empresaId = 1) ORDER BY c.nome, s.nome;",
+  "rows": [
+    {
+      "subcategoriaId": "1",
+      "subcategoria": "Assistencia Medica E Odontologica",
+      "categoria": "Benefícios"
+    },
+    {
+      "subcategoriaId": "2",
+      "subcategoria": "Auxilio Alimentacao Refeicao",
+      "categoria": "Benefícios"
+    },
+    {
+      "subcategoriaId": "3",
+      "subcategoria": "Auxilio Transporte",
+      "categoria": "Benefícios"
+    },
+    {
+      "subcategoriaId": "4",
+      "subcategoria": "Seguro De Vida",
+      "categoria": "Benefícios"
+    },
+    {
+      "subcategoriaId": "5",
+      "subcategoria": "Contratacao Pessoa Juridica",
+      "categoria": "Custos com Serviços Contratados"
+    },
+    {
+      "subcategoriaId": "6",
+      "subcategoria": "Locacao De Equipamentos",
+      "categoria": "Despesas Administrativas"
+    },
+    {
+      "subcategoriaId": "7",
+      "subcategoria": "Seguros",
+      "categoria": "Despesas Administrativas"
+    },
+    {
+      "subcategoriaId": "9",
+      "subcategoria": "Alugueis",
+      "categoria": "Despesas com Aluguéis e Condomínios"
+    },
+    {
+      "subcategoriaId": "10",
+      "subcategoria": "Condominios",
+      "categoria": "Despesas com Aluguéis e Condomínios"
+    },
+    {
+      "subcategoriaId": "12",
+      "subcategoria": "Feiras Exposicoes Congressos E Conferencias",
+      "categoria": "Despesas com Serviços"
+    },
+    {
+      "subcategoriaId": "13",
+      "subcategoria": "Reunioes E Confraternizaçoes",
+      "categoria": "Despesas com Serviços"
+    },
+    {
+      "subcategoriaId": "14",
+      "subcategoria": "Servicos Administrativos",
+      "categoria": "Despesas com Serviços"
+    },
+    {
+      "subcategoriaId": "15",
+      "subcategoria": "Servicos Advocaticios",
+      "categoria": "Despesas com Serviços"
+    },
+    {
+      "subcategoriaId": "16",
+      "subcategoria": "Servicos Contabeis",
+      "categoria": "Despesas com Serviços"
+    },
+    {
+      "subcategoriaId": "17",
+      "subcategoria": "Servicos De Gestao E Consultoria",
+      "categoria": "Despesas com Serviços"
+    },
+    {
+      "subcategoriaId": "18",
+      "subcategoria": "Servicos De Limpeza E Conservacao De Bens",
+      "categoria": "Despesas com Serviços"
+    },
+    {
+      "subcategoriaId": "19",
+      "subcategoria": "Servicos De Manutencao",
+      "categoria": "Despesas com Serviços"
+    },
+    {
+      "subcategoriaId": "20",
+      "subcategoria": "Servicos Graficos",
+      "categoria": "Despesas com Serviços"
+    },
+    {
+      "subcategoriaId": "21",
+      "subcategoria": "Combustivel E Lubrificantes",
+      "categoria": "Despesas com Veículos"
+    },
+    {
+      "subcategoriaId": "22",
+      "subcategoria": "Agua E Esgoto",
+      "categoria": "Despesas de Consumo"
+    },
+    {
+      "subcategoriaId": "23",
+      "subcategoria": "Energia Eletrica",
+      "categoria": "Despesas de Consumo"
+    },
+    {
+      "subcategoriaId": "24",
+      "subcategoria": "Lanches E Refeicoes",
+      "categoria": "Despesas de Consumo"
+    },
+    {
+      "subcategoriaId": "25",
+      "subcategoria": "Materiais De Limpeza/higiene",
+      "categoria": "Despesas de Consumo"
+    },
+    {
+      "subcategoriaId": "26",
+      "subcategoria": "Telefone E Internet",
+      "categoria": "Despesas de Consumo"
+    },
+    {
+      "subcategoriaId": "27",
+      "subcategoria": "Anuidade Cartao De Credito",
+      "categoria": "Despesas Financeiras"
+    },
+    {
+      "subcategoriaId": "28",
+      "subcategoria": "Despesas Bancarias",
+      "categoria": "Despesas Financeiras"
+    },
+    {
+      "subcategoriaId": "29",
+      "subcategoria": "Certificados Digitais",
+      "categoria": "Despesas Gerais"
+    },
+    {
+      "subcategoriaId": "30",
+      "subcategoria": "Licenca De Softwares",
+      "categoria": "Despesas Gerais"
+    },
+    {
+      "subcategoriaId": "31",
+      "subcategoria": "Retirada Socio",
+      "categoria": "Diretoria"
+    },
+    {
+      "subcategoriaId": "32",
+      "subcategoria": "Fgts",
+      "categoria": "Encargos"
+    },
+    {
+      "subcategoriaId": "33",
+      "subcategoria": "Inss",
+      "categoria": "Encargos"
+    },
+    {
+      "subcategoriaId": "34",
+      "subcategoria": "Consorcios",
+      "categoria": "Imobilizado"
+    },
+    {
+      "subcategoriaId": "35",
+      "subcategoria": "Equipamentos De Informatica",
+      "categoria": "Imobilizado"
+    },
+    {
+      "subcategoriaId": "36",
+      "subcategoria": "Moveis E Utensilios",
+      "categoria": "Imobilizado"
+    },
+    {
+      "subcategoriaId": "38",
+      "subcategoria": "Amortizacao De Emprestimo",
+      "categoria": "Liquidação de Empréstimo"
+    },
+    {
+      "subcategoriaId": "39",
+      "subcategoria": "Exames Periodicos/seg. Do Trabalho",
+      "categoria": "Outros Custos com Pessoal"
+    },
+    {
+      "subcategoriaId": "40",
+      "subcategoria": "Uniformes E Acessorios",
+      "categoria": "Outros Custos com Pessoal"
+    },
+    {
+      "subcategoriaId": "41",
+      "subcategoria": "13°salario",
+      "categoria": "Salários e Ordenados"
+    },
+    {
+      "subcategoriaId": "42",
+      "subcategoria": "Ferias",
+      "categoria": "Salários e Ordenados"
+    },
+    {
+      "subcategoriaId": "43",
+      "subcategoria": "Salarios",
+      "categoria": "Salários e Ordenados"
+    },
+    {
+      "subcategoriaId": "44",
+      "subcategoria": "Entidades De Classe E Associacoes",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "subcategoriaId": "45",
+      "subcategoria": "Iptu Tlp",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "subcategoriaId": "46",
+      "subcategoria": "Ipva",
+      "categoria": "Tributos, Taxas e Contribuições"
+    },
+    {
+      "subcategoriaId": "47",
+      "subcategoria": "Simples Nacional (parcelamento)",
+      "categoria": "Tributos, Taxas e Contribuições"
+    }
+  ],
+  "messages": [],
+  "stdout": "subcategoriaId\tsubcategoria\tcategoria\n1\tAssistencia Medica E Odontologica\tBenefícios\n2\tAuxilio Alimentacao Refeicao\tBenefícios\n3\tAuxilio Transporte\tBenefícios\n4\tSeguro De Vida\tBenefícios\n5\tContratacao Pessoa Juridica\tCustos com Serviços Contratados\n6\tLocacao De Equipamentos\tDespesas Administrativas\n7\tSeguros\tDespesas Administrativas\n9\tAlugueis\tDespesas com Aluguéis e Condomínios\n10\tCondominios\tDespesas com Aluguéis e Condomínios\n12\tFeiras Exposicoes Congressos E Conferencias\tDespesas com Serviços\n13\tReunioes E Confraternizaçoes\tDespesas com Serviços\n14\tServicos Administrativos\tDespesas com Serviços\n15\tServicos Advocaticios\tDespesas com Serviços\n16\tServicos Contabeis\tDespesas com Serviços\n17\tServicos De Gestao E Consultoria\tDespesas com Serviços\n18\tServicos De Limpeza E Conservacao De Bens\tDespesas com Serviços\n19\tServicos De Manutencao\tDespesas com Serviços\n20\tServicos Graficos\tDespesas com Serviços\n21\tCombustivel E Lubrificantes\tDespesas com Veículos\n22\tAgua E Esgoto\tDespesas de Consumo\n23\tEnergia Eletrica\tDespesas de Consumo\n24\tLanches E Refeicoes\tDespesas de Consumo\n25\tMateriais De Limpeza/higiene\tDespesas de Consumo\n26\tTelefone E Internet\tDespesas de Consumo\n27\tAnuidade Cartao De Credito\tDespesas Financeiras\n28\tDespesas Bancarias\tDespesas Financeiras\n29\tCertificados Digitais\tDespesas Gerais\n30\tLicenca De Softwares\tDespesas Gerais\n31\tRetirada Socio\tDiretoria\n32\tFgts\tEncargos\n33\tInss\tEncargos\n34\tConsorcios\tImobilizado\n35\tEquipamentos De Informatica\tImobilizado\n36\tMoveis E Utensilios\tImobilizado\n38\tAmortizacao De Emprestimo\tLiquidação de Empréstimo\n39\tExames Periodicos/seg. Do Trabalho\tOutros Custos com Pessoal\n40\tUniformes E Acessorios\tOutros Custos com Pessoal\n41\t13°salario\tSalários e Ordenados\n42\tFerias\tSalários e Ordenados\n43\tSalarios\tSalários e Ordenados\n44\tEntidades De Classe E Associacoes\tTributos, Taxas e Contribuições\n45\tIptu Tlp\tTributos, Taxas e Contribuições\n46\tIpva\tTributos, Taxas e Contribuições\n47\tSimples Nacional (parcelamento)\tTributos, Taxas e Contribuições\n",
+  "stderr": "",
+  "execution_time_ms": 396
+}

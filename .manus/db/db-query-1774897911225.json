@@ -1,0 +1,110 @@
+{
+  "query": "SELECT c.nome as categoria, COUNT(*) as linhas, SUM(l.totalAnual) as totalAnual FROM orcamento_planejado_linhas l JOIN orcamento_categorias c ON c.id = l.categoriaId WHERE l.versaoId = 1 GROUP BY c.nome ORDER BY totalAnual DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT c.nome as categoria, COUNT(*) as linhas, SUM(l.totalAnual) as totalAnual FROM orcamento_planejado_linhas l JOIN orcamento_categorias c ON c.id = l.categoriaId WHERE l.versaoId = 1 GROUP BY c.nome ORDER BY totalAnual DESC LIMIT 20;",
+  "rows": [
+    {
+      "categoria": "Despesas com Serviços",
+      "linhas": "9",
+      "totalAnual": "1312621.15"
+    },
+    {
+      "categoria": "Liquidação de Empréstimo",
+      "linhas": "1",
+      "totalAnual": "869329.51"
+    },
+    {
+      "categoria": "Custos Diretos de Projeto",
+      "linhas": "12",
+      "totalAnual": "606256.10"
+    },
+    {
+      "categoria": "Custos com Materiais e Serviços",
+      "linhas": "4",
+      "totalAnual": "381221.61"
+    },
+    {
+      "categoria": "Movimentações Financeiras",
+      "linhas": "4",
+      "totalAnual": "341288.88"
+    },
+    {
+      "categoria": "Custos com Serviços Contratados",
+      "linhas": "1",
+      "totalAnual": "237600.00"
+    },
+    {
+      "categoria": "Salários e Ordenados",
+      "linhas": "3",
+      "totalAnual": "230533.90"
+    },
+    {
+      "categoria": "Diretoria",
+      "linhas": "1",
+      "totalAnual": "205787.76"
+    },
+    {
+      "categoria": "Despesas Gerais",
+      "linhas": "2",
+      "totalAnual": "126264.57"
+    },
+    {
+      "categoria": "Tributos Operacionais",
+      "linhas": "1",
+      "totalAnual": "117452.75"
+    },
+    {
+      "categoria": "Encargos",
+      "linhas": "2",
+      "totalAnual": "79947.33"
+    },
+    {
+      "categoria": "Despesas com Veículos",
+      "linhas": "4",
+      "totalAnual": "75356.38"
+    },
+    {
+      "categoria": "Custos Trabalhistas Eventuais",
+      "linhas": "3",
+      "totalAnual": "61560.73"
+    },
+    {
+      "categoria": "Benefícios",
+      "linhas": "4",
+      "totalAnual": "58838.69"
+    },
+    {
+      "categoria": "Despesas Não Classificadas",
+      "linhas": "6",
+      "totalAnual": "55684.08"
+    },
+    {
+      "categoria": "Investimentos e Melhorias",
+      "linhas": "2",
+      "totalAnual": "49914.12"
+    },
+    {
+      "categoria": "Tributos, Taxas e Contribuições",
+      "linhas": "4",
+      "totalAnual": "49584.27"
+    },
+    {
+      "categoria": "Despesas Administrativas",
+      "linhas": "3",
+      "totalAnual": "45612.19"
+    },
+    {
+      "categoria": "Despesas de Consumo",
+      "linhas": "5",
+      "totalAnual": "38247.77"
+    },
+    {
+      "categoria": "Imobilizado",
+      "linhas": "3",
+      "totalAnual": "21368.27"
+    }
+  ],
+  "messages": [],
+  "stdout": "categoria\tlinhas\ttotalAnual\nDespesas com Serviços\t9\t1312621.15\nLiquidação de Empréstimo\t1\t869329.51\nCustos Diretos de Projeto\t12\t606256.10\nCustos com Materiais e Serviços\t4\t381221.61\nMovimentações Financeiras\t4\t341288.88\nCustos com Serviços Contratados\t1\t237600.00\nSalários e Ordenados\t3\t230533.90\nDiretoria\t1\t205787.76\nDespesas Gerais\t2\t126264.57\nTributos Operacionais\t1\t117452.75\nEncargos\t2\t79947.33\nDespesas com Veículos\t4\t75356.38\nCustos Trabalhistas Eventuais\t3\t61560.73\nBenefícios\t4\t58838.69\nDespesas Não Classificadas\t6\t55684.08\nInvestimentos e Melhorias\t2\t49914.12\nTributos, Taxas e Contribuições\t4\t49584.27\nDespesas Administrativas\t3\t45612.19\nDespesas de Consumo\t5\t38247.77\nImobilizado\t3\t21368.27\n",
+  "stderr": "",
+  "execution_time_ms": 350
+}
