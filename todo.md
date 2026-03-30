@@ -1354,3 +1354,9 @@
 - [x] Mapear itens do PDF para linhas planejadas e subcategorias existentes (12 itens mapeados)
 - [x] Inserir valores executados no banco (Jan-Mar 2026) - 36 linhas, R$ 26.454,15 total
 - [x] Validar dados importados: 3 meses x 12 itens = 36 linhas, total confere
+
+## Importação Executado 1º Trimestre - Arqueoproject
+- [x] Extrair dados do PDF Entrar-Zenply (80 itens, total R$ 1.067.154,75)
+- [x] Mapear 80 itens do PDF para 48 subcategorias existentes no plano de contas
+- [x] Inserir valores executados no banco (Jan-Mar 2026) - 240 linhas, R$ 1.067.154,75 total
+- [x] Validar dados importados: 3 meses x 80 itens = 240 linhas, total confere
