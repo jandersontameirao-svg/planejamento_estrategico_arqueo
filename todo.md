@@ -1406,3 +1406,13 @@
 - [x] 5 sub-abas: Resumo, Curva ABC, Alertas, Detalhado, Economia
 - [x] Integrar como nova aba "Análise" na GestaoOrcamentaria (8 abas)
 - [x] Testes vitest: 5 testes passando (estrutura, ABC, empresa vazia, totais, tendências)
+
+## Controle de Revisões Orçamentárias
+- [x] Adicionar campo "motivo_revisao" e "congelarOrigem" na duplicação de versão orçamentária
+- [x] Procedure compararVersoes + listarVersoes no backend
+- [x] Componente ComparativoVersoes: seletores, cards resumo, tabela expansível com status, detalhamento mensal
+- [x] Seletor de versão no relatório Previsto vs Executado (aparece quando há múltiplas versões)
+- [x] Congelamento automático da versão original ao criar revisão (checkbox no dialog)
+- [x] Dialog "Criar Revisão" com motivo, nome sugerido e checkbox de congelar
+- [x] Nova aba "Versões" na GestaoOrcamentaria (9 abas)
+- [x] Testes vitest: 6 testes passando (listar, comparar, estrutura, erro, tipo função)

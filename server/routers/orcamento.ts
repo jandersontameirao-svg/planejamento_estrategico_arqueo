@@ -19,6 +19,8 @@ import {
   createVersao,
   updateVersaoStatus,
   duplicarVersao,
+  compararVersoes,
+  listarVersoes,
   getLinhasPlanejadas,
   upsertLinhaPlanejada,
   deleteLinhaPlanejada,
@@ -146,9 +148,29 @@ export const orcamentoRouter = router({
     .input(z.object({
       versaoOrigemId: z.number(),
       nomeVersao: z.string().min(1),
+      motivoRevisao: z.string().optional(),
+      congelarOrigem: z.boolean().optional(),
     }))
     .mutation(async ({ input, ctx }) => {
-      return duplicarVersao(input.versaoOrigemId, input.nomeVersao, ctx.user.id);
+      return duplicarVersao(input.versaoOrigemId, input.nomeVersao, ctx.user.id, input.motivoRevisao, input.congelarOrigem);
+    }),
+
+  compararVersoes: protectedProcedure
+    .input(z.object({
+      versaoIdA: z.number(),
+      versaoIdB: z.number(),
+    }))
+    .query(async ({ input }) => {
+      return compararVersoes(input.versaoIdA, input.versaoIdB);
+    }),
+
+  listarVersoes: protectedProcedure
+    .input(z.object({
+      empresaId: z.number(),
+      ano: z.number(),
+    }))
+    .query(async ({ input }) => {
+      return listarVersoes(input.empresaId, input.ano);
     }),
 
   // ── LINHAS PLANEJADAS ────────────────────────────────────────────────────────
@@ -253,9 +275,10 @@ export const orcamentoRouter = router({
       empresaId: z.number(),
       ano: z.number(),
       categoriaId: z.number().optional(),
+      versaoId: z.number().optional(),
     }))
     .query(async ({ input }) => {
-      return getRelatorioDetalhadoPvsE(input.empresaId, input.ano, input.categoriaId);
+      return getRelatorioDetalhadoPvsE(input.empresaId, input.ano, input.categoriaId, input.versaoId);
     }),
 
   // ── ANÁLISE DE CUSTOS ────────────────────────────────────────────────────────

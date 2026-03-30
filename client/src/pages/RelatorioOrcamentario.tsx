@@ -86,12 +86,16 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
   const [expandedCats, setExpandedCats] = useState<Set<number>>(new Set());
   const [mesAtual, setMesAtual] = useState<number>(Math.min(new Date().getMonth(), 11));
   const [viewMode, setViewMode] = useState<"mensal" | "anual" | "evolucao">("mensal");
+  const [versaoSelecionada, setVersaoSelecionada] = useState<string>("auto");
   const printRef = useRef<HTMLDivElement>(null);
+
+  const { data: versoes } = trpc.orcamento.listarVersoes.useQuery({ empresaId, ano });
 
   const { data: relatorio, isLoading } = trpc.orcamento.getRelatorioDetalhado.useQuery({
     empresaId,
     ano,
     categoriaId: categoriaFiltro !== "todas" ? Number(categoriaFiltro) : undefined,
+    versaoId: versaoSelecionada !== "auto" ? Number(versaoSelecionada) : undefined,
   });
 
   const { data: categorias } = trpc.orcamento.getCategorias.useQuery();
@@ -231,6 +235,24 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
                 </SelectContent>
               </Select>
             </div>
+            {/* Seletor de versão */}
+            {versoes && versoes.length > 1 && (
+              <div className="flex items-center gap-2">
+                <Select value={versaoSelecionada} onValueChange={setVersaoSelecionada}>
+                  <SelectTrigger className="w-[280px]">
+                    <SelectValue placeholder="Versão" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">Versão ativa (automático)</SelectItem>
+                    {(versoes as any[]).map((v: any) => (
+                      <SelectItem key={v.id} value={String(v.id)}>
+                        v{v.numeroVersao} — {v.nomeVersao} ({v.status})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             {/* Filtro de categoria */}
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />

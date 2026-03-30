@@ -8,7 +8,7 @@ import {
   orcamentoExecutadoLinhas,
   orcamentoRevisoes,
 } from "../drizzle/schema";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, inArray } from "drizzle-orm";
 
 async function db() {
   const d = await getDb();
@@ -209,9 +209,20 @@ export async function updateVersaoStatus(
   return { success: true };
 }
 
-export async function duplicarVersao(versaoOrigemId: number, nomeVersao: string, usuarioId?: number) {
+export async function duplicarVersao(
+  versaoOrigemId: number,
+  nomeVersao: string,
+  usuarioId?: number,
+  motivoRevisao?: string,
+  congelarOrigem?: boolean
+) {
   const origem = await getVersaoById(versaoOrigemId);
   if (!origem) throw new Error("Versão de origem não encontrada");
+
+  // Opcionalmente congelar a versão original para preservar referência
+  if (congelarOrigem && origem.status !== "congelado") {
+    await updateVersaoStatus(versaoOrigemId, "congelado", usuarioId, "Congelada automaticamente ao criar revisão");
+  }
 
   // Criar nova versão
   const { id: novaVersaoId } = await createVersao({
@@ -219,7 +230,7 @@ export async function duplicarVersao(versaoOrigemId: number, nomeVersao: string,
     ano: origem.ano,
     nomeVersao,
     moedaBase: origem.moedaBase ?? "BRL",
-    observacoes: `Duplicada da versão: ${origem.nomeVersao}`,
+    observacoes: motivoRevisao ?? `Duplicada da versão: ${origem.nomeVersao}`,
     criadoPor: usuarioId,
     versaoOrigemId,
   });
@@ -254,15 +265,138 @@ export async function duplicarVersao(versaoOrigemId: number, nomeVersao: string,
     });
   }
 
-  // Registrar revisão de duplicação
+  // Registrar revisão de duplicação com motivo
   await d2.insert(orcamentoRevisoes).values({
     versaoId: novaVersaoId,
     acao: "duplicacao",
     usuarioId,
-    motivo: `Duplicada da versão ${versaoOrigemId}: ${origem.nomeVersao}`,
+    motivo: motivoRevisao ?? `Duplicada da versão ${versaoOrigemId}: ${origem.nomeVersao}`,
   });
 
   return { id: novaVersaoId };
+}
+
+// ─── COMPARATIVO ENTRE VERSÕES ──────────────────────────────────────────────
+
+export async function compararVersoes(versaoIdA: number, versaoIdB: number) {
+  const d = await db();
+
+  const [versaoA, versaoB] = await Promise.all([
+    getVersaoById(versaoIdA),
+    getVersaoById(versaoIdB),
+  ]);
+  if (!versaoA || !versaoB) throw new Error("Uma ou ambas versões não encontradas");
+
+  const [linhasA, linhasB] = await Promise.all([
+    d.select().from(orcamentoPlanejadoLinhas).where(eq(orcamentoPlanejadoLinhas.versaoId, versaoIdA)),
+    d.select().from(orcamentoPlanejadoLinhas).where(eq(orcamentoPlanejadoLinhas.versaoId, versaoIdB)),
+  ]);
+
+  // Buscar nomes de categorias e subcategorias
+  const allCatIds = new Set<number>();
+  const allSubIds = new Set<number>();
+  [...linhasA, ...linhasB].forEach(l => {
+    allCatIds.add(l.categoriaId);
+    if (l.subcategoriaId) allSubIds.add(l.subcategoriaId);
+  });
+
+  const cats = allCatIds.size > 0
+    ? await d.select().from(orcamentoCategorias).where(inArray(orcamentoCategorias.id, Array.from(allCatIds)))
+    : [];
+  const subs = allSubIds.size > 0
+    ? await d.select().from(orcamentoSubcategorias).where(inArray(orcamentoSubcategorias.id, Array.from(allSubIds)))
+    : [];
+
+  const catMap = new Map(cats.map(c => [c.id, c.nome]));
+  const subMap = new Map(subs.map(s => [s.id, s.nome]));
+
+  const meses = ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"] as const;
+
+  // Indexar linhas por subcategoriaId para comparação
+  const mapA = new Map<string, typeof linhasA[0]>();
+  const mapB = new Map<string, typeof linhasB[0]>();
+  linhasA.forEach(l => mapA.set(`${l.categoriaId}-${l.subcategoriaId ?? 0}`, l));
+  linhasB.forEach(l => mapB.set(`${l.categoriaId}-${l.subcategoriaId ?? 0}`, l));
+
+  const allKeys = new Set([...Array.from(mapA.keys()), ...Array.from(mapB.keys())]);
+
+  const comparativo: Array<{
+    categoriaId: number;
+    categoriaNome: string;
+    subcategoriaId: number | null;
+    subcategoriaNome: string;
+    status: "inalterado" | "alterado" | "adicionado" | "removido";
+    versaoA: { meses: number[]; total: number };
+    versaoB: { meses: number[]; total: number };
+    diferencas: { meses: number[]; total: number };
+  }> = [];
+
+  for (const key of Array.from(allKeys)) {
+    const linhaA = mapA.get(key);
+    const linhaB = mapB.get(key);
+
+    const catId = linhaA?.categoriaId ?? linhaB!.categoriaId;
+    const subId = linhaA?.subcategoriaId ?? linhaB!.subcategoriaId;
+
+    const valoresA = meses.map(m => Number(linhaA?.[m] ?? 0));
+    const valoresB = meses.map(m => Number(linhaB?.[m] ?? 0));
+    const totalA = valoresA.reduce((a, b) => a + b, 0);
+    const totalB = valoresB.reduce((a, b) => a + b, 0);
+    const diffs = meses.map((_, i) => valoresB[i] - valoresA[i]);
+    const totalDiff = totalB - totalA;
+
+    let status: "inalterado" | "alterado" | "adicionado" | "removido";
+    if (!linhaA) status = "adicionado";
+    else if (!linhaB) status = "removido";
+    else if (Math.abs(totalDiff) < 0.01) status = "inalterado";
+    else status = "alterado";
+
+    comparativo.push({
+      categoriaId: catId,
+      categoriaNome: catMap.get(catId) ?? `Categoria ${catId}`,
+      subcategoriaId: subId,
+      subcategoriaNome: subId ? (subMap.get(subId) ?? `Sub ${subId}`) : "Geral",
+      status,
+      versaoA: { meses: valoresA, total: totalA },
+      versaoB: { meses: valoresB, total: totalB },
+      diferencas: { meses: diffs, total: totalDiff },
+    });
+  }
+
+  // Ordenar: alterados/adicionados/removidos primeiro, depois por categoria
+  const statusOrder = { alterado: 0, adicionado: 1, removido: 2, inalterado: 3 };
+  comparativo.sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.categoriaNome.localeCompare(b.categoriaNome));
+
+  // Resumo
+  const totalVersaoA = comparativo.reduce((a, c) => a + c.versaoA.total, 0);
+  const totalVersaoB = comparativo.reduce((a, c) => a + c.versaoB.total, 0);
+
+  return {
+    versaoA: { id: versaoA.id, nome: versaoA.nomeVersao, numero: versaoA.numeroVersao, status: versaoA.status },
+    versaoB: { id: versaoB.id, nome: versaoB.nomeVersao, numero: versaoB.numeroVersao, status: versaoB.status },
+    resumo: {
+      totalVersaoA,
+      totalVersaoB,
+      diferencaTotal: totalVersaoB - totalVersaoA,
+      percentualVariacao: totalVersaoA > 0 ? ((totalVersaoB - totalVersaoA) / totalVersaoA) * 100 : 0,
+      itensAlterados: comparativo.filter(c => c.status === "alterado").length,
+      itensAdicionados: comparativo.filter(c => c.status === "adicionado").length,
+      itensRemovidos: comparativo.filter(c => c.status === "removido").length,
+      itensInalterados: comparativo.filter(c => c.status === "inalterado").length,
+    },
+    itens: comparativo,
+  };
+}
+
+// ─── LISTAR VERSÕES POR EMPRESA/ANO ─────────────────────────────────────────
+
+export async function listarVersoes(empresaId: number, ano: number) {
+  const d = await db();
+  return d
+    .select()
+    .from(orcamentoVersoes)
+    .where(and(eq(orcamentoVersoes.empresaId, empresaId), eq(orcamentoVersoes.ano, ano)))
+    .orderBy(orcamentoVersoes.numeroVersao);
 }
 
 // ─── LINHAS PLANEJADAS ───────────────────────────────────────────────────────
@@ -515,14 +649,16 @@ export async function getDashboardOrcamento(empresaId: number, ano: number) {
 
 // ─── RELATÓRIO DETALHADO: PLANEJADO vs EXECUTADO ──────────────────────────
 
-export async function getRelatorioDetalhadoPvsE(empresaId: number, ano: number, categoriaIdFiltro?: number) {
+export async function getRelatorioDetalhadoPvsE(empresaId: number, ano: number, categoriaIdFiltro?: number, versaoIdEspecifica?: number) {
   const d = await db();
 
-  // Buscar versão aprovada ou mais recente do ano
+  // Buscar versão específica ou aprovada ou mais recente do ano
   const versoes = await getVersoesByEmpresa(empresaId);
-  const versaoAtiva = versoes.find((v: any) => v.ano === ano && v.status === "aprovado")
-    ?? versoes.find((v: any) => v.ano === ano)
-    ?? null;
+  const versaoAtiva = versaoIdEspecifica
+    ? versoes.find((v: any) => v.id === versaoIdEspecifica)
+    : (versoes.find((v: any) => v.ano === ano && v.status === "aprovado")
+      ?? versoes.find((v: any) => v.ano === ano)
+      ?? null);
 
   if (!versaoAtiva) {
     return { versaoId: null, versaoNome: null, categorias: [], totais: null };

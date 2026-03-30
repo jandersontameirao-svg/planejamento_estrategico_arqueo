@@ -15,7 +15,7 @@ import PageHeader from "@/components/PageHeader";
 import {
   DollarSign, TrendingUp, TrendingDown, BarChart3, Upload,
   Plus, Settings, Copy, Lock, CheckCircle, FileText, AlertTriangle,
-  ChevronRight, RefreshCw, Brain, Target
+  ChevronRight, RefreshCw, Brain, Target, GitCompare
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -27,6 +27,7 @@ import OrcamentoImportacao from "./OrcamentoImportacao";
 import OrcamentoAnaliseIA from "./OrcamentoAnaliseIA";
 import RelatorioOrcamentario from "./RelatorioOrcamentario";
 import AnaliseOrcamentaria from "./AnaliseOrcamentaria";
+import ComparativoVersoes from "./ComparativoVersoes";
 
 interface GestaoOrcamentariaProps {
   empresaId: number;
@@ -55,6 +56,8 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
   const [versaoDuplicarId, setVersaoDuplicarId] = useState<number | null>(null);
   const [novaVersaoNome, setNovaVersaoNome] = useState("");
   const [novaVersaoObs, setNovaVersaoObs] = useState("");
+  const [motivoRevisao, setMotivoRevisao] = useState("");
+  const [congelarOrigem, setCongelarOrigem] = useState(true);
   const [versaoSelecionadaId, setVersaoSelecionadaId] = useState<number | null>(null);
 
   const { data: versoes, refetch: refetchVersoes } = trpc.orcamento.getVersoesByEmpresa.useQuery({ empresaId });
@@ -79,6 +82,8 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
       toast.success("Versão duplicada com sucesso!");
       setShowDuplicar(false);
       setNovaVersaoNome("");
+      setMotivoRevisao("");
+      setCongelarOrigem(true);
       setVersaoDuplicarId(null);
       refetchVersoes();
       setVersaoSelecionadaId(data.id);
@@ -164,11 +169,11 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
                   size="sm"
                   onClick={() => {
                     setVersaoDuplicarId(versaoAtiva.id);
-                    setNovaVersaoNome(`${versaoAtiva.nomeVersao} - Cópia`);
+                    setNovaVersaoNome(`Revisão ${(versoes?.length ?? 1)} - ${new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`);
                     setShowDuplicar(true);
                   }}
                 >
-                  <Copy className="h-4 w-4 mr-1" /> Duplicar
+                  <Copy className="h-4 w-4 mr-1" /> Criar Revisão
                 </Button>
                 {versaoAtiva.status === "rascunho" && (
                   <Button
@@ -275,7 +280,7 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
 
         {/* Tabs principais */}
         <Tabs value={abaAtiva} onValueChange={setAbaAtiva}>
-          <TabsList className="grid grid-cols-8 w-full">
+          <TabsList className="grid grid-cols-9 w-full">
             <TabsTrigger value="dashboard">
               <BarChart3 className="h-4 w-4 mr-1" /> Dashboard
             </TabsTrigger>
@@ -296,6 +301,9 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
             </TabsTrigger>
             <TabsTrigger value="analise-custos">
               <Target className="h-4 w-4 mr-1" /> Análise
+            </TabsTrigger>
+            <TabsTrigger value="comparativo">
+              <GitCompare className="h-4 w-4 mr-1" /> Versões
             </TabsTrigger>
             <TabsTrigger value="analise-ia">
               <Brain className="h-4 w-4 mr-1" /> IA
@@ -429,6 +437,11 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
             <AnaliseOrcamentaria empresaId={empresaId} ano={anoSelecionado} />
           </TabsContent>
 
+          {/* Comparativo de Versões */}
+          <TabsContent value="comparativo" className="mt-6">
+            <ComparativoVersoes empresaId={empresaId} ano={anoSelecionado} />
+          </TabsContent>
+
           {/* Análise IA */}
           <TabsContent value="analise-ia" className="mt-6">
             <OrcamentoAnaliseIA empresaId={empresaId} ano={anoSelecionado} />
@@ -491,20 +504,52 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
         </DialogContent>
       </Dialog>
 
-      {/* Modal Duplicar */}
+      {/* Modal Duplicar / Criar Revisão */}
       <Dialog open={showDuplicar} onOpenChange={setShowDuplicar}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Duplicar Versão Orçamentária</DialogTitle>
+            <DialogTitle>Criar Revisão Orçamentária</DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Duplica a versão atual com todos os valores, permitindo ajustes sem perder a referência original.
+            </p>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <Label>Nome da Nova Versão</Label>
+              <Label>Nome da Nova Versão *</Label>
               <Input
                 value={novaVersaoNome}
                 onChange={(e) => setNovaVersaoNome(e.target.value)}
+                placeholder="Ex: Revisão 1 - Abril 2026"
               />
             </div>
+            <div>
+              <Label>Motivo da Revisão</Label>
+              <Textarea
+                value={motivoRevisao}
+                onChange={(e) => setMotivoRevisao(e.target.value)}
+                placeholder="Descreva o motivo da revisão (ex: Inclusão de custos operacionais de campo)"
+                rows={3}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="congelar-origem"
+                checked={congelarOrigem}
+                onChange={(e) => setCongelarOrigem(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300"
+              />
+              <Label htmlFor="congelar-origem" className="cursor-pointer">
+                <span className="flex items-center gap-1">
+                  <Lock className="h-3.5 w-3.5" />
+                  Congelar versão original (recomendado)
+                </span>
+              </Label>
+            </div>
+            <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded">
+              Ao congelar, a versão original fica protegida contra edições e serve como referência histórica.
+              Você poderá comparar as versões na aba "Versões".
+            </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDuplicar(false)}>Cancelar</Button>
@@ -513,9 +558,11 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
               onClick={() => versaoDuplicarId && duplicarMutation.mutate({
                 versaoOrigemId: versaoDuplicarId,
                 nomeVersao: novaVersaoNome.trim(),
+                motivoRevisao: motivoRevisao.trim() || undefined,
+                congelarOrigem,
               })}
             >
-              {duplicarMutation.isPending ? "Duplicando..." : "Duplicar"}
+              {duplicarMutation.isPending ? "Criando revisão..." : "Criar Revisão"}
             </Button>
           </DialogFooter>
         </DialogContent>
