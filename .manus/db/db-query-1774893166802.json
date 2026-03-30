@@ -1,0 +1,34 @@
+{
+  "query": "SELECT id, nome, areaId, status FROM empresas WHERE id IN (660003, 660004, 1, 30001);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, nome, areaId, status FROM empresas WHERE id IN (660003, 660004, 1, 30001);",
+  "rows": [
+    {
+      "id": "660003",
+      "nome": "Arqueogis Preventiva",
+      "areaId": "1",
+      "status": "ativa"
+    },
+    {
+      "id": "660004",
+      "nome": "Arqueocean",
+      "areaId": "1",
+      "status": "ativa"
+    },
+    {
+      "id": "1",
+      "nome": "Arqueoproject Projetos e Pesquisas LTDA",
+      "areaId": "1",
+      "status": "ativa"
+    },
+    {
+      "id": "30001",
+      "nome": "arqueogis geoprocessamento",
+      "areaId": "1",
+      "status": "ativa"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tareaId\tstatus\n660003\tArqueogis Preventiva\t1\tativa\n660004\tArqueocean\t1\tativa\n1\tArqueoproject Projetos e Pesquisas LTDA\t1\tativa\n30001\tarqueogis geoprocessamento\t1\tativa\n",
+  "stderr": "",
+  "execution_time_ms": 363
+}

@@ -1343,3 +1343,7 @@
 - [x] Lançar orçamento Arqueogis Preventiva conforme planilha (4 linhas, R$ 91.813,46)
 - [x] Lançar orçamento Arqueocean conforme planilha (11 linhas, R$ 135.410,53)
 - [x] Validar dados no banco: totais conferem com planilha original
+
+## Correção: Empresas não aparecem na área Grupo Arqueo Brasil
+- [x] Verificar areaId das empresas Arqueogis Preventiva (660003) e Arqueocean (660004)
+- [x] Vincular empresas à área de negócio Grupo Arqueo Brasil (tabela empresa_area_vinculo)

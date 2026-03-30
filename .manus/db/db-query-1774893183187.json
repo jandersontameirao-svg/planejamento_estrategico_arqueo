@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, nome FROM areas_negocio;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, nome FROM areas_negocio;",
+  "rows": [
+    {
+      "id": "1",
+      "nome": "Grupo Arqueo Brasil"
+    },
+    {
+      "id": "30002",
+      "nome": "Grupo Arqueo Africa"
+    },
+    {
+      "id": "30003",
+      "nome": "Vinhos 24 horas BSB"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\n1\tGrupo Arqueo Brasil\n30002\tGrupo Arqueo Africa\n30003\tVinhos 24 horas BSB\n",
+  "stderr": "",
+  "execution_time_ms": 361
+}

@@ -1,0 +1,22 @@
+{
+  "query": "SELECT * FROM empresa_area_vinculo WHERE areaId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT * FROM empresa_area_vinculo WHERE areaId = 1;",
+  "rows": [
+    {
+      "id": "2",
+      "empresaId": "30001",
+      "areaId": "1",
+      "createdAt": "2026-01-16 20:21:17"
+    },
+    {
+      "id": "5",
+      "empresaId": "1",
+      "areaId": "1",
+      "createdAt": "2026-01-16 20:44:53"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tempresaId\tareaId\tcreatedAt\n2\t30001\t1\t2026-01-16 20:21:17\n5\t1\t1\t2026-01-16 20:44:53\n",
+  "stderr": "",
+  "execution_time_ms": 355
+}
