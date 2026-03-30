@@ -465,7 +465,7 @@ export const contratosRouter = router({
           : "contrato";
 
         const userContent: MessageContent[] = [
-          { type: "text" as const, text: `Analise este ${tipoLabel} e extraia os dados estruturados:` },
+          { type: "text" as const, text: `Analise este ${tipoLabel} e extraia TODOS os dados estruturados do documento:` },
           { type: "file_url" as const, file_url: { url: input.pdfUrl, mime_type: "application/pdf" as const } },
         ];
 
@@ -473,38 +473,70 @@ export const contratosRouter = router({
           messages: [
             {
               role: "system",
-              content: `Você é um especialista em análise de contratos brasileiros. Extraia as informações estruturadas do documento.
-              Para contratos: extraia número, título, partes, valor total, data de início, data de fim, marcos financeiros e riscos.
-              Para aditivos: identifique se é financeiro (altera valor) ou de escopo (altera entregáveis/prazo).
-              Retorne JSON estruturado.`,
+              content: `Você é um especialista em análise de contratos brasileiros, especialmente contratos de serviços de arqueologia, geoprocessamento e meio ambiente.
+
+Extraia TODAS as informações estruturadas do documento PDF:
+
+1. DADOS GERAIS: número, título/objeto, tipo de contrato, modalidade de licitação (se houver)
+2. PARTES ENVOLVIDAS: identifique contratante e contratado com CNPJ, razão social e representantes
+3. VALORES: valor total, forma de pagamento, reajuste
+4. DATAS: assinatura, início, término, prazo em meses
+5. MARCOS FINANCEIROS: todas as parcelas, medições ou etapas de pagamento com valores e datas previstas
+6. RISCOS: identifique riscos financeiros, legais, operacionais e de prazo
+7. CLÁUSULAS-CHAVE: multas, garantias, rescisão, reajuste, subcontratação
+8. RESUMO EXECUTIVO: síntese do contrato em 3-5 frases
+
+Para cada marco financeiro, calcule o percentual em relação ao valor total.
+Para cada risco, classifique severidade e probabilidade.
+Retorne APENAS JSON válido.`,
             },
             { role: "user", content: userContent },
           ],
           response_format: {
             type: "json_schema",
             json_schema: {
-              name: "extracao_contrato",
+              name: "extracao_contrato_completa",
               strict: false,
               schema: {
                 type: "object",
                 properties: {
-                  numero: { type: "string" },
-                  titulo: { type: "string" },
-                  tipo: { type: "string" },
-                  valorTotal: { type: "string" },
-                  valorAditivo: { type: "string" },
-                  dataInicio: { type: "string" },
-                  dataFim: { type: "string" },
-                  resumo: { type: "string" },
+                  numero: { type: "string", description: "Número do contrato" },
+                  titulo: { type: "string", description: "Título ou objeto do contrato" },
+                  tipo: { type: "string", description: "Tipo: servico, produto, misto, consultoria" },
+                  modalidadeLicitacao: { type: "string", description: "Modalidade de licitação se houver" },
+                  valorTotal: { type: "string", description: "Valor total do contrato (apenas número)" },
+                  valorAditivo: { type: "string", description: "Valor do aditivo se for aditivo" },
+                  dataAssinatura: { type: "string", description: "Data de assinatura (YYYY-MM-DD)" },
+                  dataInicio: { type: "string", description: "Data de início (YYYY-MM-DD)" },
+                  dataFim: { type: "string", description: "Data de término (YYYY-MM-DD)" },
+                  prazoMeses: { type: "number", description: "Prazo em meses" },
+                  resumo: { type: "string", description: "Resumo executivo em 3-5 frases" },
+                  contratante: {
+                    type: "object",
+                    properties: {
+                      razaoSocial: { type: "string" },
+                      cnpj: { type: "string", description: "CNPJ formatado ou apenas números" },
+                      representante: { type: "string" },
+                    },
+                  },
+                  contratado: {
+                    type: "object",
+                    properties: {
+                      razaoSocial: { type: "string" },
+                      cnpj: { type: "string", description: "CNPJ formatado ou apenas números" },
+                      representante: { type: "string" },
+                    },
+                  },
                   marcos: {
                     type: "array",
                     items: {
                       type: "object",
                       properties: {
                         titulo: { type: "string" },
-                        valor: { type: "string" },
-                        dataPrevista: { type: "string" },
+                        valor: { type: "string", description: "Valor numérico" },
+                        dataPrevista: { type: "string", description: "Data prevista (YYYY-MM-DD)" },
                         descricao: { type: "string" },
+                        percentual: { type: "number", description: "Percentual do valor total" },
                       },
                     },
                   },
@@ -515,9 +547,21 @@ export const contratosRouter = router({
                       properties: {
                         titulo: { type: "string" },
                         descricao: { type: "string" },
-                        categoria: { type: "string" },
-                        probabilidade: { type: "string" },
-                        impacto: { type: "string" },
+                        categoria: { type: "string", description: "financeiro, juridico, operacional, prazo, escopo" },
+                        probabilidade: { type: "string", description: "baixa, media, alta" },
+                        impacto: { type: "string", description: "baixo, medio, alto" },
+                        acaoMitigacao: { type: "string" },
+                      },
+                    },
+                  },
+                  clausulasChave: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        titulo: { type: "string" },
+                        descricao: { type: "string" },
+                        tipo: { type: "string", description: "multa, garantia, rescisao, reajuste, subcontratacao, outro" },
                       },
                     },
                   },

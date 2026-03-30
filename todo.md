@@ -1438,3 +1438,18 @@
 - [x] Frontend: Detalhamento por contrato com progresso
 - [x] Integrado como aba "Financeiro" na GestaoOrcamentaria (10 abas)
 - [x] Testes vitest: 9 testes passando (estrutura, meses, consolidado, DRE, margem, campos)
+
+## Criação de Contrato via IA
+- [x] Analisar funcionalidade existente de extração de PDF por IA
+- [x] Aprimorar backend: extração com CNPJ, partes, cláusulas-chave, resumo executivo
+- [x] Redesenhar frontend: Wizard de 4 passos (Upload → Revisão IA → Complementar → Confirmar)
+- [x] Suporte a drag-and-drop de PDF
+- [x] Preenchimento automático do formulário com dados extraídos
+- [x] Edição inline de marcos financeiros na tela de revisão
+- [x] Edição inline de riscos (categoria/probabilidade/impacto)
+- [x] Auto-match de cliente por CNPJ extraído pela IA
+- [x] Criação automática de marcos e riscos ao confirmar (via confirmarExtracao)
+- [x] Modo manual disponível (pular IA)
+- [x] Visualização de cláusulas-chave extraídas
+- [x] Revisão obrigatória antes de salvar
+- [x] Testes vitest: 7 testes passando
