@@ -1493,3 +1493,10 @@
 - [x] Corrigir mesmo bug em getAnaliseCustos
 - [x] getDashboardOrcamento já calculava corretamente (soma direta das linhas)
 - [x] 128 testes passando
+
+## Subcategorias Detalhadas - Arqueogis Preventiva
+- [x] Mapear despesas executadas e subcategorias existentes no banco
+- [x] Criar 9 novas subcategorias detalhadas (IDs 60001-60009)
+- [x] Vincular 27 linhas de executado às subcategorias (27/27)
+- [x] Vincular 27 linhas de planejado às mesmas subcategorias (27/27)
+- [x] Verificar: 0 linhas sem subcategoria em executado e planejado
