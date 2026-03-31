@@ -1504,3 +1504,8 @@
 ## Renomear Unidade e Vincular Empresa
 - [x] Renomear unidade "Vinhos 24 horas BSB" para "Foods and Drinks" (areaId=30003)
 - [x] Criar empresa "Vinho 24 Horas BSB" (id=780003) e vincular à unidade "Foods and Drinks"
+
+## Identidade Organizacional - Arqueoproject
+- [x] Extrair dados do site arqueoproject.com.br
+- [x] Estruturar missão, visão, valores e política organizacional
+- [x] Preencher identidade organizacional no banco de dados (empresaId=1)
