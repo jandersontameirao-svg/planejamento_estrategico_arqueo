@@ -39,17 +39,19 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
   // Buscar itens do banco
   const { data: swotData, isLoading } = trpc.analises.getSwot.useQuery({ empresaId });
   const { data: templateConfig } = trpc.templates.getConfig.useQuery({ empresaId });
-  const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });  
-  // Mutation para salvar itens
+  const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
+
+  // Mutation para salvar itens - SEM alert(), usa apenas indicador visual
   const salvarMutation = trpc.analises.saveSwot.useMutation({
     onSuccess: () => {
-      alert("Análise SWOT salva com sucesso!");
-      utils.analises.getSwot.invalidate({ empresaId });
+      // Não chamar invalidate aqui para evitar loop com auto-save
+      // O invalidate será chamado apenas no save manual
     },
     onError: (error) => {
-      alert(`Erro ao salvar: ${error.message}`);
+      console.error("Erro ao salvar SWOT:", error.message);
     },
   });
+
   const [forcas, setForcas] = useState<ItemSwot[]>([]);
   const [fraquezas, setFraquezas] = useState<ItemSwot[]>([]);
   const [oportunidades, setOportunidades] = useState<ItemSwot[]>([]);
@@ -59,6 +61,8 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
   const isInitialLoad = useRef(true);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  // Track if user has made changes (prevents save on initial load)
+  const hasUserChanges = useRef(false);
 
   // Carregar itens do banco ao montar o componente
   useEffect(() => {
@@ -67,18 +71,29 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
       const fraquezasDb = swotData.filter((i: any) => i.tipo === "fraqueza").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
       const oportunidadesDb = swotData.filter((i: any) => i.tipo === "oportunidade").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
       const ameacasDb = swotData.filter((i: any) => i.tipo === "ameaca").map((i: any) => ({ id: i.id?.toString(), descricao: i.descricao }));
+      
+      // Mark as initial load to prevent auto-save from triggering
+      isInitialLoad.current = true;
+      hasUserChanges.current = false;
+      
       setForcas(forcasDb);
       setFraquezas(fraquezasDb);
       setOportunidades(oportunidadesDb);
       setAmeacas(ameacasDb);
-      setTimeout(() => { isInitialLoad.current = false; }, 500);
+      
+      // Allow changes after a delay to ensure state has settled
+      setTimeout(() => { 
+        isInitialLoad.current = false; 
+      }, 1000);
     }
   }, [swotData]);
 
-  // Função de auto-save com debounce
+  // Função de auto-save com debounce - só salva se houve mudança do usuário
   const triggerAutoSave = useCallback(() => {
+    if (isInitialLoad.current || !hasUserChanges.current) return;
+    
     const totalItems = forcas.length + fraquezas.length + oportunidades.length + ameacas.length;
-    if (isInitialLoad.current || totalItems === 0) return;
+    if (totalItems === 0) return;
     
     if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
     
@@ -96,22 +111,27 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
         {
           onSuccess: () => {
             setAutoSaveStatus('saved');
+            hasUserChanges.current = false;
             setTimeout(() => setAutoSaveStatus('idle'), 2000);
           },
           onError: () => setAutoSaveStatus('error'),
         }
       );
     }, 2000);
-  }, [forcas, fraquezas, oportunidades, ameacas, empresaId, salvarMutation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forcas, fraquezas, oportunidades, ameacas, empresaId]);
 
-  // Disparar auto-save quando itens mudam
+  // Disparar auto-save quando itens mudam (somente se houve mudança do usuário)
   useEffect(() => {
-    triggerAutoSave();
+    if (hasUserChanges.current) {
+      triggerAutoSave();
+    }
     return () => { if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current); };
   }, [forcas, fraquezas, oportunidades, ameacas, triggerAutoSave]);
 
   const [novoItem, setNovoItem] = useState("");
   const [tipoSelecionado, setTipoSelecionado] = useState<"forcas" | "fraquezas" | "oportunidades" | "ameacas">("forcas");
+  const [manualSaveSuccess, setManualSaveSuccess] = useState(false);
 
   const adicionarItem = () => {
     if (!novoItem || novoItem.trim() === "") {
@@ -122,6 +142,7 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
       alert("A descrição deve ter pelo menos 5 caracteres.");
       return;
     }
+    hasUserChanges.current = true;
     const item = { id: Date.now().toString(), descricao: novoItem };
     if (tipoSelecionado === "forcas") setForcas([...forcas, item]);
     else if (tipoSelecionado === "fraquezas") setFraquezas([...fraquezas, item]);
@@ -131,6 +152,7 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
   };
 
   const removerItem = (tipo: string, id: string) => {
+    hasUserChanges.current = true;
     if (tipo === "forcas") setForcas(forcas.filter((i) => i.id !== id));
     else if (tipo === "fraquezas") setFraquezas(fraquezas.filter((i) => i.id !== id));
     else if (tipo === "oportunidades") setOportunidades(oportunidades.filter((i) => i.id !== id));
@@ -153,10 +175,20 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
       ...ameacas.map(a => ({ tipo: "ameaca" as const, descricao: a.descricao })),
     ];
 
-    salvarMutation.mutate({
-      empresaId,
-      items,
-    });
+    salvarMutation.mutate(
+      { empresaId, items },
+      {
+        onSuccess: () => {
+          setManualSaveSuccess(true);
+          hasUserChanges.current = false;
+          utils.analises.getSwot.invalidate({ empresaId });
+          setTimeout(() => setManualSaveSuccess(false), 3000);
+        },
+        onError: (error) => {
+          alert(`Erro ao salvar: ${error.message}`);
+        },
+      }
+    );
   };
 
   const tipoConfig = {
@@ -317,6 +349,13 @@ export default function SwotLite({ empresaId }: SwotLiteProps) {
           {autoSaveStatus === 'saving' && <><span className="animate-spin">⏳</span> Salvando automaticamente...</>}
           {autoSaveStatus === 'saved' && <><span>✓</span> Salvo automaticamente!</>}
           {autoSaveStatus === 'error' && <><span>✕</span> Erro ao salvar. Tente manualmente.</>}
+        </div>
+      )}
+
+      {/* Feedback de save manual */}
+      {manualSaveSuccess && (
+        <div className="text-sm px-3 py-2 rounded-lg flex items-center gap-2 bg-green-100 text-green-700 border border-green-300">
+          <span>✓</span> Análise SWOT salva com sucesso!
         </div>
       )}
 

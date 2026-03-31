@@ -44,22 +44,23 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
   const { data: templateConfig } = trpc.templates.getConfig.useQuery({ empresaId });
   const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
   
-  // Mutation para salvar objetivos
+  // Mutation para salvar objetivos - SEM alert() para evitar popup repetido
   const salvarMutation = trpc.analises.saveOkr.useMutation({
     onSuccess: () => {
-      alert("OKR salva com sucesso!");
-      utils.analises.getOkr.invalidate({ empresaId });
+      // Não chamar invalidate aqui para evitar loop com auto-save
     },
     onError: (error) => {
-      alert(`Erro ao salvar: ${error.message}`);
+      console.error("Erro ao salvar OKR:", error.message);
     },
   });
   const [okrs, setOkrs] = useState<OKR[]>([]);
+  const [manualSaveSuccess, setManualSaveSuccess] = useState(false);
 
   // Flag para evitar auto-save no carregamento inicial
   const isInitialLoad = useRef(true);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const hasUserChanges = useRef(false);
 
   // Carregar objetivos do banco ao montar o componente
   useEffect(() => {
@@ -75,14 +76,16 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
           keyResults,
         };
       });
+      isInitialLoad.current = true;
+      hasUserChanges.current = false;
       setOkrs(okrsFormatados);
-      setTimeout(() => { isInitialLoad.current = false; }, 500);
+      setTimeout(() => { isInitialLoad.current = false; }, 1000);
     }
   }, [objectivesDb]);
 
-  // Função de auto-save com debounce
+  // Função de auto-save com debounce - só salva se houve mudança do usuário
   const triggerAutoSave = useCallback(() => {
-    if (isInitialLoad.current || okrs.length === 0) return;
+    if (isInitialLoad.current || !hasUserChanges.current || okrs.length === 0) return;
     
     if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
     
@@ -104,17 +107,21 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
         {
           onSuccess: () => {
             setAutoSaveStatus('saved');
+            hasUserChanges.current = false;
             setTimeout(() => setAutoSaveStatus('idle'), 2000);
           },
           onError: () => setAutoSaveStatus('error'),
         }
       );
     }, 2000);
-  }, [okrs, empresaId, salvarMutation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [okrs, empresaId]);
 
-  // Disparar auto-save quando okrs mudam
+  // Disparar auto-save quando okrs mudam (somente se houve mudança do usuário)
   useEffect(() => {
-    triggerAutoSave();
+    if (hasUserChanges.current) {
+      triggerAutoSave();
+    }
     return () => { if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current); };
   }, [okrs, triggerAutoSave]);
   const [novoObjetivo, setNovoObjetivo] = useState("");
@@ -129,6 +136,7 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
       alert("O objetivo deve ter pelo menos 10 caracteres.");
       return;
     }
+    hasUserChanges.current = true;
     setOkrs([...okrs, {
       id: Date.now().toString(),
       objetivo: novoObjetivo,
@@ -138,6 +146,7 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
   };
 
   const removerOKR = (id: string) => {
+    hasUserChanges.current = true;
     setOkrs(okrs.filter((o) => o.id !== id));
   };
 
@@ -150,6 +159,7 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
       alert("A descrição do Key Result deve ter pelo menos 5 caracteres.");
       return;
     }
+    hasUserChanges.current = true;
     setOkrs(okrs.map((o) => {
       if (o.id === okrId) {
         return {
@@ -168,6 +178,7 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
   };
 
   const removerKR = (okrId: string, krId: string) => {
+    hasUserChanges.current = true;
     setOkrs(okrs.map((o) => {
       if (o.id === okrId) {
         return { ...o, keyResults: o.keyResults.filter((kr) => kr.id !== krId) };
@@ -177,6 +188,7 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
   };
 
   const atualizarKR = (okrId: string, krId: string, atual: number) => {
+    hasUserChanges.current = true;
     setOkrs(okrs.map((o) => {
       if (o.id === okrId) {
         return {
@@ -221,10 +233,20 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
       metaResultado3: okr.keyResults[2]?.meta.toString() || undefined,
     }));
 
-    salvarMutation.mutate({
-      empresaId,
-      objectives,
-    });
+    salvarMutation.mutate(
+      { empresaId, objectives },
+      {
+        onSuccess: () => {
+          setManualSaveSuccess(true);
+          hasUserChanges.current = false;
+          utils.analises.getOkr.invalidate({ empresaId });
+          setTimeout(() => setManualSaveSuccess(false), 3000);
+        },
+        onError: (error) => {
+          alert(`Erro ao salvar: ${error.message}`);
+        },
+      }
+    );
   };
 
   const getCorProgresso = (progresso: number) => {
@@ -448,6 +470,13 @@ export default function OkrLite({ empresaId }: OkrLiteProps) {
           {autoSaveStatus === 'saving' && <><span className="animate-spin">⏳</span> Salvando automaticamente...</>}
           {autoSaveStatus === 'saved' && <><span>✓</span> Salvo automaticamente!</>}
           {autoSaveStatus === 'error' && <><span>✕</span> Erro ao salvar. Tente manualmente.</>}
+        </div>
+      )}
+
+      {/* Feedback de save manual */}
+      {manualSaveSuccess && (
+        <div className="text-sm px-3 py-2 rounded-lg flex items-center gap-2 bg-green-100 text-green-700 border border-green-300">
+          <span>✓</span> OKR salva com sucesso!
         </div>
       )}
 

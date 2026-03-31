@@ -1466,3 +1466,8 @@
 - [x] Frontend: 2 sub-abas (Riscos e Cláusulas)
 - [x] Integrado como aba "Riscos" na GestaoOrcamentaria (11 abas)
 - [x] Testes vitest: 10 testes passando
+
+## Bug Fix: Alerta SWOT repetido
+- [x] Investigar causa do alerta "Análise SWOT salva com sucesso!" aparecendo automaticamente ao entrar na SWOT
+- [x] Corrigir o bug para que o alerta só apareça após ação explícita do usuário (SwotLite, OkrLite, AnalisePestelLite)
+- [x] Testar a correção (128 testes passando)

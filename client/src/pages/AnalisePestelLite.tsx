@@ -58,22 +58,20 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
   const [fatorEmEdicao, setFatorEmEdicao] = useState<FatorPestel | null>(null);
   const [impactoEdicao, setImpactoEdicao] = useState(3);
   const [probabilidadeEdicao, setProbabilidadeEdicao] = useState(3);
+  const [manualSaveSuccess, setManualSaveSuccess] = useState(false);
   
   // Buscar fatores do banco
   const { data: pestelData, isLoading } = trpc.analises.getPestel.useQuery({ empresaId });
   const { data: templateConfig } = trpc.templates.getConfig.useQuery({ empresaId });
   const { data: empresa } = trpc.empresas.getById.useQuery({ id: empresaId });
   
-  // Mutation para salvar fatores
+  // Mutation para salvar fatores - SEM toast no onSuccess para evitar popup repetido com auto-save
   const salvarMutation = trpc.analises.savePestel.useMutation({
     onSuccess: () => {
-      console.log("[salvarMutation onSuccess] Salvamento bem-sucedido!");
-      toast.success("Análise PESTEL salva com sucesso!");
-      utils.analises.getPestel.invalidate({ empresaId });
+      // Não chamar invalidate aqui para evitar loop com auto-save
     },
     onError: (error) => {
       console.error("[salvarMutation onError] Erro ao salvar PESTEL:", error.message);
-      toast.error(`Erro ao salvar: ${error.message}`);
     },
   });
   
@@ -98,6 +96,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
   const isInitialLoad = useRef(true);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const hasUserChanges = useRef(false);
 
   // Carregar fatores do banco ao montar o componente
   useEffect(() => {
@@ -109,17 +108,19 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         probabilidade: f.probabilidade,
         descricao: f.descricao,
       }));
+      isInitialLoad.current = true;
+      hasUserChanges.current = false;
       setFatores(fatoresFormatados);
       // Marcar que carregamento inicial foi concluído após um breve delay
       setTimeout(() => {
         isInitialLoad.current = false;
-      }, 500);
+      }, 1000);
     }
   }, [pestelData]);
 
-  // Função de auto-save com debounce
+  // Função de auto-save com debounce - só salva se houve mudança do usuário
   const triggerAutoSave = useCallback(() => {
-    if (isInitialLoad.current || fatores.length === 0) return;
+    if (isInitialLoad.current || !hasUserChanges.current || fatores.length === 0) return;
     
     // Limpar timeout anterior
     if (autoSaveTimeoutRef.current) {
@@ -146,6 +147,7 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         {
           onSuccess: () => {
             setAutoSaveStatus('saved');
+            hasUserChanges.current = false;
             setTimeout(() => setAutoSaveStatus('idle'), 2000);
           },
           onError: () => {
@@ -154,11 +156,14 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         }
       );
     }, 2000);
-  }, [fatores, empresaId, salvarMutation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fatores, empresaId]);
 
-  // Disparar auto-save quando fatores mudam
+  // Disparar auto-save quando fatores mudam (somente se houve mudança do usuário)
   useEffect(() => {
-    triggerAutoSave();
+    if (hasUserChanges.current) {
+      triggerAutoSave();
+    }
     return () => {
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
@@ -193,15 +198,18 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         descricao: novoFator.descricao,
       },
     ]);
+    hasUserChanges.current = true;
     setNovoFator({ categoria: novoFator.categoria, impacto: 3, probabilidade: 3, descricao: "" });
   };
 
   const removerFator = (id: string) => {
+    hasUserChanges.current = true;
     setFatores(fatores.filter((f) => f.id !== id));
   };
 
   const editarFator = () => {
     if (!fatorEmEdicao) return;
+    hasUserChanges.current = true;
     setFatores(
       fatores.map((f) =>
         f.id === fatorEmEdicao.id
@@ -273,13 +281,20 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
       descricao: f.descricao,
     }));
 
-    console.log("[FRONTEND handleSave] Fatores formatados:", fatoresParaSalvar);
-    console.log("[FRONTEND handleSave] empresaId:", empresaId);
-    
-    salvarMutation.mutate({
-      empresaId,
-      fatores: fatoresParaSalvar,
-    });
+    salvarMutation.mutate(
+      { empresaId, fatores: fatoresParaSalvar },
+      {
+        onSuccess: () => {
+          setManualSaveSuccess(true);
+          hasUserChanges.current = false;
+          utils.analises.getPestel.invalidate({ empresaId });
+          setTimeout(() => setManualSaveSuccess(false), 3000);
+        },
+        onError: (error) => {
+          notification.error(`Erro ao salvar: ${error.message}`);
+        },
+      }
+    );
   };
 
   if (isLoading) return <div className="text-center py-8">Carregando...</div>;
@@ -574,7 +589,25 @@ export default function AnalisePestelLite({ empresaId }: AnalisePestelLiteProps)
         </CardContent>
       </Card>
 
-      {/* Indicador de salvamento automático removido */}
+      {/* Indicador de Auto-Save */}
+      {autoSaveStatus !== 'idle' && (
+        <div className={`text-sm px-3 py-2 rounded-lg flex items-center gap-2 ${
+          autoSaveStatus === 'saving' ? 'bg-blue-100 text-blue-700' :
+          autoSaveStatus === 'saved' ? 'bg-green-100 text-green-700' :
+          'bg-red-100 text-red-700'
+        }`}>
+          {autoSaveStatus === 'saving' && <><span className="animate-spin">⏳</span> Salvando automaticamente...</>}
+          {autoSaveStatus === 'saved' && <><span>✓</span> Salvo automaticamente!</>}
+          {autoSaveStatus === 'error' && <><span>✕</span> Erro ao salvar. Tente manualmente.</>}
+        </div>
+      )}
+
+      {/* Feedback de save manual */}
+      {manualSaveSuccess && (
+        <div className="text-sm px-3 py-2 rounded-lg flex items-center gap-2 bg-green-100 text-green-700 border border-green-300">
+          <span>✓</span> Análise PESTEL salva com sucesso!
+        </div>
+      )}
 
       {/* Salvar e Exportar */}
       <div className="flex gap-2">
