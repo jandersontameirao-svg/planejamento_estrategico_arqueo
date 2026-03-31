@@ -1,0 +1,70 @@
+{
+  "query": "SELECT opl.descricao, opl.janeiro, opl.totalAnual FROM orcamento_planejado_linhas opl WHERE opl.versaoId = 1 AND opl.categoriaId = 60002 ORDER BY opl.totalAnual DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT opl.descricao, opl.janeiro, opl.totalAnual FROM orcamento_planejado_linhas opl WHERE opl.versaoId = 1 AND opl.categoriaId = 60002 ORDER BY opl.totalAnual DESC;",
+  "rows": [
+    {
+      "descricao": "Hospedagem De Campo",
+      "janeiro": "12487.63",
+      "totalAnual": "149851.57"
+    },
+    {
+      "descricao": "Despesas De Campo Diversas",
+      "janeiro": "10616.38",
+      "totalAnual": "127396.57"
+    },
+    {
+      "descricao": "Equipamentos E Ferramentas",
+      "janeiro": "8380.21",
+      "totalAnual": "100562.51"
+    },
+    {
+      "descricao": "Aluguel De Veiculos",
+      "janeiro": "6468.33",
+      "totalAnual": "77619.97"
+    },
+    {
+      "descricao": "Auxiliar De Campo",
+      "janeiro": "5501.67",
+      "totalAnual": "66020.03"
+    },
+    {
+      "descricao": "Viagens Aereas",
+      "janeiro": "3299.94",
+      "totalAnual": "39599.27"
+    },
+    {
+      "descricao": "Ajuda De Custo Alimentacao",
+      "janeiro": "1770.00",
+      "totalAnual": "21240.00"
+    },
+    {
+      "descricao": "Transportes E Pedagios",
+      "janeiro": "825.08",
+      "totalAnual": "9900.96"
+    },
+    {
+      "descricao": "Epi E Seguranca",
+      "janeiro": "493.73",
+      "totalAnual": "5924.77"
+    },
+    {
+      "descricao": "Viagens Terrestres",
+      "janeiro": "388.23",
+      "totalAnual": "4658.77"
+    },
+    {
+      "descricao": "Lanches E Refeicoes De Campo",
+      "janeiro": "232.80",
+      "totalAnual": "2793.61"
+    },
+    {
+      "descricao": "Aplicativos De Transporte",
+      "janeiro": "57.34",
+      "totalAnual": "688.07"
+    }
+  ],
+  "messages": [],
+  "stdout": "descricao\tjaneiro\ttotalAnual\nHospedagem De Campo\t12487.63\t149851.57\nDespesas De Campo Diversas\t10616.38\t127396.57\nEquipamentos E Ferramentas\t8380.21\t100562.51\nAluguel De Veiculos\t6468.33\t77619.97\nAuxiliar De Campo\t5501.67\t66020.03\nViagens Aereas\t3299.94\t39599.27\nAjuda De Custo Alimentacao\t1770.00\t21240.00\nTransportes E Pedagios\t825.08\t9900.96\nEpi E Seguranca\t493.73\t5924.77\nViagens Terrestres\t388.23\t4658.77\nLanches E Refeicoes De Campo\t232.80\t2793.61\nAplicativos De Transporte\t57.34\t688.07\n",
+  "stderr": "",
+  "execution_time_ms": 377
+}

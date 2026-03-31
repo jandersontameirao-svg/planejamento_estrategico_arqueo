@@ -1,0 +1,118 @@
+{
+  "query": "SELECT 'executado' as tipo, categoriaId, COUNT(*) as linhas, SUM(valorConvertidoBase) as total FROM orcamento_executado_linhas WHERE empresaId = 660003 GROUP BY categoriaId\nUNION ALL\nSELECT 'planejado' as tipo, categoriaId, COUNT(*) as linhas, SUM(totalAnual) as total FROM orcamento_planejado_linhas WHERE versaoId = 4 GROUP BY categoriaId\nORDER BY categoriaId, tipo;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT 'executado' as tipo, categoriaId, COUNT(*) as linhas, SUM(valorConvertidoBase) as total FROM orcamento_executado_linhas WHERE empresaId = 660003 GROUP BY categoriaId\nUNION ALL\nSELECT 'planejado' as tipo, categoriaId, COUNT(*) as linhas, SUM(totalAnual) as total FROM orcamento_planejado_linhas WHERE versaoId = 4 GROUP BY categoriaId\nORDER BY categoriaId, tipo;",
+  "rows": [
+    {
+      "tipo": "executado",
+      "categoriaId": "30006",
+      "linhas": "2",
+      "total": "721.98"
+    },
+    {
+      "tipo": "planejado",
+      "categoriaId": "30006",
+      "linhas": "2",
+      "total": "2887.92"
+    },
+    {
+      "tipo": "executado",
+      "categoriaId": "30008",
+      "linhas": "7",
+      "total": "23583.70"
+    },
+    {
+      "tipo": "planejado",
+      "categoriaId": "30008",
+      "linhas": "7",
+      "total": "94334.76"
+    },
+    {
+      "tipo": "executado",
+      "categoriaId": "30009",
+      "linhas": "3",
+      "total": "19226.84"
+    },
+    {
+      "tipo": "planejado",
+      "categoriaId": "30009",
+      "linhas": "3",
+      "total": "76907.28"
+    },
+    {
+      "tipo": "executado",
+      "categoriaId": "30012",
+      "linhas": "2",
+      "total": "9064.22"
+    },
+    {
+      "tipo": "planejado",
+      "categoriaId": "30012",
+      "linhas": "2",
+      "total": "36256.92"
+    },
+    {
+      "tipo": "executado",
+      "categoriaId": "30013",
+      "linhas": "1",
+      "total": "4808.24"
+    },
+    {
+      "tipo": "planejado",
+      "categoriaId": "30013",
+      "linhas": "1",
+      "total": "19233.00"
+    },
+    {
+      "tipo": "executado",
+      "categoriaId": "30015",
+      "linhas": "1",
+      "total": "50000.00"
+    },
+    {
+      "tipo": "planejado",
+      "categoriaId": "30015",
+      "linhas": "1",
+      "total": "200000.04"
+    },
+    {
+      "tipo": "executado",
+      "categoriaId": "30016",
+      "linhas": "3",
+      "total": "16469.11"
+    },
+    {
+      "tipo": "planejado",
+      "categoriaId": "30016",
+      "linhas": "3",
+      "total": "65876.52"
+    },
+    {
+      "tipo": "executado",
+      "categoriaId": "60002",
+      "linhas": "7",
+      "total": "111503.65"
+    },
+    {
+      "tipo": "planejado",
+      "categoriaId": "60002",
+      "linhas": "7",
+      "total": "446014.68"
+    },
+    {
+      "tipo": "executado",
+      "categoriaId": "60004",
+      "linhas": "1",
+      "total": "110.00"
+    },
+    {
+      "tipo": "planejado",
+      "categoriaId": "60004",
+      "linhas": "1",
+      "total": "440.04"
+    }
+  ],
+  "messages": [],
+  "stdout": "tipo\tcategoriaId\tlinhas\ttotal\nexecutado\t30006\t2\t721.98\nplanejado\t30006\t2\t2887.92\nexecutado\t30008\t7\t23583.70\nplanejado\t30008\t7\t94334.76\nexecutado\t30009\t3\t19226.84\nplanejado\t30009\t3\t76907.28\nexecutado\t30012\t2\t9064.22\nplanejado\t30012\t2\t36256.92\nexecutado\t30013\t1\t4808.24\nplanejado\t30013\t1\t19233.00\nexecutado\t30015\t1\t50000.00\nplanejado\t30015\t1\t200000.04\nexecutado\t30016\t3\t16469.11\nplanejado\t30016\t3\t65876.52\nexecutado\t60002\t7\t111503.65\nplanejado\t60002\t7\t446014.68\nexecutado\t60004\t1\t110.00\nplanejado\t60004\t1\t440.04\n",
+  "stderr": "",
+  "execution_time_ms": 384
+}

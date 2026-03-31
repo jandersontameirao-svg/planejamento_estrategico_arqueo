@@ -1,0 +1,15 @@
+{
+  "query": "SELECT importacaoId, COUNT(*) as linhas, SUM(valorConvertidoBase) as total FROM orcamento_executado_linhas WHERE empresaId = 660003 GROUP BY importacaoId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT importacaoId, COUNT(*) as linhas, SUM(valorConvertidoBase) as total FROM orcamento_executado_linhas WHERE empresaId = 660003 GROUP BY importacaoId;",
+  "rows": [
+    {
+      "importacaoId": "30001",
+      "linhas": "27",
+      "total": "235487.74"
+    }
+  ],
+  "messages": [],
+  "stdout": "importacaoId\tlinhas\ttotal\n30001\t27\t235487.74\n",
+  "stderr": "",
+  "execution_time_ms": 351
+}

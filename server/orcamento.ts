@@ -680,7 +680,7 @@ export async function getRelatorioDetalhadoPvsE(empresaId: number, ano: number, 
   const mesesKeys = ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"] as const;
   const mesesNomes = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
-  // Agrupar executado por subcategoria e mês
+  // Agrupar executado por subcategoria+mês e categoria+mês
   const execPorSubMes = new Map<string, number>();
   const execPorCatMes = new Map<string, number>();
 
@@ -698,12 +698,18 @@ export async function getRelatorioDetalhadoPvsE(empresaId: number, ano: number, 
     const subId = exec.subcategoriaId ?? 0;
     const catId = exec.categoriaId ?? 0;
 
-    const keySubMes = `${subId}_${mesIdx}`;
-    execPorSubMes.set(keySubMes, (execPorSubMes.get(keySubMes) ?? 0) + valor);
+    // Chave com subcategoria real (não-zero) para match preciso
+    if (subId !== 0) {
+      const keySubMes = `${catId}_${subId}_${mesIdx}`;
+      execPorSubMes.set(keySubMes, (execPorSubMes.get(keySubMes) ?? 0) + valor);
+    }
 
     const keyCatMes = `${catId}_${mesIdx}`;
     execPorCatMes.set(keyCatMes, (execPorCatMes.get(keyCatMes) ?? 0) + valor);
   }
+
+  // Track quais categorias+mês já tiveram executado atribuído (para evitar duplicação)
+  const execCatMesConsumed = new Set<string>();
 
   // Agrupar por categoria > subcategoria
   type SubcategoriaRelatorio = {
@@ -755,7 +761,13 @@ export async function getRelatorioDetalhadoPvsE(empresaId: number, ano: number, 
 
     const subMeses = mesesKeys.map((mesKey, idx) => {
       const planejado = parseFloat(lp[mesKey] ?? "0");
-      const executado = execPorSubMes.get(`${subId}_${idx}`) ?? 0;
+      // Para executado: se subcategoria é real (não-zero), usar match por sub
+      // Se subcategoria é 0 (NULL), NÃO atribuir executado aqui para evitar duplicação
+      // O executado será atribuído no nível da categoria depois
+      let executado = 0;
+      if (subId !== 0) {
+        executado = execPorSubMes.get(`${catId}_${subId}_${idx}`) ?? 0;
+      }
       const variacao = executado - planejado;
       const percentual = planejado > 0 ? ((executado / planejado) * 100) : (executado > 0 ? 100 : 0);
       return { mes: mesesNomes[idx], planejado, executado, variacao, percentual };
@@ -774,10 +786,13 @@ export async function getRelatorioDetalhadoPvsE(empresaId: number, ano: number, 
       totalPercentual: totalPlanejadoSub > 0 ? (totalExecutadoSub / totalPlanejadoSub) * 100 : (totalExecutadoSub > 0 ? 100 : 0),
     });
 
-    // Acumular nos totais da categoria
+    // Acumular planejado nos totais da categoria
     for (let i = 0; i < 12; i++) {
       catRel.meses[i].planejado += subMeses[i].planejado;
-      catRel.meses[i].executado += subMeses[i].executado;
+      // Executado de subcategorias reais
+      if (subId !== 0) {
+        catRel.meses[i].executado += subMeses[i].executado;
+      }
     }
   }
 
@@ -787,6 +802,37 @@ export async function getRelatorioDetalhadoPvsE(empresaId: number, ano: number, 
   let grandTotalExecutado = 0;
 
   for (const catRel of Array.from(categoriasMap.values())) {
+    // Se a categoria tem subcategorias com subId=0 (sem subcategoria real),
+    // atribuir executado no nível da categoria usando execPorCatMes (uma vez só)
+    const hasNullSubs = catRel.subcategorias.some(s => s.subcategoriaId === 0);
+    if (hasNullSubs) {
+      for (let i = 0; i < 12; i++) {
+        const catExec = execPorCatMes.get(`${catRel.categoriaId}_${i}`) ?? 0;
+        catRel.meses[i].executado = catExec;
+      }
+      // Redistribuir executado proporcionalmente entre subcategorias para exibição
+      for (let i = 0; i < 12; i++) {
+        const totalPlanMes = catRel.subcategorias.reduce((a, s) => a + s.meses[i].planejado, 0);
+        const catExec = catRel.meses[i].executado;
+        for (const sub of catRel.subcategorias) {
+          if (totalPlanMes > 0) {
+            sub.meses[i].executado = (sub.meses[i].planejado / totalPlanMes) * catExec;
+          } else {
+            sub.meses[i].executado = catExec / catRel.subcategorias.length;
+          }
+          sub.meses[i].variacao = sub.meses[i].executado - sub.meses[i].planejado;
+          sub.meses[i].percentual = sub.meses[i].planejado > 0 ? (sub.meses[i].executado / sub.meses[i].planejado) * 100 : (sub.meses[i].executado > 0 ? 100 : 0);
+        }
+      }
+      // Recalcular totais das subcategorias
+      for (const sub of catRel.subcategorias) {
+        sub.totalPlanejado = sub.meses.reduce((a, m) => a + m.planejado, 0);
+        sub.totalExecutado = sub.meses.reduce((a, m) => a + m.executado, 0);
+        sub.totalVariacao = sub.totalExecutado - sub.totalPlanejado;
+        sub.totalPercentual = sub.totalPlanejado > 0 ? (sub.totalExecutado / sub.totalPlanejado) * 100 : (sub.totalExecutado > 0 ? 100 : 0);
+      }
+    }
+
     catRel.totalPlanejado = catRel.meses.reduce((a: number, m: { planejado: number }) => a + m.planejado, 0);
     catRel.totalExecutado = catRel.meses.reduce((a: number, m: { executado: number }) => a + m.executado, 0);
     catRel.totalVariacao = catRel.totalExecutado - catRel.totalPlanejado;
@@ -863,8 +909,9 @@ export async function getAnaliseCustos(empresaId: number, ano: number) {
 
   const mesesKeys = ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"] as const;
 
-  // Agrupar executado por subcategoria e mês
+  // Agrupar executado por subcategoria+mês e categoria+mês
   const execPorSubMes = new Map<string, number>();
+  const execPorCatMesAnalise = new Map<string, number>();
   for (const exec of linhasExecutadas as any[]) {
     let mesIdx = -1;
     if (exec.competencia) {
@@ -876,8 +923,21 @@ export async function getAnaliseCustos(empresaId: number, ano: number) {
     if (mesIdx < 0 || mesIdx > 11) continue;
     const valor = parseFloat(exec.valorConvertidoBase ?? "0");
     const subId = exec.subcategoriaId ?? 0;
-    const key = `${subId}_${mesIdx}`;
-    execPorSubMes.set(key, (execPorSubMes.get(key) ?? 0) + valor);
+    const catId = exec.categoriaId ?? 0;
+    if (subId !== 0) {
+      const key = `${catId}_${subId}_${mesIdx}`;
+      execPorSubMes.set(key, (execPorSubMes.get(key) ?? 0) + valor);
+    }
+    const keyCat = `${catId}_${mesIdx}`;
+    execPorCatMesAnalise.set(keyCat, (execPorCatMesAnalise.get(keyCat) ?? 0) + valor);
+  }
+
+  // Pré-calcular quantas linhas planejadas cada categoria tem (para distribuir executado)
+  const catLinhaCount = new Map<number, number>();
+  const catLinhaIdx = new Map<number, number>();
+  for (const lp of linhasPlanejadas as any[]) {
+    const catId = lp.categoriaId;
+    catLinhaCount.set(catId, (catLinhaCount.get(catId) ?? 0) + 1);
   }
 
   // Construir itens de análise por subcategoria
@@ -918,9 +978,22 @@ export async function getAnaliseCustos(empresaId: number, ano: number) {
     let planejadoAnual = 0;
     let executadoAnual = 0;
 
+    // Track índice desta linha dentro da categoria
+    const currentIdx = catLinhaIdx.get(catId) ?? 0;
+    catLinhaIdx.set(catId, currentIdx + 1);
+    const totalLinhasNaCat = catLinhaCount.get(catId) ?? 1;
+    const isFirstInCat = currentIdx === 0;
+
     for (let i = 0; i < 12; i++) {
       const planejado = parseFloat(lp[mesesKeys[i]] ?? "0");
-      const executado = execPorSubMes.get(`${subId}_${i}`) ?? 0;
+      let executado = 0;
+      if (subId !== 0) {
+        executado = execPorSubMes.get(`${catId}_${subId}_${i}`) ?? 0;
+      } else if (isFirstInCat) {
+        // Atribuir todo o executado da categoria apenas na primeira linha
+        // para evitar duplicação
+        executado = execPorCatMesAnalise.get(`${catId}_${i}`) ?? 0;
+      }
       meses.push({ mes: i, planejado, executado });
       planejadoAnual += planejado;
       executadoAnual += executado;

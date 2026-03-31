@@ -1,0 +1,55 @@
+{
+  "query": "SELECT categoriaId, subcategoriaId, COUNT(*) as linhas FROM orcamento_planejado_linhas WHERE versaoId = 4 GROUP BY categoriaId, subcategoriaId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT categoriaId, subcategoriaId, COUNT(*) as linhas FROM orcamento_planejado_linhas WHERE versaoId = 4 GROUP BY categoriaId, subcategoriaId;",
+  "rows": [
+    {
+      "categoriaId": "30015",
+      "subcategoriaId": "NULL",
+      "linhas": "1"
+    },
+    {
+      "categoriaId": "30006",
+      "subcategoriaId": "NULL",
+      "linhas": "2"
+    },
+    {
+      "categoriaId": "30008",
+      "subcategoriaId": "NULL",
+      "linhas": "7"
+    },
+    {
+      "categoriaId": "30009",
+      "subcategoriaId": "NULL",
+      "linhas": "3"
+    },
+    {
+      "categoriaId": "30016",
+      "subcategoriaId": "NULL",
+      "linhas": "3"
+    },
+    {
+      "categoriaId": "60004",
+      "subcategoriaId": "NULL",
+      "linhas": "1"
+    },
+    {
+      "categoriaId": "30013",
+      "subcategoriaId": "NULL",
+      "linhas": "1"
+    },
+    {
+      "categoriaId": "30012",
+      "subcategoriaId": "NULL",
+      "linhas": "2"
+    },
+    {
+      "categoriaId": "60002",
+      "subcategoriaId": "NULL",
+      "linhas": "7"
+    }
+  ],
+  "messages": [],
+  "stdout": "categoriaId\tsubcategoriaId\tlinhas\n30015\tNULL\t1\n30006\tNULL\t2\n30008\tNULL\t7\n30009\tNULL\t3\n30016\tNULL\t3\n60004\tNULL\t1\n30013\tNULL\t1\n30012\tNULL\t2\n60002\tNULL\t7\n",
+  "stderr": "",
+  "execution_time_ms": 351
+}

@@ -1,0 +1,195 @@
+{
+  "query": "SELECT id, nome, tipo FROM orcamento_categorias WHERE ativo = 1 ORDER BY ordem, nome;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, nome, tipo FROM orcamento_categorias WHERE ativo = 1 ORDER BY ordem, nome;",
+  "rows": [
+    {
+      "id": "7",
+      "nome": "Administrativo",
+      "tipo": "despesa"
+    },
+    {
+      "id": "10",
+      "nome": "Aluguel e Infraestrutura",
+      "tipo": "despesa"
+    },
+    {
+      "id": "60003",
+      "nome": "Custos com Materiais e Serviços",
+      "tipo": "despesa"
+    },
+    {
+      "id": "60002",
+      "nome": "Custos Diretos de Projeto",
+      "tipo": "despesa"
+    },
+    {
+      "id": "60004",
+      "nome": "Custos Trabalhistas Eventuais",
+      "tipo": "despesa"
+    },
+    {
+      "id": "60008",
+      "nome": "Despesas Não Classificadas",
+      "tipo": "despesa"
+    },
+    {
+      "id": "11",
+      "nome": "Impostos e Taxas",
+      "tipo": "despesa"
+    },
+    {
+      "id": "60007",
+      "nome": "Investimentos e Melhorias",
+      "tipo": "despesa"
+    },
+    {
+      "id": "12",
+      "nome": "Investimentos em Ativos",
+      "tipo": "investimento"
+    },
+    {
+      "id": "6",
+      "nome": "Marketing e Vendas",
+      "tipo": "despesa"
+    },
+    {
+      "id": "5",
+      "nome": "Materiais e Insumos",
+      "tipo": "custo"
+    },
+    {
+      "id": "60005",
+      "nome": "Movimentações Financeiras",
+      "tipo": "despesa"
+    },
+    {
+      "id": "2",
+      "nome": "Outras Receitas",
+      "tipo": "receita"
+    },
+    {
+      "id": "13",
+      "nome": "P&D e Inovação",
+      "tipo": "investimento"
+    },
+    {
+      "id": "3",
+      "nome": "Pessoal e Encargos",
+      "tipo": "custo"
+    },
+    {
+      "id": "1",
+      "nome": "Receita Operacional",
+      "tipo": "receita"
+    },
+    {
+      "id": "14",
+      "nome": "Reserva e Contingência",
+      "tipo": "outro"
+    },
+    {
+      "id": "4",
+      "nome": "Serviços de Terceiros",
+      "tipo": "custo"
+    },
+    {
+      "id": "8",
+      "nome": "Tecnologia e Sistemas",
+      "tipo": "despesa"
+    },
+    {
+      "id": "60006",
+      "nome": "Tributos Operacionais",
+      "tipo": "despesa"
+    },
+    {
+      "id": "9",
+      "nome": "Viagens e Deslocamentos",
+      "tipo": "despesa"
+    },
+    {
+      "id": "30001",
+      "nome": "Benefícios",
+      "tipo": "custo"
+    },
+    {
+      "id": "30002",
+      "nome": "Salários e Ordenados",
+      "tipo": "custo"
+    },
+    {
+      "id": "30003",
+      "nome": "Encargos",
+      "tipo": "custo"
+    },
+    {
+      "id": "30004",
+      "nome": "Outros Custos com Pessoal",
+      "tipo": "custo"
+    },
+    {
+      "id": "30005",
+      "nome": "Custos com Serviços Contratados",
+      "tipo": "custo"
+    },
+    {
+      "id": "30006",
+      "nome": "Despesas Administrativas",
+      "tipo": "despesa"
+    },
+    {
+      "id": "30007",
+      "nome": "Despesas com Aluguéis e Condomínios",
+      "tipo": "despesa"
+    },
+    {
+      "id": "30008",
+      "nome": "Despesas com Serviços",
+      "tipo": "despesa"
+    },
+    {
+      "id": "30009",
+      "nome": "Despesas com Veículos",
+      "tipo": "despesa"
+    },
+    {
+      "id": "30010",
+      "nome": "Despesas de Consumo",
+      "tipo": "despesa"
+    },
+    {
+      "id": "30011",
+      "nome": "Despesas Financeiras",
+      "tipo": "despesa"
+    },
+    {
+      "id": "30012",
+      "nome": "Despesas Gerais",
+      "tipo": "despesa"
+    },
+    {
+      "id": "30013",
+      "nome": "Diretoria",
+      "tipo": "despesa"
+    },
+    {
+      "id": "30014",
+      "nome": "Imobilizado",
+      "tipo": "investimento"
+    },
+    {
+      "id": "30015",
+      "nome": "Liquidação de Empréstimo",
+      "tipo": "despesa"
+    },
+    {
+      "id": "30016",
+      "nome": "Tributos, Taxas e Contribuições",
+      "tipo": "despesa"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\ttipo\n7\tAdministrativo\tdespesa\n10\tAluguel e Infraestrutura\tdespesa\n60003\tCustos com Materiais e Serviços\tdespesa\n60002\tCustos Diretos de Projeto\tdespesa\n60004\tCustos Trabalhistas Eventuais\tdespesa\n60008\tDespesas Não Classificadas\tdespesa\n11\tImpostos e Taxas\tdespesa\n60007\tInvestimentos e Melhorias\tdespesa\n12\tInvestimentos em Ativos\tinvestimento\n6\tMarketing e Vendas\tdespesa\n5\tMateriais e Insumos\tcusto\n60005\tMovimentações Financeiras\tdespesa\n2\tOutras Receitas\treceita\n13\tP&D e Inovação\tinvestimento\n3\tPessoal e Encargos\tcusto\n1\tReceita Operacional\treceita\n14\tReserva e Contingência\toutro\n4\tServiços de Terceiros\tcusto\n8\tTecnologia e Sistemas\tdespesa\n60006\tTributos Operacionais\tdespesa\n9\tViagens e Deslocamentos\tdespesa\n30001\tBenefícios\tcusto\n30002\tSalários e Ordenados\tcusto\n30003\tEncargos\tcusto\n30004\tOutros Custos com Pessoal\tcusto\n30005\tCustos com Serviços Contratados\tcusto\n30006\tDespesas Administrativas\tdespesa\n30007\tDespesas com Aluguéis e Condomínios\tdespesa\n30008\tDespesas com Serviços\tdespesa\n30009\tDespesas com Veículos\tdespesa\n30010\tDespesas de Consumo\tdespesa\n30011\tDespesas Financeiras\tdespesa\n30012\tDespesas Gerais\tdespesa\n30013\tDiretoria\tdespesa\n30014\tImobilizado\tinvestimento\n30015\tLiquidação de Empréstimo\tdespesa\n30016\tTributos, Taxas e Contribuições\tdespesa\n",
+  "stderr": "",
+  "execution_time_ms": 447
+}

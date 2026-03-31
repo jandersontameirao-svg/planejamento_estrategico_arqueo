@@ -1,0 +1,8 @@
+{
+  "query": "SELECT opl.versaoId, opl.categoriaId, opl.descricao, opl.mes_01, opl.mes_02, opl.mes_03, opl.total_trimestral FROM orcamento_planejado_linhas opl WHERE opl.empresaId IN (1, 660004) LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT opl.versaoId, opl.categoriaId, opl.descricao, opl.mes_01, opl.mes_02, opl.mes_03, opl.total_trimestral FROM orcamento_planejado_linhas opl WHERE opl.empresaId IN (1, 660004) LIMIT 10;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'opl.empresaid' in 'where clause'"
+  ]
+}

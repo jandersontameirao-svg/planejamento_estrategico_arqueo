@@ -1,0 +1,30 @@
+{
+  "query": "SELECT e.id, e.nome, COUNT(oel.id) as linhas_executado FROM empresas e LEFT JOIN orcamento_executado_linhas oel ON e.id = oel.empresaId WHERE e.nome LIKE '%Arqueogis%' OR e.id IN (1, 660004, 660003) GROUP BY e.id, e.nome;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT e.id, e.nome, COUNT(oel.id) as linhas_executado FROM empresas e LEFT JOIN orcamento_executado_linhas oel ON e.id = oel.empresaId WHERE e.nome LIKE '%Arqueogis%' OR e.id IN (1, 660004, 660003) GROUP BY e.id, e.nome;",
+  "rows": [
+    {
+      "id": "30001",
+      "nome": "arqueogis geoprocessamento",
+      "linhas_executado": "0"
+    },
+    {
+      "id": "1",
+      "nome": "Arqueoproject Projetos e Pesquisas LTDA",
+      "linhas_executado": "240"
+    },
+    {
+      "id": "660003",
+      "nome": "Arqueogis Preventiva",
+      "linhas_executado": "0"
+    },
+    {
+      "id": "660004",
+      "nome": "Arqueocean",
+      "linhas_executado": "36"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\tlinhas_executado\n30001\tarqueogis geoprocessamento\t0\n1\tArqueoproject Projetos e Pesquisas LTDA\t240\n660003\tArqueogis Preventiva\t0\n660004\tArqueocean\t36\n",
+  "stderr": "",
+  "execution_time_ms": 384
+}

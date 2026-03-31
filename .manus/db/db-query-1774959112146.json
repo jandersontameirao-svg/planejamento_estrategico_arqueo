@@ -1,0 +1,20 @@
+{
+  "query": "SELECT DISTINCT empresaId, COUNT(*) as total_linhas, SUM(valorConvertidoBase) as total_valor FROM orcamento_executado_linhas GROUP BY empresaId ORDER BY empresaId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT DISTINCT empresaId, COUNT(*) as total_linhas, SUM(valorConvertidoBase) as total_valor FROM orcamento_executado_linhas GROUP BY empresaId ORDER BY empresaId;",
+  "rows": [
+    {
+      "empresaId": "1",
+      "total_linhas": "240",
+      "total_valor": "1067154.75"
+    },
+    {
+      "empresaId": "660004",
+      "total_linhas": "36",
+      "total_valor": "26454.15"
+    }
+  ],
+  "messages": [],
+  "stdout": "empresaId\ttotal_linhas\ttotal_valor\n1\t240\t1067154.75\n660004\t36\t26454.15\n",
+  "stderr": "",
+  "execution_time_ms": 2382
+}

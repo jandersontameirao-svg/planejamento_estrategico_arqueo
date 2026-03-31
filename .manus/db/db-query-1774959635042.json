@@ -1,0 +1,50 @@
+{
+  "query": "SELECT opl.id, opl.categoriaId, oc.nome as categoria, opl.descricao, opl.janeiro, opl.fevereiro, opl.marco, opl.totalAnual FROM orcamento_planejado_linhas opl JOIN orcamento_categorias oc ON opl.categoriaId = oc.id WHERE opl.versaoId = 4;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT opl.id, opl.categoriaId, oc.nome as categoria, opl.descricao, opl.janeiro, opl.fevereiro, opl.marco, opl.totalAnual FROM orcamento_planejado_linhas opl JOIN orcamento_categorias oc ON opl.categoriaId = oc.id WHERE opl.versaoId = 4;",
+  "rows": [
+    {
+      "id": "71",
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Servicos Administrativos",
+      "janeiro": "6000.00",
+      "fevereiro": "6000.00",
+      "marco": "6000.00",
+      "totalAnual": "72000.00"
+    },
+    {
+      "id": "72",
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Servicos Contabeis",
+      "janeiro": "810.50",
+      "fevereiro": "810.50",
+      "marco": "810.50",
+      "totalAnual": "10536.50"
+    },
+    {
+      "id": "73",
+      "categoriaId": "30012",
+      "categoria": "Despesas Gerais",
+      "descricao": "Certificados Digitais",
+      "janeiro": "20.83",
+      "fevereiro": "20.83",
+      "marco": "20.83",
+      "totalAnual": "249.96"
+    },
+    {
+      "id": "74",
+      "categoriaId": "30012",
+      "categoria": "Despesas Gerais",
+      "descricao": "Licenca De Softwares",
+      "janeiro": "602.25",
+      "fevereiro": "602.25",
+      "marco": "782.25",
+      "totalAnual": "9027.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcategoriaId\tcategoria\tdescricao\tjaneiro\tfevereiro\tmarco\ttotalAnual\n71\t30008\tDespesas com Serviços\tServicos Administrativos\t6000.00\t6000.00\t6000.00\t72000.00\n72\t30008\tDespesas com Serviços\tServicos Contabeis\t810.50\t810.50\t810.50\t10536.50\n73\t30012\tDespesas Gerais\tCertificados Digitais\t20.83\t20.83\t20.83\t249.96\n74\t30012\tDespesas Gerais\tLicenca De Softwares\t602.25\t602.25\t782.25\t9027.00\n",
+  "stderr": "",
+  "execution_time_ms": 363
+}

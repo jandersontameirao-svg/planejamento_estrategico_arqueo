@@ -1,0 +1,162 @@
+{
+  "query": "DESCRIBE orcamento_executado_linhas;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute DESCRIBE orcamento_executado_linhas;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "importacaoId",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "empresaId",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "categoriaId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "subcategoriaId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "dataLancamento",
+      "Type": "date",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "competencia",
+      "Type": "varchar(7)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "descricao",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "valorOriginal",
+      "Type": "decimal(18,2)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "moedaOriginal",
+      "Type": "varchar(10)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "BRL",
+      "Extra": ""
+    },
+    {
+      "Field": "taxaCambio",
+      "Type": "decimal(18,6)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1.000000",
+      "Extra": ""
+    },
+    {
+      "Field": "dataTaxaCambio",
+      "Type": "date",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "valorConvertidoBase",
+      "Type": "decimal(18,2)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "referenciaExterna",
+      "Type": "varchar(500)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "documentoReferencia",
+      "Type": "varchar(500)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "hashLinha",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "ativo",
+      "Type": "tinyint",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\nimportacaoId\tint\tNO\t\tNULL\t\nempresaId\tint\tNO\t\tNULL\t\ncategoriaId\tint\tYES\t\tNULL\t\nsubcategoriaId\tint\tYES\t\tNULL\t\ndataLancamento\tdate\tYES\t\tNULL\t\ncompetencia\tvarchar(7)\tYES\t\tNULL\t\ndescricao\ttext\tYES\t\tNULL\t\nvalorOriginal\tdecimal(18,2)\tNO\t\t0.00\t\nmoedaOriginal\tvarchar(10)\tNO\t\tBRL\t\ntaxaCambio\tdecimal(18,6)\tNO\t\t1.000000\t\ndataTaxaCambio\tdate\tYES\t\tNULL\t\nvalorConvertidoBase\tdecimal(18,2)\tNO\t\t0.00\t\nreferenciaExterna\tvarchar(500)\tYES\t\tNULL\t\ndocumentoReferencia\tvarchar(500)\tYES\t\tNULL\t\nhashLinha\tvarchar(64)\tYES\t\tNULL\t\nativo\ttinyint\tNO\t\t1\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\n",
+  "stderr": "",
+  "execution_time_ms": 360
+}

@@ -1471,3 +1471,25 @@
 - [x] Investigar causa do alerta "Análise SWOT salva com sucesso!" aparecendo automaticamente ao entrar na SWOT
 - [x] Corrigir o bug para que o alerta só apareça após ação explícita do usuário (SwotLite, OkrLite, AnalisePestelLite)
 - [x] Testar a correção (128 testes passando)
+
+## Integração de Gastos Arqueogis Preventiva 1º Trimestre
+- [x] Extrair dados do PDF de gastos (30/03/2026, R$ 235.487,74 total)
+- [x] Estruturar dados em JSON com categorias de despesas
+- [x] Inserir 27 linhas de executado no banco (empresaId 660003)
+- [x] Integrar com análises orçamentárias existentes
+
+## Orçamento Planejado Arqueogis Preventiva
+- [x] Analisar como foi feito o orçamento planejado da Arqueoproject (padrão a seguir)
+- [x] Versão orçamentária já existia (versaoId=4, aprovada)
+- [x] Distribuir gastos no orçamento planejado (17 linhas não-campo)
+- [x] Incluir média de gastos com campo no orçamento (10 linhas de campo)
+- [x] Criar projeção anual (R$ 941.951,16 total)
+- [x] Verificar dados no sistema (27 linhas, total conferido)
+
+## Bug Fix: Executado multiplicado no relatório Previsto vs Executado
+- [x] Investigar causa do R$ 6.358.168,98 (27x R$ 235.487,74)
+- [x] Corrigir mapeamento de categoriaId dos executados (7→30006, 60004→30013, etc.)
+- [x] Corrigir bug de multiplicação em getRelatorioDetalhadoPvsE (subcategoriaId NULL causava duplicação)
+- [x] Corrigir mesmo bug em getAnaliseCustos
+- [x] getDashboardOrcamento já calculava corretamente (soma direta das linhas)
+- [x] 128 testes passando

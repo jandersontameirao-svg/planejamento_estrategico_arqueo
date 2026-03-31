@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(*) as total_linhas, SUM(totalAnual) as total_anual FROM orcamento_planejado_linhas WHERE versaoId = 4;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT COUNT(*) as total_linhas, SUM(totalAnual) as total_anual FROM orcamento_planejado_linhas WHERE versaoId = 4;",
+  "rows": [
+    {
+      "total_linhas": "4",
+      "total_anual": "91813.46"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_linhas\ttotal_anual\n4\t91813.46\n",
+  "stderr": "",
+  "execution_time_ms": 350
+}

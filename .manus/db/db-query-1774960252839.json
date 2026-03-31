@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE orcamento_executado_linhas SET categoriaId = 30006 WHERE empresaId = 660003 AND categoriaId = 7;\nUPDATE orcamento_executado_linhas SET categoriaId = 30013 WHERE empresaId = 660003 AND categoriaId = 60004;\nUPDATE orcamento_executado_linhas SET categoriaId = 30015 WHERE empresaId = 660003 AND categoriaId = 60005;\nUPDATE orcamento_executado_linhas SET categoriaId = 30012 WHERE empresaId = 660003 AND categoriaId = 60008;\nUPDATE orcamento_executado_linhas SET categoriaId = 60004 WHERE empresaId = 660003 AND categoriaId = 3;\nUPDATE orcamento_executado_linhas SET categoriaId = 30016 WHERE empresaId = 660003 AND categoriaId = 60006;\nUPDATE orcamento_executado_linhas SET categoriaId = 30009 WHERE empresaId = 660003 AND categoriaId = 60003;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute UPDATE orcamento_executado_linhas SET categoriaId = 30006 WHERE empresaId = 660003 AND categoriaId = 7;\nUPDATE orcamento_executado_linhas SET categoriaId = 30013 WHERE empresaId = 660003 AND categoriaId = 60004;\nUPDATE orcamento_executado_linhas SET categoriaId = 30015 WHERE empresaId = 660003 AND categoriaId = 60005;\nUPDATE orcamento_executado_linhas SET categoriaId = 30012 WHERE empresaId = 660003 AND categoriaId = 60008;\nUPDATE orcamento_executado_linhas SET categoriaId = 60004 WHERE empresaId = 660003 AND categoriaId = 3;\nUPDATE orcamento_executado_linhas SET categoriaId = 30016 WHERE empresaId = 660003 AND categoriaId = 60006;\nUPDATE orcamento_executado_linhas SET categoriaId = 30009 WHERE empresaId = 660003 AND categoriaId = 60003;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 689
+}

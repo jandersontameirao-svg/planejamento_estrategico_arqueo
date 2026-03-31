@@ -1,0 +1,42 @@
+{
+  "query": "SELECT id, empresaId, ano, nomeVersao, numeroVersao, status FROM orcamento_versoes ORDER BY empresaId, ano;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, empresaId, ano, nomeVersao, numeroVersao, status FROM orcamento_versoes ORDER BY empresaId, ano;",
+  "rows": [
+    {
+      "id": "1",
+      "empresaId": "1",
+      "ano": "2026",
+      "nomeVersao": "Orçamento 2026 - Arqueoproject",
+      "numeroVersao": "1",
+      "status": "aprovado"
+    },
+    {
+      "id": "2",
+      "empresaId": "30001",
+      "ano": "2026",
+      "nomeVersao": "Orçamento 2026 - Arqueogis Geoprocessamento",
+      "numeroVersao": "1",
+      "status": "aprovado"
+    },
+    {
+      "id": "4",
+      "empresaId": "660003",
+      "ano": "2026",
+      "nomeVersao": "Orçamento 2026 - Arqueogis Preventiva",
+      "numeroVersao": "1",
+      "status": "aprovado"
+    },
+    {
+      "id": "3",
+      "empresaId": "660004",
+      "ano": "2026",
+      "nomeVersao": "Orçamento 2026 - Arqueocean",
+      "numeroVersao": "1",
+      "status": "aprovado"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tempresaId\tano\tnomeVersao\tnumeroVersao\tstatus\n1\t1\t2026\tOrçamento 2026 - Arqueoproject\t1\taprovado\n2\t30001\t2026\tOrçamento 2026 - Arqueogis Geoprocessamento\t1\taprovado\n4\t660003\t2026\tOrçamento 2026 - Arqueogis Preventiva\t1\taprovado\n3\t660004\t2026\tOrçamento 2026 - Arqueocean\t1\taprovado\n",
+  "stderr": "",
+  "execution_time_ms": 359
+}

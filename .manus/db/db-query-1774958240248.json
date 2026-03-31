@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO orcamento_importacoes (empresaId, ano, mesReferencia, arquivoNome, status, totalLinhas, totalImportado, moedaLote, observacoes, createdAt, updatedAt) VALUES (660003, 2026, 3, 'Gastos1TrimestreArqueogisPreventiva.pdf', 'concluido', 27, 27, 'BRL', 'Gastos 1º trimestre 2026 - Arqueogis Preventiva - Total R$ 235.487,74', NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute INSERT INTO orcamento_importacoes (empresaId, ano, mesReferencia, arquivoNome, status, totalLinhas, totalImportado, moedaLote, observacoes, createdAt, updatedAt) VALUES (660003, 2026, 3, 'Gastos1TrimestreArqueogisPreventiva.pdf', 'concluido', 27, 27, 'BRL', 'Gastos 1º trimestre 2026 - Arqueogis Preventiva - Total R$ 235.487,74', NOW(), NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 368
+}

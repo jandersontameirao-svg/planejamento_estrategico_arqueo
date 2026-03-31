@@ -1,0 +1,730 @@
+{
+  "query": "SELECT opl.categoriaId, oc.nome as categoria, opl.descricao, opl.janeiro, opl.fevereiro, opl.marco, opl.totalAnual FROM orcamento_planejado_linhas opl JOIN orcamento_categorias oc ON opl.categoriaId = oc.id WHERE opl.versaoId = 1 ORDER BY oc.nome;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT opl.categoriaId, oc.nome as categoria, opl.descricao, opl.janeiro, opl.fevereiro, opl.marco, opl.totalAnual FROM orcamento_planejado_linhas opl JOIN orcamento_categorias oc ON opl.categoriaId = oc.id WHERE opl.versaoId = 1 ORDER BY oc.nome;",
+  "rows": [
+    {
+      "categoriaId": "30001",
+      "categoria": "Benefícios",
+      "descricao": "Assistencia Medica E Odontologica",
+      "janeiro": "718.00",
+      "fevereiro": "718.00",
+      "marco": "718.00",
+      "totalAnual": "8616.00"
+    },
+    {
+      "categoriaId": "30001",
+      "categoria": "Benefícios",
+      "descricao": "Auxilio Alimentacao Refeicao",
+      "janeiro": "4039.20",
+      "fevereiro": "4039.20",
+      "marco": "3915.00",
+      "totalAnual": "40181.40"
+    },
+    {
+      "categoriaId": "30001",
+      "categoria": "Benefícios",
+      "descricao": "Auxilio Transporte",
+      "janeiro": "1936.00",
+      "fevereiro": "1936.00",
+      "marco": "717.75",
+      "totalAnual": "8896.25"
+    },
+    {
+      "categoriaId": "30001",
+      "categoria": "Benefícios",
+      "descricao": "Seguro De Vida",
+      "janeiro": "95.42",
+      "fevereiro": "95.42",
+      "marco": "95.42",
+      "totalAnual": "1145.04"
+    },
+    {
+      "categoriaId": "60003",
+      "categoria": "Custos com Materiais e Serviços",
+      "descricao": "Endosso",
+      "janeiro": "2666.67",
+      "fevereiro": "2666.67",
+      "marco": "2666.66",
+      "totalAnual": "32000.03"
+    },
+    {
+      "categoriaId": "60003",
+      "categoria": "Custos com Materiais e Serviços",
+      "descricao": "Correios",
+      "janeiro": "283.56",
+      "fevereiro": "283.56",
+      "marco": "283.55",
+      "totalAnual": "3402.71"
+    },
+    {
+      "categoriaId": "60003",
+      "categoria": "Custos com Materiais e Serviços",
+      "descricao": "Cursos E Treinamentos",
+      "janeiro": "1317.23",
+      "fevereiro": "1317.23",
+      "marco": "1317.22",
+      "totalAnual": "15806.75"
+    },
+    {
+      "categoriaId": "60003",
+      "categoria": "Custos com Materiais e Serviços",
+      "descricao": "Outras Despesas Eventuais",
+      "janeiro": "27501.01",
+      "fevereiro": "27501.01",
+      "marco": "27501.01",
+      "totalAnual": "330012.12"
+    },
+    {
+      "categoriaId": "30005",
+      "categoria": "Custos com Serviços Contratados",
+      "descricao": "Contratacao Pessoa Juridica",
+      "janeiro": "19800.00",
+      "fevereiro": "19800.00",
+      "marco": "19800.00",
+      "totalAnual": "237600.00"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Transportes E Pedagios",
+      "janeiro": "825.08",
+      "fevereiro": "825.08",
+      "marco": "825.08",
+      "totalAnual": "9900.96"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Aplicativos De Transporte",
+      "janeiro": "57.34",
+      "fevereiro": "57.34",
+      "marco": "57.33",
+      "totalAnual": "688.07"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Aluguel De Veiculos",
+      "janeiro": "6468.33",
+      "fevereiro": "6468.33",
+      "marco": "6468.34",
+      "totalAnual": "77619.97"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Ajuda De Custo Alimentacao",
+      "janeiro": "1770.00",
+      "fevereiro": "1770.00",
+      "marco": "1770.00",
+      "totalAnual": "21240.00"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Hospedagem De Campo",
+      "janeiro": "12487.63",
+      "fevereiro": "12487.63",
+      "marco": "12487.64",
+      "totalAnual": "149851.57"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Auxiliar De Campo",
+      "janeiro": "5501.67",
+      "fevereiro": "5501.67",
+      "marco": "5501.66",
+      "totalAnual": "66020.03"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Equipamentos E Ferramentas",
+      "janeiro": "8380.21",
+      "fevereiro": "8380.21",
+      "marco": "8380.20",
+      "totalAnual": "100562.51"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Epi E Seguranca",
+      "janeiro": "493.73",
+      "fevereiro": "493.73",
+      "marco": "493.74",
+      "totalAnual": "5924.77"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Viagens Aereas",
+      "janeiro": "3299.94",
+      "fevereiro": "3299.94",
+      "marco": "3299.93",
+      "totalAnual": "39599.27"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Viagens Terrestres",
+      "janeiro": "388.23",
+      "fevereiro": "388.23",
+      "marco": "388.24",
+      "totalAnual": "4658.77"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Lanches E Refeicoes De Campo",
+      "janeiro": "232.80",
+      "fevereiro": "232.80",
+      "marco": "232.81",
+      "totalAnual": "2793.61"
+    },
+    {
+      "categoriaId": "60002",
+      "categoria": "Custos Diretos de Projeto",
+      "descricao": "Despesas De Campo Diversas",
+      "janeiro": "10616.38",
+      "fevereiro": "10616.38",
+      "marco": "10616.39",
+      "totalAnual": "127396.57"
+    },
+    {
+      "categoriaId": "60004",
+      "categoria": "Custos Trabalhistas Eventuais",
+      "descricao": "Pro-Labore",
+      "janeiro": "1412.13",
+      "fevereiro": "1412.13",
+      "marco": "1412.14",
+      "totalAnual": "16945.57"
+    },
+    {
+      "categoriaId": "60004",
+      "categoria": "Custos Trabalhistas Eventuais",
+      "descricao": "Fgts Rescisorio",
+      "janeiro": "1874.82",
+      "fevereiro": "1874.82",
+      "marco": "1874.81",
+      "totalAnual": "22497.83"
+    },
+    {
+      "categoriaId": "60004",
+      "categoria": "Custos Trabalhistas Eventuais",
+      "descricao": "Rescisoes",
+      "janeiro": "1843.11",
+      "fevereiro": "1843.11",
+      "marco": "1843.12",
+      "totalAnual": "22117.33"
+    },
+    {
+      "categoriaId": "30006",
+      "categoria": "Despesas Administrativas",
+      "descricao": "Locacao De Equipamentos",
+      "janeiro": "1081.55",
+      "fevereiro": "1081.55",
+      "marco": "1081.55",
+      "totalAnual": "12978.60"
+    },
+    {
+      "categoriaId": "30006",
+      "categoria": "Despesas Administrativas",
+      "descricao": "Reunioes E Confraternizacoes",
+      "janeiro": "332.32",
+      "fevereiro": "332.32",
+      "marco": "332.31",
+      "totalAnual": "3987.83"
+    },
+    {
+      "categoriaId": "30006",
+      "categoria": "Despesas Administrativas",
+      "descricao": "Seguros",
+      "janeiro": "2847.82",
+      "fevereiro": "2480.50",
+      "marco": "2480.50",
+      "totalAnual": "28645.76"
+    },
+    {
+      "categoriaId": "30007",
+      "categoria": "Despesas com Aluguéis e Condomínios",
+      "descricao": "Condominios",
+      "janeiro": "549.40",
+      "fevereiro": "549.40",
+      "marco": "549.40",
+      "totalAnual": "6592.80"
+    },
+    {
+      "categoriaId": "30007",
+      "categoria": "Despesas com Aluguéis e Condomínios",
+      "descricao": "Alugueis",
+      "janeiro": "178.80",
+      "fevereiro": "178.80",
+      "marco": "178.80",
+      "totalAnual": "536.40"
+    },
+    {
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Servicos De Gestao E Consultoria",
+      "janeiro": "7500.00",
+      "fevereiro": "7500.00",
+      "marco": "7500.00",
+      "totalAnual": "90000.00"
+    },
+    {
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Servicos Contabeis",
+      "janeiro": "6140.04",
+      "fevereiro": "6140.04",
+      "marco": "6140.04",
+      "totalAnual": "79820.52"
+    },
+    {
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Servicos Graficos",
+      "janeiro": "1200.00",
+      "fevereiro": "1200.00",
+      "marco": "1200.00",
+      "totalAnual": "14400.00"
+    },
+    {
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Servicos De Manutencao",
+      "janeiro": "500.00",
+      "fevereiro": "500.00",
+      "marco": "500.00",
+      "totalAnual": "6000.00"
+    },
+    {
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Servicos De Limpeza E Conservacao De Bens",
+      "janeiro": "990.00",
+      "fevereiro": "990.00",
+      "marco": "990.00",
+      "totalAnual": "11880.00"
+    },
+    {
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Servicos Advocaticios",
+      "janeiro": "6667.00",
+      "fevereiro": "6667.00",
+      "marco": "6667.00",
+      "totalAnual": "80004.00"
+    },
+    {
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Servicos Administrativos",
+      "janeiro": "75800.00",
+      "fevereiro": "75800.00",
+      "marco": "75800.00",
+      "totalAnual": "957600.00"
+    },
+    {
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Reunioes E Confraternizaçoes",
+      "janeiro": "2500.00",
+      "fevereiro": "2500.00",
+      "marco": "2500.00",
+      "totalAnual": "30000.00"
+    },
+    {
+      "categoriaId": "30008",
+      "categoria": "Despesas com Serviços",
+      "descricao": "Feiras Exposicoes Congressos E Conferencias",
+      "janeiro": "3333.33",
+      "fevereiro": "3333.33",
+      "marco": "3333.33",
+      "totalAnual": "42916.63"
+    },
+    {
+      "categoriaId": "30009",
+      "categoria": "Despesas com Veículos",
+      "descricao": "Manutencao E Reparo De Veiculos",
+      "janeiro": "5181.67",
+      "fevereiro": "5181.67",
+      "marco": "5181.66",
+      "totalAnual": "62180.03"
+    },
+    {
+      "categoriaId": "30009",
+      "categoria": "Despesas com Veículos",
+      "descricao": "Licenciamento De Veiculos",
+      "janeiro": "283.36",
+      "fevereiro": "283.36",
+      "marco": "283.36",
+      "totalAnual": "3400.32"
+    },
+    {
+      "categoriaId": "30009",
+      "categoria": "Despesas com Veículos",
+      "descricao": "Combustivel E Lubrificantes",
+      "janeiro": "480.00",
+      "fevereiro": "480.00",
+      "marco": "480.00",
+      "totalAnual": "5760.00"
+    },
+    {
+      "categoriaId": "30009",
+      "categoria": "Despesas com Veículos",
+      "descricao": "Lavagem De Veiculos",
+      "janeiro": "334.67",
+      "fevereiro": "334.67",
+      "marco": "334.66",
+      "totalAnual": "4016.03"
+    },
+    {
+      "categoriaId": "30010",
+      "categoria": "Despesas de Consumo",
+      "descricao": "Energia Eletrica",
+      "janeiro": "1000.00",
+      "fevereiro": "1000.00",
+      "marco": "1000.00",
+      "totalAnual": "12000.00"
+    },
+    {
+      "categoriaId": "30010",
+      "categoria": "Despesas de Consumo",
+      "descricao": "Agua E Esgoto",
+      "janeiro": "150.00",
+      "fevereiro": "150.00",
+      "marco": "150.00",
+      "totalAnual": "1800.00"
+    },
+    {
+      "categoriaId": "30010",
+      "categoria": "Despesas de Consumo",
+      "descricao": "Lanches E Refeicoes",
+      "janeiro": "800.00",
+      "fevereiro": "800.00",
+      "marco": "800.00",
+      "totalAnual": "9600.00"
+    },
+    {
+      "categoriaId": "30010",
+      "categoria": "Despesas de Consumo",
+      "descricao": "Materiais De Limpeza/higiene",
+      "janeiro": "500.00",
+      "fevereiro": "500.00",
+      "marco": "500.00",
+      "totalAnual": "6000.00"
+    },
+    {
+      "categoriaId": "30010",
+      "categoria": "Despesas de Consumo",
+      "descricao": "Telefone E Internet",
+      "janeiro": "796.25",
+      "fevereiro": "802.77",
+      "marco": "802.77",
+      "totalAnual": "8847.77"
+    },
+    {
+      "categoriaId": "30011",
+      "categoria": "Despesas Financeiras",
+      "descricao": "Anuidade Cartao De Credito",
+      "janeiro": "37.50",
+      "fevereiro": "37.50",
+      "marco": "37.50",
+      "totalAnual": "450.00"
+    },
+    {
+      "categoriaId": "30011",
+      "categoria": "Despesas Financeiras",
+      "descricao": "Despesas Bancarias",
+      "janeiro": "602.13",
+      "fevereiro": "602.13",
+      "marco": "602.13",
+      "totalAnual": "7225.56"
+    },
+    {
+      "categoriaId": "30012",
+      "categoria": "Despesas Gerais",
+      "descricao": "Licenca De Softwares",
+      "janeiro": "11370.45",
+      "fevereiro": "11370.45",
+      "marco": "11370.45",
+      "totalAnual": "125764.65"
+    },
+    {
+      "categoriaId": "30012",
+      "categoria": "Despesas Gerais",
+      "descricao": "Certificados Digitais",
+      "janeiro": "41.66",
+      "fevereiro": "41.66",
+      "marco": "41.66",
+      "totalAnual": "499.92"
+    },
+    {
+      "categoriaId": "60008",
+      "categoria": "Despesas Não Classificadas",
+      "descricao": "Nao Categorizado",
+      "janeiro": "4531.88",
+      "fevereiro": "4531.88",
+      "marco": "4531.88",
+      "totalAnual": "54382.56"
+    },
+    {
+      "categoriaId": "60008",
+      "categoria": "Despesas Não Classificadas",
+      "descricao": "Utensilios Administrativos",
+      "janeiro": "33.63",
+      "fevereiro": "33.63",
+      "marco": "33.64",
+      "totalAnual": "403.57"
+    },
+    {
+      "categoriaId": "60008",
+      "categoria": "Despesas Não Classificadas",
+      "descricao": "Comissao E Parcerias",
+      "janeiro": "4.30",
+      "fevereiro": "4.30",
+      "marco": "4.30",
+      "totalAnual": "51.60"
+    },
+    {
+      "categoriaId": "60008",
+      "categoria": "Despesas Não Classificadas",
+      "descricao": "Receita Financeira (Credito)",
+      "janeiro": "8.25",
+      "fevereiro": "8.25",
+      "marco": "8.24",
+      "totalAnual": "98.99"
+    },
+    {
+      "categoriaId": "60008",
+      "categoria": "Despesas Não Classificadas",
+      "descricao": "Materiais De Informatica",
+      "janeiro": "45.62",
+      "fevereiro": "45.62",
+      "marco": "45.61",
+      "totalAnual": "547.43"
+    },
+    {
+      "categoriaId": "60008",
+      "categoria": "Despesas Não Classificadas",
+      "descricao": "Materiais De Escritorio",
+      "janeiro": "16.66",
+      "fevereiro": "16.66",
+      "marco": "16.67",
+      "totalAnual": "199.93"
+    },
+    {
+      "categoriaId": "30013",
+      "categoria": "Diretoria",
+      "descricao": "Retirada Socio",
+      "janeiro": "17148.98",
+      "fevereiro": "17148.98",
+      "marco": "17148.98",
+      "totalAnual": "205787.76"
+    },
+    {
+      "categoriaId": "30003",
+      "categoria": "Encargos",
+      "descricao": "Fgts",
+      "janeiro": "1843.00",
+      "fevereiro": "1843.00",
+      "marco": "1687.16",
+      "totalAnual": "17051.20"
+    },
+    {
+      "categoriaId": "30003",
+      "categoria": "Encargos",
+      "descricao": "Inss",
+      "janeiro": "6708.03",
+      "fevereiro": "6708.03",
+      "marco": "6166.49",
+      "totalAnual": "62896.13"
+    },
+    {
+      "categoriaId": "30014",
+      "categoria": "Imobilizado",
+      "descricao": "Consorcios",
+      "janeiro": "861.42",
+      "fevereiro": "861.42",
+      "marco": "861.42",
+      "totalAnual": "10337.04"
+    },
+    {
+      "categoriaId": "30014",
+      "categoria": "Imobilizado",
+      "descricao": "Equipamentos De Informatica",
+      "janeiro": "2233.46",
+      "fevereiro": "2233.46",
+      "marco": "1935.11",
+      "totalAnual": "10551.25"
+    },
+    {
+      "categoriaId": "30014",
+      "categoria": "Imobilizado",
+      "descricao": "Moveis E Utensilios",
+      "janeiro": "239.99",
+      "fevereiro": "239.99",
+      "marco": "0.00",
+      "totalAnual": "479.98"
+    },
+    {
+      "categoriaId": "60007",
+      "categoria": "Investimentos e Melhorias",
+      "descricao": "Benfeitorias",
+      "janeiro": "198.90",
+      "fevereiro": "198.90",
+      "marco": "198.90",
+      "totalAnual": "2386.80"
+    },
+    {
+      "categoriaId": "60007",
+      "categoria": "Investimentos e Melhorias",
+      "descricao": "Desenvolvimento De Software",
+      "janeiro": "3960.61",
+      "fevereiro": "3960.61",
+      "marco": "3960.61",
+      "totalAnual": "47527.32"
+    },
+    {
+      "categoriaId": "30015",
+      "categoria": "Liquidação de Empréstimo",
+      "descricao": "Amortizacao De Emprestimo",
+      "janeiro": "58476.30",
+      "fevereiro": "59787.67",
+      "marco": "57498.24",
+      "totalAnual": "869329.51"
+    },
+    {
+      "categoriaId": "60005",
+      "categoria": "Movimentações Financeiras",
+      "descricao": "Encargos De Atraso",
+      "janeiro": "123.09",
+      "fevereiro": "123.09",
+      "marco": "123.10",
+      "totalAnual": "1477.09"
+    },
+    {
+      "categoriaId": "60005",
+      "categoria": "Movimentações Financeiras",
+      "descricao": "Juros E Multas",
+      "janeiro": "317.65",
+      "fevereiro": "317.65",
+      "marco": "317.64",
+      "totalAnual": "3811.79"
+    },
+    {
+      "categoriaId": "60005",
+      "categoria": "Movimentações Financeiras",
+      "descricao": "Mutuo Entre Empresas",
+      "janeiro": "13000.00",
+      "fevereiro": "13000.00",
+      "marco": "13000.00",
+      "totalAnual": "156000.00"
+    },
+    {
+      "categoriaId": "60005",
+      "categoria": "Movimentações Financeiras",
+      "descricao": "Fundo De Reserva",
+      "janeiro": "15000.00",
+      "fevereiro": "15000.00",
+      "marco": "15000.00",
+      "totalAnual": "180000.00"
+    },
+    {
+      "categoriaId": "30004",
+      "categoria": "Outros Custos com Pessoal",
+      "descricao": "Uniformes E Acessorios",
+      "janeiro": "350.00",
+      "fevereiro": "350.00",
+      "marco": "350.00",
+      "totalAnual": "4200.00"
+    },
+    {
+      "categoriaId": "30004",
+      "categoria": "Outros Custos com Pessoal",
+      "descricao": "Exames Periodicos/seg. Do Trabalho",
+      "janeiro": "118.30",
+      "fevereiro": "118.30",
+      "marco": "118.30",
+      "totalAnual": "1419.60"
+    },
+    {
+      "categoriaId": "30002",
+      "categoria": "Salários e Ordenados",
+      "descricao": "Salarios",
+      "janeiro": "20806.53",
+      "fevereiro": "20806.53",
+      "marco": "19175.53",
+      "totalAnual": "196670.86"
+    },
+    {
+      "categoriaId": "30002",
+      "categoria": "Salários e Ordenados",
+      "descricao": "13°salario",
+      "janeiro": "1606.73",
+      "fevereiro": "1606.73",
+      "marco": "1470.87",
+      "totalAnual": "14512.96"
+    },
+    {
+      "categoriaId": "30002",
+      "categoria": "Salários e Ordenados",
+      "descricao": "Ferias",
+      "janeiro": "2142.26",
+      "fevereiro": "2142.26",
+      "marco": "1961.11",
+      "totalAnual": "19350.08"
+    },
+    {
+      "categoriaId": "60006",
+      "categoria": "Tributos Operacionais",
+      "descricao": "Iss",
+      "janeiro": "9787.73",
+      "fevereiro": "9787.73",
+      "marco": "9787.72",
+      "totalAnual": "117452.75"
+    },
+    {
+      "categoriaId": "30016",
+      "categoria": "Tributos, Taxas e Contribuições",
+      "descricao": "Simples Nacional (parcelamento)",
+      "janeiro": "2854.61",
+      "fevereiro": "2881.61",
+      "marco": "2908.61",
+      "totalAnual": "17532.66"
+    },
+    {
+      "categoriaId": "30016",
+      "categoria": "Tributos, Taxas e Contribuições",
+      "descricao": "Entidades De Classe E Associacoes",
+      "janeiro": "599.50",
+      "fevereiro": "626.75",
+      "marco": "626.75",
+      "totalAnual": "7493.75"
+    },
+    {
+      "categoriaId": "30016",
+      "categoria": "Tributos, Taxas e Contribuições",
+      "descricao": "Iptu Tlp",
+      "janeiro": "463.97",
+      "fevereiro": "463.97",
+      "marco": "463.97",
+      "totalAnual": "2783.82"
+    },
+    {
+      "categoriaId": "30016",
+      "categoria": "Tributos, Taxas e Contribuições",
+      "descricao": "Ipva",
+      "janeiro": "3484.78",
+      "fevereiro": "4350.14",
+      "marco": "3484.78",
+      "totalAnual": "21774.04"
+    }
+  ],
+  "messages": [],
+  "stdout": "categoriaId\tcategoria\tdescricao\tjaneiro\tfevereiro\tmarco\ttotalAnual\n30001\tBenefícios\tAssistencia Medica E Odontologica\t718.00\t718.00\t718.00\t8616.00\n30001\tBenefícios\tAuxilio Alimentacao Refeicao\t4039.20\t4039.20\t3915.00\t40181.40\n30001\tBenefícios\tAuxilio Transporte\t1936.00\t1936.00\t717.75\t8896.25\n30001\tBenefícios\tSeguro De Vida\t95.42\t95.42\t95.42\t1145.04\n60003\tCustos com Materiais e Serviços\tEndosso\t2666.67\t2666.67\t2666.66\t32000.03\n60003\tCustos com Materiais e Serviços\tCorreios\t283.56\t283.56\t283.55\t3402.71\n60003\tCustos com Materiais e Serviços\tCursos E Treinamentos\t1317.23\t1317.23\t1317.22\t15806.75\n60003\tCustos com Materiais e Serviços\tOutras Despesas Eventuais\t27501.01\t27501.01\t27501.01\t330012.12\n30005\tCustos com Serviços Contratados\tContratacao Pessoa Juridica\t19800.00\t19800.00\t19800.00\t237600.00\n60002\tCustos Diretos de Projeto\tTransportes E Pedagios\t825.08\t825.08\t825.08\t9900.96\n60002\tCustos Diretos de Projeto\tAplicativos De Transporte\t57.34\t57.34\t57.33\t688.07\n60002\tCustos Diretos de Projeto\tAluguel De Veiculos\t6468.33\t6468.33\t6468.34\t77619.97\n60002\tCustos Diretos de Projeto\tAjuda De Custo Alimentacao\t1770.00\t1770.00\t1770.00\t21240.00\n60002\tCustos Diretos de Projeto\tHospedagem De Campo\t12487.63\t12487.63\t12487.64\t149851.57\n60002\tCustos Diretos de Projeto\tAuxiliar De Campo\t5501.67\t5501.67\t5501.66\t66020.03\n60002\tCustos Diretos de Projeto\tEquipamentos E Ferramentas\t8380.21\t8380.21\t8380.20\t100562.51\n60002\tCustos Diretos de Projeto\tEpi E Seguranca\t493.73\t493.73\t493.74\t5924.77\n60002\tCustos Diretos de Projeto\tViagens Aereas\t3299.94\t3299.94\t3299.93\t39599.27\n60002\tCustos Diretos de Projeto\tViagens Terrestres\t388.23\t388.23\t388.24\t4658.77\n60002\tCustos Diretos de Projeto\tLanches E Refeicoes De Campo\t232.80\t232.80\t232.81\t2793.61\n60002\tCustos Diretos de Projeto\tDespesas De Campo Diversas\t10616.38\t10616.38\t10616.39\t127396.57\n60004\tCustos Trabalhistas Eventuais\tPro-Labore\t1412.13\t1412.13\t1412.14\t16945.57\n60004\tCustos Trabalhistas Eventuais\tFgts Rescisorio\t1874.82\t1874.82\t1874.81\t22497.83\n60004\tCustos Trabalhistas Eventuais\tRescisoes\t1843.11\t1843.11\t1843.12\t22117.33\n30006\tDespesas Administrativas\tLocacao De Equipamentos\t1081.55\t1081.55\t1081.55\t12978.60\n30006\tDespesas Administrativas\tReunioes E Confraternizacoes\t332.32\t332.32\t332.31\t3987.83\n30006\tDespesas Administrativas\tSeguros\t2847.82\t2480.50\t2480.50\t28645.76\n30007\tDespesas com Aluguéis e Condomínios\tCondominios\t549.40\t549.40\t549.40\t6592.80\n30007\tDespesas com Aluguéis e Condomínios\tAlugueis\t178.80\t178.80\t178.80\t536.40\n30008\tDespesas com Serviços\tServicos De Gestao E Consultoria\t7500.00\t7500.00\t7500.00\t90000.00\n30008\tDespesas com Serviços\tServicos Contabeis\t6140.04\t6140.04\t6140.04\t79820.52\n30008\tDespesas com Serviços\tServicos Graficos\t1200.00\t1200.00\t1200.00\t14400.00\n30008\tDespesas com Serviços\tServicos De Manutencao\t500.00\t500.00\t500.00\t6000.00\n30008\tDespesas com Serviços\tServicos De Limpeza E Conservacao De Bens\t990.00\t990.00\t990.00\t11880.00\n30008\tDespesas com Serviços\tServicos Advocaticios\t6667.00\t6667.00\t6667.00\t80004.00\n30008\tDespesas com Serviços\tServicos Administrativos\t75800.00\t75800.00\t75800.00\t957600.00\n30008\tDespesas com Serviços\tReunioes E Confraternizaçoes\t2500.00\t2500.00\t2500.00\t30000.00\n30008\tDespesas com Serviços\tFeiras Exposicoes Congressos E Conferencias\t3333.33\t3333.33\t3333.33\t42916.63\n30009\tDespesas com Veículos\tManutencao E Reparo De Veiculos\t5181.67\t5181.67\t5181.66\t62180.03\n30009\tDespesas com Veículos\tLicenciamento De Veiculos\t283.36\t283.36\t283.36\t3400.32\n30009\tDespesas com Veículos\tCombustivel E Lubrificantes\t480.00\t480.00\t480.00\t5760.00\n30009\tDespesas com Veículos\tLavagem De Veiculos\t334.67\t334.67\t334.66\t4016.03\n30010\tDespesas de Consumo\tEnergia Eletrica\t1000.00\t1000.00\t1000.00\t12000.00\n30010\tDespesas de Consumo\tAgua E Esgoto\t150.00\t150.00\t150.00\t1800.00\n30010\tDespesas de Consumo\tLanches E Refeicoes\t800.00\t800.00\t800.00\t9600.00\n30010\tDespesas de Consumo\tMateriais De Limpeza/higiene\t500.00\t500.00\t500.00\t6000.00\n30010\tDespesas de Consumo\tTelefone E Internet\t796.25\t802.77\t802.77\t8847.77\n30011\tDespesas Financeiras\tAnuidade Cartao De Credito\t37.50\t37.50\t37.50\t450.00\n30011\tDespesas Financeiras\tDespesas Bancarias\t602.13\t602.13\t602.13\t7225.56\n30012\tDespesas Gerais\tLicenca De Softwares\t11370.45\t11370.45\t11370.45\t125764.65\n30012\tDespesas Gerais\tCertificados Digitais\t41.66\t41.66\t41.66\t499.92\n60008\tDespesas Não Classificadas\tNao Categorizado\t4531.88\t4531.88\t4531.88\t54382.56\n60008\tDespesas Não Classificadas\tUtensilios Administrativos\t33.63\t33.63\t33.64\t403.57\n60008\tDespesas Não Classificadas\tComissao E Parcerias\t4.30\t4.30\t4.30\t51.60\n60008\tDespesas Não Classificadas\tReceita Financeira (Credito)\t8.25\t8.25\t8.24\t98.99\n60008\tDespesas Não Classificadas\tMateriais De Informatica\t45.62\t45.62\t45.61\t547.43\n60008\tDespesas Não Classificadas\tMateriais De Escritorio\t16.66\t16.66\t16.67\t199.93\n30013\tDiretoria\tRetirada Socio\t17148.98\t17148.98\t17148.98\t205787.76\n30003\tEncargos\tFgts\t1843.00\t1843.00\t1687.16\t17051.20\n30003\tEncargos\tInss\t6708.03\t6708.03\t6166.49\t62896.13\n30014\tImobilizado\tConsorcios\t861.42\t861.42\t861.42\t10337.04\n30014\tImobilizado\tEquipamentos De Informatica\t2233.46\t2233.46\t1935.11\t10551.25\n30014\tImobilizado\tMoveis E Utensilios\t239.99\t239.99\t0.00\t479.98\n60007\tInvestimentos e Melhorias\tBenfeitorias\t198.90\t198.90\t198.90\t2386.80\n60007\tInvestimentos e Melhorias\tDesenvolvimento De Software\t3960.61\t3960.61\t3960.61\t47527.32\n30015\tLiquidação de Empréstimo\tAmortizacao De Emprestimo\t58476.30\t59787.67\t57498.24\t869329.51\n60005\tMovimentações Financeiras\tEncargos De Atraso\t123.09\t123.09\t123.10\t1477.09\n60005\tMovimentações Financeiras\tJuros E Multas\t317.65\t317.65\t317.64\t3811.79\n60005\tMovimentações Financeiras\tMutuo Entre Empresas\t13000.00\t13000.00\t13000.00\t156000.00\n60005\tMovimentações Financeiras\tFundo De Reserva\t15000.00\t15000.00\t15000.00\t180000.00\n30004\tOutros Custos com Pessoal\tUniformes E Acessorios\t350.00\t350.00\t350.00\t4200.00\n30004\tOutros Custos com Pessoal\tExames Periodicos/seg. Do Trabalho\t118.30\t118.30\t118.30\t1419.60\n30002\tSalários e Ordenados\tSalarios\t20806.53\t20806.53\t19175.53\t196670.86\n30002\tSalários e Ordenados\t13°salario\t1606.73\t1606.73\t1470.87\t14512.96\n30002\tSalários e Ordenados\tFerias\t2142.26\t2142.26\t1961.11\t19350.08\n60006\tTributos Operacionais\tIss\t9787.73\t9787.73\t9787.72\t117452.75\n30016\tTributos, Taxas e Contribuições\tSimples Nacional (parcelamento)\t2854.61\t2881.61\t2908.61\t17532.66\n30016\tTributos, Taxas e Contribuições\tEntidades De Classe E Associacoes\t599.50\t626.75\t626.75\t7493.75\n30016\tTributos, Taxas e Contribuições\tIptu Tlp\t463.97\t463.97\t463.97\t2783.82\n30016\tTributos, Taxas e Contribuições\tIpva\t3484.78\t4350.14\t3484.78\t21774.04\n",
+  "stderr": "",
+  "execution_time_ms": 362
+}

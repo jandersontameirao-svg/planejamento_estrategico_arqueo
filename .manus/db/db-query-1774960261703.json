@@ -1,0 +1,88 @@
+{
+  "query": "SELECT id, descricao, categoriaId, valorConvertidoBase FROM orcamento_executado_linhas WHERE empresaId = 660003 AND categoriaId = 4;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT id, descricao, categoriaId, valorConvertidoBase FROM orcamento_executado_linhas WHERE empresaId = 660003 AND categoriaId = 4;",
+  "rows": [
+    {
+      "id": "30009",
+      "descricao": "Despesas Com Serviços - Serviços Administrativos",
+      "categoriaId": "4",
+      "valorConvertidoBase": "18000.00"
+    },
+    {
+      "id": "30010",
+      "descricao": "Despesas Com Serviços - Serviços Contábeis",
+      "categoriaId": "4",
+      "valorConvertidoBase": "2328.50"
+    },
+    {
+      "id": "30011",
+      "descricao": "Despesas Com Serviços - Serviços de Manutenção",
+      "categoriaId": "4",
+      "valorConvertidoBase": "2200.00"
+    },
+    {
+      "id": "30012",
+      "descricao": "Custos Com Materiais e Serviços - Serviços Gráficos",
+      "categoriaId": "4",
+      "valorConvertidoBase": "615.00"
+    },
+    {
+      "id": "30013",
+      "descricao": "Custos Com Materiais e Serviços - Equipamentos Manuais (ferramentas)",
+      "categoriaId": "4",
+      "valorConvertidoBase": "135.70"
+    },
+    {
+      "id": "30014",
+      "descricao": "Custos Com Materiais e Serviços - Utensílios",
+      "categoriaId": "4",
+      "valorConvertidoBase": "54.50"
+    },
+    {
+      "id": "30015",
+      "descricao": "Custos Com Serviços Contratados - Contratação de Pessoa Jurídica",
+      "categoriaId": "4",
+      "valorConvertidoBase": "26500.00"
+    },
+    {
+      "id": "30016",
+      "descricao": "Custos Com Serviços Contratados - Auxiliar de Campo",
+      "categoriaId": "4",
+      "valorConvertidoBase": "18762.00"
+    },
+    {
+      "id": "30017",
+      "descricao": "Custos Com Serviços Contratados - Cursos e Treinamentos",
+      "categoriaId": "4",
+      "valorConvertidoBase": "250.00"
+    },
+    {
+      "id": "30024",
+      "descricao": "Custos Com Viagens e Deslocamento - Hospedagem",
+      "categoriaId": "4",
+      "valorConvertidoBase": "38300.00"
+    },
+    {
+      "id": "30025",
+      "descricao": "Custos Com Viagens e Deslocamento - Ajuda de Custo",
+      "categoriaId": "4",
+      "valorConvertidoBase": "11548.34"
+    },
+    {
+      "id": "30026",
+      "descricao": "Custos Com Viagens e Deslocamento - Lanches e Refeições",
+      "categoriaId": "4",
+      "valorConvertidoBase": "4326.95"
+    },
+    {
+      "id": "30027",
+      "descricao": "Custos Com Viagens e Deslocamentos - Viagens Terrestres",
+      "categoriaId": "4",
+      "valorConvertidoBase": "2609.49"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tdescricao\tcategoriaId\tvalorConvertidoBase\n30009\tDespesas Com Serviços - Serviços Administrativos\t4\t18000.00\n30010\tDespesas Com Serviços - Serviços Contábeis\t4\t2328.50\n30011\tDespesas Com Serviços - Serviços de Manutenção\t4\t2200.00\n30012\tCustos Com Materiais e Serviços - Serviços Gráficos\t4\t615.00\n30013\tCustos Com Materiais e Serviços - Equipamentos Manuais (ferramentas)\t4\t135.70\n30014\tCustos Com Materiais e Serviços - Utensílios\t4\t54.50\n30015\tCustos Com Serviços Contratados - Contratação de Pessoa Jurídica\t4\t26500.00\n30016\tCustos Com Serviços Contratados - Auxiliar de Campo\t4\t18762.00\n30017\tCustos Com Serviços Contratados - Cursos e Treinamentos\t4\t250.00\n30024\tCustos Com Viagens e Deslocamento - Hospedagem\t4\t38300.00\n30025\tCustos Com Viagens e Deslocamento - Ajuda de Custo\t4\t11548.34\n30026\tCustos Com Viagens e Deslocamento - Lanches e Refeições\t4\t4326.95\n30027\tCustos Com Viagens e Deslocamentos - Viagens Terrestres\t4\t2609.49\n",
+  "stderr": "",
+  "execution_time_ms": 352
+}

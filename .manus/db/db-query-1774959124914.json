@@ -1,0 +1,45 @@
+{
+  "query": "SELECT importacaoId, competencia, descricao, valorOriginal, categoriaId FROM orcamento_executado_linhas WHERE empresaId = 1 LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT importacaoId, competencia, descricao, valorOriginal, categoriaId FROM orcamento_executado_linhas WHERE empresaId = 1 LIMIT 5;",
+  "rows": [
+    {
+      "importacaoId": "2",
+      "competencia": "2026-01",
+      "descricao": "Amortizacao De Emprestimo",
+      "valorOriginal": "55960.49",
+      "categoriaId": "30015"
+    },
+    {
+      "importacaoId": "2",
+      "competencia": "2026-02",
+      "descricao": "Amortizacao De Emprestimo",
+      "valorOriginal": "55960.49",
+      "categoriaId": "30015"
+    },
+    {
+      "importacaoId": "2",
+      "competencia": "2026-03",
+      "descricao": "Amortizacao De Emprestimo",
+      "valorOriginal": "55960.49",
+      "categoriaId": "30015"
+    },
+    {
+      "importacaoId": "2",
+      "competencia": "2026-01",
+      "descricao": "Servicos Administrativos",
+      "valorOriginal": "45023.65",
+      "categoriaId": "30008"
+    },
+    {
+      "importacaoId": "2",
+      "competencia": "2026-02",
+      "descricao": "Servicos Administrativos",
+      "valorOriginal": "45023.65",
+      "categoriaId": "30008"
+    }
+  ],
+  "messages": [],
+  "stdout": "importacaoId\tcompetencia\tdescricao\tvalorOriginal\tcategoriaId\n2\t2026-01\tAmortizacao De Emprestimo\t55960.49\t30015\n2\t2026-02\tAmortizacao De Emprestimo\t55960.49\t30015\n2\t2026-03\tAmortizacao De Emprestimo\t55960.49\t30015\n2\t2026-01\tServicos Administrativos\t45023.65\t30008\n2\t2026-02\tServicos Administrativos\t45023.65\t30008\n",
+  "stderr": "",
+  "execution_time_ms": 377
+}

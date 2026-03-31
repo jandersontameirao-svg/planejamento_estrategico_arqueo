@@ -1,0 +1,52 @@
+{
+  "query": "SELECT empresaId, competencia, COUNT(*) as linhas, SUM(valorConvertidoBase) as total FROM orcamento_executado_linhas GROUP BY empresaId, competencia ORDER BY empresaId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT empresaId, competencia, COUNT(*) as linhas, SUM(valorConvertidoBase) as total FROM orcamento_executado_linhas GROUP BY empresaId, competencia ORDER BY empresaId;",
+  "rows": [
+    {
+      "empresaId": "1",
+      "competencia": "2026-03",
+      "linhas": "80",
+      "total": "355718.23"
+    },
+    {
+      "empresaId": "1",
+      "competencia": "2026-01",
+      "linhas": "80",
+      "total": "355718.26"
+    },
+    {
+      "empresaId": "1",
+      "competencia": "2026-02",
+      "linhas": "80",
+      "total": "355718.26"
+    },
+    {
+      "empresaId": "660003",
+      "competencia": "2026-03",
+      "linhas": "27",
+      "total": "235487.74"
+    },
+    {
+      "empresaId": "660004",
+      "competencia": "2026-02",
+      "linhas": "12",
+      "total": "8818.05"
+    },
+    {
+      "empresaId": "660004",
+      "competencia": "2026-03",
+      "linhas": "12",
+      "total": "8818.05"
+    },
+    {
+      "empresaId": "660004",
+      "competencia": "2026-01",
+      "linhas": "12",
+      "total": "8818.05"
+    }
+  ],
+  "messages": [],
+  "stdout": "empresaId\tcompetencia\tlinhas\ttotal\n1\t2026-03\t80\t355718.23\n1\t2026-01\t80\t355718.26\n1\t2026-02\t80\t355718.26\n660003\t2026-03\t27\t235487.74\n660004\t2026-02\t12\t8818.05\n660004\t2026-03\t12\t8818.05\n660004\t2026-01\t12\t8818.05\n",
+  "stderr": "",
+  "execution_time_ms": 378
+}

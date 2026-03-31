@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE orcamento_executado_linhas SET categoriaId = 30008 WHERE id IN (30009, 30010, 30011, 30012, 30013, 30014, 30017);\nUPDATE orcamento_executado_linhas SET categoriaId = 60002 WHERE id IN (30015, 30016, 30024, 30025, 30026, 30027);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute UPDATE orcamento_executado_linhas SET categoriaId = 30008 WHERE id IN (30009, 30010, 30011, 30012, 30013, 30014, 30017);\nUPDATE orcamento_executado_linhas SET categoriaId = 60002 WHERE id IN (30015, 30016, 30024, 30025, 30026, 30027);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 422
+}

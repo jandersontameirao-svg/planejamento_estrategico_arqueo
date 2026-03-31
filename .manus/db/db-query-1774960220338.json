@@ -1,0 +1,64 @@
+{
+  "query": "SELECT subcategoriaId, categoriaId, COUNT(*) as linhas, SUM(valorConvertidoBase) as total FROM orcamento_executado_linhas WHERE empresaId = 660003 GROUP BY subcategoriaId, categoriaId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4X2C2Km2DVLwNTk.c1886cf7bd86 --database GdPAuRogRcNPzV7ENB2n8s --execute SELECT subcategoriaId, categoriaId, COUNT(*) as linhas, SUM(valorConvertidoBase) as total FROM orcamento_executado_linhas WHERE empresaId = 660003 GROUP BY subcategoriaId, categoriaId;",
+  "rows": [
+    {
+      "subcategoriaId": "NULL",
+      "categoriaId": "3",
+      "linhas": "1",
+      "total": "110.00"
+    },
+    {
+      "subcategoriaId": "NULL",
+      "categoriaId": "60006",
+      "linhas": "3",
+      "total": "16469.11"
+    },
+    {
+      "subcategoriaId": "NULL",
+      "categoriaId": "60003",
+      "linhas": "3",
+      "total": "19226.84"
+    },
+    {
+      "subcategoriaId": "NULL",
+      "categoriaId": "60008",
+      "linhas": "2",
+      "total": "9064.22"
+    },
+    {
+      "subcategoriaId": "NULL",
+      "categoriaId": "60004",
+      "linhas": "1",
+      "total": "4808.24"
+    },
+    {
+      "subcategoriaId": "NULL",
+      "categoriaId": "60005",
+      "linhas": "1",
+      "total": "50000.00"
+    },
+    {
+      "subcategoriaId": "NULL",
+      "categoriaId": "4",
+      "linhas": "13",
+      "total": "125630.48"
+    },
+    {
+      "subcategoriaId": "NULL",
+      "categoriaId": "7",
+      "linhas": "2",
+      "total": "721.98"
+    },
+    {
+      "subcategoriaId": "NULL",
+      "categoriaId": "60002",
+      "linhas": "1",
+      "total": "9456.87"
+    }
+  ],
+  "messages": [],
+  "stdout": "subcategoriaId\tcategoriaId\tlinhas\ttotal\nNULL\t3\t1\t110.00\nNULL\t60006\t3\t16469.11\nNULL\t60003\t3\t19226.84\nNULL\t60008\t2\t9064.22\nNULL\t60004\t1\t4808.24\nNULL\t60005\t1\t50000.00\nNULL\t4\t13\t125630.48\nNULL\t7\t2\t721.98\nNULL\t60002\t1\t9456.87\n",
+  "stderr": "",
+  "execution_time_ms": 372
+}
