@@ -1500,3 +1500,7 @@
 - [x] Vincular 27 linhas de executado às subcategorias (27/27)
 - [x] Vincular 27 linhas de planejado às mesmas subcategorias (27/27)
 - [x] Verificar: 0 linhas sem subcategoria em executado e planejado
+
+## Renomear Unidade e Vincular Empresa
+- [x] Renomear unidade "Vinhos 24 horas BSB" para "Foods and Drinks" (areaId=30003)
+- [x] Criar empresa "Vinho 24 Horas BSB" (id=780003) e vincular à unidade "Foods and Drinks"
