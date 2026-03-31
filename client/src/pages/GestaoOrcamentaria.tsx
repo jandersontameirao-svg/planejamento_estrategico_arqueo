@@ -15,7 +15,7 @@ import PageHeader from "@/components/PageHeader";
 import {
   DollarSign, TrendingUp, TrendingDown, BarChart3, Upload,
   Plus, Settings, Copy, Lock, CheckCircle, FileText, AlertTriangle,
-  ChevronRight, RefreshCw, Brain, Target, GitCompare
+  ChevronRight, RefreshCw, Brain, Target, GitCompare, ShieldAlert
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -29,6 +29,7 @@ import RelatorioOrcamentario from "./RelatorioOrcamentario";
 import AnaliseOrcamentaria from "./AnaliseOrcamentaria";
 import ComparativoVersoes from "./ComparativoVersoes";
 import DashboardReceita from "./DashboardReceita";
+import PainelRiscosClausulas from "./PainelRiscosClausulas";
 
 interface GestaoOrcamentariaProps {
   empresaId: number;
@@ -309,6 +310,9 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
             <TabsTrigger value="financeiro">
               <TrendingUp className="h-4 w-4 mr-1" /> Financeiro
             </TabsTrigger>
+            <TabsTrigger value="riscos">
+              <ShieldAlert className="h-4 w-4 mr-1" /> Riscos
+            </TabsTrigger>
             <TabsTrigger value="analise-ia">
               <Brain className="h-4 w-4 mr-1" /> IA
             </TabsTrigger>
@@ -449,6 +453,10 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
           {/* Análise IA */}
           <TabsContent value="financeiro" className="mt-6">
             <DashboardReceita empresaId={empresaId} />
+          </TabsContent>
+
+          <TabsContent value="riscos" className="mt-6">
+            <PainelRiscosClausulas empresaId={empresaId} />
           </TabsContent>
 
           <TabsContent value="analise-ia" className="mt-6">

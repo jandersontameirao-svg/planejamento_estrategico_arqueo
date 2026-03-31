@@ -1453,3 +1453,16 @@
 - [x] Visualização de cláusulas-chave extraídas
 - [x] Revisão obrigatória antes de salvar
 - [x] Testes vitest: 7 testes passando
+
+## Painel de Visualização de Riscos e Cláusulas-Chave
+- [x] Backend: getPainelRiscos (por severidade, categoria, status, empresa, mapa de calor)
+- [x] Backend: getPainelClausulas (por tipo, contrato, empresa)
+- [x] Frontend: Dashboard de riscos com gráficos (pizza severidade, barras categoria)
+- [x] Frontend: Mapa de calor de riscos (probabilidade x impacto) com 9 células
+- [x] Frontend: Listagem de cláusulas-chave agrupadas por tipo com badges
+- [x] Frontend: Filtros por empresa e status
+- [x] Frontend: KPIs de risco (total, críticos, sem mitigação, gerados por IA)
+- [x] Frontend: Tabela detalhada de riscos com contrato, severidade, status e ações
+- [x] Frontend: 2 sub-abas (Riscos e Cláusulas)
+- [x] Integrado como aba "Riscos" na GestaoOrcamentaria (11 abas)
+- [x] Testes vitest: 10 testes passando

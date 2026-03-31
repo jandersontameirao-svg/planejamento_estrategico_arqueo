@@ -676,3 +676,166 @@ export async function getResultadoOperacional(empresaId: number, ano?: number) {
     },
   };
 }
+
+
+// ─── PAINEL DE RISCOS E CLÁUSULAS ─────────────────────────────────────────
+
+export async function getPainelRiscos(empresaId?: number) {
+  const db = (await getDb())!;
+
+  // Buscar todos os riscos com dados do contrato
+  const baseQuery = db
+    .select({
+      riscoId: contratosRiscos.id,
+      titulo: contratosRiscos.titulo,
+      descricao: contratosRiscos.descricao,
+      categoria: contratosRiscos.categoria,
+      probabilidade: contratosRiscos.probabilidade,
+      impacto: contratosRiscos.impacto,
+      severidade: contratosRiscos.severidade,
+      status: contratosRiscos.status,
+      planoMitigacao: contratosRiscos.planoMitigacao,
+      dataIdentificacao: contratosRiscos.dataIdentificacao,
+      dataRevisao: contratosRiscos.dataRevisao,
+      geradoPorIA: contratosRiscos.geradoPorIA,
+      createdAt: contratosRiscos.createdAt,
+      contratoId: contratos.id,
+      contratoTitulo: contratos.titulo,
+      contratoNumero: contratos.numero,
+      contratoStatus: contratos.status,
+      contratoValor: contratos.valorTotal,
+      empresaId: contratos.empresaId,
+      empresaNome: empresas.nome,
+    })
+    .from(contratosRiscos)
+    .innerJoin(contratos, eq(contratosRiscos.contratoId, contratos.id))
+    .innerJoin(empresas, eq(contratos.empresaId, empresas.id));
+
+  const riscos = empresaId
+    ? await baseQuery.where(eq(contratos.empresaId, empresaId)).orderBy(desc(contratosRiscos.createdAt))
+    : await baseQuery.orderBy(desc(contratosRiscos.createdAt));
+
+  // Estatísticas por severidade
+  const porSeveridade = { baixa: 0, media: 0, alta: 0, critica: 0 };
+  const porCategoria: Record<string, number> = {};
+  const porStatus: Record<string, number> = {};
+  const porEmpresa: Record<string, number> = {};
+  // Mapa de calor: probabilidade x impacto
+  const mapaCalor: Record<string, number> = {};
+
+  for (const r of riscos) {
+    porSeveridade[r.severidade as keyof typeof porSeveridade]++;
+    porCategoria[r.categoria] = (porCategoria[r.categoria] || 0) + 1;
+    porStatus[r.status] = (porStatus[r.status] || 0) + 1;
+    porEmpresa[r.empresaNome] = (porEmpresa[r.empresaNome] || 0) + 1;
+    const chaveCalor = `${r.probabilidade}_${r.impacto}`;
+    mapaCalor[chaveCalor] = (mapaCalor[chaveCalor] || 0) + 1;
+  }
+
+  // Riscos críticos que precisam de atenção
+  const riscosCriticos = riscos.filter(
+    (r: typeof riscos[number]) => r.severidade === "critica" || (r.severidade === "alta" && r.status === "identificado")
+  );
+
+  // Riscos sem plano de mitigação
+  const riscosSemMitigacao = riscos.filter(
+    (r: typeof riscos[number]) => !r.planoMitigacao && r.status !== "mitigado" && r.status !== "aceito"
+  );
+
+  // Riscos gerados por IA vs manual
+  const geradosIA = riscos.filter((r: typeof riscos[number]) => r.geradoPorIA).length;
+  const geradosManuais = riscos.length - geradosIA;
+
+  return {
+    total: riscos.length,
+    riscos,
+    porSeveridade,
+    porCategoria,
+    porStatus,
+    porEmpresa,
+    mapaCalor,
+    riscosCriticos,
+    riscosSemMitigacao,
+    geradosIA,
+    geradosManuais,
+  };
+}
+
+export async function getPainelClausulas(empresaId?: number) {
+  const db = (await getDb())!;
+
+  // Buscar contratos com dados extraídos por IA (campo dadosExtradosIA contém cláusulas)
+  const baseQuery = db
+    .select({
+      contratoId: contratos.id,
+      contratoTitulo: contratos.titulo,
+      contratoNumero: contratos.numero,
+      contratoStatus: contratos.status,
+      contratoValor: contratos.valorTotal,
+      empresaId: contratos.empresaId,
+      empresaNome: empresas.nome,
+      dadosExtradosIA: contratos.dadosExtradosIA,
+      resumoIA: contratos.resumoIA,
+    })
+    .from(contratos)
+    .innerJoin(empresas, eq(contratos.empresaId, empresas.id));
+
+  const contratosComDados = empresaId
+    ? await baseQuery.where(eq(contratos.empresaId, empresaId))
+    : await baseQuery;
+
+  // Extrair cláusulas de cada contrato
+  const clausulasExtraidas: Array<{
+    contratoId: number;
+    contratoTitulo: string;
+    contratoNumero: string | null;
+    empresaNome: string;
+    tipo: string;
+    descricao: string;
+    relevancia: string;
+  }> = [];
+
+  const porTipo: Record<string, number> = {};
+  const porRelevancia: Record<string, number> = {};
+  let totalContratosAnalisados = 0;
+
+  for (const c of contratosComDados) {
+    if (!c.dadosExtradosIA) continue;
+    totalContratosAnalisados++;
+
+    try {
+      const dados = JSON.parse(c.dadosExtradosIA);
+      const clausulas = dados.clausulasChave || dados.clausulas || [];
+
+      for (const cl of clausulas) {
+        const tipo = cl.tipo || cl.category || "geral";
+        const descricao = cl.descricao || cl.texto || cl.description || String(cl);
+        const relevancia = cl.relevancia || cl.importance || "media";
+
+        clausulasExtraidas.push({
+          contratoId: c.contratoId,
+          contratoTitulo: c.contratoTitulo,
+          contratoNumero: c.contratoNumero,
+          empresaNome: c.empresaNome,
+          tipo,
+          descricao,
+          relevancia,
+        });
+
+        porTipo[tipo] = (porTipo[tipo] || 0) + 1;
+        porRelevancia[relevancia] = (porRelevancia[relevancia] || 0) + 1;
+      }
+    } catch {
+      // JSON inválido, ignorar
+    }
+  }
+
+  return {
+    totalContratos: contratosComDados.length,
+    totalContratosAnalisados,
+    totalClausulas: clausulasExtraidas.length,
+    clausulas: clausulasExtraidas,
+    porTipo,
+    porRelevancia,
+  };
+}

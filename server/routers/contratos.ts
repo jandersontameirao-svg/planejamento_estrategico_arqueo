@@ -42,6 +42,8 @@ import {
   desvincularClienteEmpresa,
   getDashboardReceita,
   getResultadoOperacional,
+  getPainelRiscos,
+  getPainelClausulas,
 } from "../contratos.db";
 
 function parseContent(content: string | unknown): unknown {
@@ -984,4 +986,17 @@ Retorne APENAS JSON válido.`,
         return await getAuditoriaGeral(input.limit);
       }),
   }),
+
+  // ── PAINEL DE RISCOS E CLÁUSULAS ──────────────────────────────────────────
+  painelRiscos: protectedProcedure
+    .input(z.object({ empresaId: z.number().optional() }))
+    .query(async ({ input }) => {
+      return await getPainelRiscos(input.empresaId);
+    }),
+
+  painelClausulas: protectedProcedure
+    .input(z.object({ empresaId: z.number().optional() }))
+    .query(async ({ input }) => {
+      return await getPainelClausulas(input.empresaId);
+    }),
 });
