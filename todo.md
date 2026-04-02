@@ -1509,3 +1509,8 @@
 - [x] Extrair dados do site arqueoproject.com.br
 - [x] Estruturar missão, visão, valores e política organizacional
 - [x] Preencher identidade organizacional no banco de dados (empresaId=1)
+
+## Bug Fix: React key prop no RelatorioOrcamentario
+- [x] Localizar o componente RelatorioOrcamentario que estava gerando o erro
+- [x] Adicionar key prop única nos 4 Fragments (linhas 418, 555, 672, 717)
+- [x] Importar React e testar - 0 erros TypeScript

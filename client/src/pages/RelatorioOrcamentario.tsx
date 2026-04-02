@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -415,9 +415,8 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
                       if (catPlan === 0 && catExec === 0) return null;
 
                       return (
-                        <>{/* Fragment */}
+                        <React.Fragment key={`cat-mensal-${cat.categoriaId}`}>
                           <TableRow
-                            key={`cat-${cat.categoriaId}`}
                             className="cursor-pointer hover:bg-muted/30 font-semibold bg-muted/20"
                             onClick={() => toggleCat(cat.categoriaId)}
                           >
@@ -465,7 +464,7 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
                               </TableRow>
                             );
                           })}
-                        </>
+                        </React.Fragment>
                       );
                     })}
                     {/* Linha de totais */}
@@ -553,9 +552,8 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
                     {relatorio.categorias.map((cat: any) => {
                       const isExpanded = expandedCats.has(cat.categoriaId);
                       return (
-                        <>
+                        <React.Fragment key={`cat-anual-${cat.categoriaId}`}>
                           <TableRow
-                            key={`cat-${cat.categoriaId}`}
                             className="cursor-pointer hover:bg-muted/30 font-semibold bg-muted/20"
                             onClick={() => toggleCat(cat.categoriaId)}
                           >
@@ -594,7 +592,7 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
                               </TableCell>
                             </TableRow>
                           ))}
-                        </>
+                        </React.Fragment>
                       );
                     })}
                     {relatorio.totais && (
@@ -671,8 +669,8 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
                   </TableHeader>
                   <TableBody>
                     {relatorio.categorias.map((cat: any) => (
-                      <>
-                        <TableRow key={`cat-prev-${cat.categoriaId}`} className="bg-blue-50/40">
+                      <React.Fragment key={`cat-evolucao-${cat.categoriaId}`}>
+                        <TableRow className="bg-blue-50/40">
                           <TableCell className="font-semibold sticky left-0 bg-blue-50/40 z-10 text-sm" rowSpan={1}>
                             {cat.categoriaNome}
                           </TableCell>
@@ -712,11 +710,11 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
                             <VariacaoIndicator variacao={cat.totalVariacao} percentual={cat.totalPercentual} />
                           </TableCell>
                         </TableRow>
-                      </>
+                      </React.Fragment>
                     ))}
                     {/* Totais gerais */}
                     {relatorio.totais && (
-                      <>
+                      <React.Fragment key="totais-gerais">
                         <TableRow className="font-bold bg-blue-100/50">
                           <TableCell className="sticky left-0 bg-blue-100/50 z-10">TOTAL GERAL</TableCell>
                           <TableCell className="text-center"><span className="text-[10px] text-blue-600">Prev.</span></TableCell>
@@ -745,7 +743,7 @@ export default function RelatorioOrcamentario({ empresaId, ano }: RelatorioOrcam
                             <VariacaoIndicator variacao={relatorio.totais.totalVariacao} percentual={relatorio.totais.totalPercentual} />
                           </TableCell>
                         </TableRow>
-                      </>
+                      </React.Fragment>
                     )}
                   </TableBody>
                 </Table>
