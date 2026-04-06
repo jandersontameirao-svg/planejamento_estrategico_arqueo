@@ -83,13 +83,13 @@ const clienteSchema = z.object({
 });
 
 const contratoSchema = z.object({
-  numero: z.string().min(1),
+  numero: z.string().min(1).optional(),
   titulo: z.string().min(2),
   descricao: z.string().optional(),
   tipo: z.enum(["servico", "produto", "misto", "consultoria", "manutencao", "outros"]).default("servico"),
   status: z.enum(["rascunho", "ativo", "suspenso", "encerrado", "rescindido"]).default("rascunho"),
   empresaId: z.number(),
-  clienteId: z.number(),
+  clienteId: z.number().optional(),
   responsavelUserId: z.number().optional(),
   aprovadorUserId: z.number().optional(),
   projetoId: z.number().optional(),
