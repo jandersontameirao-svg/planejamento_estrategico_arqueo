@@ -235,7 +235,7 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.razaoSocial.trim()) { toast.error("Razão Social é obrigatória"); return; }
+    if (!form.razaoSocial.trim() && !form.nomeFantasia.trim()) { toast.error("Informe ao menos a Razão Social ou o Nome Fantasia"); return; }
     if (!form.cnpj.trim()) { toast.error("CNPJ é obrigatório"); return; }
     const payload = {
       cnpj: form.cnpj,
@@ -483,12 +483,13 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
             {/* Dados Principais */}
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2">
-                <Label htmlFor="razaoSocial">Razão Social *</Label>
-                <Input id="razaoSocial" value={form.razaoSocial} onChange={e => setField("razaoSocial", e.target.value)} required />
+                <Label htmlFor="razaoSocial">Razão Social</Label>
+                <Input id="razaoSocial" value={form.razaoSocial} onChange={e => setField("razaoSocial", e.target.value)} />
               </div>
               <div>
                 <Label htmlFor="nomeFantasia">Nome Fantasia</Label>
                 <Input id="nomeFantasia" value={form.nomeFantasia} onChange={e => setField("nomeFantasia", e.target.value)} />
+                <p className="text-xs text-muted-foreground mt-1">Informe a Razão Social ou o Nome Fantasia</p>
               </div>
 
               <div>

@@ -55,7 +55,7 @@ function parseContent(content: string | unknown): unknown {
 
 const clienteSchema = z.object({
   cnpj: z.string().min(14),
-  razaoSocial: z.string().min(2),
+  razaoSocial: z.string().optional().default(""),
   nomeFantasia: z.string().optional(),
   email: z.string().email().optional(),
   telefone: z.string().optional(),
