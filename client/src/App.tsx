@@ -46,6 +46,7 @@ import GestaoClienteDetalhe from "./pages/GestaoClienteDetalhe";
 import PlanejamentoEstrategicoArea from "./pages/PlanejamentoEstrategicoArea";
 import DashboardAnalisesArea from "./pages/DashboardAnalisesArea";
 import AprovacaoBoletim from "./pages/AprovacaoBoletim";
+import GestaoRiscos from "./pages/GestaoRiscos";
 
 
 function Router() {
@@ -126,6 +127,9 @@ function Router() {
       <Route path="/gestao-clientes/:id" component={GestaoClienteDetalhe} />
       <Route path="/empresa/:id/clientes">
         {(params) => <GestaoClientes empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/empresa/:id/gestao-riscos">
+        {(params) => <GestaoRiscos />}
       </Route>
       <Route path="/gestao-contratos">{() => { window.location.replace("/empresas"); return null; }}</Route>
       <Route path="/gestao-contratos/novo">{() => { window.location.replace("/empresas"); return null; }}</Route>

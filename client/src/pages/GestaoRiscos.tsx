@@ -1,0 +1,758 @@
+import React, { useState } from "react";
+import { useParams } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertTriangle, Plus, Sparkles, Target, TrendingDown, Shield, ChevronDown, ChevronRight, Trash2, Edit3, CheckCircle2, Clock, AlertCircle, X } from "lucide-react";
+import { toast } from "sonner";
+
+// ─── TIPOS ────────────────────────────────────────────────────────────────────
+
+type Risco = {
+  id: number;
+  empresaId: number;
+  titulo: string;
+  descricao?: string | null;
+  origem: string;
+  categoria: string;
+  probabilidade: string;
+  impacto: string;
+  severidade: string;
+  status: string;
+  responsavel?: string | null;
+  createdAt: Date;
+};
+
+type PlanoAcao = {
+  id: number;
+  riscoId: number;
+  titulo: string;
+  objetivo?: string | null;
+  descricao?: string | null;
+  tipoPrioridade: string;
+  economiaEstimada?: string | null;
+  prazoImplementacao?: string | null;
+  impactoOperacional: string;
+  benchmarking?: string | null;
+  acoes?: any;
+  geradoPorIA?: boolean | null;
+  status: string;
+};
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+
+const SEVERIDADE_COLOR: Record<string, string> = {
+  critica: "bg-red-100 text-red-800 border-red-200",
+  alta: "bg-orange-100 text-orange-800 border-orange-200",
+  media: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  baixa: "bg-green-100 text-green-800 border-green-200",
+};
+
+const SEVERIDADE_DOT: Record<string, string> = {
+  critica: "bg-red-500",
+  alta: "bg-orange-500",
+  media: "bg-yellow-500",
+  baixa: "bg-green-500",
+};
+
+const STATUS_COLOR: Record<string, string> = {
+  identificado: "bg-blue-100 text-blue-800",
+  em_mitigacao: "bg-purple-100 text-purple-800",
+  mitigado: "bg-green-100 text-green-800",
+  materializado: "bg-red-100 text-red-800",
+  aceito: "bg-gray-100 text-gray-800",
+  monitorando: "bg-cyan-100 text-cyan-800",
+};
+
+const ORIGEM_LABEL: Record<string, string> = {
+  orcamentario: "Orçamentário",
+  estrategico: "Estratégico",
+  operacional: "Operacional",
+  contratual: "Contratual",
+  financeiro: "Financeiro",
+  regulatorio: "Regulatório",
+  outro: "Outro",
+};
+
+const TIPO_PRIORIDADE_LABEL: Record<string, string> = {
+  corte_custos: "Corte de Custos",
+  mitigacao: "Mitigação",
+  prevencao: "Prevenção",
+  contingencia: "Contingência",
+  monitoramento: "Monitoramento",
+};
+
+const IMPACTO_OP_COLOR: Record<string, string> = {
+  nenhum: "text-green-600",
+  baixo: "text-yellow-600",
+  medio: "text-orange-600",
+  alto: "text-red-600",
+};
+
+// ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
+
+export default function GestaoRiscos() {
+  const params = useParams<{ empresaId: string }>();
+  const empresaId = parseInt(params.empresaId || "0");
+  const [tabAtiva, setTabAtiva] = useState("dashboard");
+  const [filtroOrigem, setFiltroOrigem] = useState<string>("todos");
+  const [filtroStatus, setFiltroStatus] = useState<string>("todos");
+  const [riscoExpandido, setRiscoExpandido] = useState<number | null>(null);
+  const [modalNovoRisco, setModalNovoRisco] = useState(false);
+  const [modalPlanoIA, setModalPlanoIA] = useState<Risco | null>(null);
+  const [modalEditarRisco, setModalEditarRisco] = useState<Risco | null>(null);
+  const [gerando, setGerando] = useState(false);
+
+  // ── Queries ────────────────────────────────────────────────────────────────
+  const empresa = trpc.empresas.getById.useQuery({ id: empresaId });
+  const resumo = trpc.gestaoRiscos.resumo.useQuery({ empresaId });
+  const riscos = trpc.gestaoRiscos.list.useQuery({
+    empresaId,
+    origem: filtroOrigem !== "todos" ? filtroOrigem as any : undefined,
+    status: filtroStatus !== "todos" ? filtroStatus as any : undefined,
+  });
+
+  // ── Utils ──────────────────────────────────────────────────────────────────
+  const utils = trpc.useUtils();
+  const invalidate = () => {
+    utils.gestaoRiscos.resumo.invalidate({ empresaId });
+    utils.gestaoRiscos.list.invalidate({ empresaId });
+  };
+
+  // ── Mutations ──────────────────────────────────────────────────────────────
+  const criarRisco = trpc.gestaoRiscos.create.useMutation({
+    onSuccess: () => { toast.success("Risco cadastrado com sucesso"); invalidate(); setModalNovoRisco(false); },
+    onError: (e) => toast.error("Erro ao cadastrar risco: " + e.message),
+  });
+
+  const excluirRisco = trpc.gestaoRiscos.delete.useMutation({
+    onSuccess: () => { toast.success("Risco excluído"); invalidate(); },
+    onError: (e) => toast.error("Erro ao excluir: " + e.message),
+  });
+
+  const gerarPlanoIA = trpc.gestaoRiscos.gerarPlanoIA.useMutation({
+    onSuccess: (data) => {
+      toast.success("Plano de Ação gerado pela IA: " + data.plano.titulo);
+      utils.gestaoRiscos.listPlanos.invalidate({ riscoId: modalPlanoIA?.id });
+      setModalPlanoIA(null);
+      setGerando(false);
+    },
+    onError: (e) => {
+      toast.error("Erro ao gerar plano: " + e.message);
+      setGerando(false);
+    },
+  });
+
+  // ── Form novo risco ────────────────────────────────────────────────────────
+  const [formRisco, setFormRisco] = useState({
+    titulo: "", descricao: "", origem: "estrategico", categoria: "financeiro",
+    probabilidade: "media", impacto: "medio", responsavel: "",
+  });
+
+  const handleCriarRisco = () => {
+    if (!formRisco.titulo.trim()) return;
+    criarRisco.mutate({ empresaId, ...formRisco as any });
+  };
+
+  const handleGerarPlanoIA = () => {
+    if (!modalPlanoIA) return;
+    setGerando(true);
+    gerarPlanoIA.mutate({
+      riscoId: modalPlanoIA.id,
+      empresaId,
+      tituloRisco: modalPlanoIA.titulo,
+      descricaoRisco: modalPlanoIA.descricao ?? undefined,
+      origem: modalPlanoIA.origem as any,
+      categoria: modalPlanoIA.categoria as any,
+      probabilidade: modalPlanoIA.probabilidade as any,
+      impacto: modalPlanoIA.impacto as any,
+      severidade: modalPlanoIA.severidade as any,
+      nomeEmpresa: empresa.data?.nome,
+      tipoEmpresa: (empresa.data as any)?.tipoAtuacao,
+    });
+  };
+
+  const r = resumo.data;
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-red-50 rounded-lg">
+            <Shield className="w-6 h-6 text-red-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Gestão de Riscos</h1>
+            <p className="text-sm text-gray-500">{empresa.data?.nome}</p>
+          </div>
+        </div>
+        <Button onClick={() => setModalNovoRisco(true)} className="gap-2">
+          <Plus className="w-4 h-4" /> Novo Risco
+        </Button>
+      </div>
+
+      <Tabs value={tabAtiva} onValueChange={setTabAtiva}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="riscos">Riscos ({riscos.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="matriz">Matriz de Calor</TabsTrigger>
+        </TabsList>
+
+        {/* ── DASHBOARD ─────────────────────────────────────────────────── */}
+        <TabsContent value="dashboard" className="space-y-4 mt-4">
+          {/* KPIs */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="border-l-4 border-l-gray-400">
+              <CardContent className="p-4">
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Total de Riscos</p>
+                <p className="text-3xl font-bold text-gray-900">{r?.total ?? 0}</p>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-red-500">
+              <CardContent className="p-4">
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Críticos</p>
+                <p className="text-3xl font-bold text-red-600">{r?.porSeveridade.critica ?? 0}</p>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-orange-500">
+              <CardContent className="p-4">
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Altos</p>
+                <p className="text-3xl font-bold text-orange-600">{r?.porSeveridade.alta ?? 0}</p>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-green-500">
+              <CardContent className="p-4">
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Mitigados</p>
+                <p className="text-3xl font-bold text-green-600">{r?.porStatus.mitigado ?? 0}</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Por Origem e Por Status */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-700">Riscos por Origem</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {r && Object.entries(r.porOrigem).filter(([, v]) => v > 0).map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">{ORIGEM_LABEL[k] || k}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 bg-gray-100 rounded-full h-2">
+                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${(v / (r.total || 1)) * 100}%` }} />
+                      </div>
+                      <span className="text-sm font-medium w-4 text-right">{v}</span>
+                    </div>
+                  </div>
+                ))}
+                {(!r || r.total === 0) && <p className="text-sm text-gray-400 text-center py-4">Nenhum risco cadastrado</p>}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-700">Riscos por Status</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {r && Object.entries(r.porStatus).filter(([, v]) => v > 0).map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600 capitalize">{k.replace("_", " ")}</span>
+                    <Badge className={`${STATUS_COLOR[k]} text-xs`}>{v}</Badge>
+                  </div>
+                ))}
+                {(!r || r.total === 0) && <p className="text-sm text-gray-400 text-center py-4">Nenhum risco cadastrado</p>}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* ── LISTA DE RISCOS ───────────────────────────────────────────── */}
+        <TabsContent value="riscos" className="space-y-4 mt-4">
+          {/* Filtros */}
+          <div className="flex gap-3 flex-wrap">
+            <Select value={filtroOrigem} onValueChange={setFiltroOrigem}>
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Origem" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas as origens</SelectItem>
+                <SelectItem value="orcamentario">Orçamentário</SelectItem>
+                <SelectItem value="estrategico">Estratégico</SelectItem>
+                <SelectItem value="operacional">Operacional</SelectItem>
+                <SelectItem value="contratual">Contratual</SelectItem>
+                <SelectItem value="financeiro">Financeiro</SelectItem>
+                <SelectItem value="regulatorio">Regulatório</SelectItem>
+                <SelectItem value="outro">Outro</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os status</SelectItem>
+                <SelectItem value="identificado">Identificado</SelectItem>
+                <SelectItem value="em_mitigacao">Em Mitigação</SelectItem>
+                <SelectItem value="mitigado">Mitigado</SelectItem>
+                <SelectItem value="materializado">Materializado</SelectItem>
+                <SelectItem value="aceito">Aceito</SelectItem>
+                <SelectItem value="monitorando">Monitorando</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Lista */}
+          {riscos.isLoading && <p className="text-sm text-gray-400 text-center py-8">Carregando riscos...</p>}
+          {!riscos.isLoading && (!riscos.data || riscos.data.length === 0) && (
+            <div className="text-center py-12 text-gray-400">
+              <Shield className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p className="text-sm">Nenhum risco cadastrado</p>
+              <Button variant="outline" size="sm" className="mt-3" onClick={() => setModalNovoRisco(true)}>
+                <Plus className="w-4 h-4 mr-1" /> Cadastrar primeiro risco
+              </Button>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            {riscos.data?.map((risco) => (
+              <RiscoCard
+                key={risco.id}
+                risco={risco}
+                expanded={riscoExpandido === risco.id}
+                onToggle={() => setRiscoExpandido(riscoExpandido === risco.id ? null : risco.id)}
+                onGerarPlanoIA={() => setModalPlanoIA(risco)}
+                onExcluir={() => {
+                  if (confirm(`Excluir o risco "${risco.titulo}"?`)) excluirRisco.mutate({ id: risco.id });
+                }}
+                empresaId={empresaId}
+              />
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* ── MATRIZ DE CALOR ───────────────────────────────────────────── */}
+        <TabsContent value="matriz" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Matriz de Risco (Probabilidade × Impacto)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-center text-sm border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="p-3 text-left text-gray-500 font-medium">Prob. \ Impacto</th>
+                      <th className="p-3 bg-green-50 text-green-700 font-medium rounded-tl">Baixo</th>
+                      <th className="p-3 bg-yellow-50 text-yellow-700 font-medium">Médio</th>
+                      <th className="p-3 bg-red-50 text-red-700 font-medium rounded-tr">Alto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { prob: "alta", label: "Alta", cells: [{ bg: "bg-yellow-100", sev: "media" }, { bg: "bg-orange-100", sev: "alta" }, { bg: "bg-red-200", sev: "critica" }] },
+                      { prob: "media", label: "Média", cells: [{ bg: "bg-green-100", sev: "baixa" }, { bg: "bg-yellow-100", sev: "media" }, { bg: "bg-orange-100", sev: "alta" }] },
+                      { prob: "baixa", label: "Baixa", cells: [{ bg: "bg-green-50", sev: "baixa" }, { bg: "bg-green-100", sev: "baixa" }, { bg: "bg-yellow-100", sev: "media" }] },
+                    ].map(({ prob, label, cells }) => (
+                      <tr key={prob}>
+                        <td className="p-3 text-left font-medium text-gray-600">{label}</td>
+                        {cells.map(({ bg, sev }, idx) => {
+                          const impactos = ["baixo", "medio", "alto"];
+                          const count = r?.matrizCalor[`${prob}_${impactos[idx]}`] ?? 0;
+                          return (
+                            <td key={idx} className={`p-4 ${bg} border border-white`}>
+                              <span className={`text-2xl font-bold ${count > 0 ? "text-gray-800" : "text-gray-300"}`}>{count}</span>
+                              {count > 0 && <p className="text-xs text-gray-500 mt-1">{sev}</p>}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex gap-4 mt-4 justify-center flex-wrap">
+                {[
+                  { label: "Crítico", color: "bg-red-500" },
+                  { label: "Alto", color: "bg-orange-500" },
+                  { label: "Médio", color: "bg-yellow-500" },
+                  { label: "Baixo", color: "bg-green-500" },
+                ].map(({ label, color }) => (
+                  <div key={label} className="flex items-center gap-1.5">
+                    <div className={`w-3 h-3 rounded-full ${color}`} />
+                    <span className="text-xs text-gray-600">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* ── MODAL NOVO RISCO ─────────────────────────────────────────────────── */}
+      <Dialog open={modalNovoRisco} onOpenChange={setModalNovoRisco}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Cadastrar Novo Risco</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Título do Risco *</Label>
+              <Input placeholder="Ex: Desvio orçamentário em campo" value={formRisco.titulo} onChange={e => setFormRisco(f => ({ ...f, titulo: e.target.value }))} />
+            </div>
+            <div>
+              <Label>Descrição</Label>
+              <Textarea placeholder="Descreva o risco em detalhes..." value={formRisco.descricao} onChange={e => setFormRisco(f => ({ ...f, descricao: e.target.value }))} rows={3} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Origem</Label>
+                <Select value={formRisco.origem} onValueChange={v => setFormRisco(f => ({ ...f, origem: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="orcamentario">Orçamentário</SelectItem>
+                    <SelectItem value="estrategico">Estratégico</SelectItem>
+                    <SelectItem value="operacional">Operacional</SelectItem>
+                    <SelectItem value="contratual">Contratual</SelectItem>
+                    <SelectItem value="financeiro">Financeiro</SelectItem>
+                    <SelectItem value="regulatorio">Regulatório</SelectItem>
+                    <SelectItem value="outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Categoria</Label>
+                <Select value={formRisco.categoria} onValueChange={v => setFormRisco(f => ({ ...f, categoria: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="financeiro">Financeiro</SelectItem>
+                    <SelectItem value="juridico">Jurídico</SelectItem>
+                    <SelectItem value="operacional">Operacional</SelectItem>
+                    <SelectItem value="prazo">Prazo</SelectItem>
+                    <SelectItem value="escopo">Escopo</SelectItem>
+                    <SelectItem value="reputacional">Reputacional</SelectItem>
+                    <SelectItem value="regulatorio">Regulatório</SelectItem>
+                    <SelectItem value="rh">RH</SelectItem>
+                    <SelectItem value="tecnologia">Tecnologia</SelectItem>
+                    <SelectItem value="outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Probabilidade</Label>
+                <Select value={formRisco.probabilidade} onValueChange={v => setFormRisco(f => ({ ...f, probabilidade: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="baixa">Baixa</SelectItem>
+                    <SelectItem value="media">Média</SelectItem>
+                    <SelectItem value="alta">Alta</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Impacto</Label>
+                <Select value={formRisco.impacto} onValueChange={v => setFormRisco(f => ({ ...f, impacto: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="baixo">Baixo</SelectItem>
+                    <SelectItem value="medio">Médio</SelectItem>
+                    <SelectItem value="alto">Alto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label>Responsável</Label>
+              <Input placeholder="Nome do responsável pelo risco" value={formRisco.responsavel} onChange={e => setFormRisco(f => ({ ...f, responsavel: e.target.value }))} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setModalNovoRisco(false)}>Cancelar</Button>
+            <Button onClick={handleCriarRisco} disabled={criarRisco.isPending}>
+              {criarRisco.isPending ? "Salvando..." : "Cadastrar Risco"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── MODAL GERAR PLANO IA ─────────────────────────────────────────────── */}
+      <Dialog open={!!modalPlanoIA} onOpenChange={() => setModalPlanoIA(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-500" />
+              Gerar Plano de Ação com IA
+            </DialogTitle>
+          </DialogHeader>
+          {modalPlanoIA && (
+            <div className="space-y-4">
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-800">{modalPlanoIA.titulo}</p>
+                <div className="flex gap-2 mt-2">
+                  <Badge className={`${SEVERIDADE_COLOR[modalPlanoIA.severidade]} text-xs`}>
+                    {modalPlanoIA.severidade}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">{ORIGEM_LABEL[modalPlanoIA.origem]}</Badge>
+                </div>
+              </div>
+              <div className="text-sm text-gray-600 space-y-1">
+                <p>A IA irá gerar um plano de ação personalizado com:</p>
+                <ul className="list-disc list-inside space-y-1 text-gray-500 ml-2">
+                  <li>Ações concretas para mitigar o risco</li>
+                  <li>Foco em corte de custos sem impactar operações</li>
+                  <li>Benchmarking com empresas do mesmo setor</li>
+                  <li>Prazo de implementação de até 90 dias</li>
+                </ul>
+              </div>
+              {gerando && (
+                <div className="flex items-center gap-2 text-purple-600 text-sm">
+                  <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                  Gerando plano de ação...
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setModalPlanoIA(null)} disabled={gerando}>Cancelar</Button>
+            <Button onClick={handleGerarPlanoIA} disabled={gerando} className="gap-2 bg-purple-600 hover:bg-purple-700">
+              <Sparkles className="w-4 h-4" />
+              {gerando ? "Gerando..." : "Gerar com IA"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+// ─── RISCO CARD ───────────────────────────────────────────────────────────────
+
+function RiscoCard({ risco, expanded, onToggle, onGerarPlanoIA, onExcluir, empresaId }: {
+  risco: Risco;
+  expanded: boolean;
+  onToggle: () => void;
+  onGerarPlanoIA: () => void;
+  onExcluir: () => void;
+  empresaId: number;
+}) {
+  const planos = trpc.gestaoRiscos.listPlanos.useQuery(
+    { riscoId: risco.id },
+    { enabled: expanded }
+  );
+
+  const deletePlano = trpc.gestaoRiscos.deletePlano.useMutation({
+    onSuccess: () => planos.refetch(),
+  });
+
+  return (
+    <Card className="overflow-hidden">
+      <div
+        className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+        onClick={onToggle}
+      >
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className={`w-3 h-3 rounded-full flex-shrink-0 ${SEVERIDADE_DOT[risco.severidade]}`} />
+          <div className="min-w-0">
+            <p className="font-medium text-gray-900 truncate">{risco.titulo}</p>
+            <div className="flex gap-2 mt-1 flex-wrap">
+              <Badge className={`${SEVERIDADE_COLOR[risco.severidade]} text-xs border`}>
+                {risco.severidade}
+              </Badge>
+              <Badge className={`${STATUS_COLOR[risco.status]} text-xs`}>
+                {risco.status.replace("_", " ")}
+              </Badge>
+              <span className="text-xs text-gray-400">{ORIGEM_LABEL[risco.origem]}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 ml-3">
+          <Button
+            variant="ghost" size="sm"
+            className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 gap-1"
+            onClick={e => { e.stopPropagation(); onGerarPlanoIA(); }}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span className="text-xs hidden sm:inline">Plano IA</span>
+          </Button>
+          <Button
+            variant="ghost" size="sm"
+            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+            onClick={e => { e.stopPropagation(); onExcluir(); }}
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </Button>
+          {expanded ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="border-t bg-gray-50 p-4 space-y-4">
+          {/* Detalhes do risco */}
+          {risco.descricao && (
+            <p className="text-sm text-gray-600">{risco.descricao}</p>
+          )}
+          <div className="grid grid-cols-3 gap-3 text-xs">
+            <div>
+              <span className="text-gray-400 uppercase tracking-wide">Probabilidade</span>
+              <p className="font-medium capitalize mt-0.5">{risco.probabilidade}</p>
+            </div>
+            <div>
+              <span className="text-gray-400 uppercase tracking-wide">Impacto</span>
+              <p className="font-medium capitalize mt-0.5">{risco.impacto}</p>
+            </div>
+            <div>
+              <span className="text-gray-400 uppercase tracking-wide">Responsável</span>
+              <p className="font-medium mt-0.5">{risco.responsavel || "—"}</p>
+            </div>
+          </div>
+
+          {/* Planos de ação */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+                <Target className="w-4 h-4 text-blue-500" />
+                Planos de Ação ({planos.data?.length ?? 0})
+              </h4>
+              <Button
+                variant="outline" size="sm"
+                className="gap-1 text-purple-600 border-purple-200 hover:bg-purple-50"
+                onClick={onGerarPlanoIA}
+              >
+                <Sparkles className="w-3.5 h-3.5" /> Gerar com IA
+              </Button>
+            </div>
+
+            {planos.isLoading && <p className="text-xs text-gray-400">Carregando planos...</p>}
+            {planos.data?.length === 0 && (
+              <p className="text-xs text-gray-400 text-center py-3">
+                Nenhum plano de ação cadastrado. Use a IA para gerar um automaticamente.
+              </p>
+            )}
+
+            <div className="space-y-3">
+              {planos.data?.map((plano) => (
+                <PlanoCard key={plano.id} plano={plano} onExcluir={() => deletePlano.mutate({ id: plano.id })} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+// ─── PLANO CARD ───────────────────────────────────────────────────────────────
+
+function PlanoCard({ plano, onExcluir }: { plano: PlanoAcao; onExcluir: () => void }) {
+  const [expandido, setExpandido] = useState(false);
+  const acoes: any[] = Array.isArray(plano.acoes) ? plano.acoes : (plano.acoes ? JSON.parse(plano.acoes as string) : []);
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div
+        className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+        onClick={() => setExpandido(!expandido)}
+      >
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {plano.geradoPorIA && <Sparkles className="w-3.5 h-3.5 text-purple-500 flex-shrink-0" />}
+          <p className="text-sm font-medium text-gray-800 truncate">{plano.titulo}</p>
+          <Badge variant="outline" className="text-xs flex-shrink-0">
+            {TIPO_PRIORIDADE_LABEL[plano.tipoPrioridade] || plano.tipoPrioridade}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-1 ml-2">
+          <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-500 h-7 w-7 p-0"
+            onClick={e => { e.stopPropagation(); onExcluir(); }}>
+            <Trash2 className="w-3 h-3" />
+          </Button>
+          {expandido ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
+        </div>
+      </div>
+
+      {expandido && (
+        <div className="border-t p-3 space-y-3 text-sm">
+          {plano.objetivo && (
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Objetivo</p>
+              <p className="text-gray-700">{plano.objetivo}</p>
+            </div>
+          )}
+          {plano.descricao && (
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Descrição</p>
+              <p className="text-gray-600">{plano.descricao}</p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-3 gap-3 text-xs">
+            {plano.economiaEstimada && (
+              <div className="bg-green-50 rounded p-2">
+                <p className="text-green-600 font-medium flex items-center gap-1">
+                  <TrendingDown className="w-3 h-3" /> Economia Est.
+                </p>
+                <p className="text-green-800 font-semibold mt-0.5">{plano.economiaEstimada}</p>
+              </div>
+            )}
+            {plano.prazoImplementacao && (
+              <div className="bg-blue-50 rounded p-2">
+                <p className="text-blue-600 font-medium flex items-center gap-1">
+                  <Clock className="w-3 h-3" /> Prazo
+                </p>
+                <p className="text-blue-800 font-semibold mt-0.5">{plano.prazoImplementacao}</p>
+              </div>
+            )}
+            {plano.impactoOperacional && (
+              <div className="bg-gray-50 rounded p-2">
+                <p className="text-gray-500 font-medium">Impacto Op.</p>
+                <p className={`font-semibold mt-0.5 capitalize ${IMPACTO_OP_COLOR[plano.impactoOperacional]}`}>
+                  {plano.impactoOperacional}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {plano.benchmarking && (
+            <div className="bg-purple-50 rounded p-2">
+              <p className="text-xs text-purple-600 font-medium mb-1">Benchmarking / Boas Práticas</p>
+              <p className="text-xs text-purple-800">{plano.benchmarking}</p>
+            </div>
+          )}
+
+          {acoes.length > 0 && (
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Ações ({acoes.length})</p>
+              <div className="space-y-1.5">
+                {acoes.map((acao: any, i: number) => (
+                  <div key={i} className="flex items-start gap-2 p-2 bg-gray-50 rounded">
+                    {acao.status === "concluido"
+                      ? <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      : acao.status === "em_andamento"
+                      ? <Clock className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                      : <AlertCircle className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                    }
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-800">{acao.acao}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {acao.responsavel && `${acao.responsavel} · `}{acao.prazo}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

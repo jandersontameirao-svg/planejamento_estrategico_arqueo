@@ -5,6 +5,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { orcamentoRouter } from "./routers/orcamento";
 import { contratosRouter } from "./routers/contratos";
 import { avaliacaoContratosRouter } from "./routers/avaliacaoContratos";
+import { gestaoRiscosRouter } from "./routers/gestaoRiscos";
 import { getMetodologiasEmpresa, saveMetodologiasEmpresa, METODOLOGIAS_DISPONIVEIS } from "./metodologias";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
@@ -14,6 +15,7 @@ export const appRouter = router({
   system: systemRouter,
   contratos: contratosRouter,
   avaliacaoContratos: avaliacaoContratosRouter,
+  gestaoRiscos: gestaoRiscosRouter,
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

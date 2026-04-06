@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Building2, Edit, FileText, Plus, Trash2, Upload, Users, X } from "lucide-react";
+import { ArrowLeft, Building2, Edit, FileText, Plus, Shield, Trash2, Upload, Users, X } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
@@ -379,7 +379,7 @@ export default function Empresas() {
                     <p className="line-clamp-2">{empresa.observacoes}</p>
                   </div>
                 )}
-                <div className="flex gap-2 mt-3 pt-3 border-t">
+                <div className="flex gap-2 mt-3 pt-3 border-t flex-wrap">
                   <Button variant="outline" size="sm" className="flex-1" asChild>
                     <Link href={`/empresa/${empresa.id}/contratos`}>
                       <FileText className="w-3.5 h-3.5 mr-1" />
@@ -390,6 +390,12 @@ export default function Empresas() {
                     <Link href={`/empresa/${empresa.id}/contratos/clientes`}>
                       <Users className="w-3.5 h-3.5 mr-1" />
                       Clientes
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700" asChild>
+                    <Link href={`/empresa/${empresa.id}/gestao-riscos`}>
+                      <Shield className="w-3.5 h-3.5 mr-1" />
+                      Riscos
                     </Link>
                   </Button>
                 </div>

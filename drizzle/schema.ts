@@ -1724,3 +1724,83 @@ export const avaliacaoPlanoItens = mysqlTable("avaliacao_plano_itens", {
 });
 export type AvaliacaoPlanoItem = typeof avaliacaoPlanoItens.$inferSelect;
 export type InsertAvaliacaoPlanoItem = typeof avaliacaoPlanoItens.$inferInsert;
+
+/**
+ * Riscos Estratégicos da Empresa
+ * Módulo centralizado de gestão de riscos (orçamentário, estratégico, operacional)
+ */
+export const riscosEmpresa = mysqlTable("riscos_empresa", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresa_id").notNull(),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  origem: mysqlEnum("origem", [
+    "orcamentario",   // desvio orçamentário
+    "estrategico",    // SWOT, PESTEL, etc.
+    "operacional",    // operações do dia a dia
+    "contratual",     // vinculado a contrato
+    "financeiro",     // fluxo de caixa, inadimplência
+    "regulatorio",    // compliance, licenças
+    "outro"
+  ]).default("estrategico").notNull(),
+  categoria: mysqlEnum("categoria_risco", [
+    "financeiro", "juridico", "operacional", "prazo", "escopo",
+    "reputacional", "regulatorio", "rh", "tecnologia", "outro"
+  ]).default("outro").notNull(),
+  probabilidade: mysqlEnum("prob_risco", ["baixa", "media", "alta"]).default("media").notNull(),
+  impacto: mysqlEnum("impacto_risco", ["baixo", "medio", "alto"]).default("medio").notNull(),
+  severidade: mysqlEnum("sev_risco", ["baixa", "media", "alta", "critica"]).default("media").notNull(),
+  status: mysqlEnum("status_risco", [
+    "identificado", "em_mitigacao", "mitigado", "materializado", "aceito", "monitorando"
+  ]).default("identificado").notNull(),
+  responsavel: varchar("responsavel", { length: 255 }),
+  dataIdentificacao: date("data_identificacao"),
+  dataRevisao: date("data_revisao"),
+  contratoId: int("contrato_id"),       // se vinculado a contrato
+  geradoPorIA: boolean("gerado_por_ia").default(false),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type RiscoEmpresa = typeof riscosEmpresa.$inferSelect;
+export type InsertRiscoEmpresa = typeof riscosEmpresa.$inferInsert;
+
+/**
+ * Plano de Ação para Riscos
+ * Vinculado a um risco específico da empresa
+ */
+export const planosAcaoRisco = mysqlTable("planos_acao_risco", {
+  id: int("id").autoincrement().primaryKey(),
+  riscoId: int("risco_id").notNull(),
+  empresaId: int("empresa_id").notNull(),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  objetivo: text("objetivo"),                    // O que se quer alcançar
+  descricao: text("descricao"),                  // Descrição detalhada do plano
+  tipoPrioridade: mysqlEnum("tipo_prioridade_plano", [
+    "corte_custos",       // redução de despesas
+    "mitigacao",          // mitigar o risco
+    "prevencao",          // prevenir o risco
+    "contingencia",       // plano B se o risco se materializar
+    "monitoramento"       // apenas monitorar
+  ]).default("mitigacao").notNull(),
+  economiaEstimada: varchar("economia_estimada", { length: 100 }), // ex: "R$ 5.000/mês"
+  prazoImplementacao: varchar("prazo_implementacao", { length: 100 }), // ex: "30 dias"
+  impactoOperacional: mysqlEnum("impacto_operacional", [
+    "nenhum",     // não impacta o dia a dia
+    "baixo",      // impacto mínimo
+    "medio",      // requer adaptação
+    "alto"        // impacto significativo
+  ]).default("nenhum").notNull(),
+  benchmarking: text("benchmarking"),            // referência de mercado / boas práticas
+  acoes: json("acoes"),                          // array de ações: [{acao, responsavel, prazo, status}]
+  geradoPorIA: boolean("gerado_por_ia").default(false),
+  iaContexto: text("ia_contexto"),               // contexto usado pela IA para gerar o plano
+  status: mysqlEnum("status_plano_risco", [
+    "rascunho", "ativo", "concluido", "cancelado"
+  ]).default("rascunho").notNull(),
+  createdByUserId: int("created_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type PlanoAcaoRisco = typeof planosAcaoRisco.$inferSelect;
+export type InsertPlanoAcaoRisco = typeof planosAcaoRisco.$inferInsert;

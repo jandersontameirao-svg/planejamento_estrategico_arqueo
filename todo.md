@@ -1514,3 +1514,30 @@
 - [x] Localizar o componente RelatorioOrcamentario que estava gerando o erro
 - [x] Adicionar key prop única nos 4 Fragments (linhas 418, 555, 672, 717)
 - [x] Importar React e testar - 0 erros TypeScript
+
+## Riscos e Plano de Ação - Arqueoproject
+- [ ] Investigar por que a área de Riscos da Arqueoproject está vazia
+- [ ] Popular riscos da Arqueoproject no banco de dados
+- [ ] Criar funcionalidade de Plano de Ação para cada risco identificado
+- [ ] Plano de Ação deve incluir: corte de custos, boas práticas e benchmarking
+
+## Módulo Centralizado de Gestão de Riscos
+- [ ] Criar tabela `riscos_empresa` no schema (riscos estratégicos/orçamentários por empresa)
+- [ ] Criar tabela `planos_acao_risco` no schema (plano de ação vinculado a cada risco)
+- [ ] Executar migração do banco (pnpm db:push)
+- [ ] Criar procedures tRPC: listar, criar, editar, excluir riscos e planos de ação
+- [ ] Criar procedure para consolidar riscos de todas as fontes (orçamento, contratos, estratégico)
+- [ ] Criar página GestaoRiscos.tsx com matriz de calor e lista consolidada
+- [ ] Adicionar card "Gestão de Riscos" na tela inicial de cada empresa
+- [ ] Implementar Plano de Ação por risco com sugestão de IA (corte de custos + benchmarking)
+- [ ] Mover riscos da aba Riscos do orçamento para o módulo centralizado
+- [ ] Testar e salvar checkpoint
+
+## Módulo Centralizado de Gestão de Riscos (Concluído)
+- [x] Criar tabelas riscos_empresa e planos_acao_risco no banco de dados
+- [x] Criar router gestaoRiscos com procedures: list, create, delete, listPlanos, gerarPlanoIA, resumo
+- [x] Criar página GestaoRiscos.tsx com dashboard, matriz de riscos, lista e planos de ação
+- [x] Adicionar botão "Riscos" nos cards das empresas (Empresas.tsx)
+- [x] Registrar rota /empresa/:id/gestao-riscos no App.tsx
+- [x] Plano de Ação com IA: prompt especializado em PMEs de arqueologia, benchmarking, corte de custos
+- [x] 140 testes passando (12 novos testes em gestaoRiscos.test.ts)
