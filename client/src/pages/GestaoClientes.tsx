@@ -187,21 +187,24 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
       const { url } = await uploadRes.json() as { url: string };
       const dados = await extrairCartaoMut.mutateAsync({ imageUrl: url }) as Record<string, string> | null;
       if (dados) {
+        // Filtrar valores literais "null"/"undefined" retornados pelo modelo de IA
+        const v = (val: string | undefined, fallback: string) =>
+          val && val !== "null" && val !== "undefined" && val.trim() !== "" ? val : fallback;
         setForm(f => ({
           ...f,
-          cnpj: dados.cnpj ? formatCNPJ(dados.cnpj) : f.cnpj,
-          razaoSocial: dados.razaoSocial || f.razaoSocial,
-          nomeFantasia: dados.nomeFantasia || f.nomeFantasia,
-          email: dados.email || f.email,
-          telefone: dados.telefone || f.telefone,
-          endereco: dados.endereco || f.endereco,
-          cidade: dados.cidade || f.cidade,
-          estado: dados.estado || f.estado,
-          cep: dados.cep ? formatCEP(dados.cep) : f.cep,
-          cnaeDescricao: dados.cnaeDescricao || f.cnaeDescricao,
-          naturezaJuridica: dados.naturezaJuridica || f.naturezaJuridica,
-          situacaoCadastral: dados.situacaoCadastral || f.situacaoCadastral,
-          dataAbertura: dados.dataAbertura || f.dataAbertura,
+          cnpj: dados.cnpj && dados.cnpj !== "null" ? formatCNPJ(dados.cnpj) : f.cnpj,
+          razaoSocial: v(dados.razaoSocial, f.razaoSocial),
+          nomeFantasia: v(dados.nomeFantasia, f.nomeFantasia),
+          email: v(dados.email, f.email),
+          telefone: v(dados.telefone, f.telefone),
+          endereco: v(dados.endereco, f.endereco),
+          cidade: v(dados.cidade, f.cidade),
+          estado: v(dados.estado, f.estado),
+          cep: dados.cep && dados.cep !== "null" ? formatCEP(dados.cep) : f.cep,
+          cnaeDescricao: v(dados.cnaeDescricao, f.cnaeDescricao),
+          naturezaJuridica: v(dados.naturezaJuridica, f.naturezaJuridica),
+          situacaoCadastral: v(dados.situacaoCadastral, f.situacaoCadastral),
+          dataAbertura: v(dados.dataAbertura, f.dataAbertura),
         }));
         toast.success("Dados extraídos do cartão CNPJ!");
       }

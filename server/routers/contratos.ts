@@ -362,7 +362,7 @@ export const contratosRouter = router({
             type: "json_schema",
             json_schema: {
               name: "dados_cnpj",
-              strict: true,
+              strict: false,
               schema: {
                 type: "object",
                 properties: {
@@ -391,7 +391,16 @@ export const contratosRouter = router({
         });
         const content = response.choices?.[0]?.message?.content;
         const parsed = content ? parseContent(content) as any : null;
-         if (parsed) return { ...parsed, fonte: "cartao_ia" as const, socios: "[]", dadosReceita: JSON.stringify(parsed) };
+        if (parsed) {
+          // Remover campos com valor literal "null" ou "undefined" retornados pelo modelo
+          const cleaned: Record<string, string> = {};
+          for (const [k, v] of Object.entries(parsed)) {
+            if (v !== null && v !== undefined && v !== "null" && v !== "undefined" && String(v).trim() !== "") {
+              cleaned[k] = String(v);
+            }
+          }
+          return { ...cleaned, fonte: "cartao_ia" as const, socios: "[]", dadosReceita: JSON.stringify(cleaned) };
+        }
         return null;
       }),
 
