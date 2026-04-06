@@ -618,11 +618,15 @@ Retorne APENAS JSON válido.`,
         if (input.dadosRevisados.marcos?.length) {
           for (let i = 0; i < input.dadosRevisados.marcos.length; i++) {
             const m = input.dadosRevisados.marcos[i];
+            // Sanitize dataPrevista: only accept YYYY-MM-DD format; discard free-text from AI
+            const rawDate = m.dataPrevista?.trim() ?? "";
+            const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) && !isNaN(Date.parse(rawDate));
+            const dataPrevista = isValidDate ? (rawDate as unknown as Date) : null;
             await createMarco({
               contratoId: input.contratoId,
               titulo: m.titulo,
               valorPrevisto: m.valorPrevisto,
-              dataPrevista: m.dataPrevista as unknown as Date,
+              dataPrevista,
               descricao: m.descricao,
               ordem: m.ordem ?? i + 1,
               status: "pendente",

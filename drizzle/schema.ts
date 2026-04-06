@@ -1124,7 +1124,7 @@ export const contratosMarcos = mysqlTable("contratos_marcos", {
   descricao: text("descricao"),
   valorPrevisto: decimal("valor_previsto", { precision: 15, scale: 2 }).notNull(),
   valorPago: decimal("valor_pago", { precision: 15, scale: 2 }),
-  dataPrevista: date("data_prevista").notNull(),
+  dataPrevista: date("data_prevista"),
   dataPagamento: date("data_pagamento"),
   prazoPagemento: int("prazo_pagamento"), // dias após aprovação do boletim
   status: mysqlEnum("status", ["pendente", "em_medicao", "aprovado", "pago", "atrasado", "cancelado"]).default("pendente").notNull(),
