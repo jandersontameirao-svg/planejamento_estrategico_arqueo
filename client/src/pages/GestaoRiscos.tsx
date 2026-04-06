@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Plus, Sparkles, Target, TrendingDown, Shield, ChevronDown, ChevronRight, Trash2, Edit3, CheckCircle2, Clock, AlertCircle, X, History, MessageSquare, Send, FileEdit, PlusCircle, MinusCircle, RefreshCw, Bot } from "lucide-react";
+import { AlertTriangle, Plus, Sparkles, Target, TrendingDown, TrendingUp, Shield, ChevronDown, ChevronRight, Trash2, Edit3, CheckCircle2, Clock, AlertCircle, X, History, MessageSquare, Send, FileEdit, PlusCircle, MinusCircle, RefreshCw, Bot, Activity, BarChart3, Zap, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from "recharts";
 import { toast } from "sonner";
 
 // ─── TIPOS ────────────────────────────────────────────────────────────────────
@@ -140,6 +141,7 @@ export default function GestaoRiscos() {
   const invalidate = () => {
     utils.gestaoRiscos.resumo.invalidate({ empresaId });
     utils.gestaoRiscos.list.invalidate({ empresaId });
+    utils.gestaoRiscos.getDashboard.invalidate({ empresaId });
   };
 
   const adicionarComentario = trpc.gestaoRiscos.adicionarComentario.useMutation({
@@ -205,6 +207,8 @@ export default function GestaoRiscos() {
     });
   };
 
+  const dashboard = trpc.gestaoRiscos.getDashboard.useQuery({ empresaId });
+  const d = dashboard.data;
   const r = resumo.data;
 
   return (
@@ -234,72 +238,232 @@ export default function GestaoRiscos() {
         </TabsList>
 
         {/* ── DASHBOARD ─────────────────────────────────────────────────── */}
-        <TabsContent value="dashboard" className="space-y-4 mt-4">
-          {/* KPIs */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="border-l-4 border-l-gray-400">
-              <CardContent className="p-4">
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Total de Riscos</p>
-                <p className="text-3xl font-bold text-gray-900">{r?.total ?? 0}</p>
+        <TabsContent value="dashboard" className="space-y-5 mt-4">
+
+          {/* ── Linha 1: Score de Exposição + KPIs principais ── */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+
+            {/* Score de Exposição */}
+            <Card className="md:col-span-1 flex flex-col items-center justify-center p-5 bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">Score de Exposição</p>
+              <div className="relative w-24 h-24">
+                <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" strokeWidth="12" />
+                  <circle cx="50" cy="50" r="40" fill="none"
+                    stroke={d?.scoreExposicao ?? 0 >= 70 ? "#ef4444" : d?.scoreExposicao ?? 0 >= 40 ? "#f97316" : "#22c55e"}
+                    strokeWidth="12"
+                    strokeDasharray={`${((d?.scoreExposicao ?? 0) / 100) * 251.2} 251.2`}
+                    strokeLinecap="round" />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className={`text-2xl font-black ${(d?.scoreExposicao ?? 0) >= 70 ? "text-red-600" : (d?.scoreExposicao ?? 0) >= 40 ? "text-orange-500" : "text-green-600"}`}>
+                    {d?.scoreExposicao ?? 0}
+                  </span>
+                  <span className="text-xs text-slate-400">/100</span>
+                </div>
+              </div>
+              <div className="mt-2 flex items-center gap-1 text-xs">
+                {d?.tendencia === 'alta' ? <><ArrowUp className="w-3 h-3 text-red-500" /><span className="text-red-500 font-medium">Em alta</span></> :
+                 d?.tendencia === 'queda' ? <><ArrowDown className="w-3 h-3 text-green-500" /><span className="text-green-500 font-medium">Em queda</span></> :
+                 <><Minus className="w-3 h-3 text-gray-400" /><span className="text-gray-400">Estável</span></>}
+              </div>
+            </Card>
+
+            {/* KPIs */}
+            <div className="md:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Card className="border-l-4 border-l-red-500">
+                <CardContent className="p-4">
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Críticos</p>
+                  <p className="text-3xl font-black text-red-600">{d?.criticos ?? 0}</p>
+                  <p className="text-xs text-gray-400 mt-1">{d?.altos ?? 0} altos</p>
+                </CardContent>
+              </Card>
+              <Card className="border-l-4 border-l-blue-500">
+                <CardContent className="p-4">
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Ativos</p>
+                  <p className="text-3xl font-black text-blue-600">{d?.ativos ?? 0}</p>
+                  <p className="text-xs text-gray-400 mt-1">{d?.emMitigacao ?? 0} em mitigação</p>
+                </CardContent>
+              </Card>
+              <Card className="border-l-4 border-l-green-500">
+                <CardContent className="p-4">
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Mitigados</p>
+                  <p className="text-3xl font-black text-green-600">{d?.mitigados ?? 0}</p>
+                  <p className="text-xs text-gray-400 mt-1">{d?.materializados ?? 0} materializados</p>
+                </CardContent>
+              </Card>
+              <Card className="border-l-4 border-l-purple-500">
+                <CardContent className="p-4">
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Cobertura</p>
+                  <p className="text-3xl font-black text-purple-600">{d?.cobertura ?? 0}%</p>
+                  <p className="text-xs text-gray-400 mt-1">{d?.planosAtivos ?? 0} planos ativos</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* ── Linha 2: Gráficos ── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            {/* Distribuição por Severidade (Donut) */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-red-500" /> Distribuição por Severidade
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {d && d.total > 0 ? (
+                  <ResponsiveContainer width="100%" height={180}>
+                    <PieChart>
+                      <Pie data={[
+                        { name: 'Crítica', value: d.criticos, fill: '#ef4444' },
+                        { name: 'Alta', value: d.altos, fill: '#f97316' },
+                        { name: 'Média', value: d.medios, fill: '#eab308' },
+                        { name: 'Baixa', value: d.baixos, fill: '#22c55e' },
+                      ].filter(x => x.value > 0)} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
+                        {["#ef4444","#f97316","#eab308","#22c55e"].map((c, i) => <Cell key={i} fill={c} />)}
+                      </Pie>
+                      <Tooltip formatter={(v: any, n: any) => [v, n]} />
+                      <Legend iconType="circle" iconSize={8} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : <p className="text-sm text-gray-400 text-center py-12">Nenhum risco cadastrado</p>}
               </CardContent>
             </Card>
-            <Card className="border-l-4 border-l-red-500">
-              <CardContent className="p-4">
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Críticos</p>
-                <p className="text-3xl font-bold text-red-600">{r?.porSeveridade.critica ?? 0}</p>
+
+            {/* Distribuição por Categoria (Barras) */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-blue-500" /> Por Categoria
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {d && Object.keys(d.porCategoria).length > 0 ? (
+                  <ResponsiveContainer width="100%" height={180}>
+                    <BarChart data={Object.entries(d.porCategoria).map(([k, v]) => ({ name: k.charAt(0).toUpperCase() + k.slice(0, 5), value: v }))} layout="vertical" margin={{ left: 0, right: 10 }}>
+                      <XAxis type="number" tick={{ fontSize: 10 }} />
+                      <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={55} />
+                      <Tooltip />
+                      <Bar dataKey="value" fill="#6366f1" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : <p className="text-sm text-gray-400 text-center py-12">Nenhum dado</p>}
               </CardContent>
             </Card>
-            <Card className="border-l-4 border-l-orange-500">
-              <CardContent className="p-4">
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Altos</p>
-                <p className="text-3xl font-bold text-orange-600">{r?.porSeveridade.alta ?? 0}</p>
-              </CardContent>
-            </Card>
-            <Card className="border-l-4 border-l-green-500">
-              <CardContent className="p-4">
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Mitigados</p>
-                <p className="text-3xl font-bold text-green-600">{r?.porStatus.mitigado ?? 0}</p>
+
+            {/* Evolução Mensal (Linha) */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <TrendingDown className="w-4 h-4 text-green-500" /> Evolução (6 meses)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={180}>
+                  <LineChart data={d?.evolucaoMensal ?? []} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="mes" tick={{ fontSize: 10 }} />
+                    <YAxis tick={{ fontSize: 10 }} />
+                    <Tooltip />
+                    <Legend iconSize={8} />
+                    <Line type="monotone" dataKey="novos" stroke="#f97316" strokeWidth={2} dot={{ r: 3 }} name="Novos" />
+                    <Line type="monotone" dataKey="mitigados" stroke="#22c55e" strokeWidth={2} dot={{ r: 3 }} name="Mitigados" />
+                  </LineChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>
 
-          {/* Por Origem e Por Status */}
+          {/* ── Linha 3: Top 5 Riscos + Status ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            {/* Top 5 Riscos Críticos */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-700">Riscos por Origem</CardTitle>
+                <CardTitle className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-yellow-500" /> Top 5 Riscos Prioritários
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {r && Object.entries(r.porOrigem).filter(([, v]) => v > 0).map(([k, v]) => (
-                  <div key={k} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">{ORIGEM_LABEL[k] || k}</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 bg-gray-100 rounded-full h-2">
-                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${(v / (r.total || 1)) * 100}%` }} />
-                      </div>
-                      <span className="text-sm font-medium w-4 text-right">{v}</span>
+                {d?.top5 && d.top5.length > 0 ? d.top5.map((risco, idx) => (
+                  <div key={risco.id} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <span className="text-xs font-bold text-gray-400 w-4">#{idx + 1}</span>
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${SEVERIDADE_DOT[risco.severidade]}`} />
+                    <span className="text-sm text-gray-800 flex-1 truncate">{risco.titulo}</span>
+                    <div className="flex items-center gap-1">
+                      {risco.temPlano ? <span title="Tem plano de ação"><CheckCircle2 className="w-3.5 h-3.5 text-green-500" /></span> : <span title="Sem plano de ação"><AlertCircle className="w-3.5 h-3.5 text-orange-400" /></span>}
+                      <Badge className={`${SEVERIDADE_COLOR[risco.severidade]} text-xs px-1.5 py-0`}>{risco.severidade}</Badge>
                     </div>
                   </div>
-                ))}
-                {(!r || r.total === 0) && <p className="text-sm text-gray-400 text-center py-4">Nenhum risco cadastrado</p>}
+                )) : <p className="text-sm text-gray-400 text-center py-6">Nenhum risco ativo</p>}
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-700">Riscos por Status</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {r && Object.entries(r.porStatus).filter(([, v]) => v > 0).map(([k, v]) => (
-                  <div key={k} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 capitalize">{k.replace("_", " ")}</span>
-                    <Badge className={`${STATUS_COLOR[k]} text-xs`}>{v}</Badge>
-                  </div>
-                ))}
-                {(!r || r.total === 0) && <p className="text-sm text-gray-400 text-center py-4">Nenhum risco cadastrado</p>}
-              </CardContent>
-            </Card>
+            {/* Distribuição por Status + Origem */}
+            <div className="space-y-3">
+              <Card>
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold text-gray-700">Por Status</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-1.5">
+                  {r && Object.entries(r.porStatus).filter(([, v]) => v > 0).map(([k, v]) => (
+                    <div key={k} className="flex items-center justify-between">
+                      <span className="text-xs text-gray-600 capitalize">{k.replace(/_/g, " ")}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 bg-gray-100 rounded-full h-1.5">
+                          <div className="bg-blue-400 h-1.5 rounded-full" style={{ width: `${(v / (r.total || 1)) * 100}%` }} />
+                        </div>
+                        <Badge className={`${STATUS_COLOR[k]} text-xs px-1.5 py-0`}>{v}</Badge>
+                      </div>
+                    </div>
+                  ))}
+                  {(!r || r.total === 0) && <p className="text-xs text-gray-400 text-center py-3">Nenhum risco</p>}
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold text-gray-700">Por Origem</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-1.5">
+                  {r && Object.entries(r.porOrigem).filter(([, v]) => v > 0).map(([k, v]) => (
+                    <div key={k} className="flex items-center justify-between">
+                      <span className="text-xs text-gray-600">{ORIGEM_LABEL[k] || k}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 bg-gray-100 rounded-full h-1.5">
+                          <div className="bg-indigo-400 h-1.5 rounded-full" style={{ width: `${(v / (r.total || 1)) * 100}%` }} />
+                        </div>
+                        <span className="text-xs font-semibold text-gray-700 w-4 text-right">{v}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {(!r || r.total === 0) && <p className="text-xs text-gray-400 text-center py-3">Nenhum risco</p>}
+                </CardContent>
+              </Card>
+            </div>
           </div>
+
+          {/* ── Linha 4: Planos de Ação ── */}
+          <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200">
+            <CardContent className="p-4">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-xs text-purple-500 uppercase tracking-wide font-semibold">Total de Planos</p>
+                  <p className="text-2xl font-black text-purple-700">{d?.totalPlanos ?? 0}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-indigo-500 uppercase tracking-wide font-semibold">Planos Ativos</p>
+                  <p className="text-2xl font-black text-indigo-700">{d?.planosAtivos ?? 0}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-blue-500 uppercase tracking-wide font-semibold">Gerados por IA</p>
+                  <p className="text-2xl font-black text-blue-700">{d?.planosPorIA ?? 0}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
         </TabsContent>
 
         {/* ── LISTA DE RISCOS ───────────────────────────────────────────── */}

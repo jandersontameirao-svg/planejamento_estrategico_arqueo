@@ -1557,3 +1557,14 @@
 - [x] Implementar aba "Histórico" geral com últimas 50 alterações de todos os riscos
 - [x] Adicionar caixa de comentários com Ctrl+Enter para enviar
 - [x] 140 testes passando, 0 erros TypeScript
+
+## Painel de Controle de Indicadores de Risco
+- [ ] Criar procedure tRPC getDashboardRiscos com indicadores consolidados
+- [ ] Implementar cards de KPIs: total de riscos, riscos críticos, riscos em monitoramento, planos ativos
+- [ ] Implementar gráfico de distribuição por nível (Crítico/Alto/Médio/Baixo)
+- [ ] Implementar gráfico de distribuição por categoria (Orçamentário/Operacional/Legal/etc.)
+- [ ] Implementar gráfico de evolução temporal (riscos abertos por mês)
+- [ ] Implementar ranking dos 5 riscos mais críticos
+- [ ] Implementar indicador de cobertura (% riscos com plano de ação)
+- [ ] Implementar indicador de tendência (riscos novos vs. resolvidos)
+- [ ] Testar e verificar

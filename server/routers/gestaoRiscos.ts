@@ -461,6 +461,102 @@ Foco do plano:
       return { success: true, id: (result as any).insertId, plano };
     }),
 
+  // ── Dashboard avançado de indicadores de risco ─────────────────────────────
+  getDashboard: protectedProcedure
+    .input(z.object({ empresaId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return null;
+
+      const riscos = await db.select().from(riscosEmpresa)
+        .where(eq(riscosEmpresa.empresaId, input.empresaId));
+      const planos = await db.select().from(planosAcaoRisco)
+        .where(eq(planosAcaoRisco.empresaId, input.empresaId));
+
+      const total = riscos.length;
+      const criticos = riscos.filter((r: any) => r.severidade === "critica").length;
+      const altos = riscos.filter((r: any) => r.severidade === "alta").length;
+      const medios = riscos.filter((r: any) => r.severidade === "media").length;
+      const baixos = riscos.filter((r: any) => r.severidade === "baixa").length;
+
+      // Riscos ativos (não mitigados nem materializados)
+      const ativos = riscos.filter((r: any) => !['mitigado','materializado'].includes(r.status)).length;
+      const mitigados = riscos.filter((r: any) => r.status === 'mitigado').length;
+      const materializados = riscos.filter((r: any) => r.status === 'materializado').length;
+      const emMitigacao = riscos.filter((r: any) => r.status === 'em_mitigacao').length;
+      const monitorando = riscos.filter((r: any) => r.status === 'monitorando').length;
+
+      // Cobertura: % de riscos com pelo menos um plano de ação ativo
+      const riscosComPlano = new Set(planos.filter((p: any) => p.status === 'ativo').map((p: any) => p.riscoId));
+      const cobertura = total > 0 ? Math.round((riscosComPlano.size / total) * 100) : 0;
+
+      // Planos de ação
+      const totalPlanos = planos.length;
+      const planosAtivos = planos.filter((p: any) => p.status === 'ativo').length;
+      const planosPorIA = planos.filter((p: any) => p.geradoPorIA).length;
+
+      // Top 5 riscos mais críticos (críticos e altos primeiro, depois por data)
+      const top5 = [...riscos]
+        .filter((r: any) => !['mitigado'].includes(r.status))
+        .sort((a: any, b: any) => {
+          const order: Record<string, number> = { critica: 0, alta: 1, media: 2, baixa: 3 };
+          return (order[a.severidade] ?? 4) - (order[b.severidade] ?? 4);
+        })
+        .slice(0, 5)
+        .map((r: any) => ({
+          id: r.id, titulo: r.titulo, severidade: r.severidade,
+          status: r.status, origem: r.origem, temPlano: riscosComPlano.has(r.id),
+        }));
+
+      // Distribuição por categoria
+      const porCategoria: Record<string, number> = {};
+      for (const r of riscos as any[]) {
+        porCategoria[r.categoria] = (porCategoria[r.categoria] || 0) + 1;
+      }
+
+      // Evolução mensal (últimos 6 meses)
+      const agora = new Date();
+      const evolucaoMensal: { mes: string; novos: number; mitigados: number }[] = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
+        const fim = new Date(agora.getFullYear(), agora.getMonth() - i + 1, 0);
+        const label = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+        const novos = riscos.filter((r: any) => {
+          const cr = new Date(r.createdAt);
+          return cr >= d && cr <= fim;
+        }).length;
+        const mit = riscos.filter((r: any) => {
+          if (r.status !== 'mitigado' || !r.updatedAt) return false;
+          const up = new Date(r.updatedAt);
+          return up >= d && up <= fim;
+        }).length;
+        evolucaoMensal.push({ mes: label, novos, mitigados: mit });
+      }
+
+      // Score de exposição ao risco (0-100)
+      const scoreExposicao = total === 0 ? 0 : Math.min(100, Math.round(
+        ((criticos * 4 + altos * 3 + medios * 2 + baixos * 1) / (total * 4)) * 100
+      ));
+
+      // Tendência: riscos novos no último mês vs mês anterior
+      const mesAtual = new Date(agora.getFullYear(), agora.getMonth(), 1);
+      const mesAnterior = new Date(agora.getFullYear(), agora.getMonth() - 1, 1);
+      const novosMesAtual = riscos.filter((r: any) => new Date(r.createdAt) >= mesAtual).length;
+      const novosMesAnterior = riscos.filter((r: any) => {
+        const cr = new Date(r.createdAt);
+        return cr >= mesAnterior && cr < mesAtual;
+      }).length;
+      const tendencia = novosMesAtual > novosMesAnterior ? 'alta' : novosMesAtual < novosMesAnterior ? 'queda' : 'estavel';
+
+      return {
+        total, criticos, altos, medios, baixos,
+        ativos, mitigados, materializados, emMitigacao, monitorando,
+        cobertura, totalPlanos, planosAtivos, planosPorIA,
+        top5, porCategoria, evolucaoMensal,
+        scoreExposicao, tendencia, novosMesAtual, novosMesAnterior,
+      };
+    }),
+
   // ── Listar histórico de um risco ──────────────────────────────────────────
   listHistorico: protectedProcedure
     .input(z.object({
