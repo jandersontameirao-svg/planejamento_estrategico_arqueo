@@ -76,13 +76,14 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
   const [filtroAuditoria, setFiltroAuditoria] = useState("");
   const [filtroAuditoriaAcao, setFiltroAuditoriaAcao] = useState("todos");
 
-  const { data: contrato, refetch } = trpc.contratos.contratos.get.useQuery({ id: contratoId });
-  const { data: marcos = [], refetch: refetchMarcos } = trpc.contratos.marcos.list.useQuery({ contratoId });
-  const { data: riscos = [], refetch: refetchRiscos } = trpc.contratos.riscos.list.useQuery({ contratoId });
-  const { data: documentos = [], refetch: refetchDocs } = trpc.contratos.documentos.list.useQuery({ contratoId });
-  const { data: aditivos = [] } = trpc.contratos.aditivos.list.useQuery({ contratoId });
-  const { data: boletins = [], refetch: refetchBoletins } = trpc.contratos.boletins.list.useQuery({ contratoId });
-  const { data: auditoria = [] } = trpc.contratos.auditoria.porContrato.useQuery({ contratoId });
+  const isValidId = !isNaN(contratoId) && contratoId > 0;
+  const { data: contrato, refetch } = trpc.contratos.contratos.get.useQuery({ id: contratoId }, { enabled: isValidId });
+  const { data: marcos = [], refetch: refetchMarcos } = trpc.contratos.marcos.list.useQuery({ contratoId }, { enabled: isValidId });
+  const { data: riscos = [], refetch: refetchRiscos } = trpc.contratos.riscos.list.useQuery({ contratoId }, { enabled: isValidId });
+  const { data: documentos = [], refetch: refetchDocs } = trpc.contratos.documentos.list.useQuery({ contratoId }, { enabled: isValidId });
+  const { data: aditivos = [] } = trpc.contratos.aditivos.list.useQuery({ contratoId }, { enabled: isValidId });
+  const { data: boletins = [], refetch: refetchBoletins } = trpc.contratos.boletins.list.useQuery({ contratoId }, { enabled: isValidId });
+  const { data: auditoria = [] } = trpc.contratos.auditoria.porContrato.useQuery({ contratoId }, { enabled: isValidId });
 
   const utils = trpc.useUtils();
 
@@ -236,6 +237,17 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
     } finally {
       setAnalisandoIA(false);
     }
+  }
+
+  if (!isValidId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center flex-col gap-4">
+        <p className="text-gray-600">ID de contrato inválido.</p>
+        <Button variant="outline" onClick={() => navigate(`/empresa/${empresaId}/contratos`)}>
+          <ArrowLeft className="w-4 h-4 mr-1" /> Voltar para Contratos
+        </Button>
+      </div>
+    );
   }
 
   if (!contrato) {

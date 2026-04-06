@@ -77,11 +77,13 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
 
   const createContrato = trpc.contratos.contratos.create.useMutation({
     onSuccess: async (data: any) => {
+      // data is the raw insertId (number) returned by createContrato
+      const novoId = typeof data === "number" ? data : data?.id;
       // If we have IA data, confirm extraction to create marcos and riscos
       if (iaResult && (marcos.length > 0 || riscos.length > 0)) {
         try {
           await confirmarExtracao.mutateAsync({
-            contratoId: data.id,
+            contratoId: novoId,
             dadosRevisados: {
               resumoIA: iaResult.resumo || form.descricao,
               dadosExtradosIA: JSON.stringify(iaResult),
@@ -106,7 +108,7 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
         }
       }
       toast.success("Contrato criado com sucesso!");
-      navigate(`/empresa/${empresaId}/contratos/${data.id}`);
+      navigate(`/empresa/${empresaId}/contratos/${novoId}`);
     },
     onError: (err: any) => {
       toast.error("Erro ao criar contrato: " + err.message);
