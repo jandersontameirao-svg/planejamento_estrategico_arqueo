@@ -142,8 +142,11 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
   }, [clientes]);
 
   async function handleFileSelect(file: File) {
-    if (!file.type.includes("pdf")) {
-      toast.error("Apenas arquivos PDF são aceitos");
+    const isValidType = file.type.includes("pdf") ||
+      file.type.includes("wordprocessingml") ||
+      file.name.toLowerCase().endsWith(".docx");
+    if (!isValidType) {
+      toast.error("Apenas arquivos PDF ou DOCX são aceitos");
       return;
     }
     if (file.size > 16 * 1024 * 1024) {
@@ -262,18 +265,18 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
                   <Upload className="w-8 h-8 text-purple-600" />
                 </div>
                 <p className="text-base font-semibold text-gray-800 mb-1">
-                  Arraste o PDF do contrato aqui
+                  Arraste o PDF ou DOCX do contrato aqui
                 </p>
                 <p className="text-sm text-gray-500 mb-3">ou clique para selecionar o arquivo</p>
                 <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
-                  <span className="flex items-center gap-1"><FileText className="w-3 h-3" /> PDF até 16MB</span>
+                  <span className="flex items-center gap-1"><FileText className="w-3 h-3" /> PDF ou DOCX até 16MB</span>
                   <span className="flex items-center gap-1"><Brain className="w-3 h-3" /> Extração por IA</span>
                   <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Revisão obrigatória</span>
                 </div>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".pdf"
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                   className="hidden"
                   onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
                 />
