@@ -1804,3 +1804,28 @@ export const planosAcaoRisco = mysqlTable("planos_acao_risco", {
 });
 export type PlanoAcaoRisco = typeof planosAcaoRisco.$inferSelect;
 export type InsertPlanoAcaoRisco = typeof planosAcaoRisco.$inferInsert;
+
+// ─── HISTÓRICO DE ALTERAÇÕES DE RISCOS ───────────────────────────────────────
+export const riscosHistorico = mysqlTable("riscos_historico", {
+  id: int("id").autoincrement().primaryKey(),
+  riscoId: int("risco_id").notNull(),
+  empresaId: int("empresa_id").notNull(),
+  userId: int("user_id"),
+  userName: varchar("user_name", { length: 200 }),
+  tipoEvento: mysqlEnum("tipo_evento", [
+    "criado",       // risco foi criado
+    "editado",      // campos do risco foram alterados
+    "excluido",     // risco foi excluído
+    "plano_criado", // plano de ação foi criado
+    "plano_ia",     // plano de ação gerado por IA
+    "status_alterado", // status do risco mudou
+    "comentario",   // comentário adicionado manualmente
+  ]).notNull(),
+  descricao: text("descricao").notNull(),  // texto legível do que mudou
+  camposAlterados: json("campos_alterados"), // { campo: { de: valor_anterior, para: valor_novo } }
+  valorAnterior: json("valor_anterior"),   // snapshot do risco antes da alteração
+  valorNovo: json("valor_novo"),           // snapshot do risco após a alteração
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type RiscoHistorico = typeof riscosHistorico.$inferSelect;
+export type InsertRiscoHistorico = typeof riscosHistorico.$inferInsert;

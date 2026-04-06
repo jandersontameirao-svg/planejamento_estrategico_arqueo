@@ -1541,3 +1541,19 @@
 - [x] Registrar rota /empresa/:id/gestao-riscos no App.tsx
 - [x] Plano de Ação com IA: prompt especializado em PMEs de arqueologia, benchmarking, corte de custos
 - [x] 140 testes passando (12 novos testes em gestaoRiscos.test.ts)
+
+## Histórico de Alterações de Riscos
+- [ ] Criar tabela riscos_historico no banco de dados
+- [ ] Criar procedure tRPC para registrar e listar histórico
+- [ ] Disparar registro automático ao criar/editar/excluir risco
+- [ ] Implementar visualização de histórico na página GestaoRiscos (timeline)
+- [ ] Testar e verificar
+
+## Histórico de Alterações de Riscos
+- [x] Criar tabela riscos_historico no banco de dados
+- [x] Criar procedures tRPC: listHistorico, listHistoricoEmpresa, adicionarComentario
+- [x] Registrar histórico automático em create, update, delete, plano_criado, plano_ia
+- [x] Implementar timeline de histórico por risco (modal com ícones por tipo de evento)
+- [x] Implementar aba "Histórico" geral com últimas 50 alterações de todos os riscos
+- [x] Adicionar caixa de comentários com Ctrl+Enter para enviar
+- [x] 140 testes passando, 0 erros TypeScript

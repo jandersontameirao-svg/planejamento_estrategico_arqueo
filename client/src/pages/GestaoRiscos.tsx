@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Plus, Sparkles, Target, TrendingDown, Shield, ChevronDown, ChevronRight, Trash2, Edit3, CheckCircle2, Clock, AlertCircle, X } from "lucide-react";
+import { AlertTriangle, Plus, Sparkles, Target, TrendingDown, Shield, ChevronDown, ChevronRight, Trash2, Edit3, CheckCircle2, Clock, AlertCircle, X, History, MessageSquare, Send, FileEdit, PlusCircle, MinusCircle, RefreshCw, Bot } from "lucide-react";
 import { toast } from "sonner";
 
 // ─── TIPOS ────────────────────────────────────────────────────────────────────
@@ -27,6 +27,20 @@ type Risco = {
   severidade: string;
   status: string;
   responsavel?: string | null;
+  createdAt: Date;
+};
+
+type HistoricoItem = {
+  id: number;
+  riscoId: number;
+  empresaId: number;
+  userId?: number | null;
+  userName?: string | null;
+  tipoEvento: string;
+  descricao: string;
+  camposAlterados?: any;
+  valorAnterior?: any;
+  valorNovo?: any;
   createdAt: Date;
 };
 
@@ -109,6 +123,8 @@ export default function GestaoRiscos() {
   const [modalPlanoIA, setModalPlanoIA] = useState<Risco | null>(null);
   const [modalEditarRisco, setModalEditarRisco] = useState<Risco | null>(null);
   const [gerando, setGerando] = useState(false);
+  const [riscoHistorico, setRiscoHistorico] = useState<number | null>(null);
+  const [comentario, setComentario] = useState("");
 
   // ── Queries ────────────────────────────────────────────────────────────────
   const empresa = trpc.empresas.getById.useQuery({ id: empresaId });
@@ -125,6 +141,16 @@ export default function GestaoRiscos() {
     utils.gestaoRiscos.resumo.invalidate({ empresaId });
     utils.gestaoRiscos.list.invalidate({ empresaId });
   };
+
+  const adicionarComentario = trpc.gestaoRiscos.adicionarComentario.useMutation({
+    onSuccess: () => {
+      setComentario("");
+      utils.gestaoRiscos.listHistorico.invalidate({ riscoId: riscoHistorico! });
+      utils.gestaoRiscos.listHistoricoEmpresa.invalidate({ empresaId });
+      toast.success("Comentário adicionado");
+    },
+    onError: (e) => toast.error("Erro: " + e.message),
+  });
 
   // ── Mutations ──────────────────────────────────────────────────────────────
   const criarRisco = trpc.gestaoRiscos.create.useMutation({
@@ -200,10 +226,11 @@ export default function GestaoRiscos() {
       </div>
 
       <Tabs value={tabAtiva} onValueChange={setTabAtiva}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="riscos">Riscos ({riscos.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="matriz">Matriz de Calor</TabsTrigger>
+          <TabsTrigger value="historico" className="gap-1.5"><History className="w-3.5 h-3.5" />Histórico</TabsTrigger>
         </TabsList>
 
         {/* ── DASHBOARD ─────────────────────────────────────────────────── */}
@@ -334,9 +361,15 @@ export default function GestaoRiscos() {
                   if (confirm(`Excluir o risco "${risco.titulo}"?`)) excluirRisco.mutate({ id: risco.id });
                 }}
                 empresaId={empresaId}
+                onVerHistorico={(id) => setRiscoHistorico(id)}
               />
             ))}
           </div>
+        </TabsContent>
+
+        {/* ── HISTÓRICO GERAL DA EMPRESA ───────────────────────────────── */}
+        <TabsContent value="historico" className="space-y-4 mt-4">
+          <HistoricoEmpresa empresaId={empresaId} onVerRisco={(id) => setRiscoHistorico(id)} />
         </TabsContent>
 
         {/* ── MATRIZ DE CALOR ───────────────────────────────────────────── */}
@@ -485,6 +518,31 @@ export default function GestaoRiscos() {
         </DialogContent>
       </Dialog>
 
+      {/* ── MODAL HISTÓRICO DO RISCO ─────────────────────────────────────────── */}
+      <Dialog open={!!riscoHistorico} onOpenChange={() => { setRiscoHistorico(null); setComentario(""); }}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="w-5 h-5 text-gray-500" />
+              Histórico de Alterações
+            </DialogTitle>
+          </DialogHeader>
+          {riscoHistorico && (
+            <HistoricoRisco
+              riscoId={riscoHistorico}
+              empresaId={empresaId}
+              comentario={comentario}
+              setComentario={setComentario}
+              onEnviarComentario={() => {
+                if (!comentario.trim()) return;
+                adicionarComentario.mutate({ riscoId: riscoHistorico, empresaId, comentario });
+              }}
+              enviando={adicionarComentario.isPending}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* ── MODAL GERAR PLANO IA ─────────────────────────────────────────────── */}
       <Dialog open={!!modalPlanoIA} onOpenChange={() => setModalPlanoIA(null)}>
         <DialogContent className="max-w-md">
@@ -535,15 +593,185 @@ export default function GestaoRiscos() {
   );
 }
 
+// ─── HISTÓRICO RISCO ─────────────────────────────────────────────────────────
+
+const EVENTO_ICON: Record<string, React.ReactNode> = {
+  criado: <PlusCircle className="w-4 h-4 text-green-500" />,
+  editado: <FileEdit className="w-4 h-4 text-blue-500" />,
+  excluido: <MinusCircle className="w-4 h-4 text-red-500" />,
+  plano_criado: <Target className="w-4 h-4 text-indigo-500" />,
+  plano_ia: <Bot className="w-4 h-4 text-purple-500" />,
+  status_alterado: <RefreshCw className="w-4 h-4 text-orange-500" />,
+  comentario: <MessageSquare className="w-4 h-4 text-gray-500" />,
+};
+
+const EVENTO_LABEL: Record<string, string> = {
+  criado: "Risco criado",
+  editado: "Risco editado",
+  excluido: "Risco excluído",
+  plano_criado: "Plano de ação criado",
+  plano_ia: "Plano gerado por IA",
+  status_alterado: "Status alterado",
+  comentario: "Comentário",
+};
+
+function HistoricoItem({ item }: { item: HistoricoItem }) {
+  const [expandido, setExpandido] = useState(false);
+  const temDetalhes = item.camposAlterados && Object.keys(item.camposAlterados).length > 0;
+
+  return (
+    <div className="flex gap-3">
+      <div className="flex flex-col items-center">
+        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+          {EVENTO_ICON[item.tipoEvento] ?? <History className="w-4 h-4 text-gray-400" />}
+        </div>
+        <div className="w-0.5 bg-gray-100 flex-1 mt-1" />
+      </div>
+      <div className="pb-4 flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-semibold text-gray-700">{EVENTO_LABEL[item.tipoEvento] ?? item.tipoEvento}</span>
+          {item.userName && <span className="text-xs text-gray-400">por {item.userName}</span>}
+          <span className="text-xs text-gray-300 ml-auto">{new Date(item.createdAt).toLocaleString("pt-BR")}</span>
+        </div>
+        <p className="text-sm text-gray-600 mt-0.5">{item.descricao}</p>
+        {temDetalhes && (
+          <button
+            className="text-xs text-blue-500 hover:text-blue-700 mt-1 flex items-center gap-1"
+            onClick={() => setExpandido(!expandido)}
+          >
+            {expandido ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+            {expandido ? "Ocultar detalhes" : "Ver campos alterados"}
+          </button>
+        )}
+        {expandido && temDetalhes && (
+          <div className="mt-2 space-y-1">
+            {Object.entries(item.camposAlterados as Record<string, { de: any; para: any }>).map(([campo, { de, para }]) => (
+              <div key={campo} className="text-xs bg-gray-50 rounded p-2">
+                <span className="font-medium text-gray-600">{campo}:</span>{" "}
+                <span className="text-red-500 line-through">{String(de ?? "—")}</span>{" → "}
+                <span className="text-green-600 font-medium">{String(para ?? "—")}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function HistoricoRisco({ riscoId, empresaId, comentario, setComentario, onEnviarComentario, enviando }: {
+  riscoId: number;
+  empresaId: number;
+  comentario: string;
+  setComentario: (v: string) => void;
+  onEnviarComentario: () => void;
+  enviando: boolean;
+}) {
+  const historico = trpc.gestaoRiscos.listHistorico.useQuery({ riscoId });
+
+  return (
+    <div className="flex flex-col gap-4 overflow-hidden">
+      <div className="overflow-y-auto flex-1 max-h-[50vh] pr-1">
+        {historico.isLoading && <p className="text-sm text-gray-400 text-center py-8">Carregando histórico...</p>}
+        {!historico.isLoading && (!historico.data || historico.data.length === 0) && (
+          <div className="text-center py-8 text-gray-400">
+            <History className="w-10 h-10 mx-auto mb-2 opacity-30" />
+            <p className="text-sm">Nenhuma alteração registrada ainda</p>
+          </div>
+        )}
+        <div className="space-y-0">
+          {historico.data?.map((item) => (
+            <HistoricoItem key={item.id} item={item as HistoricoItem} />
+          ))}
+        </div>
+      </div>
+      {/* Caixa de comentário */}
+      <div className="border-t pt-3">
+        <p className="text-xs text-gray-500 mb-2 font-medium">Adicionar comentário</p>
+        <div className="flex gap-2">
+          <Textarea
+            placeholder="Escreva uma observação sobre este risco..."
+            value={comentario}
+            onChange={e => setComentario(e.target.value)}
+            rows={2}
+            className="text-sm resize-none"
+            onKeyDown={e => { if (e.key === "Enter" && e.ctrlKey) onEnviarComentario(); }}
+          />
+          <Button
+            size="sm"
+            onClick={onEnviarComentario}
+            disabled={!comentario.trim() || enviando}
+            className="self-end gap-1"
+          >
+            <Send className="w-3.5 h-3.5" />
+            {enviando ? "..." : "Enviar"}
+          </Button>
+        </div>
+        <p className="text-xs text-gray-300 mt-1">Ctrl+Enter para enviar</p>
+      </div>
+    </div>
+  );
+}
+
+function HistoricoEmpresa({ empresaId, onVerRisco }: { empresaId: number; onVerRisco: (id: number) => void }) {
+  const historico = trpc.gestaoRiscos.listHistoricoEmpresa.useQuery({ empresaId, limit: 50 });
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-gray-700">Últimas 50 alterações em todos os riscos</h3>
+        <Button variant="ghost" size="sm" onClick={() => historico.refetch()} className="gap-1 text-xs">
+          <RefreshCw className="w-3.5 h-3.5" /> Atualizar
+        </Button>
+      </div>
+      {historico.isLoading && <p className="text-sm text-gray-400 text-center py-8">Carregando...</p>}
+      {!historico.isLoading && (!historico.data || historico.data.length === 0) && (
+        <div className="text-center py-12 text-gray-400">
+          <History className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p className="text-sm">Nenhuma alteração registrada ainda</p>
+          <p className="text-xs mt-1">O histórico será preenchido conforme os riscos forem criados e editados</p>
+        </div>
+      )}
+      <div className="space-y-0">
+        {historico.data?.map((item) => (
+          <div key={item.id} className="flex gap-3 group">
+            <div className="flex flex-col items-center">
+              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                {EVENTO_ICON[item.tipoEvento] ?? <History className="w-4 h-4 text-gray-400" />}
+              </div>
+              <div className="w-0.5 bg-gray-100 flex-1 mt-1" />
+            </div>
+            <div className="pb-4 flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-semibold text-gray-700">{EVENTO_LABEL[item.tipoEvento] ?? item.tipoEvento}</span>
+                {item.userName && <span className="text-xs text-gray-400">por {item.userName}</span>}
+                <button
+                  className="text-xs text-blue-500 hover:underline ml-1"
+                  onClick={() => onVerRisco(item.riscoId)}
+                >
+                  Ver risco #{item.riscoId}
+                </button>
+                <span className="text-xs text-gray-300 ml-auto">{new Date(item.createdAt).toLocaleString("pt-BR")}</span>
+              </div>
+              <p className="text-sm text-gray-600 mt-0.5">{item.descricao}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── RISCO CARD ───────────────────────────────────────────────────────────────
 
-function RiscoCard({ risco, expanded, onToggle, onGerarPlanoIA, onExcluir, empresaId }: {
+function RiscoCard({ risco, expanded, onToggle, onGerarPlanoIA, onExcluir, empresaId, onVerHistorico }: {
   risco: Risco;
   expanded: boolean;
   onToggle: () => void;
   onGerarPlanoIA: () => void;
   onExcluir: () => void;
   empresaId: number;
+  onVerHistorico: (id: number) => void;
 }) {
   const planos = trpc.gestaoRiscos.listPlanos.useQuery(
     { riscoId: risco.id },
@@ -614,6 +842,21 @@ function RiscoCard({ risco, expanded, onToggle, onGerarPlanoIA, onExcluir, empre
               <span className="text-gray-400 uppercase tracking-wide">Responsável</span>
               <p className="font-medium mt-0.5">{risco.responsavel || "—"}</p>
             </div>
+          </div>
+
+          {/* Histórico do risco */}
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <History className="w-4 h-4 text-gray-400" />
+              Histórico de Alterações
+            </h4>
+            <Button
+              variant="ghost" size="sm"
+              className="text-xs text-gray-500 gap-1"
+              onClick={e => { e.stopPropagation(); onVerHistorico(risco.id); }}
+            >
+              <History className="w-3.5 h-3.5" /> Ver histórico completo
+            </Button>
           </div>
 
           {/* Planos de ação */}

@@ -2,8 +2,8 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { invokeLLM } from "../_core/llm";
 import { getDb } from "../db";
-import { riscosEmpresa, planosAcaoRisco } from "../../drizzle/schema";
-import { eq, desc } from "drizzle-orm";
+import { riscosEmpresa, planosAcaoRisco, riscosHistorico } from "../../drizzle/schema";
+import { eq, desc, and } from "drizzle-orm";
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
@@ -15,6 +15,35 @@ function calcSeveridade(prob: string, impacto: string): "baixa" | "media" | "alt
   if (score <= 4) return "media";
   if (score <= 6) return "alta";
   return "critica";
+}
+
+async function registrarHistorico(db: any, params: {
+  riscoId: number;
+  empresaId: number;
+  userId?: number;
+  userName?: string;
+  tipoEvento: "criado" | "editado" | "excluido" | "plano_criado" | "plano_ia" | "status_alterado" | "comentario";
+  descricao: string;
+  camposAlterados?: Record<string, { de: any; para: any }>;
+  valorAnterior?: any;
+  valorNovo?: any;
+}) {
+  try {
+    await db.insert(riscosHistorico).values({
+      riscoId: params.riscoId,
+      empresaId: params.empresaId,
+      userId: params.userId ?? null,
+      userName: params.userName ?? null,
+      tipoEvento: params.tipoEvento,
+      descricao: params.descricao,
+      camposAlterados: params.camposAlterados ?? null,
+      valorAnterior: params.valorAnterior ?? null,
+      valorNovo: params.valorNovo ?? null,
+    });
+  } catch (e) {
+    // Histórico não deve quebrar a operação principal
+    console.error("[gestaoRiscos] Erro ao registrar histórico:", e);
+  }
 }
 
 // ─── SCHEMAS ─────────────────────────────────────────────────────────────────
@@ -61,31 +90,31 @@ export const gestaoRiscosRouter = router({
 
       const total = riscos.length;
       const porSeveridade = {
-        critica: riscos.filter(r => r.severidade === "critica").length,
-        alta: riscos.filter(r => r.severidade === "alta").length,
-        media: riscos.filter(r => r.severidade === "media").length,
-        baixa: riscos.filter(r => r.severidade === "baixa").length,
+        critica: riscos.filter((r: any) => r.severidade === "critica").length,
+        alta: riscos.filter((r: any) => r.severidade === "alta").length,
+        media: riscos.filter((r: any) => r.severidade === "media").length,
+        baixa: riscos.filter((r: any) => r.severidade === "baixa").length,
       };
       const porStatus = {
-        identificado: riscos.filter(r => r.status === "identificado").length,
-        em_mitigacao: riscos.filter(r => r.status === "em_mitigacao").length,
-        mitigado: riscos.filter(r => r.status === "mitigado").length,
-        materializado: riscos.filter(r => r.status === "materializado").length,
-        aceito: riscos.filter(r => r.status === "aceito").length,
-        monitorando: riscos.filter(r => r.status === "monitorando").length,
+        identificado: riscos.filter((r: any) => r.status === "identificado").length,
+        em_mitigacao: riscos.filter((r: any) => r.status === "em_mitigacao").length,
+        mitigado: riscos.filter((r: any) => r.status === "mitigado").length,
+        materializado: riscos.filter((r: any) => r.status === "materializado").length,
+        aceito: riscos.filter((r: any) => r.status === "aceito").length,
+        monitorando: riscos.filter((r: any) => r.status === "monitorando").length,
       };
       const porOrigem = {
-        orcamentario: riscos.filter(r => r.origem === "orcamentario").length,
-        estrategico: riscos.filter(r => r.origem === "estrategico").length,
-        operacional: riscos.filter(r => r.origem === "operacional").length,
-        contratual: riscos.filter(r => r.origem === "contratual").length,
-        financeiro: riscos.filter(r => r.origem === "financeiro").length,
-        regulatorio: riscos.filter(r => r.origem === "regulatorio").length,
-        outro: riscos.filter(r => r.origem === "outro").length,
+        orcamentario: riscos.filter((r: any) => r.origem === "orcamentario").length,
+        estrategico: riscos.filter((r: any) => r.origem === "estrategico").length,
+        operacional: riscos.filter((r: any) => r.origem === "operacional").length,
+        contratual: riscos.filter((r: any) => r.origem === "contratual").length,
+        financeiro: riscos.filter((r: any) => r.origem === "financeiro").length,
+        regulatorio: riscos.filter((r: any) => r.origem === "regulatorio").length,
+        outro: riscos.filter((r: any) => r.origem === "outro").length,
       };
       const matrizCalor: Record<string, number> = {};
       for (const r of riscos) {
-        const key = `${r.probabilidade}_${r.impacto}`;
+        const key = `${(r as any).probabilidade}_${(r as any).impacto}`;
         matrizCalor[key] = (matrizCalor[key] || 0) + 1;
       }
       return { total, porSeveridade, porStatus, porOrigem, matrizCalor, riscos };
@@ -126,13 +155,24 @@ export const gestaoRiscosRouter = router({
         contratoId: input.contratoId ?? null,
         createdByUserId: ctx.user.id,
       });
-      return { success: true, id: (result as any).insertId };
+      const novoId = (result as any).insertId;
+      await registrarHistorico(db, {
+        riscoId: novoId,
+        empresaId: input.empresaId,
+        userId: ctx.user.id,
+        userName: ctx.user.name ?? undefined,
+        tipoEvento: "criado",
+        descricao: `Risco "${input.titulo}" criado com severidade ${severidade}.`,
+        valorNovo: { ...input, severidade, status: "identificado" },
+      });
+      return { success: true, id: novoId };
     }),
 
   // ── Atualizar risco ───────────────────────────────────────────────────────
   update: protectedProcedure
     .input(z.object({
       id: z.number(),
+      empresaId: z.number().optional(),
       titulo: z.string().min(1).optional(),
       descricao: z.string().optional(),
       origem: z.enum(["orcamentario","estrategico","operacional","contratual","financeiro","regulatorio","outro"]).optional(),
@@ -143,33 +183,78 @@ export const gestaoRiscosRouter = router({
       responsavel: z.string().optional(),
       dataRevisao: z.string().optional(),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       const { id, ...data } = input;
+
+      // Buscar estado anterior para histórico
+      const [anterior] = await db.select().from(riscosEmpresa).where(eq(riscosEmpresa.id, id));
+
       const updateData: Record<string, any> = { ...data };
       if (data.probabilidade || data.impacto) {
-        // Fetch current to compute severidade
-        const [cur] = await db.select().from(riscosEmpresa).where(eq(riscosEmpresa.id, id));
-        if (cur) {
-          const prob = data.probabilidade ?? cur.probabilidade;
-          const imp = data.impacto ?? cur.impacto;
-          updateData.severidade = calcSeveridade(prob, imp);
-        }
+        const prob = data.probabilidade ?? (anterior as any)?.probabilidade;
+        const imp = data.impacto ?? (anterior as any)?.impacto;
+        updateData.severidade = calcSeveridade(prob, imp);
       }
       if (data.dataRevisao) {
         updateData.dataRevisao = new Date(data.dataRevisao);
       }
       await db.update(riscosEmpresa).set(updateData).where(eq(riscosEmpresa.id, id));
+
+      // Registrar histórico com campos alterados
+      const camposAlterados: Record<string, { de: any; para: any }> = {};
+      const labelMap: Record<string, string> = {
+        titulo: "Título", descricao: "Descrição", origem: "Origem", categoria: "Categoria",
+        probabilidade: "Probabilidade", impacto: "Impacto", status: "Status",
+        responsavel: "Responsável", dataRevisao: "Data de Revisão", severidade: "Severidade",
+      };
+      for (const campo of Object.keys(updateData)) {
+        const valorAnterior = (anterior as any)?.[campo];
+        const valorNovo = updateData[campo];
+        if (valorAnterior !== valorNovo) {
+          camposAlterados[labelMap[campo] ?? campo] = { de: valorAnterior, para: valorNovo };
+        }
+      }
+
+      const tipoEvento = data.status && data.status !== (anterior as any)?.status
+        ? "status_alterado"
+        : "editado";
+      const descricaoEvento = tipoEvento === "status_alterado"
+        ? `Status alterado de "${(anterior as any)?.status}" para "${data.status}".`
+        : `Risco atualizado: ${Object.keys(camposAlterados).join(", ")}.`;
+
+      await registrarHistorico(db, {
+        riscoId: id,
+        empresaId: (anterior as any)?.empresaId ?? input.empresaId ?? 0,
+        userId: ctx.user.id,
+        userName: ctx.user.name ?? undefined,
+        tipoEvento,
+        descricao: descricaoEvento,
+        camposAlterados,
+        valorAnterior: anterior,
+        valorNovo: { ...anterior, ...updateData },
+      });
+
       return { success: true };
     }),
 
   // ── Excluir risco ─────────────────────────────────────────────────────────
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
+      const [risco] = await db.select().from(riscosEmpresa).where(eq(riscosEmpresa.id, input.id));
+      await registrarHistorico(db, {
+        riscoId: input.id,
+        empresaId: (risco as any)?.empresaId ?? 0,
+        userId: ctx.user.id,
+        userName: ctx.user.name ?? undefined,
+        tipoEvento: "excluido",
+        descricao: `Risco "${(risco as any)?.titulo ?? "desconhecido"}" excluído.`,
+        valorAnterior: risco,
+      });
       await db.delete(planosAcaoRisco).where(eq(planosAcaoRisco.riscoId, input.id));
       await db.delete(riscosEmpresa).where(eq(riscosEmpresa.id, input.id));
       return { success: true };
@@ -218,6 +303,14 @@ export const gestaoRiscosRouter = router({
         acoes: input.acoes ? input.acoes : null,
         status: "ativo",
         createdByUserId: ctx.user.id,
+      });
+      await registrarHistorico(db, {
+        riscoId: input.riscoId,
+        empresaId: input.empresaId,
+        userId: ctx.user.id,
+        userName: ctx.user.name ?? undefined,
+        tipoEvento: "plano_criado",
+        descricao: `Plano de ação "${input.titulo}" criado manualmente.`,
       });
       return { success: true, id: (result as any).insertId };
     }),
@@ -355,6 +448,65 @@ Foco do plano:
         createdByUserId: ctx.user.id,
       });
 
+      await registrarHistorico(db, {
+        riscoId: input.riscoId,
+        empresaId: input.empresaId,
+        userId: ctx.user.id,
+        userName: ctx.user.name ?? undefined,
+        tipoEvento: "plano_ia",
+        descricao: `Plano de ação "${plano.titulo}" gerado por IA com foco em ${plano.tipoPrioridade === "corte_custos" ? "corte de custos" : plano.tipoPrioridade}.`,
+        valorNovo: { planoId: (result as any).insertId, titulo: plano.titulo },
+      });
+
       return { success: true, id: (result as any).insertId, plano };
+    }),
+
+  // ── Listar histórico de um risco ──────────────────────────────────────────
+  listHistorico: protectedProcedure
+    .input(z.object({
+      riscoId: z.number(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      return await db.select().from(riscosHistorico)
+        .where(eq(riscosHistorico.riscoId, input.riscoId))
+        .orderBy(desc(riscosHistorico.createdAt));
+    }),
+
+  // ── Listar histórico de todos os riscos de uma empresa ────────────────────
+  listHistoricoEmpresa: protectedProcedure
+    .input(z.object({
+      empresaId: z.number(),
+      limit: z.number().min(1).max(100).default(50),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      return await db.select().from(riscosHistorico)
+        .where(eq(riscosHistorico.empresaId, input.empresaId))
+        .orderBy(desc(riscosHistorico.createdAt))
+        .limit(input.limit);
+    }),
+
+  // ── Adicionar comentário ao histórico ─────────────────────────────────────
+  adicionarComentario: protectedProcedure
+    .input(z.object({
+      riscoId: z.number(),
+      empresaId: z.number(),
+      comentario: z.string().min(1),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      await registrarHistorico(db, {
+        riscoId: input.riscoId,
+        empresaId: input.empresaId,
+        userId: ctx.user.id,
+        userName: ctx.user.name ?? undefined,
+        tipoEvento: "comentario",
+        descricao: input.comentario,
+      });
+      return { success: true };
     }),
 });
