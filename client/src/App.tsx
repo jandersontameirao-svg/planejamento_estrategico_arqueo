@@ -39,6 +39,7 @@ import Contratos from "./pages/Contratos";
 import ContratoDetalhe from "./pages/ContratoDetalhe";
 import ContratosClientes from "./pages/ContratosClientes";
 import GestaoClienteDetalhe from "./pages/GestaoClienteDetalhe";
+import GestaoClientes from "./pages/GestaoClientes";
 
 import PlanejamentoEstrategicoArea from "./pages/PlanejamentoEstrategicoArea";
 import DashboardAnalisesArea from "./pages/DashboardAnalisesArea";
@@ -107,6 +108,9 @@ function Router() {
       </Route>
       <Route path="/empresa/:id/contratos/clientes">
         {(params) => <ContratosClientes empresaId={Number(params.id)} />}
+      </Route>
+      <Route path="/empresa/:id/clientes">
+        {(params) => <GestaoClientes empresaId={Number(params.id)} />}
       </Route>
       <Route path="/empresa/:id/contratos/:contratoId">
         {(params) => <ContratoDetalhe empresaId={Number(params.id)} contratoId={Number(params.contratoId)} />}
