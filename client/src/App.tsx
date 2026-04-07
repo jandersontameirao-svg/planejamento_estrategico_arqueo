@@ -118,6 +118,7 @@ function Router() {
       <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path="/aprovacao/:token" component={AprovacaoBoletim} />
+      <Route path="/gestao-clientes">{() => <GestaoClientes />}</Route>
       <Route path="/gestao-clientes/:id" component={GestaoClienteDetalhe} />
       <Route path="/empresa/:id/gestao-riscos">
         {(params) => <GestaoRiscos />}
