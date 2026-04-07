@@ -1620,3 +1620,6 @@
 - [x] Remover botão "Novo Cliente" de GestaoClientes.tsx — rota removida
 - [x] Remover rotas de criação do App.tsx
 - [x] Testar navegação e redirecionamentos (183/183 testes passando)
+
+## Correção Estado Vazio Contratos
+- [x] Remover botão "Criar Contrato no SGC" do estado vazio e exibir mensagem de conexão pendente com o SGC
