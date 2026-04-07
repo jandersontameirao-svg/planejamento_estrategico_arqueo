@@ -1,19 +1,13 @@
-import { useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SGCBanner } from "@/components/SGCBanner";
-import { toast } from "sonner";
 import {
   ArrowLeft, Building2, MapPin, Phone, Mail, Briefcase,
-  Hash, Loader2, Pencil, Trash2, Users, FileText,
-  Plus, Eye, CheckCircle2, XCircle, Clock,
+  Hash, Loader2, Users, FileText, Eye, CheckCircle2, XCircle, Clock,
 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 function formatDate(v: unknown) {
@@ -61,66 +55,16 @@ export default function GestaoClienteDetalhe() {
   const [, params] = useRoute("/gestao-clientes/:id");
   const [, navigate] = useLocation();
   const clientId = Number(params?.id);
-  const [showEdit, setShowEdit] = useState(false);
-  const [form, setForm] = useState<Record<string, string>>({});
-  const utils = trpc.useUtils();
 
   const { data: client, isLoading } = trpc.contratos.clientes.get.useQuery(
     { id: clientId },
     { enabled: !!clientId }
   );
 
-  // Contratos do cliente (módulo SGC)
   const { data: contratos, isLoading: contratosLoading } = trpc.contratos.contratos.listByCliente.useQuery(
     { clienteId: clientId },
     { enabled: !!clientId }
   );
-
-  const updateMut = trpc.contratos.clientes.update.useMutation({
-    onSuccess: () => {
-      utils.contratos.clientes.get.invalidate({ id: clientId });
-      toast.success("Cliente atualizado!");
-      setShowEdit(false);
-    },
-    onError: (e: { message: string }) => toast.error(e.message),
-  });
-
-  const deleteMut = trpc.contratos.clientes.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Cliente removido.");
-      navigate("/gestao-clientes");
-    },
-    onError: (e: { message: string }) => toast.error(e.message),
-  });
-
-  function handleEdit() {
-    if (!client) return;
-    setForm({
-      razaoSocial: client.razaoSocial || "",
-      nomeFantasia: client.nomeFantasia || "",
-      cnpj: client.cnpj || "",
-      endereco: client.endereco || "",
-      cep: client.cep || "",
-      cidade: client.cidade || "",
-      estado: client.estado || "",
-      telefone: client.telefone || "",
-      email: client.email || "",
-      contatoNome: client.contatoNome || "",
-      cnaeDescricao: client.cnaeDescricao || "",
-      naturezaJuridica: client.naturezaJuridica || "",
-      dataAbertura: client.dataAbertura || "",
-      situacaoCadastral: client.situacaoCadastral || "",
-      logoUrl: client.logoUrl || "",
-    });
-    setShowEdit(true);
-  }
-
-  function handleDelete() {
-    if (!client) return;
-    if (confirm(`Tem certeza que deseja excluir "${client.razaoSocial}"? Esta ação não pode ser desfeita.`)) {
-      deleteMut.mutate({ id: clientId });
-    }
-  }
 
   if (isLoading) {
     return (
@@ -149,10 +93,11 @@ export default function GestaoClienteDetalhe() {
   return (
     <div className="container py-8 max-w-5xl">
       <SGCBanner
-        message="Os dados deste cliente são gerenciados pelo SGC. Alterações devem ser feitas lá."
+        message="Os dados deste cliente são gerenciados pelo SGC. Esta é uma visualização somente leitura."
         sgcUrl={`${import.meta.env.VITE_SGC_PUBLIC_APP_URL || ''}/gestao-clientes/${client.id}`}
       />
       <div className="mt-4" />
+
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 mb-6">
         <Button variant="ghost" size="sm" onClick={() => navigate("/gestao-clientes")}>
@@ -187,7 +132,6 @@ export default function GestaoClienteDetalhe() {
             </div>
           </div>
         </div>
-
       </div>
 
       {/* Tabs */}
@@ -325,18 +269,6 @@ export default function GestaoClienteDetalhe() {
 
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold">Contratos de {client.razaoSocial}</h3>
-            <Button
-              size="sm"
-              className="bg-orange-500 hover:bg-orange-600 text-white"
-              onClick={() =>
-                navigate(
-                  `/contratos/novo?clienteId=${clientId}&clienteNome=${encodeURIComponent(client.razaoSocial)}`
-                )
-              }
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Contrato
-            </Button>
           </div>
 
           {contratosLoading ? (
@@ -347,22 +279,10 @@ export default function GestaoClienteDetalhe() {
             <Card className="border-dashed">
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                 <FileText className="h-12 w-12 text-muted-foreground mb-3" />
-                <h3 className="text-base font-semibold mb-1">Nenhum contrato cadastrado</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Crie o primeiro contrato para este cliente.
+                <h3 className="text-base font-semibold mb-1">Nenhum contrato disponível</h3>
+                <p className="text-sm text-muted-foreground">
+                  Os contratos são gerenciados pelo SGC. Aguardando sincronização de dados.
                 </p>
-                <Button
-                  size="sm"
-                  className="bg-orange-500 hover:bg-orange-600 text-white"
-                  onClick={() =>
-                    navigate(
-                      `/contratos/novo?clienteId=${clientId}&clienteNome=${encodeURIComponent(client.razaoSocial)}`
-                    )
-                  }
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Novo Contrato
-                </Button>
               </CardContent>
             </Card>
           ) : (
@@ -426,87 +346,6 @@ export default function GestaoClienteDetalhe() {
           )}
         </TabsContent>
       </Tabs>
-
-      {/* Modal de Edição */}
-      <Dialog open={showEdit} onOpenChange={setShowEdit}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Editar Cliente</DialogTitle>
-          </DialogHeader>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              updateMut.mutate({ id: clientId, data: form });
-            }}
-            className="space-y-4"
-          >
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <Label>Razão Social *</Label>
-                <Input value={form.razaoSocial || ""} onChange={e => setForm(f => ({ ...f, razaoSocial: e.target.value }))} required />
-              </div>
-              <div>
-                <Label>Nome Fantasia</Label>
-                <Input value={form.nomeFantasia || ""} onChange={e => setForm(f => ({ ...f, nomeFantasia: e.target.value }))} />
-              </div>
-              <div>
-                <Label>CNPJ</Label>
-                <Input value={form.cnpj || ""} onChange={e => setForm(f => ({ ...f, cnpj: e.target.value }))} placeholder="00.000.000/0000-00" />
-              </div>
-              <div className="col-span-2">
-                <Label>Endereço</Label>
-                <Input value={form.endereco || ""} onChange={e => setForm(f => ({ ...f, endereco: e.target.value }))} />
-              </div>
-              <div>
-                <Label>CEP</Label>
-                <Input value={form.cep || ""} onChange={e => setForm(f => ({ ...f, cep: e.target.value }))} placeholder="00000-000" />
-              </div>
-              <div>
-                <Label>Cidade</Label>
-                <Input value={form.cidade || ""} onChange={e => setForm(f => ({ ...f, cidade: e.target.value }))} />
-              </div>
-              <div>
-                <Label>Estado (UF)</Label>
-                <Input value={form.estado || ""} onChange={e => setForm(f => ({ ...f, estado: e.target.value.toUpperCase() }))} maxLength={2} placeholder="SP" />
-              </div>
-              <div>
-                <Label>Telefone</Label>
-                <Input value={form.telefone || ""} onChange={e => setForm(f => ({ ...f, telefone: e.target.value }))} />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input type="email" value={form.email || ""} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
-              </div>
-              <div>
-                <Label>Nome do Contato</Label>
-                <Input value={form.contatoNome || ""} onChange={e => setForm(f => ({ ...f, contatoNome: e.target.value }))} />
-              </div>
-              <div>
-                <Label>CNAE / Atividade Econômica</Label>
-                <Input value={form.cnaeDescricao || ""} onChange={e => setForm(f => ({ ...f, cnaeDescricao: e.target.value }))} />
-              </div>
-              <div>
-                <Label>Natureza Jurídica</Label>
-                <Input value={form.naturezaJuridica || ""} onChange={e => setForm(f => ({ ...f, naturezaJuridica: e.target.value }))} />
-              </div>
-              <div>
-                <Label>Data de Abertura</Label>
-                <Input type="date" value={form.dataAbertura || ""} onChange={e => setForm(f => ({ ...f, dataAbertura: e.target.value }))} />
-              </div>
-              <div>
-                <Label>Situação Cadastral</Label>
-                <Input value={form.situacaoCadastral || ""} onChange={e => setForm(f => ({ ...f, situacaoCadastral: e.target.value }))} />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-2 border-t">
-              <Button type="button" variant="outline" onClick={() => setShowEdit(false)}>Cancelar</Button>
-              <Button type="submit" disabled={updateMut.isPending} className="bg-orange-500 hover:bg-orange-600 text-white">
-                {updateMut.isPending ? "Salvando..." : "Salvar Alterações"}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

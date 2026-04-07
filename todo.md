@@ -1623,3 +1623,9 @@
 
 ## Correção Estado Vazio Contratos
 - [x] Remover botão "Criar Contrato no SGC" do estado vazio e exibir mensagem de conexão pendente com o SGC
+
+## Remoção Cadastro de Clientes
+- [ ] Localizar página GestaoClientes.tsx e remover formulário/botão de cadastro
+- [ ] Remover estado vazio com botão de criar cliente
+- [ ] Verificar se há rota /clientes/novo ainda ativa no App.tsx
+- [ ] Verificar link "Clientes" no header — remover ou redirecionar para SGC
