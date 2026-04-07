@@ -1589,3 +1589,15 @@
 - [x] Criar 37 testes de homologação da integração
 - [x] Criar SGC_INTEGRATION.md - Documentação técnica completa
 - [x] Gerar relatório de homologação final
+
+
+## Tarefa Corretiva - Substituição Funcional Backend Clientes/Contratos
+- [x] Mapear todos os pontos locais de clientes/contratos (páginas, rotas, procedures, db helpers, navegação)
+- [x] Substituir procedures de leitura de contratos para consumir do SGC via gateway
+- [x] Substituir procedures de leitura de clientes para consumir do SGC via gateway
+- [x] Neutralizar/bloquear todas as mutations locais de escrita contratual
+- [x] Neutralizar/bloquear todas as mutations locais de escrita de clientes
+- [x] Adaptar frontend para exibir dados do SGC e incluir deep links para SGC
+- [x] Executar testes de regressão e checkup final (183/183 testes passando)
+- [x] Gerar evidência técnica obrigatória (lista de páginas, procedures, rotas afetadas)
+- [x] Confirmar que o estratégico NÃO é mais fonte mestra de clientes/contratos

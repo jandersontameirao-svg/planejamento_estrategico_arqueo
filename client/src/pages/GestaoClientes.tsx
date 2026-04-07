@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { SGCBanner } from "@/components/SGCBanner";
 import { toast } from "sonner";
 import { Link, useLocation } from "wouter";
 import {
@@ -277,6 +278,12 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
 
   return (
     <div className="container py-8">
+      <SGCBanner
+        message="A gestão de clientes agora é realizada pelo SGC. Os dados exibidos são somente leitura."
+        sgcUrl={empresaId ? `${import.meta.env.VITE_SGC_PUBLIC_APP_URL || ''}/empresa/${empresaId}/clientes` : (import.meta.env.VITE_SGC_PUBLIC_APP_URL || '')}
+        variant="info"
+      />
+      <div className="mt-4" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>

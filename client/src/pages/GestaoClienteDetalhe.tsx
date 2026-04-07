@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { SGCBanner } from "@/components/SGCBanner";
 import { toast } from "sonner";
 import {
   ArrowLeft, Building2, MapPin, Phone, Mail, Briefcase,
@@ -147,6 +148,11 @@ export default function GestaoClienteDetalhe() {
 
   return (
     <div className="container py-8 max-w-5xl">
+      <SGCBanner
+        message="Os dados deste cliente são gerenciados pelo SGC. Alterações devem ser feitas lá."
+        sgcUrl={`${import.meta.env.VITE_SGC_PUBLIC_APP_URL || ''}/gestao-clientes/${client.id}`}
+      />
+      <div className="mt-4" />
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 mb-6">
         <Button variant="ghost" size="sm" onClick={() => navigate("/gestao-clientes")}>

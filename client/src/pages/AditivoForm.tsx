@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { SGCBanner } from "@/components/SGCBanner";
 import { ArrowLeft, Upload, Brain, FileText, CheckCircle2, Loader2, AlertTriangle, Save } from "lucide-react";
 
 interface AditivoFormProps {
@@ -105,6 +106,14 @@ export default function AditivoForm({ empresaId, contratoId }: AditivoFormProps)
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* SGC Integration Banner */}
+      <div className="max-w-3xl mx-auto px-6 pt-4">
+        <SGCBanner
+          message="A criação de aditivos agora é gerenciada pelo SGC."
+          sgcUrl={`${import.meta.env.VITE_SGC_PUBLIC_APP_URL || ''}/empresa/${empresaId}/contratos/${contratoId}`}
+          variant="warning"
+        />
+      </div>
       <div className="bg-white border-b px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos/${contratoId}`)}>

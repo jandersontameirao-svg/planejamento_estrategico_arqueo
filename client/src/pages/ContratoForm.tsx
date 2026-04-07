@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { SGCBanner } from "@/components/SGCBanner";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import {
@@ -1108,6 +1109,12 @@ export default function ContratoForm({ empresaId }: ContratoFormProps) {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-6">
+        <SGCBanner
+          message="A criação de contratos agora é gerenciada pelo SGC (Sistema de Gestão de Contratos)."
+          sgcUrl={`${import.meta.env.VITE_SGC_PUBLIC_APP_URL || ''}/empresa/${empresaId}/contratos/novo`}
+          variant="warning"
+        />
+        <div className="mt-4" />
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
         {step === 3 && renderStep3()}

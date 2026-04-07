@@ -5,6 +5,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { SGCBanner } from "@/components/SGCBanner";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -62,6 +63,13 @@ export default function Contratos({ empresaId }: ContratosProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* SGC Integration Banner */}
+      <div className="max-w-7xl mx-auto px-6 pt-4">
+        <SGCBanner
+          message="Os contratos são gerenciados pelo SGC. Esta é uma visualização somente leitura."
+          sgcUrl={`${import.meta.env.VITE_SGC_PUBLIC_APP_URL || ''}/empresa/${empresaId}/contratos`}
+        />
+      </div>
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">

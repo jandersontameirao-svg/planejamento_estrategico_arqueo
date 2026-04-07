@@ -1,6 +1,7 @@
 /**
- * Testes do módulo de Gestão de Clientes (SGC consolidado)
- * Usa trpc.contratos.clientes.* — router SGC unificado
+ * Testes do módulo de Gestão de Clientes — Integração SGC
+ * Após a substituição funcional, operações de escrita são bloqueadas (FORBIDDEN)
+ * e leituras são delegadas ao SGC via gateway.
  */
 import { describe, it, expect } from "vitest";
 import { appRouter } from "./routers";
@@ -27,13 +28,8 @@ function createAuthContext(): TrpcContext {
   };
 }
 
-function uniqueCNPJ(): string {
-  const ts = Date.now().toString().slice(-14).padStart(14, "0");
-  return ts;
-}
-
-describe("contratos.clientes.list", () => {
-  it("retorna lista de clientes para usuário autenticado", async () => {
+describe("contratos.clientes.list (leitura via SGC)", () => {
+  it("retorna array (vazio se SGC indisponível, dados se disponível)", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.contratos.clientes.list({});
@@ -41,47 +37,8 @@ describe("contratos.clientes.list", () => {
   });
 });
 
-describe("contratos.clientes.create e get", () => {
-  it("cria um cliente com dados mínimos e busca pelo ID", async () => {
-    const ctx = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-    const cnpj = uniqueCNPJ();
-    const id = await caller.contratos.clientes.create({
-      razaoSocial: "Empresa Teste LTDA",
-      cnpj,
-    });
-    expect(typeof id).toBe("number");
-    const found = await caller.contratos.clientes.get({ id });
-    expect(found).not.toBeNull();
-    expect(found?.razaoSocial).toBe("Empresa Teste LTDA");
-    await caller.contratos.clientes.delete({ id });
-  });
-
-  it("cria um cliente com dados completos", async () => {
-    const ctx = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-    const cnpj = uniqueCNPJ();
-    const id = await caller.contratos.clientes.create({
-      razaoSocial: "Empresa Completa S.A.",
-      nomeFantasia: "Completa",
-      cnpj,
-      endereco: "Rua das Flores, 100",
-      cidade: "São Paulo",
-      estado: "SP",
-      cep: "01310-100",
-      telefone: "(11) 3456-7890",
-      email: "contato@completa.com.br",
-      naturezaJuridica: "Sociedade Anônima",
-      situacaoCadastral: "ATIVA",
-    });
-    expect(typeof id).toBe("number");
-    const found = await caller.contratos.clientes.get({ id });
-    expect(found?.nomeFantasia).toBe("Completa");
-    expect(found?.cidade).toBe("São Paulo");
-    await caller.contratos.clientes.delete({ id });
-  });
-
-  it("retorna null para ID inexistente", async () => {
+describe("contratos.clientes.get (leitura via SGC)", () => {
+  it("retorna null para ID inexistente sem lançar erro", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.contratos.clientes.get({ id: 999999 });
@@ -89,59 +46,60 @@ describe("contratos.clientes.create e get", () => {
   });
 });
 
-describe("contratos.clientes.update", () => {
-  it("atualiza os dados de um cliente", async () => {
+describe("contratos.clientes — operações de escrita bloqueadas pelo SGC", () => {
+  it("create lança FORBIDDEN com mensagem de redirecionamento ao SGC", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
-    const cnpj = uniqueCNPJ();
-    const id = await caller.contratos.clientes.create({
-      razaoSocial: "Cliente Para Atualizar",
-      cnpj,
-    });
-    await caller.contratos.clientes.update({
-      id,
-      data: { razaoSocial: "Cliente Atualizado", email: "novo@email.com" },
-    });
-    const updated = await caller.contratos.clientes.get({ id });
-    expect(updated?.razaoSocial).toBe("Cliente Atualizado");
-    expect(updated?.email).toBe("novo@email.com");
-    await caller.contratos.clientes.delete({ id });
+    await expect(
+      caller.contratos.clientes.create({
+        razaoSocial: "Empresa Teste LTDA",
+        cnpj: "00000000000000",
+      })
+    ).rejects.toThrow(/SGC/);
+  });
+
+  it("update lança FORBIDDEN com mensagem de redirecionamento ao SGC", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.contratos.clientes.update({
+        id: 1,
+        data: { razaoSocial: "Novo Nome" },
+      })
+    ).rejects.toThrow(/SGC/);
+  });
+
+  it("delete lança FORBIDDEN com mensagem de redirecionamento ao SGC", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.contratos.clientes.delete({ id: 1 })
+    ).rejects.toThrow(/SGC/);
+  });
+
+  it("vincularEmpresa lança FORBIDDEN", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.contratos.clientes.vincularEmpresa({ clienteId: 1, empresaId: 1 })
+    ).rejects.toThrow(/SGC/);
+  });
+
+  it("desvincularEmpresa lança FORBIDDEN", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.contratos.clientes.desvincularEmpresa({ clienteId: 1, empresaId: 1 })
+    ).rejects.toThrow(/SGC/);
   });
 });
 
-describe("contratos.clientes.delete", () => {
-  it("inativa um cliente existente (exclusão lógica)", async () => {
+describe("contratos.clientes.buscarCNPJ — bloqueado pelo SGC", () => {
+  it("lança FORBIDDEN com mensagem de redirecionamento ao SGC", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
-    const cnpj = uniqueCNPJ();
-    const id = await caller.contratos.clientes.create({
-      razaoSocial: "Cliente Para Deletar",
-      cnpj,
-    });
-    await caller.contratos.clientes.delete({ id });
-    // Exclusão lógica: registro permanece, mas status muda para inativo
-    const deleted = await caller.contratos.clientes.get({ id });
-    expect(deleted?.status).toBe("inativo");
+    await expect(
+      caller.contratos.clientes.buscarCNPJ({ cnpj: "00000000000000" })
+    ).rejects.toThrow(/SGC/);
   });
-})
-
-describe("contratos.clientes.buscarCNPJ", () => {
-  it("aceita CNPJ com 14 dígitos e retorna objeto ou lança erro de API externa", async () => {
-    const ctx = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-    // CNPJ inválido — a API externa pode retornar erro ou null, ambos são aceitáveis
-    let passed = false;
-    try {
-      const result = await caller.contratos.clientes.buscarCNPJ({ cnpj: "00000000000000" });
-      // Se retornar sem lançar, aceita qualquer resultado
-      expect(result === null || typeof result === "object").toBe(true);
-      passed = true;
-    } catch (e: unknown) {
-      // Erro de API externa é aceitável
-      const err = e as { message?: string };
-      expect(typeof err.message).toBe("string");
-      passed = true;
-    }
-    expect(passed).toBe(true);
-  }, 15000);
 });

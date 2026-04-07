@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { SGCBanner, SGCReadOnlyBadge } from "@/components/SGCBanner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -262,6 +263,13 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* SGC Integration Banner */}
+      <div className="max-w-7xl mx-auto px-6 pt-4">
+        <SGCBanner
+          message="Este contrato é gerenciado pelo SGC. Alterações devem ser feitas no sistema de gestão de contratos."
+          sgcUrl={`${import.meta.env.VITE_SGC_PUBLIC_APP_URL || ''}/empresa/${empresaId}/contratos/${contratoId}`}
+        />
+      </div>
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="max-w-7xl mx-auto">
