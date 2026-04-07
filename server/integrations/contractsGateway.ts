@@ -1,12 +1,12 @@
 /**
  * Contracts Gateway - Camada de abstração para consumir dados contratuais do SGC
- * 
- * Responsabilidades:
- * - Orquestrar chamadas ao SGC Client
- * - Mapear payloads brutos para DTOs internos
- * - Implementar cache local (opcional)
- * - Tratar fallback para dados legados
- * - Agregar dados para dashboards e análises
+ *
+ * Endpoints disponíveis no SGC (validados em produção):
+ *   GET /companies/:sgcId/summary  → KPIs consolidados da empresa
+ *   GET /companies/:sgcId/clients  → Lista de clientes com contratos
+ *   GET /companies/:sgcId/risks    → Dados de riscos por severidade
+ *
+ * Todos os outros endpoints retornam 404 ENDPOINT_NOT_FOUND.
  */
 
 import { getSGCClient } from "./sgcClient";
@@ -22,462 +22,368 @@ import {
   StrategicContractContextDTO,
 } from "./sgcDtos";
 
+// ─── Tipos dos payloads reais do SGC ─────────────────────────────────────────
+
+interface SGCSummaryPayload {
+  empresaId: number;
+  empresaNome: string;
+  contratosTotal: number;
+  contratosVigentes: number;
+  contratosEncerrados: number;
+  valorTotalContratado: number;
+  valorTotalPrevisto: number;
+  valorTotalFaturado: number;
+  clientesAtivos: number;
+  marcosVencidos: number;
+  marcosAVencer: number;
+  boletinsPendentes: number;
+  riscosPorSeveridade: {
+    baixa: number;
+    media: number;
+    alta: number;
+    critica: number;
+  };
+}
+
+interface SGCClientPayload {
+  clienteId: number;
+  clienteNome: string;
+  clienteLink: string;
+  quantidadeContratos: number;
+  valorAgregado: number;
+  statusConsolidados: {
+    ativos: number;
+    concluidos: number;
+    cancelados: number;
+  };
+  ultimoMovimento: string;
+}
+
+interface SGCRisksPayload {
+  totalRiscos: number;
+  riscosPorSeveridade: {
+    baixa: number;
+    media: number;
+    alta: number;
+    critica: number;
+  };
+  riscosPorStatus: {
+    aberto: number;
+    mitigado: number;
+    aceito: number;
+  };
+  riscosCriticosAbertos: number;
+  riscosSemPlanoDeAcao: number;
+  riscosPorContrato: Array<{
+    contractId: number;
+    contractTitle: string;
+    total: number;
+    criticos: number;
+  }>;
+}
+
+// ─── Gateway ─────────────────────────────────────────────────────────────────
+
 export class ContractsGateway {
   private sgcClient = getSGCClient();
   private cacheMap = new Map<string, { data: any; timestamp: number }>();
   private cacheTTL = 5 * 60 * 1000; // 5 minutos
 
+  // ─── Métodos principais ─────────────────────────────────────────────────
+
   /**
-   * Obter lista de clientes por empresa
+   * Obter KPIs consolidados de uma empresa (summary)
+   * Endpoint: GET /companies/:sgcId/summary
    */
-  async getClientsByEmpresa(empresaId: number): Promise<StrategicClientSummaryDTO[]> {
-    const cacheKey = `clients:${empresaId}`;
+  async getCompanySummary(sgcEmpresaId: number): Promise<SGCSummaryPayload | null> {
+    const cacheKey = `summary:${sgcEmpresaId}`;
+    if (this.isCacheValid(cacheKey)) return this.cacheMap.get(cacheKey)!.data;
 
-    if (this.isCacheValid(cacheKey)) {
-      return this.cacheMap.get(cacheKey)!.data;
-    }
-
-    const response = await this.sgcClient.get<any[]>("/api/clientes", {
-      empresaId,
-    });
+    const response = await this.sgcClient.get<{ success: boolean; data: SGCSummaryPayload }>(
+      `/companies/${sgcEmpresaId}/summary`
+    );
 
     if (!response.success || !response.data) {
-      console.warn(`[ContractsGateway] Failed to fetch clients for empresa ${empresaId}`);
+      console.warn(`[ContractsGateway] Failed to fetch summary for sgcEmpresaId ${sgcEmpresaId}`);
+      return null;
+    }
+
+    // O SGC retorna { success, data, meta } — extrair .data
+    const payload = (response.data as any).data ?? response.data;
+    this.setCache(cacheKey, payload);
+    return payload;
+  }
+
+  /**
+   * Obter lista de clientes de uma empresa
+   * Endpoint: GET /companies/:sgcId/clients
+   */
+  async getClientsByEmpresa(sgcEmpresaId: number): Promise<StrategicClientSummaryDTO[]> {
+    const cacheKey = `clients:${sgcEmpresaId}`;
+    if (this.isCacheValid(cacheKey)) return this.cacheMap.get(cacheKey)!.data;
+
+    const response = await this.sgcClient.get<{ success: boolean; data: SGCClientPayload[] }>(
+      `/companies/${sgcEmpresaId}/clients`
+    );
+
+    if (!response.success || !response.data) {
+      console.warn(`[ContractsGateway] Failed to fetch clients for sgcEmpresaId ${sgcEmpresaId}`);
       return [];
     }
 
-    const clients = response.data.map(this.mapToClientDTO);
+    const rawList: SGCClientPayload[] = (response.data as any).data ?? response.data;
+    const clients = rawList.map(this.mapSGCClientToDTO);
     this.setCache(cacheKey, clients);
-
     return clients;
   }
 
   /**
-   * Obter contrato por ID
+   * Obter dados de riscos de uma empresa
+   * Endpoint: GET /companies/:sgcId/risks
    */
-  async getContratoById(contratoId: number): Promise<StrategicContractSummaryDTO | null> {
-    const cacheKey = `contrato:${contratoId}`;
+  async getRisksByEmpresa(sgcEmpresaId: number): Promise<SGCRisksPayload | null> {
+    const cacheKey = `risks:${sgcEmpresaId}`;
+    if (this.isCacheValid(cacheKey)) return this.cacheMap.get(cacheKey)!.data;
 
-    if (this.isCacheValid(cacheKey)) {
-      return this.cacheMap.get(cacheKey)!.data;
-    }
-
-    const response = await this.sgcClient.get<any>(`/api/contratos/${contratoId}`);
+    const response = await this.sgcClient.get<{ success: boolean; data: SGCRisksPayload }>(
+      `/companies/${sgcEmpresaId}/risks`
+    );
 
     if (!response.success || !response.data) {
-      console.warn(`[ContractsGateway] Failed to fetch contrato ${contratoId}`);
+      console.warn(`[ContractsGateway] Failed to fetch risks for sgcEmpresaId ${sgcEmpresaId}`);
       return null;
     }
 
-    const contrato = this.mapToContratoDTO(response.data);
-    this.setCache(cacheKey, contrato);
-
-    return contrato;
+    const payload = (response.data as any).data ?? response.data;
+    this.setCache(cacheKey, payload);
+    return payload;
   }
 
   /**
-   * Obter contratos por empresa
-   */
-  async getContratosByEmpresa(empresaId: number): Promise<StrategicContractSummaryDTO[]> {
-    const cacheKey = `contratos:${empresaId}`;
-
-    if (this.isCacheValid(cacheKey)) {
-      return this.cacheMap.get(cacheKey)!.data;
-    }
-
-    const response = await this.sgcClient.get<any[]>("/api/contratos", {
-      empresaId,
-    });
-
-    if (!response.success || !response.data) {
-      console.warn(`[ContractsGateway] Failed to fetch contratos for empresa ${empresaId}`);
-      return [];
-    }
-
-    const contratos = response.data.map(this.mapToContratoDTO);
-    this.setCache(cacheKey, contratos);
-
-    return contratos;
-  }
-
-  /**
-   * Obter marcos por contrato
-   */
-  async getMarcosByContrato(contratoId: number): Promise<StrategicMilestoneSummaryDTO[]> {
-    const cacheKey = `marcos:${contratoId}`;
-
-    if (this.isCacheValid(cacheKey)) {
-      return this.cacheMap.get(cacheKey)!.data;
-    }
-
-    const response = await this.sgcClient.get<any[]>(`/api/contratos/${contratoId}/marcos`);
-
-    if (!response.success || !response.data) {
-      console.warn(`[ContractsGateway] Failed to fetch marcos for contrato ${contratoId}`);
-      return [];
-    }
-
-    const marcos = response.data.map(this.mapToMilestoneDTO);
-    this.setCache(cacheKey, marcos);
-
-    return marcos;
-  }
-
-  /**
-   * Obter riscos por contrato
-   */
-  async getRiscosByContrato(contratoId: number): Promise<StrategicRiskSummaryDTO[]> {
-    const cacheKey = `riscos:${contratoId}`;
-
-    if (this.isCacheValid(cacheKey)) {
-      return this.cacheMap.get(cacheKey)!.data;
-    }
-
-    const response = await this.sgcClient.get<any[]>(`/api/contratos/${contratoId}/riscos`);
-
-    if (!response.success || !response.data) {
-      console.warn(`[ContractsGateway] Failed to fetch riscos for contrato ${contratoId}`);
-      return [];
-    }
-
-    const riscos = response.data.map(this.mapToRiskDTO);
-    this.setCache(cacheKey, riscos);
-
-    return riscos;
-  }
-
-  /**
-   * Obter boletins por contrato
-   */
-  async getBoletinsByContrato(contratoId: number): Promise<StrategicBulletinSummaryDTO[]> {
-    const cacheKey = `boletins:${contratoId}`;
-
-    if (this.isCacheValid(cacheKey)) {
-      return this.cacheMap.get(cacheKey)!.data;
-    }
-
-    const response = await this.sgcClient.get<any[]>(`/api/contratos/${contratoId}/boletins`);
-
-    if (!response.success || !response.data) {
-      console.warn(`[ContractsGateway] Failed to fetch boletins for contrato ${contratoId}`);
-      return [];
-    }
-
-    const boletins = response.data.map(this.mapToBulletinDTO);
-    this.setCache(cacheKey, boletins);
-
-    return boletins;
-  }
-
-  /**
-   * Obter agregação de contratos por empresa
+   * Obter agregação de contratos por empresa (usando summary como fonte)
+   * Mapeia os dados do summary para o formato StrategicContractAggregateDTO
    */
   async getContractAggregateByEmpresa(
-    empresaId: number
+    sgcEmpresaId: number
   ): Promise<StrategicContractAggregateDTO | null> {
-    const cacheKey = `aggregate:${empresaId}`;
+    const summary = await this.getCompanySummary(sgcEmpresaId);
+    if (!summary) return null;
 
-    if (this.isCacheValid(cacheKey)) {
-      return this.cacheMap.get(cacheKey)!.data;
-    }
-
-    const response = await this.sgcClient.get<any>("/api/contratos/aggregate", {
-      empresaId,
-    });
-
-    if (!response.success || !response.data) {
-      console.warn(
-        `[ContractsGateway] Failed to fetch contract aggregate for empresa ${empresaId}`
-      );
-      return null;
-    }
-
-    const aggregate = this.mapToAggregateDTO(response.data);
-    this.setCache(cacheKey, aggregate);
-
-    return aggregate;
+    return {
+      empresaId: summary.empresaId,
+      totalContratos: summary.contratosTotal,
+      totalClientes: summary.clientesAtivos,
+      valorTotalContratos: summary.valorTotalContratado,
+      contratosPorStatus: {
+        vigente: summary.contratosVigentes,
+        encerrado: summary.contratosEncerrados,
+      },
+      marcosPendentes: summary.marcosAVencer,
+      marcosAtrasados: summary.marcosVencidos,
+      riscosAbertos:
+        (summary.riscosPorSeveridade?.baixa ?? 0) +
+        (summary.riscosPorSeveridade?.media ?? 0) +
+        (summary.riscosPorSeveridade?.alta ?? 0) +
+        (summary.riscosPorSeveridade?.critica ?? 0),
+      riscosAltosAbertos:
+        (summary.riscosPorSeveridade?.alta ?? 0) +
+        (summary.riscosPorSeveridade?.critica ?? 0),
+      boletinsPendentes: summary.boletinsPendentes,
+    };
   }
 
   /**
-   * Obter agregação de contratos para o grupo
+   * Obter agregação consolidada do grupo
+   * Agrega summaries de todas as empresas com sgcEmpresaId mapeado
    */
   async getContractAggregateForGroup(): Promise<StrategicContractGroupAggregateDTO | null> {
-    const cacheKey = "aggregate:group";
+    // Por enquanto, retorna apenas a empresa principal (930003)
+    // Futuramente, iterar sobre todas as empresas com sgcEmpresaId
+    const aggregate = await this.getContractAggregateByEmpresa(930003);
+    if (!aggregate) return null;
 
-    if (this.isCacheValid(cacheKey)) {
-      return this.cacheMap.get(cacheKey)!.data;
-    }
-
-    const response = await this.sgcClient.get<any>("/api/contratos/aggregate/group");
-
-    if (!response.success || !response.data) {
-      console.warn(`[ContractsGateway] Failed to fetch contract aggregate for group`);
-      return null;
-    }
-
-    const aggregate = this.mapToGroupAggregateDTO(response.data);
-    this.setCache(cacheKey, aggregate);
-
-    return aggregate;
+    return {
+      totalContratos: aggregate.totalContratos,
+      totalClientes: aggregate.totalClientes,
+      valorTotalContratos: aggregate.valorTotalContratos,
+      empresas: [aggregate],
+      marcosPendentes: aggregate.marcosPendentes,
+      marcosAtrasados: aggregate.marcosAtrasados,
+      riscosAbertos: aggregate.riscosAbertos,
+      riscosAltosAbertos: aggregate.riscosAltosAbertos,
+      boletinsPendentes: aggregate.boletinsPendentes,
+    };
   }
 
   /**
-   * Obter alertas estratégicos
+   * Obter contratos por empresa (não disponível no SGC atual — retorna lista vazia)
    */
-  async getStrategicAlerts(empresaId?: number): Promise<StrategicAlertDTO[]> {
-    const cacheKey = `alerts:${empresaId || "group"}`;
+  async getContratosByEmpresa(_sgcEmpresaId: number): Promise<StrategicContractSummaryDTO[]> {
+    console.warn("[ContractsGateway] getContratosByEmpresa: endpoint not available in SGC v1");
+    return [];
+  }
 
-    if (this.isCacheValid(cacheKey)) {
-      return this.cacheMap.get(cacheKey)!.data;
+  /**
+   * Obter contrato por ID (não disponível no SGC atual)
+   */
+  async getContratoById(_contratoId: number): Promise<StrategicContractSummaryDTO | null> {
+    console.warn("[ContractsGateway] getContratoById: endpoint not available in SGC v1");
+    return null;
+  }
+
+  /**
+   * Obter marcos por contrato (não disponível no SGC atual)
+   */
+  async getMarcosByContrato(_contratoId: number): Promise<StrategicMilestoneSummaryDTO[]> {
+    console.warn("[ContractsGateway] getMarcosByContrato: endpoint not available in SGC v1");
+    return [];
+  }
+
+  /**
+   * Obter riscos por contrato (não disponível no SGC atual — use getRisksByEmpresa)
+   */
+  async getRiscosByContrato(_contratoId: number): Promise<StrategicRiskSummaryDTO[]> {
+    console.warn("[ContractsGateway] getRiscosByContrato: endpoint not available in SGC v1");
+    return [];
+  }
+
+  /**
+   * Obter boletins por contrato (não disponível no SGC atual)
+   */
+  async getBoletinsByContrato(_contratoId: number): Promise<StrategicBulletinSummaryDTO[]> {
+    console.warn("[ContractsGateway] getBoletinsByContrato: endpoint not available in SGC v1");
+    return [];
+  }
+
+  /**
+   * Obter alertas estratégicos (derivados do summary)
+   */
+  async getStrategicAlerts(sgcEmpresaId?: number): Promise<StrategicAlertDTO[]> {
+    const id = sgcEmpresaId ?? 930003;
+    const summary = await this.getCompanySummary(id);
+    if (!summary) return [];
+
+    const alerts: StrategicAlertDTO[] = [];
+    const now = new Date().toISOString();
+
+    if (summary.marcosVencidos > 0) {
+      alerts.push({
+        id: "1",
+        tipo: "marco_atrasado" as const,
+        severidade: "critico" as const,
+        titulo: `${summary.marcosVencidos} marco(s) vencido(s)`,
+        descricao: `Existem ${summary.marcosVencidos} marcos financeiros com prazo vencido.`,
+        empresaId: id,
+        dataCriacao: now,
+      });
     }
 
-    const response = await this.sgcClient.get<any[]>("/api/alertas", empresaId ? { empresaId } : {});
-
-    if (!response.success || !response.data) {
-      console.warn(`[ContractsGateway] Failed to fetch strategic alerts`);
-      return [];
+    if ((summary.riscosPorSeveridade?.critica ?? 0) > 0) {
+      alerts.push({
+        id: "2",
+        tipo: "risco_alto" as const,
+        severidade: "critico" as const,
+        titulo: `${summary.riscosPorSeveridade.critica} risco(s) crítico(s)`,
+        descricao: `Existem ${summary.riscosPorSeveridade.critica} riscos de severidade crítica identificados.`,
+        empresaId: id,
+        dataCriacao: now,
+      });
     }
-
-    const alerts = response.data.map(this.mapToAlertDTO);
-    this.setCache(cacheKey, alerts);
 
     return alerts;
   }
 
   /**
-   * Obter contexto contratual completo para uma empresa
+   * Obter contexto contratual completo
    */
-  async getContractContext(empresaId: number): Promise<StrategicContractContextDTO | null> {
-    const cacheKey = `context:${empresaId}`;
-
-    if (this.isCacheValid(cacheKey)) {
-      return this.cacheMap.get(cacheKey)!.data;
-    }
+  async getContractContext(sgcEmpresaId: number): Promise<StrategicContractContextDTO | null> {
+    const cacheKey = `context:${sgcEmpresaId}`;
+    if (this.isCacheValid(cacheKey)) return this.cacheMap.get(cacheKey)!.data;
 
     try {
-      const [contratos, clientes, marcos, riscos, alertas] = await Promise.all([
-        this.getContratosByEmpresa(empresaId),
-        this.getClientsByEmpresa(empresaId),
-        this.getMarcosByEmpresa(empresaId),
-        this.getRiscosByEmpresa(empresaId),
-        this.getStrategicAlerts(empresaId),
+      const [summary, clients, alerts] = await Promise.all([
+        this.getCompanySummary(sgcEmpresaId),
+        this.getClientsByEmpresa(sgcEmpresaId),
+        this.getStrategicAlerts(sgcEmpresaId),
       ]);
 
-      const totalValor = contratos.reduce((sum, c) => sum + (c.valorTotal || 0), 0);
-      const totalMarcos = marcos.length;
-      const marcosAtrasados = marcos.filter((m) => m.status === "atrasado").length;
-      const riscosAltos = riscos.filter((r) => r.severidade === "critica").length;
-      const boletinsPendentes = 0; // TODO: calcular
+      if (!summary) return null;
 
       const context: StrategicContractContextDTO = {
-        empresaId,
+        empresaId: sgcEmpresaId,
         periodo: {
           inicio: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
           fim: new Date().toISOString().split("T")[0],
         },
-        contratos,
-        clientes,
-        marcos,
-        riscos,
-        alertas,
+        contratos: [],
+        clientes: clients,
+        marcos: [],
+        riscos: [],
+        alertas: alerts,
         metricas: {
-          totalValor,
-          totalMarcos,
-          marcosAtrasados,
-          riscosAltos,
-          boletinsPendentes,
+          totalValor: summary.valorTotalContratado,
+          totalMarcos: summary.marcosAVencer + summary.marcosVencidos,
+          marcosAtrasados: summary.marcosVencidos,
+          riscosAltos:
+            (summary.riscosPorSeveridade?.alta ?? 0) +
+            (summary.riscosPorSeveridade?.critica ?? 0),
+          boletinsPendentes: summary.boletinsPendentes,
         },
       };
 
       this.setCache(cacheKey, context);
       return context;
     } catch (error) {
-      console.error(`[ContractsGateway] Failed to fetch contract context for empresa ${empresaId}:`, error);
+      console.error(
+        `[ContractsGateway] Failed to fetch contract context for sgcEmpresaId ${sgcEmpresaId}:`,
+        error
+      );
       return null;
     }
   }
 
-  /**
-   * Limpar cache
-   */
+  // ─── Cache ───────────────────────────────────────────────────────────────
+
   clearCache(): void {
     this.cacheMap.clear();
   }
 
-  /**
-   * Limpar cache de uma chave específica
-   */
   clearCacheKey(key: string): void {
     this.cacheMap.delete(key);
   }
 
-  // ─── Métodos privados de mapeamento ──────────────────────────────────────
+  // ─── Mapeamentos ─────────────────────────────────────────────────────────
 
-  private mapToClientDTO(raw: any): StrategicClientSummaryDTO {
+  private mapSGCClientToDTO(raw: SGCClientPayload): StrategicClientSummaryDTO {
     return {
-      id: raw.id,
-      cnpj: raw.cnpj,
-      razaoSocial: raw.razaoSocial,
-      nomeFantasia: raw.nomeFantasia,
-      email: raw.email,
-      telefone: raw.telefone,
-      status: raw.status || "ativo",
-      empresaId: raw.empresaId,
-      totalContratos: raw.totalContratos || 0,
-      valorTotalContratos: raw.valorTotalContratos || 0,
-      ultimoContratoData: raw.ultimoContratoData,
+      id: raw.clienteId,
+      cnpj: "",
+      razaoSocial: raw.clienteNome,
+      nomeFantasia: raw.clienteNome,
+      email: "",
+      telefone: "",
+      status: "ativo",
+      empresaId: 0,
+      totalContratos: raw.quantidadeContratos,
+      valorTotalContratos: raw.valorAgregado,
+      ultimoContratoData: raw.ultimoMovimento,
     };
   }
 
-  private mapToContratoDTO(raw: any): StrategicContractSummaryDTO {
-    return {
-      id: raw.id,
-      numero: raw.numero,
-      titulo: raw.titulo,
-      clienteId: raw.clienteId,
-      clienteNome: raw.clienteNome || raw.cliente?.nomeFantasia || raw.cliente?.razaoSocial,
-      empresaId: raw.empresaId,
-      status: raw.status || "rascunho",
-      valorTotal: raw.valorTotal,
-      dataInicio: raw.dataInicio,
-      dataFim: raw.dataFim,
-      dataAssinatura: raw.dataAssinatura,
-      totalMarcos: raw.totalMarcos || 0,
-      marcosAtrasados: raw.marcosAtrasados || 0,
-      totalRiscos: raw.totalRiscos || 0,
-      riscosAltosAbertos: raw.riscosAltosAbertos || 0,
-    };
-  }
-
-  private mapToMilestoneDTO(raw: any): StrategicMilestoneSummaryDTO {
-    return {
-      id: raw.id,
-      contratoId: raw.contratoId,
-      titulo: raw.titulo,
-      valorPrevisto: raw.valorPrevisto,
-      valorPago: raw.valorPago,
-      dataPrevista: raw.dataPrevista,
-      dataPagamento: raw.dataPagamento,
-      status: raw.status || "pendente",
-      diasAtrasado: raw.diasAtrasado,
-      ordem: raw.ordem || 0,
-    };
-  }
-
-  private mapToRiskDTO(raw: any): StrategicRiskSummaryDTO {
-    return {
-      id: raw.id,
-      contratoId: raw.contratoId,
-      titulo: raw.titulo,
-      categoria: raw.categoria || "outro",
-      probabilidade: raw.probabilidade || "media",
-      impacto: raw.impacto || "medio",
-      status: raw.status || "identificado",
-      severidade: raw.severidade || "media",
-    };
-  }
-
-  private mapToBulletinDTO(raw: any): StrategicBulletinSummaryDTO {
-    return {
-      id: raw.id,
-      contratoId: raw.contratoId,
-      marcoId: raw.marcoId,
-      status: raw.status || "rascunho",
-      valorMedicao: raw.valorMedicao,
-      percentualMedicao: raw.percentualMedicao,
-      periodo: raw.periodo,
-      dataCriacao: raw.dataCriacao || new Date().toISOString(),
-    };
-  }
-
-  private mapToAggregateDTO(raw: any): StrategicContractAggregateDTO {
-    return {
-      empresaId: raw.empresaId,
-      totalContratos: raw.totalContratos || 0,
-      totalClientes: raw.totalClientes || 0,
-      valorTotalContratos: raw.valorTotalContratos || 0,
-      contratosPorStatus: raw.contratosPorStatus || {},
-      marcosPendentes: raw.marcosPendentes || 0,
-      marcosAtrasados: raw.marcosAtrasados || 0,
-      riscosAbertos: raw.riscosAbertos || 0,
-      riscosAltosAbertos: raw.riscosAltosAbertos || 0,
-      boletinsPendentes: raw.boletinsPendentes || 0,
-    };
-  }
-
-  private mapToGroupAggregateDTO(raw: any): StrategicContractGroupAggregateDTO {
-    return {
-      totalContratos: raw.totalContratos || 0,
-      totalClientes: raw.totalClientes || 0,
-      valorTotalContratos: raw.valorTotalContratos || 0,
-      empresas: (raw.empresas || []).map(this.mapToAggregateDTO.bind(this)),
-      marcosPendentes: raw.marcosPendentes || 0,
-      marcosAtrasados: raw.marcosAtrasados || 0,
-      riscosAbertos: raw.riscosAbertos || 0,
-      riscosAltosAbertos: raw.riscosAltosAbertos || 0,
-      boletinsPendentes: raw.boletinsPendentes || 0,
-    };
-  }
-
-  private mapToAlertDTO(raw: any): StrategicAlertDTO {
-    return {
-      id: raw.id,
-      tipo: raw.tipo,
-      severidade: raw.severidade || "aviso",
-      titulo: raw.titulo,
-      descricao: raw.descricao,
-      empresaId: raw.empresaId,
-      contratoId: raw.contratoId,
-      marcoId: raw.marcoId,
-      dataCriacao: raw.dataCriacao || new Date().toISOString(),
-      dataVencimento: raw.dataVencimento,
-      acao: raw.acao,
-    };
-  }
-
-  // ─── Métodos auxiliares ──────────────────────────────────────────────────
-
-  private async getMarcosByEmpresa(empresaId: number): Promise<StrategicMilestoneSummaryDTO[]> {
-    const contratos = await this.getContratosByEmpresa(empresaId);
-    const allMarcos: StrategicMilestoneSummaryDTO[] = [];
-
-    for (const contrato of contratos) {
-      const marcos = await this.getMarcosByContrato(contrato.id);
-      allMarcos.push(...marcos);
-    }
-
-    return allMarcos;
-  }
-
-  private async getRiscosByEmpresa(empresaId: number): Promise<StrategicRiskSummaryDTO[]> {
-    const contratos = await this.getContratosByEmpresa(empresaId);
-    const allRiscos: StrategicRiskSummaryDTO[] = [];
-
-    for (const contrato of contratos) {
-      const riscos = await this.getRiscosByContrato(contrato.id);
-      allRiscos.push(...riscos);
-    }
-
-    return allRiscos;
-  }
+  // ─── Helpers ─────────────────────────────────────────────────────────────
 
   private isCacheValid(key: string): boolean {
     const cached = this.cacheMap.get(key);
     if (!cached) return false;
-
-    const age = Date.now() - cached.timestamp;
-    return age < this.cacheTTL;
+    return Date.now() - cached.timestamp < this.cacheTTL;
   }
 
   private setCache(key: string, data: any): void {
-    this.cacheMap.set(key, {
-      data,
-      timestamp: Date.now(),
-    });
+    this.cacheMap.set(key, { data, timestamp: Date.now() });
   }
 }
 
-// Instância global (singleton)
+// Singleton
 let contractsGatewayInstance: ContractsGateway | null = null;
 
 export function getContractsGateway(): ContractsGateway {

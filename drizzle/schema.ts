@@ -43,6 +43,7 @@ export const empresas = mysqlTable("empresas", {
   tipoAtuacao: mysqlEnum("tipoAtuacao", ["servicos", "produtos", "servicos_produtos"]).notNull(),
   status: mysqlEnum("status", ["ativa", "inativa"]).default("ativa").notNull(),
   areaId: int("areaId"),
+  sgcEmpresaId: int("sgcEmpresaId"),
   observacoes: text("observacoes"),
   logoUrl: text("logoUrl"),
   logoKey: text("logoKey"),

@@ -14,6 +14,9 @@ import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getContractsGateway } from "../integrations/contractsGateway";
+import { db } from "../db";
+import { empresas } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
 import {
   sgcContratoLink,
   sgcContratosListLink,
@@ -23,6 +26,19 @@ import {
 } from "../integrations/sgcDeepLinks";
 
 const gateway = getContractsGateway();
+
+/**
+ * Resolve o sgcEmpresaId a partir do empresaId local.
+ * Retorna null se a empresa não tiver mapeamento SGC configurado.
+ */
+async function resolveSgcEmpresaId(localEmpresaId: number): Promise<number | null> {
+  try {
+    const rows = await db.select({ sgcEmpresaId: empresas.sgcEmpresaId }).from(empresas).where(eq(empresas.id, localEmpresaId)).limit(1);
+    return rows[0]?.sgcEmpresaId ?? null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Helper: gera mensagem de bloqueio com deep link para o SGC
@@ -53,29 +69,9 @@ export const contratosRouter = router({
   dashboard: protectedProcedure
     .input(z.object({ empresaId: z.number().optional() }))
     .query(async ({ input }) => {
-      if (!input.empresaId) {
-        // Dashboard geral do grupo
-        const agg = await gateway.getContractAggregateForGroup();
-        return agg || {
-          totalContratos: 0,
-          contratosAtivos: 0,
-          valorTotalContratos: 0,
-          valorRecebido: 0,
-          valorPendente: 0,
-          marcosAtrasados: 0,
-          riscosAltos: 0,
-          boletinsPendentes: 0,
-          contratosPorStatus: {},
-          contratosRecentes: [],
-          marcosProximos: [],
-        };
-      }
-      const agg = await gateway.getContractAggregateByEmpresa(input.empresaId);
-      return agg || {
-        empresaId: input.empresaId,
+      const emptyGroup = {
         totalContratos: 0,
         contratosAtivos: 0,
-        totalClientes: 0,
         valorTotalContratos: 0,
         valorRecebido: 0,
         valorPendente: 0,
@@ -86,6 +82,49 @@ export const contratosRouter = router({
         contratosRecentes: [],
         marcosProximos: [],
       };
+
+      if (!input.empresaId) {
+        // Dashboard geral do grupo
+        const agg = await gateway.getContractAggregateForGroup();
+        if (!agg) return emptyGroup;
+        return {
+          ...emptyGroup,
+          totalContratos: agg.totalContratos,
+          contratosAtivos: (agg.contratosPorStatus as any).vigente ?? 0,
+          valorTotalContratos: agg.valorTotalContratos,
+          marcosAtrasados: agg.marcosAtrasados,
+          riscosAltos: agg.riscosAltosAbertos,
+          boletinsPendentes: agg.boletinsPendentes,
+          contratosPorStatus: agg.contratosPorStatus,
+          totalClientes: agg.totalClientes,
+        };
+      }
+
+      // Resolver o ID do SGC a partir do ID local
+      const sgcId = await resolveSgcEmpresaId(input.empresaId);
+      if (!sgcId) {
+        // Empresa não tem mapeamento SGC — retorna zeros
+        return { ...emptyGroup, empresaId: input.empresaId, totalClientes: 0 };
+      }
+
+      const agg = await gateway.getContractAggregateByEmpresa(sgcId);
+      if (!agg) return { ...emptyGroup, empresaId: input.empresaId, totalClientes: 0 };
+
+      return {
+        ...emptyGroup,
+        empresaId: input.empresaId,
+        totalContratos: agg.totalContratos,
+        contratosAtivos: (agg.contratosPorStatus as any).vigente ?? 0,
+        ativos: (agg.contratosPorStatus as any).vigente ?? 0,
+        vigentes: (agg.contratosPorStatus as any).vigente ?? 0,
+        totalClientes: agg.totalClientes,
+        valorTotalContratos: agg.valorTotalContratos,
+        valorTotal: agg.valorTotalContratos,
+        marcosAtrasados: agg.marcosAtrasados,
+        riscosAltos: agg.riscosAltosAbertos,
+        boletinsPendentes: agg.boletinsPendentes,
+        contratosPorStatus: agg.contratosPorStatus,
+      };
     }),
 
   // ── CLIENTES (LEITURA VIA SGC, ESCRITA BLOQUEADA) ────────────────────────
@@ -94,12 +133,12 @@ export const contratosRouter = router({
       .input(z.object({ empresaId: z.number().optional() }))
       .query(async ({ input }) => {
         if (!input.empresaId) {
-          // Sem empresa, retorna lista global via SGC
-          const sgcClient = (await import("../integrations/sgcClient")).getSGCClient();
-          const resp = await sgcClient.get<any[]>("/api/clientes");
-          return resp.success && resp.data ? resp.data : [];
+          // Sem empresa, usa empresa principal (930003)
+          return await gateway.getClientsByEmpresa(930003);
         }
-        return await gateway.getClientsByEmpresa(input.empresaId);
+        const sgcId = await resolveSgcEmpresaId(input.empresaId);
+        if (!sgcId) return [];
+        return await gateway.getClientsByEmpresa(sgcId);
       }),
 
     get: protectedProcedure
