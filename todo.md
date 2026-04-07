@@ -1601,3 +1601,22 @@
 - [x] Executar testes de regressão e checkup final (183/183 testes passando)
 - [x] Gerar evidência técnica obrigatória (lista de páginas, procedures, rotas afetadas)
 - [x] Confirmar que o estratégico NÃO é mais fonte mestra de clientes/contratos
+
+
+## Ativação do Endpoint de Integração no SGC
+- [ ] Verificar estado atual do SGC e localizar arquivos de rotas/servidor
+- [ ] Implementar endpoint /api/integration/v1 no SGC
+- [ ] Configurar INTERNAL_API_TOKEN no SGC com o mesmo valor do SGC_INTERNAL_TOKEN
+- [ ] Testar fluxo de dados entre sistema estratégico e SGC
+- [ ] Confirmar que dados de contratos/clientes fluem corretamente
+
+
+## Remoção de Páginas de Criação — Redirecionamento para SGC
+- [x] Remover página ContratoForm.tsx (criação de contratos) — rotas removidas
+- [x] Remover página AditivoForm.tsx (criação de aditivos) — rotas removidas
+- [x] Remover página GestaoClientes.tsx (criação de clientes) — rotas removidas
+- [x] Remover botão "Novo Contrato" de Contratos.tsx
+- [x] Remover botão "Novo Aditivo" de ContratoDetalhe.tsx
+- [x] Remover botão "Novo Cliente" de GestaoClientes.tsx — rota removida
+- [x] Remover rotas de criação do App.tsx
+- [x] Testar navegação e redirecionamentos (183/183 testes passando)

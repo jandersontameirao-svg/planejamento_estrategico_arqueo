@@ -92,9 +92,6 @@ export default function Contratos({ empresaId }: ContratosProps) {
             <Button variant="outline" size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos/clientes`)}>
               <Users className="w-4 h-4 mr-1" /> Clientes
             </Button>
-            <Button size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos/novo`)}>
-              <Plus className="w-4 h-4 mr-1" /> Novo Contrato
-            </Button>
           </div>
         </div>
       </div>

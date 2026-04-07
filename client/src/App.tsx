@@ -37,10 +37,7 @@ import GestaoOrcamentaria from "./pages/GestaoOrcamentaria";
 import AreasNegocio from "./pages/AreasNegocio";
 import Contratos from "./pages/Contratos";
 import ContratoDetalhe from "./pages/ContratoDetalhe";
-import ContratoForm from "./pages/ContratoForm";
-import AditivoForm from "./pages/AditivoForm";
 import ContratosClientes from "./pages/ContratosClientes";
-import GestaoClientes from "./pages/GestaoClientes";
 import GestaoClienteDetalhe from "./pages/GestaoClienteDetalhe";
 
 import PlanejamentoEstrategicoArea from "./pages/PlanejamentoEstrategicoArea";
@@ -108,14 +105,8 @@ function Router() {
       <Route path="/empresa/:id/contratos">
         {(params) => <Contratos empresaId={Number(params.id)} />}
       </Route>
-      <Route path="/empresa/:id/contratos/novo">
-        {(params) => <ContratoForm empresaId={Number(params.id)} />}
-      </Route>
       <Route path="/empresa/:id/contratos/clientes">
         {(params) => <ContratosClientes empresaId={Number(params.id)} />}
-      </Route>
-      <Route path="/empresa/:id/contratos/:contratoId/aditivo/novo">
-        {(params) => <AditivoForm empresaId={Number(params.id)} contratoId={Number(params.contratoId)} />}
       </Route>
       <Route path="/empresa/:id/contratos/:contratoId">
         {(params) => <ContratoDetalhe empresaId={Number(params.id)} contratoId={Number(params.contratoId)} />}
@@ -123,11 +114,7 @@ function Router() {
       <Route path="/planejamento-macro" component={PlanejamentoMacro} />
       <Route path="/relatorios" component={Relatorios} />
       <Route path="/aprovacao/:token" component={AprovacaoBoletim} />
-      <Route path="/gestao-clientes">{() => <GestaoClientes />}</Route>
       <Route path="/gestao-clientes/:id" component={GestaoClienteDetalhe} />
-      <Route path="/empresa/:id/clientes">
-        {(params) => <GestaoClientes empresaId={Number(params.id)} />}
-      </Route>
       <Route path="/empresa/:id/gestao-riscos">
         {(params) => <GestaoRiscos />}
       </Route>

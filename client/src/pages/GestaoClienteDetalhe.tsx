@@ -187,20 +187,7 @@ export default function GestaoClienteDetalhe() {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleEdit}>
-            <Pencil className="mr-2 h-4 w-4" />
-            Editar
-          </Button>
-          <Button
-            variant="outline" size="sm"
-            className="text-destructive hover:text-destructive"
-            onClick={handleDelete}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Excluir
-          </Button>
-        </div>
+
       </div>
 
       {/* Tabs */}

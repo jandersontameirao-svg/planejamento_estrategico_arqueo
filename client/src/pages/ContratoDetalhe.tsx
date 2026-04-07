@@ -546,9 +546,6 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
           <TabsContent value="aditivos" className="mt-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-semibold text-gray-900">Aditivos Contratuais</h3>
-              <Button size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos/${contratoId}/aditivo/novo`)}>
-                <Plus className="w-4 h-4 mr-1" /> Novo Aditivo
-              </Button>
             </div>
             {aditivos.length === 0 ? (
               <Card>
