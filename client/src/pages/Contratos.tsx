@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   FileText, Search, Building2, DollarSign, Clock, AlertTriangle,
-  CheckCircle2, TrendingUp, Users, ArrowLeft, BarChart3, Shield,
+  CheckCircle2, TrendingUp, ArrowLeft, BarChart3, Shield, ExternalLink,
 } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -89,9 +89,15 @@ export default function Contratos({ empresaId }: ContratosProps) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigate(`/empresa/${empresaId}/contratos/clientes`)}>
-              <Users className="w-4 h-4 mr-1" /> Clientes
-            </Button>
+            <a
+              href={`${import.meta.env.VITE_SGC_PUBLIC_APP_URL || 'https://arqueomanage-c7undxdh.manus.space'}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="outline" size="sm">
+                <ExternalLink className="w-4 h-4 mr-1" /> Abrir no SGC
+              </Button>
+            </a>
           </div>
         </div>
       </div>
