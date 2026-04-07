@@ -193,11 +193,11 @@ export default function Contratos({ empresaId }: ContratosProps) {
               <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-500 font-medium">Nenhum contrato encontrado</p>
               <p className="text-gray-400 text-sm mt-1">
-                {busca || filtroStatus !== "todos" ? "Tente ajustar os filtros" : "Clique em \"Novo Contrato\" para começar"}
+                {busca || filtroStatus !== "todos" ? "Tente ajustar os filtros" : "Crie contratos no SGC (Sistema de Gestão Contratual)"}
               </p>
               {!busca && filtroStatus === "todos" && (
-                <Button className="mt-4" onClick={() => navigate(`/empresa/${empresaId}/contratos/novo`)}>
-                  <Plus className="w-4 h-4 mr-1" /> Criar Primeiro Contrato
+                <Button className="mt-4" onClick={() => window.open(`${import.meta.env.VITE_SGC_PUBLIC_APP_URL || ''}/empresa/${empresaId}/contratos/novo`, '_blank')}>
+                  <Plus className="w-4 h-4 mr-1" /> Criar Contrato no SGC
                 </Button>
               )}
             </CardContent>
