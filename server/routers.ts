@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { orcamentoRouter } from "./routers/orcamento";
 import { contratosRouter } from "./routers/contratos";
+import { contratosGatewayRouter } from "./routers/contratosGateway";
 import { avaliacaoContratosRouter } from "./routers/avaliacaoContratos";
 import { gestaoRiscosRouter } from "./routers/gestaoRiscos";
 import { getMetodologiasEmpresa, saveMetodologiasEmpresa, METODOLOGIAS_DISPONIVEIS } from "./metodologias";
@@ -13,7 +14,8 @@ import { TRPCError } from "@trpc/server";
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
-  contratos: contratosRouter,
+  contratos: contratosRouter, // LEGADO: mantido para compatibilidade, será removido após transição completa
+  contratosGateway: contratosGatewayRouter, // NOVA FONTE: consome dados do SGC
   avaliacaoContratos: avaliacaoContratosRouter,
   gestaoRiscos: gestaoRiscosRouter,
 

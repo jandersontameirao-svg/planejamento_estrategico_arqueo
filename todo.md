@@ -1568,3 +1568,24 @@
 - [ ] Implementar indicador de cobertura (% riscos com plano de ação)
 - [ ] Implementar indicador de tendência (riscos novos vs. resolvidos)
 - [ ] Testar e verificar
+
+
+## Integração com SGC (Sistema de Gestão de Contratos)
+- [x] Criar sgcClient.ts - Cliente HTTP centralizado para SGC
+- [x] Criar sgcDtos.ts - DTOs internos desacoplados do payload SGC
+- [x] Criar contractsGateway.ts - Gateway com cache e fallback
+- [x] Criar sgcDeepLinks.ts - Helper de deep links para SGC
+- [x] Criar contratosGateway.ts - Router adaptado para SGC
+- [x] Registrar contratosGatewayRouter no appRouter principal
+- [x] Marcar router local de contratos como LEGADO
+- [x] Configurar SGC_API_BASE_URL via webdev_request_secrets
+- [x] Configurar SGC_INTERNAL_TOKEN via webdev_request_secrets
+- [x] Configurar SGC_TIMEOUT_MS via webdev_request_secrets
+- [x] Configurar SGC_ENABLED via webdev_request_secrets
+- [x] Configurar SGC_PUBLIC_APP_URL via webdev_request_secrets
+- [x] Bloquear mutations de escrita no gateway (create/update/delete)
+- [x] Implementar cache com TTL de 5 minutos
+- [x] Implementar fallback para indisponibilidade do SGC
+- [x] Criar 37 testes de homologação da integração
+- [x] Criar SGC_INTEGRATION.md - Documentação técnica completa
+- [x] Gerar relatório de homologação final
