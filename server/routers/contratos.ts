@@ -513,4 +513,32 @@ export const contratosRouter = router({
         clausulasPorTipo: {},
       };
     }),
+
+  // ── DASHBOARD ESTRATÉGICO (CONSOLIDADO: SUMMARY + CLIENTS + RISKS) ──────
+  strategicDashboard: protectedProcedure
+    .input(z.object({ empresaId: z.number() }))
+    .query(async ({ input }) => {
+      const sgcId = await resolveSgcEmpresaId(input.empresaId);
+      if (!sgcId) {
+        return {
+          summary: null,
+          clients: [] as any[],
+          risks: null,
+          sgcEnabled: false,
+        };
+      }
+
+      const [summary, clients, risks] = await Promise.all([
+        gateway.getCompanySummary(sgcId),
+        gateway.getClientsByEmpresa(sgcId),
+        gateway.getRisksByEmpresa(sgcId),
+      ]);
+
+      return {
+        summary,
+        clients,
+        risks,
+        sgcEnabled: true,
+      };
+    }),
 });

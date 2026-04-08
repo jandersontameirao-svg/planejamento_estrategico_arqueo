@@ -1629,3 +1629,11 @@
 - [ ] Remover estado vazio com botão de criar cliente
 - [ ] Verificar se há rota /clientes/novo ainda ativa no App.tsx
 - [ ] Verificar link "Clientes" no header — remover ou redirecionar para SGC
+
+## Dashboard Estratégico de Contratos (SGC)
+- [x] Procedure strategicDashboard consolidando 3 endpoints do SGC (summary, clients, risks)
+- [x] Aba Visão Geral com panorama financeiro, marcos e resumo de riscos
+- [x] Aba Carteira de Clientes com ranking por valor contratado e análise de concentração
+- [x] Aba Exposição a Riscos com distribuição por severidade e riscos por contrato
+- [x] KPIs principais: Total Contratos, Vigentes, Encerrados, Clientes Ativos, Marcos Vencidos, Riscos Críticos
+- [x] Alertas automáticos para alto volume de marcos vencidos e riscos sem plano de ação
