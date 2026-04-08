@@ -156,7 +156,7 @@ export default function ContratosClientes({ empresaId }: ContratosClientesProps)
       setCnpjVerificado(verificacao);
 
       if (verificacao.existe && !editando) {
-        toast.warning(`CNPJ já cadastrado como "${verificacao.cliente?.razaoSocial}"`);
+        toast.warning(`CNPJ já cadastrado como "${(verificacao.cliente as any)?.razaoSocial}"`);
         setBuscandoCNPJ(false);
         return;
       }

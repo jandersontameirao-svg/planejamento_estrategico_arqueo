@@ -92,12 +92,12 @@ export const contratosRouter = router({
         return {
           ...emptyGroup,
           totalContratos: agg.totalContratos,
-          contratosAtivos: (agg.contratosPorStatus as any).vigente ?? 0,
+          contratosAtivos: ((agg as any).contratosPorStatus as any)?.vigente ?? 0,
           valorTotalContratos: agg.valorTotalContratos,
           marcosAtrasados: agg.marcosAtrasados,
           riscosAltos: agg.riscosAltosAbertos,
           boletinsPendentes: agg.boletinsPendentes,
-          contratosPorStatus: agg.contratosPorStatus,
+          contratosPorStatus: (agg as any).contratosPorStatus ?? {},
           totalClientes: agg.totalClientes,
         };
       }
@@ -125,7 +125,7 @@ export const contratosRouter = router({
         marcosAtrasados: agg.marcosAtrasados,
         riscosAltos: agg.riscosAltosAbertos,
         boletinsPendentes: agg.boletinsPendentes,
-        contratosPorStatus: agg.contratosPorStatus,
+          contratosPorStatus: (agg as any).contratosPorStatus ?? {},
       };
     }),
 

@@ -28,7 +28,7 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
       c.razaoSocial?.toLowerCase().includes(q) ||
       c.nomeFantasia?.toLowerCase().includes(q) ||
       c.cnpj?.includes(q) ||
-      c.cidade?.toLowerCase().includes(q)
+      (c as any).cidade?.toLowerCase().includes(q)
     );
   });
 
@@ -87,7 +87,7 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
         <Card className="p-4">
           <p className="text-sm text-muted-foreground">Com Endereço</p>
           <p className="text-2xl font-bold text-blue-600">
-            {clientes.filter((c) => c.cidade).length}
+            {clientes.filter((c) => (c as any).cidade).length}
           </p>
         </Card>
         <Card className="p-4">
@@ -126,8 +126,8 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
                     {c.nomeFantasia && <p className="text-sm text-muted-foreground truncate">{c.nomeFantasia}</p>}
                     <CardDescription className="font-mono text-xs mt-1">{c.cnpj}</CardDescription>
                   </div>
-                  {c.logoUrl ? (
-                    <img src={c.logoUrl} alt={c.razaoSocial} className="w-10 h-10 rounded object-contain shrink-0" />
+                  {(c as any).logoUrl ? (
+                    <img src={(c as any).logoUrl} alt={c.razaoSocial} className="w-10 h-10 rounded object-contain shrink-0" />
                   ) : (
                     <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center shrink-0">
                       <Building2 className="h-5 w-5 text-primary" />
@@ -142,10 +142,10 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
                 </Badge>
               </CardHeader>
               <CardContent className="flex-1 space-y-1.5 pb-3">
-                {(c.cidade || c.estado) && (
+                {((c as any).cidade || (c as any).estado) && (
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <MapPin className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{[c.cidade, c.estado].filter(Boolean).join(" - ")}</span>
+                    <span className="truncate">{[(c as any).cidade, (c as any).estado].filter(Boolean).join(" - ")}</span>
                   </div>
                 )}
                 {c.telefone && (
@@ -160,10 +160,10 @@ export default function GestaoClientes({ empresaId }: GestaoClientesProps = {}) 
                     <span className="truncate">{c.email}</span>
                   </div>
                 )}
-                {c.cnaeDescricao && (
+                {(c as any).cnaeDescricao && (
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <Briefcase className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate text-xs">{c.cnaeDescricao}</span>
+                    <span className="truncate text-xs">{(c as any).cnaeDescricao}</span>
                   </div>
                 )}
               </CardContent>

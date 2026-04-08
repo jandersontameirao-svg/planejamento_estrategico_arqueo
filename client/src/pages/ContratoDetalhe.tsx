@@ -285,7 +285,7 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusInfo.color}`}>
                     {statusInfo.label}
                   </span>
-                  {!contrato.iaRevisado && contrato.pdfUrl && (
+                  {!(contrato as any).iaRevisado && (contrato as any).pdfUrl && (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 flex items-center gap-1">
                       <AlertTriangle className="w-3 h-3" /> Revisão IA pendente
                     </span>
@@ -302,8 +302,8 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {contrato.pdfUrl ? (
-                <Button variant="outline" size="sm" onClick={() => window.open(contrato.pdfUrl!, "_blank")}>
+              {(contrato as any).pdfUrl ? (
+                <Button variant="outline" size="sm" onClick={() => window.open((contrato as any).pdfUrl!, "_blank")}>
                   <Eye className="w-4 h-4 mr-1" /> Ver PDF
                 </Button>
               ) : (
@@ -332,10 +332,10 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
           </div>
 
           {/* Resumo IA */}
-          {contrato.resumoIA && (
+          {(contrato as any).resumoIA && (
             <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-100 text-sm text-blue-800 flex items-start gap-2">
               <Brain className="w-4 h-4 flex-shrink-0 mt-0.5 text-blue-600" />
-              <p>{contrato.resumoIA}</p>
+              <p>{(contrato as any).resumoIA}</p>
             </div>
           )}
         </div>
@@ -347,7 +347,7 @@ export default function ContratoDetalhe({ empresaId, contratoId }: ContratoDetal
           <Card>
             <CardContent className="p-4 text-center">
               <p className="text-xs text-gray-500">Valor Total</p>
-              <p className="text-xl font-bold text-gray-900 mt-1">{formatCurrency(contrato.valorTotal)}</p>
+              <p className="text-xl font-bold text-gray-900 mt-1">{formatCurrency(contrato.valorTotal != null ? String(contrato.valorTotal) : undefined)}</p>
             </CardContent>
           </Card>
           <Card>
