@@ -14,7 +14,7 @@ import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getContractsGateway } from "../integrations/contractsGateway";
-import { db } from "../db";
+import { getDb } from "../db";
 import { empresas } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -33,6 +33,8 @@ const gateway = getContractsGateway();
  */
 async function resolveSgcEmpresaId(localEmpresaId: number): Promise<number | null> {
   try {
+    const db = await getDb();
+    if (!db) return null;
     const rows = await db.select({ sgcEmpresaId: empresas.sgcEmpresaId }).from(empresas).where(eq(empresas.id, localEmpresaId)).limit(1);
     return rows[0]?.sgcEmpresaId ?? null;
   } catch {
