@@ -7,6 +7,7 @@ import { contratosRouter } from "./routers/contratos";
 import { contratosGatewayRouter } from "./routers/contratosGateway";
 import { avaliacaoContratosRouter } from "./routers/avaliacaoContratos";
 import { gestaoRiscosRouter } from "./routers/gestaoRiscos";
+import { organogramaRouter } from "./routers/organograma";
 import { getMetodologiasEmpresa, saveMetodologiasEmpresa, METODOLOGIAS_DISPONIVEIS } from "./metodologias";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
@@ -18,6 +19,7 @@ export const appRouter = router({
   contratosGateway: contratosGatewayRouter, // NOVA FONTE: consome dados do SGC
   avaliacaoContratos: avaliacaoContratosRouter,
   gestaoRiscos: gestaoRiscosRouter,
+  organograma: organogramaRouter,
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

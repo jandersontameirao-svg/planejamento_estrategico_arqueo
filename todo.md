@@ -1637,3 +1637,20 @@
 - [x] Aba Exposição a Riscos com distribuição por severidade e riscos por contrato
 - [x] KPIs principais: Total Contratos, Vigentes, Encerrados, Clientes Ativos, Marcos Vencidos, Riscos Críticos
 - [x] Alertas automáticos para alto volume de marcos vencidos e riscos sem plano de ação
+
+## Integração Organograma (Read-Only)
+- [x] Descobrir endpoints disponíveis no sistema de organograma externo
+- [x] Criar camada de integração backend (organogramClient.ts + router organograma.ts)
+- [x] Configurar variáveis de ambiente (ORGANOGRAM_API_BASE_URL, ORGANOGRAM_INTERNAL_TOKEN)
+- [x] Criar DTOs internos de consumo (tipagem automática via resposta do endpoint)
+- [x] Criar procedures tRPC read-only (overview, tree, leaders, departments)
+- [x] Implementar página de visão geral organizacional do grupo (/organograma)
+- [x] Implementar aba Árvore Hierárquica com nós expansíveis
+- [x] Implementar aba Lideranças com cards de perfil
+- [x] Implementar aba Departamentos com cores e métricas
+- [x] Implementar KPIs: Total Cargos, Colaboradores, Níveis, Taxa de Ocupação
+- [x] Implementar links profundos para o OrganoArq
+- [x] Criar testes de integração (4/4 passando)
+- [x] Adicionar link Organograma no menu de navegação da Home
+- [ ] Implementar cruzamentos read-only com dados do planejamento estratégico
+- [ ] Criar documentação técnica da integração

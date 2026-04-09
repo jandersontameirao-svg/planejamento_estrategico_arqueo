@@ -45,6 +45,7 @@ import PlanejamentoEstrategicoArea from "./pages/PlanejamentoEstrategicoArea";
 import DashboardAnalisesArea from "./pages/DashboardAnalisesArea";
 import AprovacaoBoletim from "./pages/AprovacaoBoletim";
 import GestaoRiscos from "./pages/GestaoRiscos";
+import Organograma from "./pages/Organograma";
 
 
 function Router() {
@@ -120,6 +121,7 @@ function Router() {
       <Route path="/aprovacao/:token" component={AprovacaoBoletim} />
       <Route path="/gestao-clientes">{() => <GestaoClientes />}</Route>
       <Route path="/gestao-clientes/:id" component={GestaoClienteDetalhe} />
+      <Route path="/organograma" component={Organograma} />
       <Route path="/empresa/:id/gestao-riscos">
         {(params) => <GestaoRiscos />}
       </Route>
