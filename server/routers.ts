@@ -743,6 +743,60 @@ export const appRouter = router({
         const { getKPIsVinculadosObjetivo } = await import("./db");
         return await getKPIsVinculadosObjetivo(input.objetivoId);
       }),
+
+    // Vinculação de líder do OrganoArq a objetivo do Grupo
+    vincularLider: protectedProcedure
+      .input(z.object({
+        objetivoId: z.number(),
+        responsavelOrganoId: z.string().nullable(),
+        responsavelOrganoNome: z.string().nullable(),
+        responsavelOrganoCargo: z.string().nullable(),
+      }))
+      .mutation(async ({ input }) => {
+        const { getDb } = await import("../server/db");
+        const db = (await getDb())!;
+        const { objetivosGrupo } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        await db.update(objetivosGrupo)
+          .set({
+            responsavelOrganoId: input.responsavelOrganoId,
+            responsavelOrganoNome: input.responsavelOrganoNome,
+            responsavelOrganoCargo: input.responsavelOrganoCargo,
+          })
+          .where(eq(objetivosGrupo.id, input.objetivoId));
+        return { success: true };
+      }),
+
+    // Retorna todos os objetivos do grupo com dados de líder enriquecidos
+    listComLideres: publicProcedure.query(async () => {
+      const { getObjetivosGrupo } = await import("./db");
+      return await getObjetivosGrupo();
+    }),
+
+    // Retorna objetivos agrupados por líder (para a visão cruzada no organograma)
+    porLider: publicProcedure.query(async () => {
+      const { getDb } = await import("../server/db");
+      const db = (await getDb())!;
+      const { objetivosGrupo } = await import("../drizzle/schema");
+      const { isNotNull } = await import("drizzle-orm");
+      const rows = await db.select().from(objetivosGrupo)
+        .where(isNotNull(objetivosGrupo.responsavelOrganoId));
+      // Agrupar por líder
+      const mapa: Record<string, { id: string; nome: string; cargo: string; objetivos: typeof rows }> = {};
+      for (const obj of rows) {
+        const key = obj.responsavelOrganoId!;
+        if (!mapa[key]) {
+          mapa[key] = {
+            id: key,
+            nome: obj.responsavelOrganoNome ?? "",
+            cargo: obj.responsavelOrganoCargo ?? "",
+            objetivos: [],
+          };
+        }
+        mapa[key].objetivos.push(obj);
+      }
+      return Object.values(mapa);
+    }),
   }),
 
   // Projetos Estratégicos do Grupo

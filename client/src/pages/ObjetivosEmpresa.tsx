@@ -21,7 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Target, Plus, Pencil, Trash2, Building2, AlertCircle } from "lucide-react";
+import { Target, Plus, Pencil, Trash2, Building2, AlertCircle, User } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -85,6 +85,16 @@ export default function ObjetivosEmpresa({ empresaId }: ObjetivosEmpresaProps) {
     status: "planejado" as "planejado" | "em_andamento" | "concluido" | "cancelado",
     impacto: "medio" as "baixo" | "medio" | "alto",
     probabilidade: "media" as "baixa" | "media" | "alta",
+    responsavelOrganoId: "" as string | null,
+    responsavelOrganoNome: "" as string | null,
+    responsavelOrganoCargo: "" as string | null,
+  });
+
+  const { data: lideres } = trpc.organograma.leaders.useQuery();
+  const vincularLiderMutation = trpc.objetivosGrupo.vincularLider.useMutation({
+    onSuccess: () => {
+      refetchObjetivos();
+    },
   });
 
   const resetForm = () => {
@@ -96,6 +106,9 @@ export default function ObjetivosEmpresa({ empresaId }: ObjetivosEmpresaProps) {
       status: "planejado",
       impacto: "medio",
       probabilidade: "media",
+      responsavelOrganoId: null,
+      responsavelOrganoNome: null,
+      responsavelOrganoCargo: null,
     });
     setEditingObjetivo(null);
   };
@@ -108,17 +121,20 @@ export default function ObjetivosEmpresa({ empresaId }: ObjetivosEmpresaProps) {
       return;
     }
 
+    const payload = { ...formData, empresaId };
     if (editingObjetivo) {
-      updateMutation.mutate({
-        id: editingObjetivo.id,
-        empresaId,
-        ...formData,
-      });
+      updateMutation.mutate({ id: editingObjetivo.id, ...payload });
+      // Vincular líder após atualizar
+      if (formData.responsavelOrganoId !== editingObjetivo.responsavelOrganoId) {
+        vincularLiderMutation.mutate({
+          objetivoId: editingObjetivo.id,
+          responsavelOrganoId: formData.responsavelOrganoId || null,
+          responsavelOrganoNome: formData.responsavelOrganoNome || null,
+          responsavelOrganoCargo: formData.responsavelOrganoCargo || null,
+        });
+      }
     } else {
-      createMutation.mutate({
-        empresaId,
-        ...formData,
-      });
+      createMutation.mutate(payload);
     }
   };
 
@@ -132,6 +148,9 @@ export default function ObjetivosEmpresa({ empresaId }: ObjetivosEmpresaProps) {
       status: objetivo.status || "planejado",
       impacto: objetivo.impacto || "medio",
       probabilidade: objetivo.probabilidade || "media",
+      responsavelOrganoId: objetivo.responsavelOrganoId || null,
+      responsavelOrganoNome: objetivo.responsavelOrganoNome || null,
+      responsavelOrganoCargo: objetivo.responsavelOrganoCargo || null,
     });
     setDialogOpen(true);
   };
@@ -329,6 +348,43 @@ export default function ObjetivosEmpresa({ empresaId }: ObjetivosEmpresaProps) {
                     </div>
                   </div>
 
+                  <div>
+                    <Label htmlFor="responsavel">Responsável (OrganoArq)</Label>
+                    <Select
+                      value={formData.responsavelOrganoId || "none"}
+                      onValueChange={(value) => {
+                        if (value === "none") {
+                          setFormData({
+                            ...formData,
+                            responsavelOrganoId: null,
+                            responsavelOrganoNome: null,
+                            responsavelOrganoCargo: null,
+                          });
+                        } else {
+                          const lider = lideres?.leaders?.find((l: any) => l.positionId === value);
+                          setFormData({
+                            ...formData,
+                            responsavelOrganoId: value,
+                            responsavelOrganoNome: lider?.person?.name || null,
+                            responsavelOrganoCargo: lider?.title || null,
+                          });
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um líder" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {lideres?.leaders?.map((lider: any) => (
+                          <SelectItem key={lider.positionId} value={lider.positionId}>
+                            {lider.person?.name} - {lider.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="flex gap-2 justify-end">
                     <Button
                       type="button"
@@ -467,7 +523,7 @@ export default function ObjetivosEmpresa({ empresaId }: ObjetivosEmpresaProps) {
                           {objetivo.descricao}
                         </p>
                       )}
-                      <div className="flex gap-4 text-sm">
+                      <div className="flex gap-4 text-sm flex-wrap">
                         {objetivo.prazo && (
                           <span className="text-muted-foreground">
                             Prazo: {new Date(objetivo.prazo).toLocaleDateString("pt-BR")}
@@ -479,6 +535,12 @@ export default function ObjetivosEmpresa({ empresaId }: ObjetivosEmpresaProps) {
                         <Badge variant="outline">
                           Probabilidade: {objetivo.probabilidade}
                         </Badge>
+                        {objetivo.responsavelOrganoNome && (
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <User className="h-3 w-3" />
+                            <span>{objetivo.responsavelOrganoNome} ({objetivo.responsavelOrganoCargo})</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                     {canEdit && (

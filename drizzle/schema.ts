@@ -144,6 +144,9 @@ export const objetivos = mysqlTable("objetivos", {
   nome: varchar("nome", { length: 255 }).notNull(),
   descricao: text("descricao"),
   perspectivaBSC: mysqlEnum("perspectivaBSC", ["financeira", "clientes", "processos", "aprendizado"]),
+  responsavelOrganoId: varchar("responsavelOrganoId", { length: 100 }), // ID do cargo/posição no OrganoArq
+  responsavelOrganoNome: varchar("responsavelOrganoNome", { length: 255 }), // Nome da pessoa no OrganoArq
+  responsavelOrganoCargo: varchar("responsavelOrganoCargo", { length: 255 }), // Título do cargo no OrganoArq
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -350,6 +353,9 @@ export const objetivosGrupo = mysqlTable("objetivos_grupo", {
   titulo: varchar("titulo", { length: 255 }).notNull(),
   descricao: text("descricao"),
   perspectivaBSC: mysqlEnum("perspectivaBSC", ["financeira", "clientes", "processos", "aprendizado"]),
+  responsavelOrganoId: varchar("responsavelOrganoId", { length: 100 }), // ID do cargo/posição no OrganoArq
+  responsavelOrganoNome: varchar("responsavelOrganoNome", { length: 255 }), // Nome da pessoa no OrganoArq
+  responsavelOrganoCargo: varchar("responsavelOrganoCargo", { length: 255 }), // Título do cargo no OrganoArq
   prazo: date("prazo"),
   status: mysqlEnum("status", ["planejado", "em_andamento", "concluido", "cancelado"]).default("planejado"),
   impacto: mysqlEnum("impacto", ["baixo", "medio", "alto"]).default("medio"),

@@ -1654,3 +1654,13 @@
 - [x] Adicionar link Organograma no menu de navegação da Home
 - [ ] Implementar cruzamentos read-only com dados do planejamento estratégico
 - [ ] Criar documentação técnica da integração
+
+## Cruzamento Organograma × Planejamento Estratégico
+- [ ] Adicionar campo responsavelOrganoId e responsavelOrganoNome na tabela de objetivos
+- [ ] Migrar banco de dados com novos campos
+- [ ] Criar procedure tRPC para vincular/desvincular líder a objetivo
+- [ ] Criar procedure tRPC para buscar objetivos com dados de líder enriquecidos
+- [ ] Implementar selector de líder (dropdown com líderes do OrganoArq) no formulário de objetivos
+- [ ] Exibir avatar e nome do líder nos cards de objetivos
+- [ ] Criar aba "Objetivos por Líder" na página de Organograma
+- [ ] Criar testes para as novas procedures

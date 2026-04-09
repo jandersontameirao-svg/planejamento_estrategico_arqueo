@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Users, Building2, Layers, TrendingUp, ChevronDown, ChevronRight, UserCheck } from "lucide-react";
+import { ExternalLink, Users, Building2, Layers, TrendingUp, ChevronDown, ChevronRight, UserCheck, Target, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 
@@ -143,11 +143,33 @@ function OrgNodeCard({ node, depth = 0 }: { node: OrgNode; depth?: number }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
+const statusColors: Record<string, string> = {
+  planejado: "bg-gray-100 text-gray-800",
+  em_andamento: "bg-blue-100 text-blue-800",
+  concluido: "bg-green-100 text-green-800",
+  cancelado: "bg-red-100 text-red-800",
+};
+
+const perspectivaBadge: Record<string, string> = {
+  financeira: "bg-emerald-100 text-emerald-800",
+  clientes: "bg-blue-100 text-blue-800",
+  processos: "bg-purple-100 text-purple-800",
+  aprendizado: "bg-amber-100 text-amber-800",
+};
+
+const perspectivaNome: Record<string, string> = {
+  financeira: "Financeira",
+  clientes: "Clientes",
+  processos: "Processos",
+  aprendizado: "Aprendizado",
+};
+
 export default function Organograma() {
   const { data: overview, isLoading: loadingOverview } = trpc.organograma.overview.useQuery();
   const { data: leadersData, isLoading: loadingLeaders } = trpc.organograma.leaders.useQuery();
   const { data: departmentsData, isLoading: loadingDepts } = trpc.organograma.departments.useQuery();
   const { data: treeData, isLoading: loadingTree } = trpc.organograma.tree.useQuery();
+  const { data: objetivosPorLider, isLoading: loadingObjetivos } = trpc.objetivosGrupo.porLider.useQuery();
 
   return (
     <div className="min-h-screen bg-background">
@@ -247,6 +269,10 @@ export default function Organograma() {
             <TabsTrigger value="tree">Árvore Hierárquica</TabsTrigger>
             <TabsTrigger value="leaders">Lideranças</TabsTrigger>
             <TabsTrigger value="departments">Departamentos</TabsTrigger>
+            <TabsTrigger value="objetivos" className="gap-1">
+              <Target className="w-3 h-3" />
+              Responsáveis por Objetivos
+            </TabsTrigger>
           </TabsList>
 
           {/* ── Tree Tab ── */}
@@ -393,6 +419,94 @@ export default function Organograma() {
                   <div className="text-center py-12 text-muted-foreground">
                     <Building2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
                     <p className="font-medium">Nenhum departamento encontrado</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          {/* ── Objetivos por Líder Tab ── */}
+          <TabsContent value="objetivos">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Target className="w-4 h-4 text-indigo-500" />
+                  Responsáveis por Objetivos Estratégicos
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Líderes do OrganoArq vinculados a objetivos do planejamento estratégico. Vincule líderes nos formulários de objetivos de cada empresa.
+                </p>
+              </CardHeader>
+              <CardContent>
+                {loadingObjetivos ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="h-32 bg-muted rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                ) : objetivosPorLider && objetivosPorLider.length > 0 ? (
+                  <div className="space-y-6">
+                    {objetivosPorLider.map((lider) => (
+                      <div key={lider.id} className="border rounded-lg overflow-hidden">
+                        {/* Líder header */}
+                        <div className="bg-indigo-50 border-b border-indigo-100 px-4 py-3 flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                            {lider.nome
+                              .split(" ")
+                              .filter(Boolean)
+                              .slice(0, 2)
+                              .map((n: string) => n[0])
+                              .join("")
+                              .toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-sm text-indigo-900">{lider.nome}</p>
+                            <p className="text-xs text-indigo-600">{lider.cargo}</p>
+                          </div>
+                          <Badge className="ml-auto bg-indigo-100 text-indigo-800">
+                            {lider.objetivos.length} objetivo{lider.objetivos.length !== 1 ? "s" : ""}
+                          </Badge>
+                        </div>
+                        {/* Objetivos */}
+                        <div className="divide-y">
+                          {lider.objetivos.map((obj: any) => (
+                            <div key={obj.id} className="px-4 py-3 flex items-start gap-3 hover:bg-muted/30 transition-colors">
+                              <Target className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-sm">{obj.titulo}</p>
+                                {obj.descricao && (
+                                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{obj.descricao}</p>
+                                )}
+                                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                                  {obj.status && (
+                                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[obj.status] || "bg-gray-100 text-gray-700"}`}>
+                                      {obj.status.replace("_", " ")}
+                                    </span>
+                                  )}
+                                  {obj.perspectivaBSC && (
+                                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${perspectivaBadge[obj.perspectivaBSC] || "bg-gray-100 text-gray-700"}`}>
+                                      {perspectivaNome[obj.perspectivaBSC] || obj.perspectivaBSC}
+                                    </span>
+                                  )}
+                                  {obj.prazo && (
+                                    <span className="text-xs text-muted-foreground">
+                                      Prazo: {new Date(obj.prazo).toLocaleDateString("pt-BR")}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-16 text-muted-foreground">
+                    <AlertCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="font-medium">Nenhum líder vinculado a objetivos</p>
+                    <p className="text-sm mt-1 max-w-sm mx-auto">
+                      Para vincular um líder, acesse os objetivos de uma empresa e selecione o responsável no campo "Responsável (OrganoArq)".
+                    </p>
                   </div>
                 )}
               </CardContent>
