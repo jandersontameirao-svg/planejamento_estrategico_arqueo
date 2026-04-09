@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, Link2, Plus, X, SlidersHorizontal, DollarSign } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, Link2, Plus, X, SlidersHorizontal, DollarSign, GitBranch, ExternalLink } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import PageHeaderWithBack from "@/components/PageHeaderWithBack";
@@ -102,6 +102,63 @@ const analises: AnaliseCard[] = [
     componente: GestaoOrcamentaria,
   },
 ];
+
+// ─── Card de Organograma ─────────────────────────────────────────────────────
+function OrganogramaCard() {
+  const { data: overview, isLoading } = trpc.organograma.overview.useQuery();
+
+  return (
+    <Link href="/organograma">
+      <Card className="cursor-pointer transition-all duration-200 hover:shadow-md hover:ring-2 hover:ring-indigo-400 h-full">
+        <CardHeader className="pb-2">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-indigo-600 text-white">
+                <GitBranch className="h-5 w-5" />
+              </div>
+              <div>
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  Organograma
+                  <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                </CardTitle>
+                <CardDescription className="text-xs">Estrutura Organizacional</CardDescription>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {isLoading ? (
+            <div className="space-y-1">
+              <div className="h-3 bg-gray-100 rounded animate-pulse w-3/4" />
+              <div className="h-3 bg-gray-100 rounded animate-pulse w-1/2" />
+            </div>
+          ) : overview ? (
+            <div className="grid grid-cols-2 gap-2 mt-1">
+              <div className="text-center p-1.5 bg-indigo-50 rounded">
+                <p className="text-lg font-bold text-indigo-700">{overview.totalPeople ?? 0}</p>
+                <p className="text-xs text-muted-foreground">Colaboradores</p>
+              </div>
+              <div className="text-center p-1.5 bg-indigo-50 rounded">
+                <p className="text-lg font-bold text-indigo-700">{overview.totalPositions ?? 0}</p>
+                <p className="text-xs text-muted-foreground">Cargos</p>
+              </div>
+              <div className="text-center p-1.5 bg-indigo-50 rounded">
+                <p className="text-lg font-bold text-indigo-700">{overview.hierarchyLevels ?? 0}</p>
+                <p className="text-xs text-muted-foreground">Níveis</p>
+              </div>
+              <div className="text-center p-1.5 bg-indigo-50 rounded">
+                <p className="text-lg font-bold text-indigo-700">{overview.occupancyRate ?? 0}%</p>
+                <p className="text-xs text-muted-foreground">Ocupação</p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground mt-1">Dados indisponíveis</p>
+          )}
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
 
 export default function PlanejamentoEstrategicoArea() {
   const [, params] = useRoute("/area/:id/planejamento");
@@ -379,6 +436,8 @@ export default function PlanejamentoEstrategicoArea() {
 
         {/* Grid de cards 4x2 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Card especial: Organograma */}
+          <OrganogramaCard />
           {analisesFiltradas.map((analise) => {
             const progresso = calcularProgresso(analise.id);
             const isExpanded = expandedCards[analise.id];
