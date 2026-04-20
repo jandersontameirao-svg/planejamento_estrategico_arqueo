@@ -1836,3 +1836,33 @@ export const riscosHistorico = mysqlTable("riscos_historico", {
 });
 export type RiscoHistorico = typeof riscosHistorico.$inferSelect;
 export type InsertRiscoHistorico = typeof riscosHistorico.$inferInsert;
+
+// ─── CAPITAL DE GIRO ──────────────────────────────────────────────────────────
+/**
+ * Dados mensais de capital de giro por empresa/unidade de negócio.
+ * Campos brutos para cálculo de CCC, PMR, PME e PMPF.
+ */
+export const capitalGiroDados = mysqlTable("capital_giro_dados", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresa_id").notNull(),
+  mes: int("mes").notNull(),        // 1-12
+  ano: int("ano").notNull(),        // ex: 2025
+  faturamento: decimal("faturamento", { precision: 15, scale: 2 }).notNull().default("0"),
+  cmv: decimal("cmv", { precision: 15, scale: 2 }).notNull().default("0"),          // Custo da Mercadoria/Serviço Vendido
+  contasReceber: decimal("contas_receber", { precision: 15, scale: 2 }).notNull().default("0"),  // Saldo final de Contas a Receber
+  estoques: decimal("estoques", { precision: 15, scale: 2 }).notNull().default("0"),             // Saldo final de Estoques
+  contasPagar: decimal("contas_pagar", { precision: 15, scale: 2 }).notNull().default("0"),      // Saldo final de Contas a Pagar (fornecedores)
+  // Indicadores calculados (armazenados para histórico)
+  pmr: decimal("pmr", { precision: 10, scale: 2 }),   // Prazo Médio de Recebimento
+  pme: decimal("pme", { precision: 10, scale: 2 }),   // Prazo Médio de Estocagem
+  pmpf: decimal("pmpf", { precision: 10, scale: 2 }), // Prazo Médio de Pagamento a Fornecedores
+  ccc: decimal("ccc", { precision: 10, scale: 2 }),   // Ciclo de Conversão de Caixa
+  observacoes: text("observacoes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+}, (t) => ({
+  uniqMesAnoEmpresa: unique("uniq_mes_ano_empresa").on(t.empresaId, t.mes, t.ano),
+}));
+
+export type CapitalGiroDados = typeof capitalGiroDados.$inferSelect;
+export type InsertCapitalGiroDados = typeof capitalGiroDados.$inferInsert;

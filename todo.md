@@ -1664,3 +1664,12 @@
 - [ ] Exibir avatar e nome do líder nos cards de objetivos
 - [ ] Criar aba "Objetivos por Líder" na página de Organograma
 - [ ] Criar testes para as novas procedures
+
+## Módulo Gestão de Capital de Giro
+- [x] Criar tabela capital_giro_dados no schema e migrar banco
+- [x] Criar procedures tRPC: getCapitalGiroGeral, getCapitalGiroPorUnidade, salvarDadosMensais
+- [x] Criar componente FormularioDados.tsx (lançamento mensal)
+- [x] Criar componente HistoricoTabela.tsx (histórico mês a mês)
+- [x] Criar página /capital-giro/:unidadeId com 3 abas (Visão Geral, Histórico, Conceitos)
+- [x] Botão "Cap. Giro" adicionado em cada EmpresaCard na Home
+- [x] Registrar rota /capital-giro/:empresaId no App.tsx
