@@ -129,6 +129,14 @@ const analises: AnaliseCard[] = [
     cor: "bg-green-600",
     href: true,
   },
+  {
+    id: "dre",
+    titulo: "DRE / EBITDA",
+    descricao: "Demonstração do Resultado",
+    icone: <BarChart3 className="h-8 w-8" />,
+    cor: "bg-teal-600",
+    href: true,
+  },
 ];
 
 export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome }: PlanejamentoEstrategicoEmpresaProps) {
@@ -143,7 +151,7 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
 
   // Filtrar cards com base nas metodologias ativas (se não há config, mostra todos)
   // O card "contratos" é um módulo permanente — sempre exibido, independente da configuração
-  const CARDS_PERMANENTES = ["contratos", "clientes", "capital-giro"];
+  const CARDS_PERMANENTES = ["contratos", "clientes", "capital-giro", "dre"];
   const analisesFiltradas = metodologiasAtivas && metodologiasAtivas.length > 0
     ? analises.filter((a) => CARDS_PERMANENTES.includes(a.id) || metodologiasAtivas.includes(a.id))
     : analises;
@@ -277,6 +285,7 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
                 if (analise.id === "contratos") navigate(`/empresa/${empresaId}/contratos`);
                 else if (analise.id === "clientes") navigate(`/empresa/${empresaId}/clientes`);
                 else if (analise.id === "capital-giro") navigate(`/capital-giro/${empresaId}`);
+                else if (analise.id === "dre") navigate(`/empresa/${empresaId}/dre`);
                 else if (analise.href) navigate(`/empresa/${empresaId}/orcamento`);
                 else toggleCard(analise.id);
               }} className="flex flex-row items-center justify-between space-y-0 pb-2">

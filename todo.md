@@ -1678,3 +1678,18 @@
 - [x] Adicionar card "Capital de Giro" na grade de módulos da página de planejamento da empresa
 - [x] Incluir card como permanente (sempre visível independente das metodologias ativas)
 - [x] Navegação ao clicar: /capital-giro/:empresaId
+
+## Módulo DRE (Demonstração do Resultado do Exercício)
+- [x] Schema: tabelas dre_dados, dre_uploads, dre_forecast, dre_audit_log
+- [x] Backend: procedures tRPC para CRUD DRE, upload PDF/Excel, processamento, indicadores, forecast
+- [x] Frontend: Página principal DRE com abas (Visão Geral, DRE Detalhada, Upload, Forecast, Análise Estratégica)
+- [x] Dashboard executivo com gráficos, KPIs, comparativos e indicadores de margem
+- [x] Integração: card DRE/EBITDA na grade de módulos, rota /empresa/:empresaId/dre
+- [x] Distinção Produto (CMV) vs Serviço (CSP) automática por empresa
+- [x] Área de upload com drag-and-drop, validação, histórico e logs
+- [x] Processamento de PDF e Excel com IA e revisão obrigatória antes de consolidação
+- [x] Aba Forecast com cenários conservador/base/otimista
+- [x] Indicadores: Margem Bruta, EBITDA, Operacional, Líquida, comparativo YoY
+- [x] Análise estratégica com IA (insights, recomendações, tendências)
+- [ ] Permissões granulares: admin, diretoria, financeiro, gestor (futuro)
+- [x] Testes vitest: 6 testes passando (estrutura, IDs únicos, ordem, linhas essenciais, calculadas, produto vs serviço)

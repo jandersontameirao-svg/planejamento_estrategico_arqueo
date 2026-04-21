@@ -47,6 +47,7 @@ import AprovacaoBoletim from "./pages/AprovacaoBoletim";
 import GestaoRiscos from "./pages/GestaoRiscos";
 import Organograma from "./pages/Organograma";
 import CapitalGiro from "./pages/CapitalGiro";
+import DRE from "./pages/DRE";
 
 
 function Router() {
@@ -124,6 +125,7 @@ function Router() {
       <Route path="/gestao-clientes/:id" component={GestaoClienteDetalhe} />
       <Route path="/organograma" component={Organograma} />
       <Route path="/capital-giro/:empresaId" component={CapitalGiro} />
+      <Route path="/empresa/:empresaId/dre" component={DRE} />
       <Route path="/empresa/:id/gestao-riscos">
         {(params) => <GestaoRiscos />}
       </Route>

@@ -1866,3 +1866,133 @@ export const capitalGiroDados = mysqlTable("capital_giro_dados", {
 
 export type CapitalGiroDados = typeof capitalGiroDados.$inferSelect;
 export type InsertCapitalGiroDados = typeof capitalGiroDados.$inferInsert;
+
+
+// ─── DRE (Demonstração do Resultado do Exercício) ─────────────────────────────
+
+/**
+ * Natureza operacional da empresa para fins de DRE.
+ * "produto" = Vinho 24 Horas; "servico" = demais empresas do grupo.
+ */
+export const dreNaturezaOperacional = mysqlTable("dre_natureza_operacional", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresa_id").notNull().unique(),
+  natureza: mysqlEnum("natureza", ["produto", "servico"]).notNull().default("servico"),
+  definidoPor: varchar("definido_por", { length: 255 }), // nome do admin que alterou
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type DreNaturezaOperacional = typeof dreNaturezaOperacional.$inferSelect;
+
+/**
+ * Plano de contas gerencial vinculado à estrutura da DRE.
+ */
+export const drePlanoContas = mysqlTable("dre_plano_contas", {
+  id: int("id").autoincrement().primaryKey(),
+  codigo: varchar("codigo", { length: 20 }).notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  linhaDre: varchar("linha_dre", { length: 100 }).notNull(), // ex: "receita_bruta", "deducoes_receita", etc.
+  tipo: mysqlEnum("tipo", ["receita", "deducao", "custo", "despesa", "depreciacao", "resultado_financeiro", "imposto"]).notNull(),
+  naturezaAplicavel: mysqlEnum("natureza_aplicavel", ["produto", "servico", "ambos"]).default("ambos").notNull(),
+  ordem: int("ordem").notNull().default(0),
+  ativo: boolean("ativo").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type DrePlanoContas = typeof drePlanoContas.$inferSelect;
+
+/**
+ * Uploads de arquivos DRE (PDF/Excel).
+ */
+export const dreUploads = mysqlTable("dre_uploads", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresa_id").notNull(),
+  nomeArquivo: varchar("nome_arquivo", { length: 500 }).notNull(),
+  tipoArquivo: varchar("tipo_arquivo", { length: 20 }).notNull(), // pdf, xlsx, xls
+  tamanhoBytes: int("tamanho_bytes"),
+  urlArquivo: text("url_arquivo").notNull(),
+  s3Key: text("s3_key"),
+  periodo: varchar("periodo", { length: 7 }), // YYYY-MM
+  ano: int("ano"),
+  mes: int("mes"),
+  status: mysqlEnum("status", ["pendente", "processando", "processado", "erro", "revisado", "consolidado"]).default("pendente").notNull(),
+  erroMensagem: text("erro_mensagem"),
+  dadosExtraidos: json("dados_extraidos"), // JSON com dados brutos extraídos pelo LLM
+  dadosRevisados: json("dados_revisados"), // JSON com dados após revisão manual
+  usuarioId: int("usuario_id").notNull(),
+  usuarioNome: varchar("usuario_nome", { length: 255 }),
+  processadoEm: timestamp("processado_em"),
+  revisadoEm: timestamp("revisado_em"),
+  consolidadoEm: timestamp("consolidado_em"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type DreUpload = typeof dreUploads.$inferSelect;
+
+/**
+ * Dados mensais da DRE por empresa (realizado, orçado, projetado, forecast).
+ */
+export const dreDados = mysqlTable("dre_dados", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresa_id").notNull(),
+  ano: int("ano").notNull(),
+  mes: int("mes").notNull(), // 1-12
+  tipoLancamento: mysqlEnum("tipo_lancamento", ["realizado", "orcado", "projetado", "forecast"]).notNull(),
+  linhaDre: varchar("linha_dre", { length: 100 }).notNull(),
+  contaId: int("conta_id"), // ref drePlanoContas
+  descricao: varchar("descricao", { length: 500 }),
+  valor: decimal("valor", { precision: 18, scale: 2 }).notNull().default("0"),
+  // Contexto adicional
+  projetoId: int("projeto_id"),
+  contratoId: int("contrato_id"),
+  clienteId: int("cliente_id"),
+  centroCusto: varchar("centro_custo", { length: 100 }),
+  uploadId: int("upload_id"), // ref dreUploads se veio de importação
+  observacoes: text("observacoes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+}, (t) => ({
+  idxEmpresaPeriodo: index("idx_dre_empresa_periodo").on(t.empresaId, t.ano, t.mes),
+  idxLinhaDre: index("idx_dre_linha").on(t.linhaDre, t.tipoLancamento),
+}));
+export type DreDados = typeof dreDados.$inferSelect;
+
+/**
+ * Forecast DRE com cenários e premissas.
+ */
+export const dreForecast = mysqlTable("dre_forecast", {
+  id: int("id").autoincrement().primaryKey(),
+  empresaId: int("empresa_id").notNull(),
+  ano: int("ano").notNull(),
+  mes: int("mes").notNull(),
+  cenario: mysqlEnum("cenario", ["conservador", "base", "otimista"]).notNull(),
+  linhaDre: varchar("linha_dre", { length: 100 }).notNull(),
+  valor: decimal("valor", { precision: 18, scale: 2 }).notNull().default("0"),
+  premissa: text("premissa"),
+  versao: int("versao").notNull().default(1),
+  criadoPor: int("criado_por"),
+  criadoPorNome: varchar("criado_por_nome", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+}, (t) => ({
+  idxForecastEmpresa: index("idx_forecast_empresa").on(t.empresaId, t.ano, t.cenario),
+}));
+export type DreForecast = typeof dreForecast.$inferSelect;
+
+/**
+ * Audit log para todas as alterações no módulo DRE.
+ */
+export const dreAuditLog = mysqlTable("dre_audit_log", {
+  id: int("id").autoincrement().primaryKey(),
+  entidade: varchar("entidade", { length: 100 }).notNull(), // "dre_dados", "dre_forecast", "dre_natureza", etc.
+  entidadeId: int("entidade_id"),
+  acao: mysqlEnum("acao", ["criar", "editar", "excluir", "importar", "consolidar", "reclassificar", "forecast"]).notNull(),
+  descricao: text("descricao").notNull(),
+  dadosAnteriores: json("dados_anteriores"),
+  dadosNovos: json("dados_novos"),
+  usuarioId: int("usuario_id").notNull(),
+  usuarioNome: varchar("usuario_nome", { length: 255 }),
+  ip: varchar("ip", { length: 45 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type DreAuditLog = typeof dreAuditLog.$inferSelect;
