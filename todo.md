@@ -1693,3 +1693,15 @@
 - [x] Análise estratégica com IA (insights, recomendações, tendências)
 - [ ] Permissões granulares: admin, diretoria, financeiro, gestor (futuro)
 - [x] Testes vitest: 6 testes passando (estrutura, IDs únicos, ordem, linhas essenciais, calculadas, produto vs serviço)
+
+
+## Refatoração DRE — Alinhamento com Padrão do App
+- [ ] Refatorar Visão Geral com todos os indicadores essenciais da DRE em cards modulares
+- [ ] Indicadores: Receita Bruta, Deduções, Receita Líquida, Custos (CMV/CSP), Lucro Bruto
+- [ ] Indicadores: Despesas Operacionais, EBITDA, Depreciação, EBIT, Juros, IR/CS, Lucro Líquido
+- [ ] Indicadores: Margens (Bruta, EBITDA, Operacional, Líquida), Variações (MoM, YoY)
+- [ ] Alinhar cores com padrão Grupo Arqueo (Bordo, Laranja, Azul, Amarelo)
+- [ ] Alinhar tipografia e espaçamento com design system do app
+- [ ] Remover layout genérico, usar cards e grid como padrão do app
+- [ ] Adicionar header com navegação consistente
+- [ ] Testar responsividade em mobile/tablet/desktop
