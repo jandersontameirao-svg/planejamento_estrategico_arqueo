@@ -6,7 +6,7 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
   Building2, LayoutDashboard, LogOut, CheckCircle2, Users,
-  BarChart3, Target, ChevronRight, Globe, MapPin, UserCheck, Network, Wallet
+  BarChart3, Target, ChevronRight, Globe, MapPin, UserCheck, Network
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { NotificationButton } from "@/components/NotificationButton";
@@ -41,7 +41,7 @@ function EmpresaCard({ empresa }: { empresa: any }) {
                 ? "Produtos"
                 : "Serviços + Produtos"}
             </p>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2">
               <Link href={`/empresa/${empresa.id}/planejamento`} className="flex-1">
                 <Button
                   size="sm"
@@ -59,16 +59,6 @@ function EmpresaCard({ empresa }: { empresa: any }) {
                 >
                   <BarChart3 className="h-3 w-3 mr-1" />
                   Dashboard
-                </Button>
-              </Link>
-              <Link href={`/capital-giro/${empresa.id}`} className="flex-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full h-7 text-xs border-green-300 text-green-700 hover:bg-green-50"
-                >
-                  <Wallet className="h-3 w-3 mr-1" />
-                  Cap. Giro
                 </Button>
               </Link>
             </div>
