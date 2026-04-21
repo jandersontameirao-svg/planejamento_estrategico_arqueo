@@ -98,18 +98,17 @@ function VisaoGeral({ empresaId, ano }: { empresaId: number; ano: number }) {
     );
   }
 
-  if (!consolidado || Object.keys(consolidado.porMes).length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <BarChart3 className="h-16 w-16 text-muted-foreground/40 mb-4" />
-        <h3 className="text-lg font-semibold text-muted-foreground">Nenhum dado de DRE encontrado</h3>
-        <p className="text-sm text-muted-foreground mt-1">Importe dados na aba "Upload" ou lance manualmente na aba "DRE Detalhada".</p>
-      </div>
-    );
-  }
-
-  const acum = consolidado.acumulado;
-  const ind = consolidado.indicadores;
+  // Usar dados consolidados ou objeto vazio para exibir sempre a estrutura
+  const acum = consolidado?.acumulado ?? {
+    receita_bruta: 0, deducoes_receita: 0, receita_liquida: 0,
+    cmv: 0, csp: 0, lucro_bruto: 0, despesas_operacionais: 0,
+    ebitda: 0, depreciacoes: 0, ebit: 0, juros: 0,
+    lucro_antes_ir: 0, ir_cs: 0, lucro_liquido: 0, resultado_financeiro: 0,
+  };
+  const ind = consolidado?.indicadores ?? {
+    margemBruta: 0, margemEbitda: 0, margemOperacional: 0, margemLiquida: 0,
+    custosPercentual: 0, despesasPercentual: 0, resultadoFinanceiroPercentual: 0,
+  };
 
   // Variações YoY
   const varReceita = comparativo?.anterior?.receita_liquida
@@ -123,7 +122,7 @@ function VisaoGeral({ empresaId, ano }: { empresaId: number; ano: number }) {
     : null;
 
   // Dados para gráfico mensal
-  const chartData = Object.entries(consolidado.porMes)
+  const chartData = Object.entries(consolidado?.porMes ?? {})
     .map(([mes, dados]) => ({
       mes: MESES[Number(mes) - 1],
       receita: dados.receita_liquida || 0,
