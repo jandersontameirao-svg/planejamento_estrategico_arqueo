@@ -1705,3 +1705,9 @@
 - [ ] Remover layout genérico, usar cards e grid como padrão do app
 - [ ] Adicionar header com navegação consistente
 - [ ] Testar responsividade em mobile/tablet/desktop
+
+## Refatoração Layout — DRE e Capital de Giro
+- [x] Capital de Giro: remover DashboardLayout, usar PageHeader padrão do sistema
+- [x] DRE: remover DashboardLayout, usar PageHeader padrão do sistema
+- [x] Ambos: sem sidebar, sem comparativos entre empresas (visão individualizada)
+- [ ] DRE: CMV visível apenas para Vinho 24h (empresa de produto); demais usam CSP

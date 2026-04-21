@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useParams, useLocation } from "wouter";
-import DashboardLayout from "@/components/DashboardLayout";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,9 @@ import {
   BarChart3, Brain, DollarSign, Percent, AlertTriangle, CheckCircle2,
   Loader2, ChevronDown, ChevronUp, Download, RefreshCw, Eye, Trash2,
   Info, Calculator, Target, Activity, ArrowUpRight, ArrowDownRight,
+  Home, LogOut,
 } from "lucide-react";
+import { getLoginUrl } from "@/const";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, Cell,
@@ -386,73 +388,114 @@ export default function DRE() {
   const { data: empresasList } = trpc.empresas.list.useQuery();
   const empresa = empresasList?.find((e: any) => e.id === empresaId);
 
+  const { user, logout } = useAuth();
+
   return (
-    <DashboardLayout>
-      <div className="space-y-4 p-4 md:p-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Header padrão do sistema */}
+      <header className="border-b bg-gradient-to-r from-card via-card to-card/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
+        <div className="container flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate(`/empresa/${empresaId}/planejamento`)}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                <DollarSign className="h-6 w-6 text-emerald-600" />
-                DRE / EBITDA
-              </h1>
-              <p className="text-sm text-muted-foreground">{empresa?.nome || "Empresa"}</p>
-            </div>
+            <img src="/logo-arqueo.png" alt="Grupo Arqueo" className="h-10 w-10" />
+            <span className="text-xl font-bold bg-gradient-to-r from-primary via-orange-500 to-orange-600 bg-clip-text text-transparent">
+              Grupo Arqueo
+            </span>
           </div>
-          <div className="flex items-center gap-2">
-            <Label className="text-xs font-medium">Ano:</Label>
-            <Select value={String(ano)} onValueChange={(v) => setAno(Number(v))}>
-              <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {[2024, 2025, 2026, 2027].map(a => <SelectItem key={a} value={String(a)}>{a}</SelectItem>)}
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-3">
+            {user && (
+              <>
+                <span className="text-sm text-muted-foreground hidden md:inline">{user.name || user.email}</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-medium hidden md:inline">
+                  {user.role === "admin" ? "Administrador" : user.role === "gestor" ? "Gestor" : "Usuário"}
+                </span>
+              </>
+            )}
+            <Button variant="ghost" size="sm" onClick={() => navigate("/" as any)} className="gap-2">
+              <Home className="h-4 w-4" />
+              <span className="hidden md:inline">Início</span>
+            </Button>
+            {user ? (
+              <Button variant="ghost" size="sm" onClick={() => logout()} className="text-muted-foreground gap-2">
+                <LogOut className="h-4 w-4" />
+                <span className="hidden md:inline">Sair</span>
+              </Button>
+            ) : (
+              <Button size="sm" asChild>
+                <a href={getLoginUrl()}>Entrar</a>
+              </Button>
+            )}
           </div>
         </div>
+      </header>
 
-        <Separator />
+      {/* Conteúdo principal */}
+      <main className="flex-1 container py-6">
+        <div className="space-y-4">
+          {/* Breadcrumb / título */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => navigate(`/empresa/${empresaId}/planejamento`)}>
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold flex items-center gap-2">
+                  <DollarSign className="h-6 w-6 text-emerald-600" />
+                  DRE / EBITDA
+                </h1>
+                <p className="text-sm text-muted-foreground">{empresa?.nome || "Empresa"}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Label className="text-xs font-medium">Ano:</Label>
+              <Select value={String(ano)} onValueChange={(v) => setAno(Number(v))}>
+                <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {[2024, 2025, 2026, 2027].map(a => <SelectItem key={a} value={String(a)}>{a}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-        {/* Tabs */}
-        <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="grid grid-cols-5 w-full max-w-3xl">
-            <TabsTrigger value="visao-geral" className="text-xs sm:text-sm">
-              <BarChart3 className="h-4 w-4 mr-1 hidden sm:inline" /> Visão Geral
-            </TabsTrigger>
-            <TabsTrigger value="dre-detalhada" className="text-xs sm:text-sm">
-              <Calculator className="h-4 w-4 mr-1 hidden sm:inline" /> Detalhada
-            </TabsTrigger>
-            <TabsTrigger value="upload" className="text-xs sm:text-sm">
-              <Upload className="h-4 w-4 mr-1 hidden sm:inline" /> Upload
-            </TabsTrigger>
-            <TabsTrigger value="forecast" className="text-xs sm:text-sm">
-              <Target className="h-4 w-4 mr-1 hidden sm:inline" /> Forecast
-            </TabsTrigger>
-            <TabsTrigger value="analise" className="text-xs sm:text-sm">
-              <Brain className="h-4 w-4 mr-1 hidden sm:inline" /> IA
-            </TabsTrigger>
-          </TabsList>
+          <Separator />
 
-          <TabsContent value="visao-geral" className="mt-4">
-            <VisaoGeral empresaId={empresaId} ano={ano} />
-          </TabsContent>
-          <TabsContent value="dre-detalhada" className="mt-4">
-            <div className="text-center py-8 text-muted-foreground">Aba de DRE Detalhada em desenvolvimento...</div>
-          </TabsContent>
-          <TabsContent value="upload" className="mt-4">
-            <div className="text-center py-8 text-muted-foreground">Aba de Upload em desenvolvimento...</div>
-          </TabsContent>
-          <TabsContent value="forecast" className="mt-4">
-            <div className="text-center py-8 text-muted-foreground">Aba de Forecast em desenvolvimento...</div>
-          </TabsContent>
-          <TabsContent value="analise" className="mt-4">
-            <div className="text-center py-8 text-muted-foreground">Aba de Análise IA em desenvolvimento...</div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </DashboardLayout>
+          {/* Tabs */}
+          <Tabs value={tab} onValueChange={setTab}>
+            <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+              <TabsTrigger value="visao-geral" className="text-xs sm:text-sm">
+                <BarChart3 className="h-4 w-4 mr-1 hidden sm:inline" /> Visão Geral
+              </TabsTrigger>
+              <TabsTrigger value="dre-detalhada" className="text-xs sm:text-sm">
+                <Calculator className="h-4 w-4 mr-1 hidden sm:inline" /> Detalhada
+              </TabsTrigger>
+              <TabsTrigger value="upload" className="text-xs sm:text-sm">
+                <Upload className="h-4 w-4 mr-1 hidden sm:inline" /> Upload
+              </TabsTrigger>
+              <TabsTrigger value="forecast" className="text-xs sm:text-sm">
+                <Target className="h-4 w-4 mr-1 hidden sm:inline" /> Forecast
+              </TabsTrigger>
+              <TabsTrigger value="analise" className="text-xs sm:text-sm">
+                <Brain className="h-4 w-4 mr-1 hidden sm:inline" /> IA
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="visao-geral" className="mt-4">
+              <VisaoGeral empresaId={empresaId} ano={ano} />
+            </TabsContent>
+            <TabsContent value="dre-detalhada" className="mt-4">
+              <div className="text-center py-8 text-muted-foreground">Aba de DRE Detalhada em desenvolvimento...</div>
+            </TabsContent>
+            <TabsContent value="upload" className="mt-4">
+              <div className="text-center py-8 text-muted-foreground">Aba de Upload em desenvolvimento...</div>
+            </TabsContent>
+            <TabsContent value="forecast" className="mt-4">
+              <div className="text-center py-8 text-muted-foreground">Aba de Forecast em desenvolvimento...</div>
+            </TabsContent>
+            <TabsContent value="analise" className="mt-4">
+              <div className="text-center py-8 text-muted-foreground">Aba de Análise IA em desenvolvimento...</div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
+    </div>
   );
 }
