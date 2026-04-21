@@ -1673,3 +1673,8 @@
 - [x] Criar página /capital-giro/:unidadeId com 3 abas (Visão Geral, Histórico, Conceitos)
 - [x] Botão "Cap. Giro" adicionado em cada EmpresaCard na Home
 - [x] Registrar rota /capital-giro/:empresaId no App.tsx
+
+## Ajuste Capital de Giro — Grade de Módulos
+- [x] Adicionar card "Capital de Giro" na grade de módulos da página de planejamento da empresa
+- [x] Incluir card como permanente (sempre visível independente das metodologias ativas)
+- [x] Navegação ao clicar: /capital-giro/:empresaId

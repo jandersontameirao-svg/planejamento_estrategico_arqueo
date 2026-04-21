@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, DollarSign, SlidersHorizontal, X, FileText, UsersRound } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, DollarSign, SlidersHorizontal, X, FileText, UsersRound, Wallet } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { Link, useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -121,6 +121,14 @@ const analises: AnaliseCard[] = [
     cor: "bg-violet-600",
     href: true,
   },
+  {
+    id: "capital-giro",
+    titulo: "Capital de Giro",
+    descricao: "PMR, PME, PMPF e CCC",
+    icone: <Wallet className="h-8 w-8" />,
+    cor: "bg-green-600",
+    href: true,
+  },
 ];
 
 export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome }: PlanejamentoEstrategicoEmpresaProps) {
@@ -135,7 +143,7 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
 
   // Filtrar cards com base nas metodologias ativas (se não há config, mostra todos)
   // O card "contratos" é um módulo permanente — sempre exibido, independente da configuração
-  const CARDS_PERMANENTES = ["contratos", "clientes"];
+  const CARDS_PERMANENTES = ["contratos", "clientes", "capital-giro"];
   const analisesFiltradas = metodologiasAtivas && metodologiasAtivas.length > 0
     ? analises.filter((a) => CARDS_PERMANENTES.includes(a.id) || metodologiasAtivas.includes(a.id))
     : analises;
@@ -268,6 +276,7 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
               <CardHeader onClick={() => {
                 if (analise.id === "contratos") navigate(`/empresa/${empresaId}/contratos`);
                 else if (analise.id === "clientes") navigate(`/empresa/${empresaId}/clientes`);
+                else if (analise.id === "capital-giro") navigate(`/capital-giro/${empresaId}`);
                 else if (analise.href) navigate(`/empresa/${empresaId}/orcamento`);
                 else toggleCard(analise.id);
               }} className="flex flex-row items-center justify-between space-y-0 pb-2">
