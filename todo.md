@@ -1711,3 +1711,14 @@
 - [x] DRE: remover DashboardLayout, usar PageHeader padrão do sistema
 - [x] Ambos: sem sidebar, sem comparativos entre empresas (visão individualizada)
 - [ ] DRE: CMV visível apenas para Vinho 24h (empresa de produto); demais usam CSP
+
+## Dashboard DRE — Histórico e Comparativo
+- [x] Aba Visão Geral: KPIs (Receita Líquida, EBITDA, Lucro Líquido, Margens) no topo
+- [x] Aba Visão Geral: gráfico de evolução mensal (barras + linha de margem)
+- [x] Aba Visão Geral: tabela DRE detalhada com todos os meses do ano selecionado
+- [x] Aba Upload: drag-and-drop para PDF/Excel, suporte a múltiplos anos históricos
+- [x] Aba Upload: processamento IA + tela de revisão antes de confirmar importação
+- [x] Aba Upload: histórico de uploads com status e data
+- [x] Aba Comparativo: seleção de 2+ anos para comparar lado a lado
+- [x] Aba Comparativo: gráfico de evolução anual dos principais indicadores
+- [x] Aba Comparativo: tabela comparativa com variação % entre anos
