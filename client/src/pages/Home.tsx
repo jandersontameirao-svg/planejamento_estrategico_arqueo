@@ -17,8 +17,12 @@ function EmpresaCard({ empresa }: { empresa: any }) {
     <Card className="border border-primary/15 bg-gradient-to-br from-card to-primary/3 hover:shadow-md hover:border-primary/30 transition-all duration-200">
       <CardContent className="pt-4 pb-4">
         <div className="flex items-start gap-3">
-          <div className="p-2 bg-gradient-to-br from-primary/15 to-orange-500/10 rounded-lg shrink-0">
-            <Building2 className="h-5 w-5 text-primary" />
+          <div className="p-1 bg-white border border-border/40 rounded-lg shrink-0 flex items-center justify-center" style={{ width: 40, height: 40 }}>
+            {empresa.logoUrl ? (
+              <img src={empresa.logoUrl} alt={empresa.nome} className="h-8 w-8 object-contain rounded" />
+            ) : (
+              <Building2 className="h-5 w-5 text-primary" />
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">

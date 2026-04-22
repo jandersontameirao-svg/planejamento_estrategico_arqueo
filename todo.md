@@ -1722,3 +1722,10 @@
 - [x] Aba Comparativo: seleção de 2+ anos para comparar lado a lado
 - [x] Aba Comparativo: gráfico de evolução anual dos principais indicadores
 - [x] Aba Comparativo: tabela comparativa com variação % entre anos
+
+## Empresa UTU Arqueologia, LDA
+- [x] Cadastrar UTU Arqueologia, LDA na unidade Grupo Arqueo Africa (areaId=30002)
+- [x] Dados: Av. Paulo Samuel Kankhomba, Nº 1063-R/C | Nuit: 400 961 182 | Maputo - Moçambique
+- [x] Logo: https://utu.co.mz/wp-content/uploads/2024/01/lgutu.png (azul #224887 + laranja #E8632A)
+- [x] Vínculo empresa_area_vinculo criado (empresaId=1020002, areaId=30002)
+- [x] EmpresaCard atualizado para exibir logo da empresa quando disponível (logoUrl)
