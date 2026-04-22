@@ -162,6 +162,7 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
   const { data: swotData } = trpc.analises.getSwot.useQuery({ empresaId });
   const { data: okrData } = trpc.analises.getOkr.useQuery({ empresaId });
   const { data: bscData } = trpc.bsc.getByEmpresa.useQuery({ empresaId });
+  const { data: identidadeData } = trpc.identidade.getByEmpresa.useQuery({ empresaId });
 
   const toggleCard = (id: string) => {
     setExpandedCards((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -191,6 +192,14 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
         return Math.min(100, Math.round((bscData.length / 8) * 100));
       
       case "identidade":
+        if (!identidadeData) return 0;
+        let camposPreenchidos = 0;
+        if (identidadeData.missao && identidadeData.missao.trim()) camposPreenchidos++;
+        if (identidadeData.visao && identidadeData.visao.trim()) camposPreenchidos++;
+        if (identidadeData.valores && identidadeData.valores.trim()) camposPreenchidos++;
+        if (identidadeData.politica && identidadeData.politica.trim()) camposPreenchidos++;
+        return (camposPreenchidos / 4) * 100;
+      
       case "5forcas":
       case "stakeholders":
       case "vrio":
