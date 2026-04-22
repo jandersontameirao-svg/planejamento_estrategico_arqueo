@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, DollarSign, SlidersHorizontal, X, FileText, UsersRound, Wallet } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, DollarSign, SlidersHorizontal, X, FileText, UsersRound, Wallet, Scale } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { Link, useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -137,6 +137,14 @@ const analises: AnaliseCard[] = [
     cor: "bg-teal-600",
     href: true,
   },
+  {
+    id: "balanco",
+    titulo: "Balanço Patrimonial",
+    descricao: "Ativo, Passivo e Patrimônio Líquido",
+    icone: <Scale className="h-8 w-8" />,
+    cor: "bg-indigo-700",
+    href: true,
+  },
 ];
 
 export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome }: PlanejamentoEstrategicoEmpresaProps) {
@@ -151,7 +159,7 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
 
   // Filtrar cards com base nas metodologias ativas (se não há config, mostra todos)
   // O card "contratos" é um módulo permanente — sempre exibido, independente da configuração
-  const CARDS_PERMANENTES = ["contratos", "clientes", "capital-giro", "dre"];
+  const CARDS_PERMANENTES = ["contratos", "clientes", "capital-giro", "dre", "balanco"];
   const analisesFiltradas = metodologiasAtivas && metodologiasAtivas.length > 0
     ? analises.filter((a) => CARDS_PERMANENTES.includes(a.id) || metodologiasAtivas.includes(a.id))
     : analises;
@@ -295,6 +303,7 @@ export default function PlanejamentoEstrategicoEmpresa({ empresaId, empresaNome 
                 else if (analise.id === "clientes") navigate(`/empresa/${empresaId}/clientes`);
                 else if (analise.id === "capital-giro") navigate(`/capital-giro/${empresaId}`);
                 else if (analise.id === "dre") navigate(`/empresa/${empresaId}/dre`);
+                else if (analise.id === "balanco") navigate(`/empresa/${empresaId}/balanco`);
                 else if (analise.href) navigate(`/empresa/${empresaId}/orcamento`);
                 else toggleCard(analise.id);
               }} className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -1996,3 +1996,109 @@ export const dreAuditLog = mysqlTable("dre_audit_log", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export type DreAuditLog = typeof dreAuditLog.$inferSelect;
+
+
+// ============ BALANÇO PATRIMONIAL ============
+
+/**
+ * Dados mensais do Balanço Patrimonial por empresa.
+ */
+export const balanco_patrimonial_dados = mysqlTable(
+  "balanco_patrimonial_dados",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    empresaId: int("empresa_id")
+      .notNull(),
+    mes: int("mes").notNull(), // 1-12
+    ano: int("ano").notNull(),
+    
+    // ATIVO
+    ativoTangivel: decimal("ativo_tangivel", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    ativoIntangivel: decimal("ativo_intangivel", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    amortizacao: decimal("amortizacao", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    clientes: decimal("clientes", { precision: 18, scale: 2 }).default("0").$type<number>(), // Contas a receber
+    outrosAtivosFinanceiros: decimal("outros_ativos_financeiros", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    outrosAtivosCorrentes: decimal("outros_ativos_correntes", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    caixaBancos: decimal("caixa_bancos", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    
+    // PASSIVO
+    emprestimosObtidos: decimal("emprestimos_obtidos", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    provisoes: decimal("provisoes", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    fornecedores: decimal("fornecedores", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    outrosPassivosFinanceiros: decimal("outros_passivos_financeiros", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    impostosAPagar: decimal("impostos_a_pagar", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    outrasContasAPagar: decimal("outras_contas_a_pagar", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    outrosPassivosCorrentes: decimal("outros_passivos_correntes", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    
+    // PATRIMÔNIO LÍQUIDO
+    capitalSocial: decimal("capital_social", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    reservas: decimal("reservas", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    prestacoesSupplementares: decimal("prestacoes_suplementares", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    resultadosTransitados: decimal("resultados_transitados", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    resultadoLiquidoExercicio: decimal("resultado_liquido_exercicio", { precision: 18, scale: 2 }).default("0").$type<number>(),
+    
+    // Campos de controle
+    status: mysqlEnum("status", ["rascunho", "revisao", "consolidado"]).default("rascunho").notNull(),
+    observacoes: text("observacoes"),
+    criadoPor: int("criado_por"),
+    criadoPorNome: varchar("criado_por_nome", { length: 255 }),
+    atualizadoPor: int("atualizado_por"),
+    atualizadoPorNome: varchar("atualizado_por_nome", { length: 255 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    idxEmpresaMesAno: index("idx_balanco_empresa_mes_ano").on(t.empresaId, t.mes, t.ano),
+  })
+);
+export type BalancoPatrimonialDados = typeof balanco_patrimonial_dados.$inferSelect;
+
+/**
+ * Uploads de arquivos Balanço Patrimonial (PDF/Excel).
+ */
+export const balanco_patrimonial_uploads = mysqlTable(
+  "balanco_patrimonial_uploads",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    empresaId: int("empresa_id").notNull(),
+    ano: int("ano").notNull(),
+    nomeArquivo: varchar("nome_arquivo", { length: 500 }).notNull(),
+    urlArquivo: text("url_arquivo").notNull(),
+    tipoArquivo: varchar("tipo_arquivo", { length: 20 }).notNull(), // pdf, xlsx, xls
+    status: mysqlEnum("status", ["processando", "revisao", "consolidado", "erro"]).default("processando").notNull(),
+    mensagemErro: text("mensagem_erro"),
+    dadosExtraidos: json("dados_extraidos"), // JSON com dados extraídos pela IA
+    confirmado: boolean("confirmado").default(false),
+    criadoPor: int("criado_por"),
+    criadoPorNome: varchar("criado_por_nome", { length: 255 }),
+    atualizadoPor: int("atualizado_por"),
+    atualizadoPorNome: varchar("atualizado_por_nome", { length: 255 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  }
+);
+export type BalancoPatrimonialUpload = typeof balanco_patrimonial_uploads.$inferSelect;
+
+/**
+ * Audit log para todas as alterações no módulo Balanço Patrimonial.
+ */
+export const balanco_patrimonial_audit_log = mysqlTable(
+  "balanco_patrimonial_audit_log",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    empresaId: int("empresa_id").notNull(),
+    balancoId: int("balanco_id"),
+    acao: mysqlEnum("acao", ["criar", "editar", "excluir", "importar", "consolidar"]).notNull(),
+    campoAlterado: varchar("campo_alterado", { length: 100 }),
+    valorAntes: text("valor_antes"),
+    valorDepois: text("valor_depois"),
+    descricao: text("descricao"),
+    usuarioId: int("usuario_id").notNull(),
+    usuarioNome: varchar("usuario_nome", { length: 255 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    idxEmpresa: index("idx_balanco_audit_empresa").on(t.empresaId),
+  })
+);
+export type BalancoPatrimonialAuditLog = typeof balanco_patrimonial_audit_log.$inferSelect;

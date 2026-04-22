@@ -1730,3 +1730,20 @@
 - [x] Vínculo empresa_area_vinculo criado (empresaId=1020002, areaId=30002)
 - [x] EmpresaCard atualizado para exibir logo da empresa quando disponível (logoUrl)
 - [x] Identidade Organizacional da UTU preenchida: Missão, Visão, Valores e Política
+
+
+## Módulo Balanço Patrimonial — Todas as Empresas
+
+- [ ] Schema: tabelas balanco_patrimonial_dados, balanco_patrimonial_uploads, balanco_patrimonial_audit_log
+- [ ] Migração do banco (pnpm db:push)
+- [ ] Router tRPC: getDados, salvarDados, getDadosConsolidados, getComparativo
+- [ ] Router tRPC: registrarUpload, processarArquivo (IA), confirmarImportacao
+- [ ] Router tRPC: calcularIndicadores (Liquidez, Solvência, ROA, ROE)
+- [ ] Página BalancoPatrimonial.tsx com 4 abas: Dashboard, Detalhado, Upload, Comparativo
+- [ ] Dashboard: KPIs (Ativo Total, Passivo, PL, Liquidez, Solvência), gráfico evolução, tabela resumida
+- [ ] Aba Detalhada: lançamento manual Ativo/Passivo/PL mês a mês
+- [ ] Aba Upload: drag-and-drop PDF/Excel com processamento IA e revisão
+- [ ] Aba Comparativo: seleção de 2+ anos, gráfico de evolução, tabela com variação %
+- [ ] Card Balanço Patrimonial na grade de módulos do planejamento
+- [ ] Rota /empresa/:empresaId/balanco-patrimonial no App.tsx
+- [ ] Testes vitest para indicadores e estrutura do módulo
