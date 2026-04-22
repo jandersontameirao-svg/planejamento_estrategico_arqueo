@@ -256,81 +256,98 @@ function AbaDashboard({ dados, totais, dadoConsolidado, dadosGrafico, isLoading,
   isLoading: boolean;
   anoSelecionado: number;
 }) {
-  const kpis = totais ? [
+  // Quando não há dados, usamos um objeto zerado para sempre exibir os KPIs
+  const dadoVazio: BalancoDados = {
+    id: 0, empresaId: 0, mes: 1, ano: anoSelecionado,
+    ativoTangivel: 0, ativoIntangivel: 0, amortizacao: 0,
+    clientes: 0, outrosAtivosFinanceiros: 0, outrosAtivosCorrentes: 0, caixaBancos: 0,
+    emprestimosObtidos: 0, provisoes: 0, fornecedores: 0,
+    outrosPassivosFinanceiros: 0, impostosAPagar: 0, outrasContasAPagar: 0, outrosPassivosCorrentes: 0,
+    capitalSocial: 0, reservas: 0, prestacoesSupplementares: 0,
+    resultadosTransitados: 0, resultadoLiquidoExercicio: 0,
+    status: "rascunho", observacoes: null,
+    createdAt: new Date(), updatedAt: new Date(),
+  };
+
+  const temDados = dados.length > 0;
+  const totaisExibir = totais ?? calcularTotais(dadoVazio);
+
+  const kpis = [
     {
       titulo: "Total do Ativo",
-      valor: fmt(totais.totalAtivo),
-      sub: `Corrente: ${fmt(totais.ativoCorrente)} | Não Corrente: ${fmt(totais.ativoNaoCorrente)}`,
+      valor: fmt(totaisExibir.totalAtivo),
+      sub: `Corrente: ${fmt(totaisExibir.ativoCorrente)} | Não Corrente: ${fmt(totaisExibir.ativoNaoCorrente)}`,
       icone: <Building2 className="w-5 h-5 text-blue-600" />,
-      cor: "blue",
-      status: null,
+      bgIcone: "bg-blue-50",
+      status: null as "verde" | "amarelo" | "vermelho" | null,
     },
     {
       titulo: "Total do Passivo",
-      valor: fmt(totais.totalPassivo),
-      sub: `Corrente: ${fmt(totais.passivoCorrente)} | Não Corrente: ${fmt(totais.passivoNaoCorrente)}`,
+      valor: fmt(totaisExibir.totalPassivo),
+      sub: `Corrente: ${fmt(totaisExibir.passivoCorrente)} | Não Corrente: ${fmt(totaisExibir.passivoNaoCorrente)}`,
       icone: <Wallet className="w-5 h-5 text-red-500" />,
-      cor: "red",
-      status: null,
+      bgIcone: "bg-red-50",
+      status: null as "verde" | "amarelo" | "vermelho" | null,
     },
     {
       titulo: "Patrimônio Líquido",
-      valor: fmt(totais.patrimonioLiquido),
-      sub: `${fmtPct(totais.autonomiaFinanceira)} do ativo total`,
+      valor: fmt(totaisExibir.patrimonioLiquido),
+      sub: `${fmtPct(totaisExibir.autonomiaFinanceira)} do ativo total`,
       icone: <Scale className="w-5 h-5 text-green-600" />,
-      cor: "green",
-      status: semaforo(totais.patrimonioLiquido, 1, 0),
+      bgIcone: "bg-green-50",
+      status: temDados ? semaforo(totaisExibir.patrimonioLiquido, 1, 0) : null,
     },
     {
       titulo: "Liquidez Corrente",
-      valor: totais.liquidezCorrente.toFixed(2),
-      sub: totais.liquidezCorrente >= 1.5 ? "Solvente" : totais.liquidezCorrente >= 1 ? "Atenção" : "Crítico",
+      valor: totaisExibir.liquidezCorrente.toFixed(2),
+      sub: !temDados ? "Sem dados" : totaisExibir.liquidezCorrente >= 1.5 ? "Solvente" : totaisExibir.liquidezCorrente >= 1 ? "Atenção" : "Crítico",
       icone: <TrendingUp className="w-5 h-5 text-orange-500" />,
-      cor: "orange",
-      status: semaforo(totais.liquidezCorrente, 1.5, 1.0),
+      bgIcone: "bg-orange-50",
+      status: temDados ? semaforo(totaisExibir.liquidezCorrente, 1.5, 1.0) : null,
     },
     {
       titulo: "Liquidez Imediata",
-      valor: totais.liquidezImediata.toFixed(2),
+      valor: totaisExibir.liquidezImediata.toFixed(2),
       sub: "Caixa / Passivo Corrente",
       icone: <Wallet className="w-5 h-5 text-purple-500" />,
-      cor: "purple",
-      status: semaforo(totais.liquidezImediata, 0.5, 0.2),
+      bgIcone: "bg-purple-50",
+      status: temDados ? semaforo(totaisExibir.liquidezImediata, 0.5, 0.2) : null,
     },
     {
       titulo: "Endividamento",
-      valor: fmtPct(totais.endividamento),
-      sub: `Autonomia: ${fmtPct(totais.autonomiaFinanceira)}`,
+      valor: fmtPct(totaisExibir.endividamento),
+      sub: `Autonomia: ${fmtPct(totaisExibir.autonomiaFinanceira)}`,
       icone: <AlertTriangle className="w-5 h-5 text-yellow-500" />,
-      cor: "yellow",
-      status: semaforo(totais.endividamento, 40, 60, true),
+      bgIcone: "bg-yellow-50",
+      status: temDados ? semaforo(totaisExibir.endividamento, 40, 60, true) : null,
     },
     {
       titulo: "Solvência Geral",
-      valor: totais.solvencia.toFixed(2),
-      sub: totais.solvencia >= 1.5 ? "Excelente" : totais.solvencia >= 1 ? "Adequada" : "Insuficiente",
+      valor: totaisExibir.solvencia.toFixed(2),
+      sub: !temDados ? "Sem dados" : totaisExibir.solvencia >= 1.5 ? "Excelente" : totaisExibir.solvencia >= 1 ? "Adequada" : "Insuficiente",
       icone: <CheckCircle className="w-5 h-5 text-teal-500" />,
-      cor: "teal",
-      status: semaforo(totais.solvencia, 1.5, 1.0),
+      bgIcone: "bg-teal-50",
+      status: temDados ? semaforo(totaisExibir.solvencia, 1.5, 1.0) : null,
     },
     {
-      titulo: "Capital de Giro",
-      valor: fmt(totais.ativoCorrente - totais.passivoCorrente),
+      titulo: "Capital de Giro Líquido",
+      valor: fmt(totaisExibir.ativoCorrente - totaisExibir.passivoCorrente),
       sub: "Ativo Corrente − Passivo Corrente",
       icone: <TrendingUp className="w-5 h-5 text-indigo-500" />,
-      cor: "indigo",
-      status: semaforo(totais.ativoCorrente - totais.passivoCorrente, 1, 0),
+      bgIcone: "bg-indigo-50",
+      status: temDados ? semaforo(totaisExibir.ativoCorrente - totaisExibir.passivoCorrente, 1, 0) : null,
     },
-  ] : [];
+  ];
 
   // Dados para gráfico de pizza (composição do ativo)
-  const pizzaAtivo = dadoConsolidado ? [
-    { name: "Ativo Tangível", value: n(dadoConsolidado.ativoTangivel) },
-    { name: "Ativo Intangível", value: n(dadoConsolidado.ativoIntangivel) },
-    { name: "Clientes (Receber)", value: n(dadoConsolidado.clientes) },
-    { name: "Caixa e Bancos", value: n(dadoConsolidado.caixaBancos) },
-    { name: "Outros Correntes", value: n(dadoConsolidado.outrosAtivosCorrentes) + n(dadoConsolidado.outrosAtivosFinanceiros) },
-  ].filter(d => d.value > 0) : [];
+  const dadoParaPizza = dadoConsolidado ?? dadoVazio;
+  const pizzaAtivo = [
+    { name: "Ativo Tangível", value: n(dadoParaPizza.ativoTangivel) },
+    { name: "Ativo Intangível", value: n(dadoParaPizza.ativoIntangivel) },
+    { name: "Clientes (Receber)", value: n(dadoParaPizza.clientes) },
+    { name: "Caixa e Bancos", value: n(dadoParaPizza.caixaBancos) },
+    { name: "Outros Correntes", value: n(dadoParaPizza.outrosAtivosCorrentes) + n(dadoParaPizza.outrosAtivosFinanceiros) },
+  ].filter(d => d.value > 0);
 
   if (isLoading) {
     return (
@@ -345,30 +362,109 @@ function AbaDashboard({ dados, totais, dadoConsolidado, dadosGrafico, isLoading,
 
   return (
     <div className="space-y-6">
-      {/* KPIs */}
+      {/* Banner informativo quando sem dados */}
+      {!temDados && (
+        <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center gap-3 text-sm text-blue-700">
+          <Info className="w-4 h-4 flex-shrink-0" />
+          <span>Nenhum dado lançado para <strong>{anoSelecionado}</strong>. Os indicadores abaixo exibem valores zerados. Importe na aba <strong>Upload</strong> ou lance manualmente em <strong>Detalhado</strong>.</span>
+        </div>
+      )}
+
+      {/* KPIs — sempre visíveis */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {kpis.length === 0 ? (
-          <div className="col-span-4 bg-white rounded-xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
-            <Scale className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="font-medium">Nenhum dado de Balanço Patrimonial para {anoSelecionado}</p>
-            <p className="text-sm mt-1">Importe dados na aba "Upload" ou lance manualmente na aba "Detalhado".</p>
-          </div>
-        ) : kpis.map((kpi) => (
-          <Card key={kpi.titulo} className="bg-white">
+        {kpis.map((kpi) => (
+          <Card key={kpi.titulo} className="bg-white shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div className="p-2 bg-gray-50 rounded-lg">{kpi.icone}</div>
-                {kpi.status && <SemaforoIcon status={kpi.status} />}
+              <div className="flex items-start justify-between mb-3">
+                <div className={`p-2 rounded-lg ${kpi.bgIcone}`}>{kpi.icone}</div>
+                {kpi.status ? (
+                  <SemaforoIcon status={kpi.status} />
+                ) : (
+                  <Minus className="w-4 h-4 text-gray-300" />
+                )}
               </div>
-              <p className="text-xs text-gray-500 mb-1">{kpi.titulo}</p>
-              <p className="text-xl font-bold text-gray-900">{kpi.valor}</p>
+              <p className="text-xs font-medium text-gray-500 mb-1">{kpi.titulo}</p>
+              <p className={`text-xl font-bold ${!temDados ? "text-gray-300" : "text-gray-900"}`}>{kpi.valor}</p>
               <p className="text-xs text-gray-400 mt-1">{kpi.sub}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {dados.length > 0 && (
+      {/* Estrutura resumida do Balanço — sempre visível */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Ativo */}
+        <Card className="bg-white shadow-sm">
+          <CardHeader className="pb-2 border-b border-blue-100">
+            <CardTitle className="text-sm font-semibold text-blue-700 flex items-center gap-2">
+              <Building2 className="w-4 h-4" /> ATIVO
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Não Corrente</span>
+              <span className={`font-medium ${!temDados ? "text-gray-300" : "text-gray-900"}`}>{fmt(totaisExibir.ativoNaoCorrente)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Corrente</span>
+              <span className={`font-medium ${!temDados ? "text-gray-300" : "text-gray-900"}`}>{fmt(totaisExibir.ativoCorrente)}</span>
+            </div>
+            <div className="flex justify-between text-sm font-bold border-t border-gray-100 pt-2 mt-2">
+              <span className="text-blue-700">Total Ativo</span>
+              <span className={`text-blue-700 ${!temDados ? "opacity-30" : ""}`}>{fmt(totaisExibir.totalAtivo)}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Passivo */}
+        <Card className="bg-white shadow-sm">
+          <CardHeader className="pb-2 border-b border-red-100">
+            <CardTitle className="text-sm font-semibold text-red-600 flex items-center gap-2">
+              <Wallet className="w-4 h-4" /> PASSIVO
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Não Corrente</span>
+              <span className={`font-medium ${!temDados ? "text-gray-300" : "text-gray-900"}`}>{fmt(totaisExibir.passivoNaoCorrente)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Corrente</span>
+              <span className={`font-medium ${!temDados ? "text-gray-300" : "text-gray-900"}`}>{fmt(totaisExibir.passivoCorrente)}</span>
+            </div>
+            <div className="flex justify-between text-sm font-bold border-t border-gray-100 pt-2 mt-2">
+              <span className="text-red-600">Total Passivo</span>
+              <span className={`text-red-600 ${!temDados ? "opacity-30" : ""}`}>{fmt(totaisExibir.totalPassivo)}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Patrimônio Líquido */}
+        <Card className="bg-white shadow-sm">
+          <CardHeader className="pb-2 border-b border-green-100">
+            <CardTitle className="text-sm font-semibold text-green-700 flex items-center gap-2">
+              <Scale className="w-4 h-4" /> PATRIMÔNIO LÍQUIDO
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Capital Social</span>
+              <span className={`font-medium ${!temDados ? "text-gray-300" : "text-gray-900"}`}>{fmt(n(dadoConsolidado?.capitalSocial))}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Resultado do Exercício</span>
+              <span className={`font-medium ${!temDados ? "text-gray-300" : "text-gray-900"}`}>{fmt(n(dadoConsolidado?.resultadoLiquidoExercicio))}</span>
+            </div>
+            <div className="flex justify-between text-sm font-bold border-t border-gray-100 pt-2 mt-2">
+              <span className="text-green-700">Total PL</span>
+              <span className={`text-green-700 ${!temDados ? "opacity-30" : ""}`}>{fmt(totaisExibir.patrimonioLiquido)}</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Gráficos — apenas quando há dados */}
+      {temDados && (
         <>
           {/* Gráfico de evolução */}
           <Card className="bg-white">
