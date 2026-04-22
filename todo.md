@@ -1729,3 +1729,4 @@
 - [x] Logo: https://utu.co.mz/wp-content/uploads/2024/01/lgutu.png (azul #224887 + laranja #E8632A)
 - [x] Vínculo empresa_area_vinculo criado (empresaId=1020002, areaId=30002)
 - [x] EmpresaCard atualizado para exibir logo da empresa quando disponível (logoUrl)
+- [x] Identidade Organizacional da UTU preenchida: Missão, Visão, Valores e Política
