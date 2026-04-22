@@ -1710,7 +1710,7 @@
 - [x] Capital de Giro: remover DashboardLayout, usar PageHeader padrão do sistema
 - [x] DRE: remover DashboardLayout, usar PageHeader padrão do sistema
 - [x] Ambos: sem sidebar, sem comparativos entre empresas (visão individualizada)
-- [ ] DRE: CMV visível apenas para Vinho 24h (empresa de produto); demais usam CSP
+- [x] DRE: CMV visível apenas para empresas de produto (tipoAtuacao=produtos/servicos_produtos); demais usam CSP
 
 ## Dashboard DRE — Histórico e Comparativo
 - [x] Aba Visão Geral: KPIs (Receita Líquida, EBITDA, Lucro Líquido, Margens) no topo

@@ -101,7 +101,7 @@ const LINHAS_TABELA = [
   { id: "receita_bruta", nome: "Receita Bruta", indent: 0, bold: true },
   { id: "deducoes_receita", nome: "(-) Deduções de Receita", indent: 1, bold: false },
   { id: "receita_liquida", nome: "= Receita Líquida", indent: 0, bold: true, highlight: true },
-  { id: "cmv_csp", nome: "(-) Custos (CMV / CSP)", indent: 1, bold: false },
+  { id: "cmv_csp", nome: "(-) Custos", indent: 1, bold: false },
   { id: "lucro_bruto", nome: "= Lucro Bruto", indent: 0, bold: true, highlight: true },
   { id: "despesas_operacionais", nome: "(-) Despesas Operacionais", indent: 1, bold: false },
   { id: "ebitda", nome: "= EBITDA", indent: 0, bold: true, highlight: true, destaque: true },
@@ -113,13 +113,13 @@ const LINHAS_TABELA = [
   { id: "lucro_liquido", nome: "= Lucro Líquido", indent: 0, bold: true, highlight: true, destaque: true },
 ];
 
-function getVal(acum: Record<string, number>, id: string) {
-  if (id === "cmv_csp") return acum.cmv || acum.csp || 0;
+function getVal(acum: Record<string, number>, id: string, isProduto?: boolean) {
+  if (id === "cmv_csp") return isProduto ? (acum.cmv || 0) : (acum.csp || 0);
   return acum[id] || 0;
 }
 
 // ─── Aba: Visão Geral / Dashboard ─────────────────────────────────────────────
-function AbaVisaoGeral({ empresaId, ano }: { empresaId: number; ano: number }) {
+function AbaVisaoGeral({ empresaId, ano, isProduto }: { empresaId: number; ano: number; isProduto: boolean }) {
   const { data: consolidado, isLoading } = trpc.dre.getDadosConsolidados.useQuery(
     { empresaId, ano, tipoLancamento: "realizado" },
     { enabled: empresaId > 0 },
@@ -208,8 +208,8 @@ function AbaVisaoGeral({ empresaId, ano }: { empresaId: number; ano: number }) {
           icon={<TrendingUp className="h-4 w-4" />}
         />
         <KpiCard
-          label="Custos (CMV/CSP)"
-          valor={acum.cmv || acum.csp || 0}
+          label={isProduto ? "Custo das Mercadorias (CMV)" : "Custo dos Serviços (CSP)"}
+          valor={isProduto ? (acum.cmv || 0) : (acum.csp || 0)}
           cor="orange"
           icon={<Activity className="h-4 w-4" />}
         />
@@ -302,7 +302,10 @@ function AbaVisaoGeral({ empresaId, ano }: { empresaId: number; ano: number }) {
             </TableHeader>
             <TableBody>
               {LINHAS_TABELA.map((linha) => {
-                const total = getVal(acum, linha.id);
+                const total = getVal(acum, linha.id, isProduto);
+                const nomeExibido = linha.id === "cmv_csp"
+                  ? (isProduto ? "(-) Custo das Mercadorias (CMV)" : "(-) Custo dos Serviços (CSP)")
+                  : linha.nome;
                 return (
                   <TableRow
                     key={linha.id}
@@ -312,12 +315,12 @@ function AbaVisaoGeral({ empresaId, ano }: { empresaId: number; ano: number }) {
                       className={`${linha.bold ? "font-semibold" : "text-muted-foreground"}`}
                       style={{ paddingLeft: linha.indent > 0 ? "1.5rem" : undefined }}
                     >
-                      {linha.nome}
+                      {nomeExibido}
                     </TableCell>
                     {Array.from({ length: 12 }, (_, i) => {
                       const m = i + 1;
                       const d = consolidado?.porMes?.[m] ?? {};
-                      const v = getVal(d, linha.id);
+                      const v = getVal(d, linha.id, isProduto);
                       return (
                         <TableCell
                           key={m}
@@ -536,7 +539,7 @@ function AbaUpload({ empresaId }: { empresaId: number }) {
 }
 
 // ─── Aba: Comparativo Anual ───────────────────────────────────────────────────
-function AbaComparativo({ empresaId }: { empresaId: number }) {
+function AbaComparativo({ empresaId, isProduto }: { empresaId: number; isProduto: boolean }) {
   const anoAtual = new Date().getFullYear();
   const [anos, setAnos] = useState<number[]>([anoAtual - 2, anoAtual - 1, anoAtual]);
 
@@ -661,7 +664,10 @@ function AbaComparativo({ empresaId }: { empresaId: number }) {
             </TableHeader>
             <TableBody>
               {LINHAS_TABELA.map((linha) => {
-                const valores = dadosPorAno.map((d) => getVal(d.acum, linha.id));
+                const nomeExibidoComp = linha.id === "cmv_csp"
+                  ? (isProduto ? "(-) Custo das Mercadorias (CMV)" : "(-) Custo dos Serviços (CSP)")
+                  : linha.nome;
+                const valores = dadosPorAno.map((d) => getVal(d.acum, linha.id, isProduto));
                 const ultimo = valores[valores.length - 1];
                 const penultimo = valores[valores.length - 2];
                 const variacao = penultimo !== 0 ? ((ultimo - penultimo) / Math.abs(penultimo)) * 100 : null;
@@ -671,7 +677,7 @@ function AbaComparativo({ empresaId }: { empresaId: number }) {
                       className={`${linha.bold ? "font-semibold" : "text-muted-foreground text-xs"}`}
                       style={{ paddingLeft: linha.indent > 0 ? "1.5rem" : undefined }}
                     >
-                      {linha.nome}
+                      {nomeExibidoComp}
                     </TableCell>
                     {valores.map((v, i) => (
                       <TableCell key={i} className={`text-right tabular-nums ${linha.bold ? "font-semibold" : ""} ${v < 0 ? "text-red-600" : ""}`}>
@@ -834,13 +840,13 @@ export default function DRE() {
             </TabsList>
 
             <TabsContent value="dashboard" className="mt-5">
-              <AbaVisaoGeral empresaId={empresaId} ano={ano} />
+              <AbaVisaoGeral empresaId={empresaId} ano={ano} isProduto={empresa?.tipoAtuacao === "produtos" || empresa?.tipoAtuacao === "servicos_produtos"} />
             </TabsContent>
             <TabsContent value="upload" className="mt-5">
               <AbaUpload empresaId={empresaId} />
             </TabsContent>
             <TabsContent value="comparativo" className="mt-5">
-              <AbaComparativo empresaId={empresaId} />
+              <AbaComparativo empresaId={empresaId} isProduto={empresa?.tipoAtuacao === "produtos" || empresa?.tipoAtuacao === "servicos_produtos"} />
             </TabsContent>
           </Tabs>
         </div>
