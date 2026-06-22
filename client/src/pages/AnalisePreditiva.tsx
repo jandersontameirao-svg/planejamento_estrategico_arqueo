@@ -85,7 +85,7 @@ export default function AnalisePreditiva({ empresaId }: AnalisePreditivaProps) {
       <header className="border-b bg-card sticky top-0 z-10">
         <div className="container flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={() => setLocation(`/empresa/${empresaId}`)}>
+            <Button variant="ghost" onClick={() => setLocation(`/empresa/${empresaId}/planejamento`)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar
             </Button>

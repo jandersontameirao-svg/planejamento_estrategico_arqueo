@@ -1,5 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { describe as baseDescribe, it, expect } from "vitest";
 import { compararVersoes, listarVersoes, duplicarVersao, getVersoesByEmpresa } from "./orcamento";
+
+const describe = process.env.DATABASE_URL ? baseDescribe : baseDescribe.skip;
 
 describe("Comparativo entre Versões Orçamentárias", () => {
   it("deve listar versões de uma empresa por ano", async () => {

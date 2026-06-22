@@ -133,7 +133,7 @@ export default function CapitalGiro() {
         {/* Breadcrumb / título da página */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
+            <Button variant="ghost" size="icon" onClick={() => navigate(`/empresa/${id}/planejamento`)}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>

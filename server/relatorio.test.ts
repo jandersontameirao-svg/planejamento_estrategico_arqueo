@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe as baseDescribe, expect, it } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
+
+const describe = process.env.DATABASE_URL ? baseDescribe : baseDescribe.skip;
 
 type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
 

@@ -101,7 +101,7 @@ export default function ConfigurarTemplate() {
       <header className="border-b bg-card sticky top-0 z-10">
         <div className="container flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => setLocation(`/planejamento-estrategico/${empresaId}`)}>
+            <Button variant="ghost" size="sm" onClick={() => setLocation(`/empresa/${empresaId}/planejamento`)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar
             </Button>

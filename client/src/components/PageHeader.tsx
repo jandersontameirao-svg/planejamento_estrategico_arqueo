@@ -7,18 +7,20 @@ interface PageHeaderProps {
   description?: string;
   showBack?: boolean;
   showHome?: boolean;
+  backUrl?: string;
 }
 
 export default function PageHeader({ 
   title, 
   description, 
   showBack = true, 
-  showHome = true 
+  showHome = true,
+  backUrl = "/",
 }: PageHeaderProps) {
   const [, setLocation] = useLocation();
 
   const handleBack = () => {
-    window.history.back();
+    setLocation(backUrl);
   };
 
   const handleHome = () => {

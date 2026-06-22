@@ -1,5 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { describe as baseDescribe, it, expect } from "vitest";
 import { appRouter } from "./routers";
+
+const describe = process.env.DATABASE_URL ? baseDescribe : baseDescribe.skip;
 
 function createAuthContext() {
   return {

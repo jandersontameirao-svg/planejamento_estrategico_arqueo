@@ -52,7 +52,7 @@ export default function AnaliseSwoTtows() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={() => setLocation(`/empresa/${empresaId}`)}>
+            <Button variant="outline" size="icon" onClick={() => setLocation(`/empresa/${empresaId}/planejamento`)}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-3">

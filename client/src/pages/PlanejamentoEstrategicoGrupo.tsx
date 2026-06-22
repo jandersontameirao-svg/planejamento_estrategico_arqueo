@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, Settings, SlidersHorizontal, DollarSign } from "lucide-react";
+import { Building2, BarChart3, Zap, Users, Target, TrendingUp, AlertCircle, Lightbulb, ChevronDown, ChevronUp, FileDown, SlidersHorizontal, DollarSign } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import PageHeaderWithBack from "@/components/PageHeaderWithBack";
 import { Link } from "wouter";
@@ -167,13 +167,6 @@ export default function PlanejamentoEstrategicoGrupo() {
       <div className="max-w-7xl mx-auto mt-6 space-y-4">
         {/* Botões de ação */}
         <div className="flex gap-4 mb-6">
-          <Link href="/configurar-template">
-            <Button variant="outline" className="gap-2">
-              <Settings className="h-4 w-4" />
-              Configurar Template de Relatórios
-            </Button>
-          </Link>
-
           {/* Botão para configurar metodologias */}
           <Dialog open={dialogMetodologias} onOpenChange={setDialogMetodologias}>
             <DialogTrigger asChild>

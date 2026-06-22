@@ -248,7 +248,7 @@ export default function AreasNegocio() {
                     variant="secondary" 
                     size="sm" 
                     className="w-full"
-                    onClick={() => setLocation(`/area/${area.id}/empresas`)}
+                    onClick={() => setLocation("/empresas")}
                   >
                     <Building2 className="mr-2 h-4 w-4" />
                     Ver Empresas

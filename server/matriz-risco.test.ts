@@ -1,5 +1,7 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe as baseDescribe, it, expect, beforeAll } from "vitest";
 import { appRouter } from "./routers";
+
+const describe = process.env.DATABASE_URL ? baseDescribe : baseDescribe.skip;
 
 describe("Matriz de Risco - Objetivos e Projetos", () => {
   let caller: ReturnType<typeof appRouter.createCaller>;

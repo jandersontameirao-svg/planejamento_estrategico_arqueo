@@ -439,7 +439,18 @@ export async function upsertKPIValor(data: {
 // Dashboard - Estatísticas consolidadas
 export async function getDashboardGrupo() {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) {
+    return {
+      totalEmpresas: 0,
+      empresasAtivas: 0,
+      totalKpis: 0,
+      statusRag: {
+        verde: 0,
+        amarelo: 0,
+        vermelho: 0,
+      },
+    };
+  }
   
   const { empresas, kpis, kpiValores } = await import("../drizzle/schema");
   

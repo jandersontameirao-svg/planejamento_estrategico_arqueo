@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
 import { invokeLLM } from "../_core/llm";
-import * as XLSX from "xlsx";
+import { extractWorkbookText } from "../utils/excel";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const pdfParse = require("pdf-parse");
@@ -310,12 +310,7 @@ export const orcamentoRouter = router({
           const parsed = await pdfParse(buffer);
           textoExtraido = parsed.text;
         } else if (arquivoTipo === "xlsx" || arquivoTipo === "xls") {
-          const wb = XLSX.read(buffer, { type: "buffer" });
-          const sheets = wb.SheetNames.map((name) => {
-            const ws = wb.Sheets[name];
-            return `=== Aba: ${name} ===\n` + XLSX.utils.sheet_to_csv(ws);
-          });
-          textoExtraido = sheets.join("\n\n");
+          textoExtraido = extractWorkbookText(buffer);
         } else {
           // CSV ou texto
           textoExtraido = buffer.toString("utf-8");
@@ -500,12 +495,7 @@ Retorne um JSON com a estrutura (sem markdown, apenas JSON puro):
           const parsed = await pdfParse(buffer);
           textoExtraido = parsed.text;
         } else if (arquivoTipo === "xlsx" || arquivoTipo === "xls") {
-          const wb = XLSX.read(buffer, { type: "buffer" });
-          const sheets = wb.SheetNames.map((name) => {
-            const ws = wb.Sheets[name];
-            return `=== Aba: ${name} ===\n` + XLSX.utils.sheet_to_csv(ws);
-          });
-          textoExtraido = sheets.join("\n\n");
+          textoExtraido = extractWorkbookText(buffer);
         } else {
           textoExtraido = buffer.toString("utf-8");
         }

@@ -1,7 +1,9 @@
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe as baseDescribe, expect, it, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 import { savePestelFatores, getPestelFatoresByEmpresa, saveSwotItems, getSwotItemsByEmpresa, saveOkrObjectives, getOkrObjectivesByEmpresa } from "./db";
+
+const describe = process.env.DATABASE_URL ? baseDescribe : baseDescribe.skip;
 
 type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
 

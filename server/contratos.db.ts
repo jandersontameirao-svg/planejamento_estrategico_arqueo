@@ -681,7 +681,22 @@ export async function getResultadoOperacional(empresaId: number, ano?: number) {
 // ─── PAINEL DE RISCOS E CLÁUSULAS ─────────────────────────────────────────
 
 export async function getPainelRiscos(empresaId?: number) {
-  const db = (await getDb())!;
+  const db = await getDb();
+  if (!db) {
+    return {
+      total: 0,
+      riscos: [],
+      porSeveridade: { baixa: 0, media: 0, alta: 0, critica: 0 },
+      porCategoria: {},
+      porStatus: {},
+      porEmpresa: {},
+      mapaCalor: {},
+      riscosCriticos: [],
+      riscosSemMitigacao: [],
+      geradosIA: 0,
+      geradosManuais: 0,
+    };
+  }
 
   // Buscar todos os riscos com dados do contrato
   const baseQuery = db
@@ -762,7 +777,17 @@ export async function getPainelRiscos(empresaId?: number) {
 }
 
 export async function getPainelClausulas(empresaId?: number) {
-  const db = (await getDb())!;
+  const db = await getDb();
+  if (!db) {
+    return {
+      totalContratos: 0,
+      totalContratosAnalisados: 0,
+      totalClausulas: 0,
+      clausulas: [],
+      porTipo: {},
+      porRelevancia: {},
+    };
+  }
 
   // Buscar contratos com dados extraídos por IA (campo dadosExtradosIA contém cláusulas)
   const baseQuery = db

@@ -7,7 +7,7 @@ import {
 } from "../../drizzle/schema";
 import { eq, and, desc, asc, sql, inArray, between, gte, lte } from "drizzle-orm";
 import { invokeLLM } from "../_core/llm";
-import * as XLSX from "xlsx";
+import { extractWorkbookText } from "../utils/excel";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const pdfParse = require("pdf-parse");
@@ -322,12 +322,7 @@ export const dreRouter = router({
           const parsed = await pdfParse(buffer);
           textoExtraido = parsed.text;
         } else if (input.arquivoTipo === "xlsx" || input.arquivoTipo === "xls") {
-          const wb = XLSX.read(buffer, { type: "buffer" });
-          const sheets = wb.SheetNames.map((name: string) => {
-            const ws = wb.Sheets[name];
-            return `=== Aba: ${name} ===\n` + XLSX.utils.sheet_to_csv(ws);
-          });
-          textoExtraido = sheets.join("\n\n");
+          textoExtraido = extractWorkbookText(buffer);
         } else {
           textoExtraido = buffer.toString("utf-8");
         }

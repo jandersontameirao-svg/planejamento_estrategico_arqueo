@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FileText, Download } from "lucide-react";
 import html2pdf from "html2pdf.js";
+import { escapeHtml } from "@/lib/escapeHtml";
 
 interface ExportadorPDFProps {
   tipo: "pestel" | "cinco_forcas" | "stakeholders" | "swot" | "okr" | "bsc" | "vrio" | "identidade";
@@ -12,13 +13,17 @@ interface ExportadorPDFProps {
 export function ExportadorPDF({ tipo, titulo, conteudo, dados }: ExportadorPDFProps) {
   const exportarIndividual = async () => {
     const elemento = document.createElement("div");
+    const dadosHtml = escapeHtml(JSON.stringify(dados, null, 2))
+      .replace(/\n/g, "<br>")
+      .replace(/ /g, "&nbsp;");
+
     elemento.innerHTML = `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h1 style="color: #333; border-bottom: 3px solid #f97316; padding-bottom: 10px;">${titulo}</h1>
+        <h1 style="color: #333; border-bottom: 3px solid #f97316; padding-bottom: 10px;">${escapeHtml(titulo)}</h1>
         <p style="color: #666; margin-top: 10px;">Gerado em: ${new Date().toLocaleString("pt-BR")}</p>
         <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
         <div style="margin-top: 20px;">
-          ${JSON.stringify(dados, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;")}
+          ${dadosHtml}
         </div>
       </div>
     `;
@@ -74,11 +79,11 @@ export function ExportadorConsolidado({ analises }: ExportadorConsolidadoProps) 
       conteudoHTML += `
         <div style="page-break-inside: avoid; margin-bottom: 30px;">
           <h2 style="color: #f97316; border-left: 4px solid #f97316; padding-left: 10px; margin-top: ${index > 0 ? '40px' : '0'};">
-            ${analise.titulo}
+            ${escapeHtml(analise.titulo)}
           </h2>
           <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px;">
             <pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 12px; color: #333;">
-${JSON.stringify(analise.dados, null, 2)}
+${escapeHtml(JSON.stringify(analise.dados, null, 2))}
             </pre>
           </div>
         </div>

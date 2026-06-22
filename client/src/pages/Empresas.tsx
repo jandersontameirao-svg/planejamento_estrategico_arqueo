@@ -9,11 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Building2, Edit, FileText, Plus, Shield, Trash2, Upload, Users, X } from "lucide-react";
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 
 export default function Empresas() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
@@ -156,7 +157,7 @@ export default function Empresas() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => window.history.back()}
+          onClick={() => setLocation("/")}
           className="h-10 w-10"
         >
           <ArrowLeft className="h-5 w-5" />

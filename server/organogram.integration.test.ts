@@ -1,5 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe as baseDescribe, it, expect } from "vitest";
 import { organogramClient } from "./integrations/organogramClient";
+
+const describe =
+  process.env.ORGANOGRAM_API_BASE_URL && process.env.ORGANOGRAM_INTERNAL_TOKEN
+    ? baseDescribe
+    : baseDescribe.skip;
 
 describe("OrganoArq Integration", () => {
   it("should fetch overview with valid credentials", async () => {

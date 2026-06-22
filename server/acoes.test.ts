@@ -1,6 +1,8 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe as baseDescribe, it, expect, beforeAll } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
+
+const describe = process.env.DATABASE_URL ? baseDescribe : baseDescribe.skip;
 
 describe("Módulo de Plano de Ação", () => {
   const mockContext: TrpcContext = {

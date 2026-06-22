@@ -14,6 +14,7 @@ import SwotLite from "./SwotLite";
 import OkrLite from "./OkrLite";
 import BscLite from "./BscLite";
 import html2pdf from "html2pdf.js";
+import { escapeHtml } from "@/lib/escapeHtml";
 
 interface AnaliseCard {
   id: string;
@@ -292,10 +293,10 @@ export default function PlanejamentoEstrategico({ empresaId = 1 }: PlanejamentoE
                 conteudoHTML += `
                   <div style="page-break-inside: avoid; margin-bottom: 30px;">
                     <h2 style="color: #f97316; border-left: 4px solid #f97316; padding-left: 10px; margin-top: ${index > 0 ? '40px' : '0'};">
-                      ${analise.titulo}
+                      ${escapeHtml(analise.titulo)}
                     </h2>
                     <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px;">
-                      <pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 12px; color: #333;">${content}</pre>
+                      <pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 12px; color: #333;">${escapeHtml(content)}</pre>
                     </div>
                   </div>
                 `;

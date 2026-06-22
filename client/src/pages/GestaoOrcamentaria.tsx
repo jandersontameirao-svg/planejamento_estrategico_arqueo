@@ -120,6 +120,7 @@ export default function GestaoOrcamentaria({ empresaId }: GestaoOrcamentariaProp
       <PageHeader
         title="Gestão Orçamentária"
         description="Planejamento, controle e análise orçamentária empresarial"
+        backUrl={`/empresa/${empresaId}/planejamento`}
       />
 
       <div className="container mx-auto py-6 space-y-6">
