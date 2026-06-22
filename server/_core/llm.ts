@@ -209,13 +209,22 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
+// LLM usa OpenAI por padrão. Pode ser sobrescrito por OPENAI_API_BASE_URL,
+// ou cair de volta para o proxy forge da Manus (BUILT_IN_FORGE_API_URL) se ainda usado.
+const resolveLlmBaseUrl = () =>
+  process.env.OPENAI_API_BASE_URL?.trim() ||
+  (ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
+    ? ENV.forgeApiUrl
+    : "https://api.openai.com");
+
+const resolveLlmApiKey = () =>
+  process.env.OPENAI_API_KEY?.trim() || ENV.forgeApiKey;
+
 const resolveApiUrl = () =>
-  ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
-    ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-    : "https://forge.manus.im/v1/chat/completions";
+  `${resolveLlmBaseUrl().replace(/\/$/, "")}/v1/chat/completions`;
 
 const assertApiKey = () => {
-  if (!ENV.forgeApiKey) {
+  if (!resolveLlmApiKey()) {
     throw new Error("OPENAI_API_KEY is not configured");
   }
 };
@@ -280,7 +289,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   } = params;
 
   const payload: Record<string, unknown> = {
-    model: "gemini-2.5-flash",
+    model: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
     messages: messages.map(normalizeMessage),
   };
 
@@ -296,10 +305,9 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     payload.tool_choice = normalizedToolChoice;
   }
 
-  payload.max_tokens = 32768
-  payload.thinking = {
-    "budget_tokens": 128
-  }
+  // OpenAI: limite de saída do gpt-4o/gpt-4o-mini é 16384. O parâmetro
+  // "thinking" não existe na OpenAI e causaria erro 400 — por isso foi removido.
+  payload.max_tokens = Number(process.env.OPENAI_MAX_TOKENS ?? 16384);
 
   const normalizedResponseFormat = normalizeResponseFormat({
     responseFormat,
@@ -316,7 +324,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
+      authorization: `Bearer ${resolveLlmApiKey()}`,
     },
     body: JSON.stringify(payload),
   });
