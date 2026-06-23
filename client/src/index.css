@@ -46,6 +46,12 @@
   /* Cores Grupo Arqueo - Laranja primário */
   --primary: oklch(0.65 0.18 45);  /* Laranja */
   --primary-foreground: oklch(1 0 0);
+  /* Paleta da marca Grupo Arqueo (uso direto via var) */
+  --brand-orange: #e8731c;
+  --brand-amber: #f5a623;
+  --brand-blue: #2b7cb3;
+  --brand-maroon: #9b1c1c;
+  --brand-gold: #c9a24b;
   --sidebar-primary: oklch(0.65 0.18 45);  /* Laranja */
   --sidebar-primary-foreground: oklch(1 0 0);
   /* Charts com cores do Grupo Arqueo */
@@ -71,7 +77,7 @@
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.623 0.214 259.815);
+  --ring: oklch(0.65 0.18 45);  /* Laranja da marca */
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.235 0.015 65);
   --sidebar-accent: oklch(0.967 0.001 286.375);

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Home } from "lucide-react";
 import { useLocation } from "wouter";
+import Logo10Anos from "@/components/Logo10Anos";
 
 interface PageHeaderProps {
   title: string;
@@ -63,6 +64,7 @@ export default function PageHeader({
               )}
             </div>
           </div>
+          <Logo10Anos height={40} className="hidden sm:block shrink-0" />
         </div>
       </div>
     </div>
