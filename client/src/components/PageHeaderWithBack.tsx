@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Building2 } from "lucide-react";
 import { Link } from "wouter";
+import Logo10Anos from "@/components/Logo10Anos";
 
 interface PageHeaderWithBackProps {
   title: string;
@@ -28,6 +29,7 @@ export default function PageHeaderWithBack({
               <div className="text-[#f97316]">ARQUEO</div>
             </div>
           </div>
+          <Logo10Anos height={38} className="ml-auto hidden sm:block" />
         </div>
 
         <div className="flex items-center justify-between">

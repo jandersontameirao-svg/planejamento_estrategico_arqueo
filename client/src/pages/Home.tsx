@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
+import Logo10Anos from "@/components/Logo10Anos";
 import { trpc } from "@/lib/trpc";
 import {
   Building2, LayoutDashboard, LogOut, CheckCircle2, Users,
@@ -206,9 +207,12 @@ export default function Home() {
               <img src="/logo-arqueo.png" alt="Grupo Arqueo" className="h-10 w-10" />
               <span className="text-xl font-bold bg-gradient-to-r from-primary via-orange-500 to-orange-600 bg-clip-text text-transparent">Grupo Arqueo</span>
             </div>
-            <Button asChild>
-              <a href={getLoginUrl()}>Entrar</a>
-            </Button>
+            <div className="flex items-center gap-4">
+              <Logo10Anos height={36} className="hidden sm:block" />
+              <Button asChild>
+                <a href={getLoginUrl()}>Entrar</a>
+              </Button>
+            </div>
           </div>
         </header>
 
