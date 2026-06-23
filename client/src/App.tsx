@@ -1,7 +1,9 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
+import type { ReactNode } from "react";
+import { useAuth } from "./_core/hooks/useAuth";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -148,6 +150,26 @@ function Router() {
 //   to keep consistent foreground/background color across components
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
+// Bloqueia o acesso a qualquer rota que nao seja publica enquanto nao houver login.
+function AuthGate({ children }: { children: ReactNode }) {
+  const [location] = useLocation();
+  const isPublic =
+    location === "/login" ||
+    location.startsWith("/portal-stakeholders") ||
+    location.startsWith("/aprovacao");
+  const { isAuthenticated, loading } = useAuth({ redirectOnUnauthenticated: !isPublic });
+
+  if (isPublic) return <>{children}</>;
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+        Carregando...
+      </div>
+    );
+  if (!isAuthenticated) return null; // redirecionando para /login
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -157,7 +179,9 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <AuthGate>
+            <Router />
+          </AuthGate>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

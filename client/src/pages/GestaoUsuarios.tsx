@@ -20,6 +20,7 @@ export default function GestaoUsuarios() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserSenha, setNewUserSenha] = useState("");
   const [newUserRole, setNewUserRole] = useState<"user" | "admin" | "gestor">("user");
 
   const { data: usuarios, isLoading, refetch } = trpc.usuarios.list.useQuery();
@@ -42,6 +43,7 @@ export default function GestaoUsuarios() {
       setIsCreateDialogOpen(false);
       setNewUserName("");
       setNewUserEmail("");
+      setNewUserSenha("");
       setNewUserRole("user");
       toast.success("Usuário criado com sucesso!");
     },
@@ -111,9 +113,14 @@ export default function GestaoUsuarios() {
       toast.error("Email é obrigatório");
       return;
     }
+    if (newUserSenha.trim().length < 6) {
+      toast.error("A senha deve ter ao menos 6 caracteres");
+      return;
+    }
     createUserMutation.mutate({
       name: newUserName,
       email: newUserEmail,
+      senha: newUserSenha,
       role: newUserRole,
     });
   };
@@ -216,6 +223,16 @@ export default function GestaoUsuarios() {
                         placeholder="email@exemplo.com"
                         value={newUserEmail}
                         onChange={(e) => setNewUserEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="senha">Senha de acesso</Label>
+                      <Input
+                        id="senha"
+                        type="password"
+                        placeholder="Mínimo 6 caracteres"
+                        value={newUserSenha}
+                        onChange={(e) => setNewUserSenha(e.target.value)}
                       />
                     </div>
                     <div className="space-y-2">

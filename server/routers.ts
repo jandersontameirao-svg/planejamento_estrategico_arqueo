@@ -35,16 +35,25 @@ export const appRouter = router({
         const { verifyAdminCredentials, ensureLocalAdmin } = await import(
           "./_core/localAuth"
         );
-        if (!verifyAdminCredentials(input.email, input.senha)) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "E-mail ou senha inválidos",
-          });
+        let session: { openId: string; name: string };
+        if (verifyAdminCredentials(input.email, input.senha)) {
+          // Admin raiz (definido no .env)
+          session = await ensureLocalAdmin(input.email);
+        } else {
+          // Usuário criado pelo admin (validado no banco)
+          const { getUserByEmail, verifyPassword } = await import("./db");
+          const user = await getUserByEmail(input.email);
+          if (!user || !user.passwordHash || !verifyPassword(input.senha, user.passwordHash)) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: "E-mail ou senha inválidos",
+            });
+          }
+          session = { openId: user.openId, name: user.name || user.email || "Usuário" };
         }
-        const admin = await ensureLocalAdmin(input.email);
         const { sdk } = await import("./_core/sdk");
         const token = await sdk.signSession(
-          { openId: admin.openId, appId: "local", name: admin.name },
+          { openId: session.openId, appId: "local", name: session.name },
           { expiresInMs: ONE_YEAR_MS }
         );
         const cookieOptions = getSessionCookieOptions(ctx.req);
@@ -311,6 +320,7 @@ export const appRouter = router({
         name: z.string().min(1, "Nome é obrigatório"),
         email: z.string().email("Email inválido"),
         role: z.enum(["user", "admin", "gestor"]),
+        senha: z.string().min(6, "Senha deve ter ao menos 6 caracteres"),
       }))
       .mutation(async ({ input, ctx }) => {
         if (ctx.user.role !== "admin") {

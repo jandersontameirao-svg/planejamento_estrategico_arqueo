@@ -1,4 +1,5 @@
 import { eq, and, desc } from "drizzle-orm";
+import crypto from "crypto";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, type InsertEmpresa, kpiValores, kpis, objetivosGrupo, type InsertObjetivoGrupo, objetivoGrupoKpis, projetosGrupo, type InsertProjetoGrupo, projetoGrupoKpis, acoesGrupo, type InsertAcaoGrupo, pestelPlanoAcao, type InsertPestelPlanoAcao, type PestelPlanoAcao } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -171,21 +172,43 @@ export async function updateUserRole(userId: number, role: "user" | "admin" | "g
   await db.update(users).set({ role }).where(eq(users.id, userId));
 }
 
-export async function createUser(data: { name: string; email: string; role: "user" | "admin" | "gestor" }) {
+export function hashPassword(senha: string): string {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.scryptSync(senha, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
+
+export function verifyPassword(senha: string, stored: string): boolean {
+  const [salt, hash] = (stored || "").split(":");
+  if (!salt || !hash) return false;
+  const hashBuf = Buffer.from(hash, "hex");
+  const test = crypto.scryptSync(senha, salt, 64);
+  return hashBuf.length === test.length && crypto.timingSafeEqual(hashBuf, test);
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select().from(users).where(eq(users.email, email.trim().toLowerCase()));
+  return rows[0] ?? null;
+}
+
+export async function createUser(data: { name: string; email: string; role: "user" | "admin" | "gestor"; senha: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
+
   // Gerar um openId único para usuários criados manualmente
   const openId = `manual_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-  
+
   const result = await db.insert(users).values({
     openId,
     name: data.name,
-    email: data.email,
+    email: data.email.trim().toLowerCase(),
     role: data.role,
     loginMethod: "manual",
+    passwordHash: hashPassword(data.senha),
   });
-  
+
   return { id: result[0].insertId };
 }
 
