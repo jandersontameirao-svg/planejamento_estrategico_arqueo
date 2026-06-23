@@ -42,7 +42,7 @@ export default function Login() {
 
         <div className="px-8 pb-8 pt-7">
           <div className="mb-7 flex flex-col items-center text-center">
-            <Logo10Anos height={96} className="mb-4 drop-shadow-sm" />
+            <Logo10Anos height={150} className="mb-5 drop-shadow-md" />
             <h1 className="text-2xl font-bold tracking-tight text-[#9b1c1c]">
               Planejamento Estratégico
             </h1>
