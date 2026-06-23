@@ -14,17 +14,11 @@ doc.rect(0, 0, sw, 9).fill(AMBER);
 doc.rect(sw, 0, sw, 9).fill(ORANGE);
 doc.rect(sw * 2, 0, sw, 9).fill(MAROON);
 
-// logo "A" vetorial da marca
-function drawA(x, y, s) {
-  doc.lineCap("round").lineWidth(0.18 * s);
-  doc.moveTo(x + 0.15 * s, y + s).lineTo(x + 0.5 * s, y).stroke(AMBER);
-  doc.moveTo(x + 0.5 * s, y).lineTo(x + 0.85 * s, y + s).stroke(ORANGE);
-  doc.circle(x + 0.5 * s, y + 0.72 * s, 0.12 * s).fill(BLUE);
-}
-drawA(M, 38, 58);
+// logo oficial do Grupo Arqueo
+doc.image("client/public/logo-arqueo.png", M, 34, { height: 62 });
 
-doc.fillColor(MAROON).font("Helvetica-Bold").fontSize(20).text("GRUPO ARQUEO", M + 78, 46);
-doc.fillColor(GOLD).font("Helvetica-Bold").fontSize(14).text("10 anos", M + 78, 70);
+doc.fillColor(MAROON).font("Helvetica-Bold").fontSize(20).text("GRUPO ARQUEO", M + 82, 46);
+doc.fillColor(GOLD).font("Helvetica-Bold").fontSize(14).text("10 anos", M + 82, 70);
 
 doc.fillColor("#222").font("Helvetica-Bold").fontSize(22).text("Planejamento Estratégico", M, 128);
 doc.fillColor("#555").font("Helvetica").fontSize(11).text("Como funciona o sistema e para que serve", M, 157);
