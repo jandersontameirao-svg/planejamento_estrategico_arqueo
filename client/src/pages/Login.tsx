@@ -29,11 +29,12 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 bg-gradient-to-br from-[#fff7ed] via-white to-[#eef4fa]">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 bg-gradient-to-br from-[#f6c89a] via-[#fde9d4] to-[#bcd6ea]">
       {/* manchas de cor da marca ao fundo */}
-      <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-[#e8731c]/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-[#2b7cb3]/20 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/3 right-1/4 h-64 w-64 rounded-full bg-[#f5a623]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-32 -left-32 h-[28rem] w-[28rem] rounded-full bg-[#e8731c]/45 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-32 -right-28 h-[28rem] w-[28rem] rounded-full bg-[#2b7cb3]/40 blur-3xl" />
+      <div className="pointer-events-none absolute top-1/4 right-1/3 h-80 w-80 rounded-full bg-[#f5a623]/35 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-1/4 left-1/4 h-72 w-72 rounded-full bg-[#9b1c1c]/15 blur-3xl" />
 
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-[#e8731c]/15 bg-white/80 shadow-2xl backdrop-blur-md">
         {/* faixa superior tri-cor da marca */}
