@@ -3,9 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Lock } from "lucide-react";
 import Logo10Anos from "@/components/Logo10Anos";
 
 export default function Login() {
@@ -31,19 +29,27 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="space-y-3 text-center">
-          <Logo10Anos className="mx-auto" height={64} />
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <Lock className="h-6 w-6 text-primary" />
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 bg-gradient-to-br from-[#fff7ed] via-white to-[#eef4fa]">
+      {/* manchas de cor da marca ao fundo */}
+      <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-[#e8731c]/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-[#2b7cb3]/20 blur-3xl" />
+      <div className="pointer-events-none absolute top-1/3 right-1/4 h-64 w-64 rounded-full bg-[#f5a623]/10 blur-3xl" />
+
+      <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-[#e8731c]/15 bg-white/80 shadow-2xl backdrop-blur-md">
+        {/* faixa superior tri-cor da marca */}
+        <div className="h-2 w-full bg-gradient-to-r from-[#f5a623] via-[#e8731c] to-[#9b1c1c]" />
+
+        <div className="px-8 pb-8 pt-7">
+          <div className="mb-7 flex flex-col items-center text-center">
+            <Logo10Anos height={96} className="mb-4 drop-shadow-sm" />
+            <h1 className="text-2xl font-bold tracking-tight text-[#9b1c1c]">
+              Planejamento Estratégico
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Grupo Arqueo · acesso restrito
+            </p>
           </div>
-          <CardTitle>Planejamento Estratégico</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Entre com suas credenciais de administrador
-          </p>
-        </CardHeader>
-        <CardContent>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
@@ -67,12 +73,16 @@ export default function Login() {
                 placeholder="••••••••"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={login.isPending}>
+            <Button
+              type="submit"
+              className="w-full bg-[#e8731c] font-semibold hover:bg-[#cf6417]"
+              disabled={login.isPending}
+            >
               {login.isPending ? "Entrando..." : "Entrar"}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
