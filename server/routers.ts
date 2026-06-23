@@ -1,4 +1,4 @@
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
@@ -29,6 +29,31 @@ export const appRouter = router({
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    login: publicProcedure
+      .input(z.object({ email: z.string().min(1), senha: z.string().min(1) }))
+      .mutation(async ({ input, ctx }) => {
+        const { verifyAdminCredentials, ensureLocalAdmin } = await import(
+          "./_core/localAuth"
+        );
+        if (!verifyAdminCredentials(input.email, input.senha)) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "E-mail ou senha inválidos",
+          });
+        }
+        const admin = await ensureLocalAdmin(input.email);
+        const { sdk } = await import("./_core/sdk");
+        const token = await sdk.signSession(
+          { openId: admin.openId, appId: "local", name: admin.name },
+          { expiresInMs: ONE_YEAR_MS }
+        );
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, {
+          ...cookieOptions,
+          maxAge: ONE_YEAR_MS,
+        });
+        return { success: true } as const;
+      }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });

@@ -22,7 +22,10 @@ export function getSessionCookieOptions(
     // causes browsers to reject or not send back the cookie on multi-level subdomains.
     httpOnly: true,
     path: "/",
-    sameSite: "none",
+    // Frontend e API sao servidos no MESMO dominio (self-host), entao "lax" e
+    // mais robusto que "none": nao depende do flag Secure pra ser aceito e
+    // protege melhor contra CSRF. "none" exigia HTTPS perfeito e causava loops.
+    sameSite: "lax",
     secure: isSecureRequest(req),
   };
 }
