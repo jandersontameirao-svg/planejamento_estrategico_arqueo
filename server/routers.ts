@@ -1331,40 +1331,45 @@ export const appRouter = router({
       }),
 
     saveForcas: protectedProcedure
-      .input(z.object({
-        empresaId: z.number(),
-        rivalidade: z.string().optional(),
-        fornecedores: z.string().optional(),
-        clientes: z.string().optional(),
-        substitutos: z.string().optional(),
-        novosEntrantes: z.string().optional(),
-      }))
+      .input(z.object({ empresaId: z.number(), dados: z.record(z.string(), z.any()) }))
       .mutation(async ({ input }) => {
-        return { success: true, message: "5 Forcas salvo" };
+        const { saveAnaliseGenerica } = await import("./db");
+        await saveAnaliseGenerica(input.empresaId, "cinco_forcas", input.dados);
+        return { success: true };
+      }),
+    getForcas: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAnaliseGenerica } = await import("./db");
+        return await getAnaliseGenerica(input.empresaId, "cinco_forcas");
       }),
 
     saveStakeholders: protectedProcedure
-      .input(z.object({
-        empresaId: z.number(),
-        altoPoder: z.string().optional(),
-        altoInteresse: z.string().optional(),
-        baixoPoder: z.string().optional(),
-        baixoInteresse: z.string().optional(),
-      }))
+      .input(z.object({ empresaId: z.number(), dados: z.record(z.string(), z.any()) }))
       .mutation(async ({ input }) => {
-        return { success: true, message: "Stakeholders salvo" };
+        const { saveAnaliseGenerica } = await import("./db");
+        await saveAnaliseGenerica(input.empresaId, "stakeholders", input.dados);
+        return { success: true };
+      }),
+    getStakeholders: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAnaliseGenerica } = await import("./db");
+        return await getAnaliseGenerica(input.empresaId, "stakeholders");
       }),
 
     saveRbvVrio: protectedProcedure
-      .input(z.object({
-        empresaId: z.number(),
-        valioso: z.string().optional(),
-        raro: z.string().optional(),
-        inimitavel: z.string().optional(),
-        organizado: z.string().optional(),
-      }))
+      .input(z.object({ empresaId: z.number(), dados: z.record(z.string(), z.any()) }))
       .mutation(async ({ input }) => {
-        return { success: true, message: "RBV/VRIO salvo" };
+        const { saveAnaliseGenerica } = await import("./db");
+        await saveAnaliseGenerica(input.empresaId, "vrio", input.dados);
+        return { success: true };
+      }),
+    getRbvVrio: protectedProcedure
+      .input(z.object({ empresaId: z.number() }))
+      .query(async ({ input }) => {
+        const { getAnaliseGenerica } = await import("./db");
+        return await getAnaliseGenerica(input.empresaId, "vrio");
       }),
 
     saveSwot: protectedProcedure

@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function AnaliseStakeholders() {
   const params = useParams();
@@ -17,6 +18,17 @@ export default function AnaliseStakeholders() {
   const [stakeholders, setStakeholders] = useState([
     { nome: "", poder: "medio", interesse: "medio", estrategia: "" },
   ]);
+
+  const saved = trpc.analises.getStakeholders.useQuery({ empresaId }, { enabled: empresaId > 0 });
+  useEffect(() => {
+    const arr = (saved.data as any)?.stakeholders;
+    if (Array.isArray(arr) && arr.length) setStakeholders(arr);
+  }, [saved.data]);
+
+  const salvar = trpc.analises.saveStakeholders.useMutation({
+    onSuccess: () => toast.success("Stakeholders salvos!"),
+    onError: (e) => toast.error(e.message || "Erro ao salvar"),
+  });
 
   const addStakeholder = () => {
     setStakeholders([...stakeholders, { nome: "", poder: "medio", interesse: "medio", estrategia: "" }]);
@@ -177,8 +189,10 @@ export default function AnaliseStakeholders() {
 
         {/* Botões de Ação */}
         <div className="flex gap-2">
-          <Button variant="outline">Cancelar</Button>
-          <Button className="bg-orange-600 hover:bg-orange-700">Salvar Análise</Button>
+          <Button variant="outline" onClick={() => setLocation(`/empresa/${empresaId}/planejamento`)}>Cancelar</Button>
+          <Button className="bg-orange-600 hover:bg-orange-700" disabled={salvar.isPending} onClick={() => salvar.mutate({ empresaId, dados: { stakeholders } })}>
+            {salvar.isPending ? "Salvando..." : "Salvar Análise"}
+          </Button>
         </div>
       </div>
     </div>

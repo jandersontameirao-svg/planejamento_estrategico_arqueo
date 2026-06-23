@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function CincoForcasPorter() {
   const params = useParams();
@@ -26,6 +27,16 @@ export default function CincoForcasPorter() {
     rivalidadeCompetidores: "",
     intensidadeRivalidade: "media",
     observacoes: "",
+  });
+
+  const saved = trpc.analises.getForcas.useQuery({ empresaId }, { enabled: empresaId > 0 });
+  useEffect(() => {
+    if (saved.data) setFormData((prev) => ({ ...prev, ...(saved.data as any) }));
+  }, [saved.data]);
+
+  const salvar = trpc.analises.saveForcas.useMutation({
+    onSuccess: () => toast.success("Análise das 5 Forças salva!"),
+    onError: (e) => toast.error(e.message || "Erro ao salvar"),
   });
 
   const forcas = [
@@ -121,9 +132,10 @@ export default function CincoForcasPorter() {
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Intensidade</label>
-                  <select 
+                  <select
                     className="w-full border rounded px-3 py-2"
                     value={formData[`intensidade${forca.key.charAt(0).toUpperCase() + forca.key.slice(1)}` as keyof typeof formData] || "media"}
+                    onChange={(e) => setFormData({ ...formData, [`intensidade${forca.key.charAt(0).toUpperCase() + forca.key.slice(1)}`]: e.target.value })}
                   >
                     <option value="baixa">Baixa</option>
                     <option value="media">Média</option>
@@ -149,8 +161,10 @@ export default function CincoForcasPorter() {
               className="min-h-32"
             />
             <div className="flex gap-2 mt-4">
-              <Button variant="outline">Cancelar</Button>
-              <Button className="bg-orange-600 hover:bg-orange-700">Salvar Análise</Button>
+              <Button variant="outline" onClick={() => setLocation(`/empresa/${empresaId}/planejamento`)}>Cancelar</Button>
+              <Button className="bg-orange-600 hover:bg-orange-700" disabled={salvar.isPending} onClick={() => salvar.mutate({ empresaId, dados: formData })}>
+                {salvar.isPending ? "Salvando..." : "Salvar Análise"}
+              </Button>
             </div>
           </CardContent>
         </Card>

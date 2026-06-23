@@ -2102,3 +2102,17 @@ export const balanco_patrimonial_audit_log = mysqlTable(
   })
 );
 export type BalancoPatrimonialAuditLog = typeof balanco_patrimonial_audit_log.$inferSelect;
+
+// Analises estrategicas genericas (5 Forcas, Stakeholders, VRIO) — 1 registro por empresa+tipo.
+export const analisesEstrategicas = mysqlTable(
+  "analises_estrategicas",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    empresaId: int("empresaId").notNull(),
+    tipo: varchar("tipo", { length: 40 }).notNull(),
+    dados: json("dados").notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({ uniqEmpresaTipo: unique("uniq_analise_empresa_tipo").on(t.empresaId, t.tipo) })
+);
+export type AnaliseEstrategica = typeof analisesEstrategicas.$inferSelect;

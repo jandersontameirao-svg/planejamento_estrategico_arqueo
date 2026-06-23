@@ -1983,3 +1983,26 @@ export async function getEmpresasNaoVinculadasArea(areaId: number) {
   
   return await db.select().from(empresas);
 }
+
+// ─── Analises estrategicas genericas (5 Forcas, Stakeholders, VRIO) ───
+export async function saveAnaliseGenerica(empresaId: number, tipo: string, dados: unknown) {
+  const db = await getDb();
+  if (!db) return;
+  const { analisesEstrategicas } = await import("../drizzle/schema");
+  await db
+    .insert(analisesEstrategicas)
+    .values({ empresaId, tipo, dados: dados as any })
+    .onDuplicateKeyUpdate({ set: { dados: dados as any } });
+}
+
+export async function getAnaliseGenerica(empresaId: number, tipo: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const { analisesEstrategicas } = await import("../drizzle/schema");
+  const { and, eq } = await import("drizzle-orm");
+  const rows = await db
+    .select()
+    .from(analisesEstrategicas)
+    .where(and(eq(analisesEstrategicas.empresaId, empresaId), eq(analisesEstrategicas.tipo, tipo)));
+  return (rows[0]?.dados as Record<string, unknown> | undefined) ?? null;
+}

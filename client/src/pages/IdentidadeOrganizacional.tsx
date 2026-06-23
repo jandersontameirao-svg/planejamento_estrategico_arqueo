@@ -177,31 +177,15 @@ export default function IdentidadeOrganizacional({ empresaId }: IdentidadeOrgani
   };
 
   const handleSaveForcas = () => {
-    saveForcasMutation.mutate({
-      empresaId,
-      rivalidade: forcasData.rivalidade,
-      fornecedores: forcasData.fornecedores,
-      clientes: forcasData.clientes,
-      novosEntrantes: forcasData.novosEntrantes,
-      substitutos: forcasData.substitutos,
-    });
+    saveForcasMutation.mutate({ empresaId, dados: { ...forcasData } });
   };
 
   const handleSaveStakeholders = () => {
-    saveStakeholdersMutation.mutate({
-      empresaId,
-      ...stakeholdersData,
-    });
+    saveStakeholdersMutation.mutate({ empresaId, dados: { ...stakeholdersData } });
   };
 
   const handleSaveRbvVrio = () => {
-    saveRbvVrioMutation.mutate({
-      empresaId,
-      valioso: rbvData.valioso,
-      raro: rbvData.raro,
-      inimitavel: rbvData.inimitavel,
-      organizado: rbvData.organizado,
-    });
+    saveRbvVrioMutation.mutate({ empresaId, dados: { ...rbvData } });
   };
 
   const handleSaveSwotTows = () => {

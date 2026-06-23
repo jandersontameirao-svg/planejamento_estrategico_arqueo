@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function AnaliseRbvVrio() {
   const params = useParams();
@@ -17,6 +18,17 @@ export default function AnaliseRbvVrio() {
   const [recursos, setRecursos] = useState([
     { recurso: "", valioso: false, raro: false, inimitavel: false, organizado: false, descricao: "" },
   ]);
+
+  const saved = trpc.analises.getRbvVrio.useQuery({ empresaId }, { enabled: empresaId > 0 });
+  useEffect(() => {
+    const arr = (saved.data as any)?.recursos;
+    if (Array.isArray(arr) && arr.length) setRecursos(arr);
+  }, [saved.data]);
+
+  const salvar = trpc.analises.saveRbvVrio.useMutation({
+    onSuccess: () => toast.success("Análise VRIO salva!"),
+    onError: (e) => toast.error(e.message || "Erro ao salvar"),
+  });
 
   const addRecurso = () => {
     setRecursos([...recursos, { recurso: "", valioso: false, raro: false, inimitavel: false, organizado: false, descricao: "" }]);
@@ -220,7 +232,9 @@ export default function AnaliseRbvVrio() {
         {/* Botões de Ação */}
         <div className="flex gap-2">
           <Button variant="outline">Cancelar</Button>
-          <Button className="bg-orange-600 hover:bg-orange-700">Salvar Análise</Button>
+          <Button className="bg-orange-600 hover:bg-orange-700" disabled={salvar.isPending} onClick={() => salvar.mutate({ empresaId, dados: { recursos } })}>
+            {salvar.isPending ? "Salvando..." : "Salvar Análise"}
+          </Button>
         </div>
       </div>
     </div>
