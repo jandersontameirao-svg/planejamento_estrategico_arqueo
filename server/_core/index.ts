@@ -9,7 +9,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { sdk } from "./sdk";
 import { serveStatic, setupVite } from "./vite";
-import { storagePut } from "../storage";
+import { storagePut, UPLOAD_DIR } from "../storage";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -116,6 +116,9 @@ async function startServer() {
   };
   app.post("/api/upload-pdf", requireUploadUser, upload.single("file"), handleUpload);
   app.post("/api/upload", requireUploadUser, upload.single("file"), handleUpload);
+
+  // Serve arquivos enviados (PDFs de contrato, imagens, etc.) a partir do disco local.
+  app.use("/uploads", express.static(UPLOAD_DIR));
 
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
